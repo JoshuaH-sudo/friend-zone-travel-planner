@@ -27,3 +27,154 @@ body {
   --rdp-range_middle-background-color: #d32c2c84; 
   --rdp-range_end-date-background-color: #d32c2c;
 }
+
+/* Import your colors and mixins manually as CSS */
+.rdp {
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.temp-range {
+  box-shadow: none;
+  background-color: #d32c2c;
+}
+
+.rdp-wrapper {
+  padding: 0;
+}
+
+.rdp-wrapper:focus {
+  outline: none;
+}
+
+.rdp-wrapper:before {
+  content: '';
+  display: block;
+  border-top: 1px solid #e0e0e0; /* Replace with $color-gray-1 */
+  position: relative;
+  top: calc(48px + 1px);
+}
+
+.rdp-day,
+.rdp-Caption > div {
+  font-size: 14px;
+}
+
+.rdp-Weekday,
+.rdp-Caption > div,
+.rdp-day--firstDayFromRange,
+.rdp-day--lastDayFromRange,
+.rdp-day--today {
+  font-weight: 600;
+}
+
+.rdp-Caption {
+  /* display: flex; */
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  text-transform: capitalize;
+}
+
+.rdp-Caption > div {
+  /* display: flex; */
+  align-items: center;
+  height: 48px;
+}
+
+.rdp-Weekdays {
+  margin: 0;
+  padding: 15px 0 6px 0;
+}
+
+.rdp-Weekday {
+  font-size: 10px;
+  color: #a0a0a0; /* Replace with $color-gray-2 */
+  padding: 0;
+  width: 32px; /* Replace $day-square */
+}
+
+/* .rdp-Month {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 25px 25px 25px;
+} */
+
+.rdp-NavBar {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  padding: 0 25px;
+  color: #a0a0a0; /* Replace with $color-gray-2 */
+}
+
+.rdp-NavBar svg {
+  width: 20px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.rdp-NavBar svg:hover {
+  color: #007bff; /* Replace with $color-blue */
+}
+
+.rdp-Week {
+  display: flex;
+  margin: 9px 0;
+}
+
+.rdp-day {
+  height: 32px; /* Replace $day-square */
+  padding: 0;
+  border-radius: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.rdp-day:hover {
+  background-color: #007bff; /* Replace with $color-blue */
+  color: #fff !important; /* Replace with $color-white */
+}
+
+.rdp-day:focus {
+  outline: none;
+}
+
+.rdp-day--selected {
+  color: #fff !important;
+  background-color: #007bff !important;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+  filter: opacity(0.8);
+}
+
+.rdp-day--first-day-from-range,
+.rdp-day--last-day-from-range {
+  border-top: 0px solid #fff;
+  border-bottom: 0px solid #fff;
+  border-radius: 5px;
+  filter: opacity(1);
+}
+
+.rdp-day--today {
+  color: #ff0000 !important; /* Replace with $color-red */
+}
+
+.rdp-day--already-in-range:hover {
+  background-color: #ff0000 !important;
+  color: #fff !important;
+  filter: opacity(1);
+}
+
+.rdp-day--outside {
+  color: #fff !important;
+  background-color: #fff !important;
+}
+
+.rdp-day--outside:hover {
+  color: #fff !important;
+  background-color: #fff !important;
+}
