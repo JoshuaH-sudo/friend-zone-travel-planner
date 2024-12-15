@@ -1,6 +1,9 @@
 "use client";
-import { DateRange, DayPicker } from "react-day-picker";
-import { addDays } from "date-fns";
+import { DateRange, DayPicker, DayPickerProps } from "react-day-picker";
+import { useEffect, useState } from "react";
+import { DateRangeNullable } from "./types";
+import service from "./services";
+import { addDayToRange, isDayInRange } from "./DateUtils";
 
 type DateRangeModifier = {
   range_start: Date[];
@@ -18,7 +21,7 @@ type DateRangeModifier = {
  * - `range_end`: An array of end dates from the provided date ranges.
  * - `range_middle`: An array of objects representing the middle date ranges, each containing an `after` and `before` date.
  */
-export function dateRangeModifiers(ranges: DateRange[]) {
+export function dateRangeModifiers(ranges: DateRange[]): DateRangeModifier {
   return ranges.reduce<DateRangeModifier>(
     (prev, curr) => ({
       // Add the 'from' date to range_start if it exists
@@ -41,16 +44,70 @@ export function dateRangeModifiers(ranges: DateRange[]) {
   );
 }
 
+const dateRangeNullableDefault: DateRangeNullable = {
+  from: null,
+  to: null,
+};
+
 const Calender = () => {
-  const dateRang1: DateRange = { from: new Date(), to: addDays(new Date(), 3)};
-  const dateRang2: DateRange = {
-    from: addDays(new Date(), 9),
-    to: addDays(new Date(), 14),
+  const [tempRange, setTempRange] = useState<DateRangeNullable>({
+    from: null,
+    to: null,
+  });
+  const [ranges, setRanges] = useState<DateRange[]>([]);
+  const [lastDayMouseEnter, setLastDayMouseEnter] = useState<
+    DateRange["to"] | null
+  >(null);
+
+  useEffect(() => {
+    if (!!tempRange.from && !!tempRange.to) {
+      const { shouldIncrease, increasedRanges } = service.increaseSmallerRanges(
+        tempRange,
+        ranges,
+      );
+      setRanges(
+        shouldIncrease ? increasedRanges : [...ranges, tempRange as DateRange],
+      );
+    }
+  }, [tempRange]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setTempRange(dateRangeNullableDefault);
+    setLastDayMouseEnter(null);
+  }, [ranges]);
+
+  const handleDayClick: DayPickerProps["onDayClick"] = (day, modifiers) => {
+    const { selected } = modifiers;
+    const isDayInHoverRange = isDayInRange(day, {
+      from: tempRange.from,
+      to: lastDayMouseEnter,
+    });
+
+    // Clicking logic:
+    // 1. startDate    -> selected: undefined, isDayInHoverRange: null
+    // 2. endDate      -> selected: true,      isDayInHoverRange: true
+    // 3. remove range -> selected: true,      isDayInHoverRange: null
+    if (!selected || isDayInHoverRange) {
+      setTempRange(addDayToRange(day, tempRange as DateRange));
+    } else {
+      const filteredRanges = ranges.filter(
+        (r: DateRange) => !isDayInRange(day, r),
+      );
+      setRanges(filteredRanges);
+    }
   };
-  const ranges = [dateRang1, dateRang2];
+
+  const handleDayMouseEnter: DayPickerProps["onDayMouseEnter"] = (day) => {
+    const { from, to } = tempRange;
+    if (!service.isSelectingFirstDay(from, to, day)) {
+      setLastDayMouseEnter(day);
+    }
+  };
+
   return (
     <DayPicker
-      mode="range"
+      onDayMouseEnter={handleDayMouseEnter}
+      onDayClick={handleDayClick}
       modifiers={dateRangeModifiers(ranges)}
       //@ts-expect-error multiple date ranges are unsupported in the react-day-picker library
       selected={ranges}
