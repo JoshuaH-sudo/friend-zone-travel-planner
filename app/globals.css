@@ -19,3 +19,11 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.rdp-root {
+  --rdp-accent-color: indigo;
+  --rdp-accent-background-color: #f0f0f0; 
+  --rdp-range_start-date-background-color: #d32c2c;
+  --rdp-range_middle-background-color: #d32c2c84; 
+  --rdp-range_end-date-background-color: #d32c2c;
+}
