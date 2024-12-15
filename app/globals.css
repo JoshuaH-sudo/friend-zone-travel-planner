@@ -34,9 +34,38 @@ body {
   border-radius: 0;
 }
 
-.temp-range {
+.rdp-day:hover {
+  background-color: #007bff; /* Replace with $color-blue */
+  color: #fff !important; /* Replace with $color-white */
+  border-radius: 5px;
+}
+
+.temp-range_start {
+  background-color: var(--rdp-range_start-date-background-color);
   box-shadow: none;
-  background-color: #d32c2c;
+  filter: opacity(0.8)
+}
+.temp-range_start > .rdp-day_button {
+  border-radius: 10px !important;
+}
+.temp-range_middle  {
+  box-shadow: none;
+  color: #fff !important;
+  border: unset;
+  border-radius: unset;
+  border-top: 4px solid #0a0a0a;
+  border-bottom: 4px solid #0a0a0a;
+  background-color: var(--rdp-range_middle-background-color);
+  filter: opacity(0.8);
+}
+.temp-range_end {
+  background-color: var(--rdp-range_end-date-background-color);
+  box-shadow: none;
+  border-radius: 10px !important;
+  filter: opacity(0.8)
+}
+.temp-range_end > .rdp-day_button {
+  border-radius: 10px !important;
 }
 
 .rdp-wrapper {
@@ -132,11 +161,6 @@ body {
   padding: 0;
   border-radius: 0;
   transition: all 0.2s ease-in-out;
-}
-
-.rdp-day:hover {
-  background-color: #007bff; /* Replace with $color-blue */
-  color: #fff !important; /* Replace with $color-white */
 }
 
 .rdp-day:focus {

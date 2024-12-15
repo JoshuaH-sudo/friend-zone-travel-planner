@@ -65,7 +65,9 @@ const Calender = () => {
     );
     return {
       ...range_modifiers,
-      tempRange: tempRangeToMouse,
+      tempRange_start: tempRange.from ? [tempRange.from] : [],
+      tempRange_middle: tempRange.from && lastDayMouseEnter ? [{ after: tempRange.from, before: lastDayMouseEnter }] : [],
+      tempRange_end: lastDayMouseEnter ? [lastDayMouseEnter] : [],
     };
   }
   useEffect(() => {
@@ -119,7 +121,7 @@ const Calender = () => {
       onDayClick={handleDayClick}
       modifiers={dateRangeModifiers(ranges)}
       // We add a class name to match with a modifier that we defined.
-      modifiersClassNames={{ tempRange: "temp-range" }}
+      modifiersClassNames={{ tempRange_start: "temp-range_start", tempRange_middle: "temp-range_middle", tempRange_end: "temp-range_end" }}
       //@ts-expect-error multiple date ranges are unsupported in the react-day-picker library
       selected={[tempRangeToMouse, ...ranges]}
     />
