@@ -1,6 +1,6 @@
 "use client";
 import { DateRange, DayPicker, DayPickerProps } from "react-day-picker";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { DateRangeNullable } from "./types";
 import service from "./services";
 import { addDayToRange, isDayInRange } from "./DateUtils";
@@ -10,25 +10,16 @@ type DateRangeModifier = {
   range_middle: { after: Date; before: Date }[];
   range_end: Date[];
 };
-/**
- * Generates date range modifiers from an array of date ranges.
- *
- * @param {DateRange[]} ranges - An array of date ranges.
- * @returns {DateRangeModifier} An object containing arrays of start dates, end dates, and middle date ranges.
- *
- * The returned object has the following structure:
- * - `range_start`: An array of start dates from the provided date ranges.
- * - `range_end`: An array of end dates from the provided date ranges.
- * - `range_middle`: An array of objects representing the middle date ranges, each containing an `after` and `before` date.
- */
-
 
 const dateRangeNullableDefault: DateRangeNullable = {
   from: null,
   to: null,
 };
 
-const Calender = () => {
+interface SelectCalenderProps {
+  onChange: (dateRanges: DateRange[]) => void;
+}
+const SelectCalender: FC<SelectCalenderProps> = ({ onChange }) => {
   const [tempRange, setTempRange] = useState<DateRangeNullable>({
     from: null,
     to: null,
@@ -38,10 +29,14 @@ const Calender = () => {
     DateRange["to"] | null
   >(null);
 
+  useEffect(() => {
+    onChange(ranges);
+  }, [ranges, onChange]);
+
   const tempRangeToMouse: DateRange = {
     from: tempRange.from!,
     to: lastDayMouseEnter!,
-  }
+  };
   function dateRangeModifiers(ranges: DateRange[]) {
     const range_modifiers = ranges.reduce<DateRangeModifier>(
       (prev, curr) => ({
@@ -66,7 +61,10 @@ const Calender = () => {
     return {
       ...range_modifiers,
       tempRange_start: tempRange.from ? [tempRange.from] : [],
-      tempRange_middle: tempRange.from && lastDayMouseEnter ? [{ after: tempRange.from, before: lastDayMouseEnter }] : [],
+      tempRange_middle:
+        tempRange.from && lastDayMouseEnter
+          ? [{ after: tempRange.from, before: lastDayMouseEnter }]
+          : [],
       tempRange_end: lastDayMouseEnter ? [lastDayMouseEnter] : [],
     };
   }
@@ -121,11 +119,15 @@ const Calender = () => {
       onDayClick={handleDayClick}
       modifiers={dateRangeModifiers(ranges)}
       // We add a class name to match with a modifier that we defined.
-      modifiersClassNames={{ tempRange_start: "temp-range_start", tempRange_middle: "temp-range_middle", tempRange_end: "temp-range_end" }}
+      modifiersClassNames={{
+        tempRange_start: "temp-range_start",
+        tempRange_middle: "temp-range_middle",
+        tempRange_end: "temp-range_end",
+      }}
       //@ts-expect-error multiple date ranges are unsupported in the react-day-picker library
       selected={[tempRangeToMouse, ...ranges]}
     />
   );
 };
 
-export default Calender;
+export default SelectCalender;
