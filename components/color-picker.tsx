@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {useTranslations} from 'next-intl';
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslations } from "next-intl";
 
 interface ColorPickerProps {
-  color: string
-  onChange: (color: string) => void
+  color: string;
+  onChange: (color: string) => void;
 }
 
 const COLORS = [
@@ -24,16 +24,16 @@ const COLORS = [
   "#8b5cf6", // violet
   "#d946ef", // fuchsia
   "#ec4899", // pink
-]
+];
 
 export function ColorPicker({ color, onChange }: ColorPickerProps) {
   const t = useTranslations();
-  const [customColor, setCustomColor] = useState(color)
+  const [customColor, setCustomColor] = useState(color);
 
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomColor(e.target.value)
-    onChange(e.target.value)
-  }
+    setCustomColor(e.target.value);
+    onChange(e.target.value);
+  };
 
   return (
     <Tabs defaultValue="preset" className="w-full">
@@ -50,7 +50,9 @@ export function ColorPicker({ color, onChange }: ColorPickerProps) {
               type="button"
               className={cn(
                 "h-8 w-8 rounded-full border-2 transition-all",
-                color === c ? "border-black dark:border-white scale-110" : "border-transparent hover:scale-110",
+                color === c
+                  ? "border-black dark:border-white scale-110"
+                  : "border-transparent hover:scale-110",
               )}
               style={{ backgroundColor: c }}
               onClick={() => onChange(c)}
@@ -62,7 +64,10 @@ export function ColorPicker({ color, onChange }: ColorPickerProps) {
 
       <TabsContent value="custom" className="pt-2 space-y-2">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full border" style={{ backgroundColor: customColor }} />
+          <div
+            className="h-8 w-8 rounded-full border"
+            style={{ backgroundColor: customColor }}
+          />
           <Input
             type="color"
             value={customColor}
@@ -79,9 +84,10 @@ export function ColorPicker({ color, onChange }: ColorPickerProps) {
             pattern="^#[0-9A-Fa-f]{6}$"
           />
         </div>
-        <p className="text-xs text-muted-foreground">Enter a hex color code (e.g., #FF5500) or use the color picker</p>
+        <p className="text-xs text-muted-foreground">
+          Enter a hex color code (e.g., #FF5500) or use the color picker
+        </p>
       </TabsContent>
     </Tabs>
-  )
+  );
 }
-

@@ -1,26 +1,32 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import type { Friend } from "@/lib/types"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ColorPicker } from "./color-picker"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Globe } from "lucide-react"
-import {useTranslations} from 'next-intl';
+import { useState } from "react";
+import type { Friend } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ColorPicker } from "./color-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AddFriendFormProps {
-  onAddFriend: (friend: Friend) => void
-  onCancel: () => void
+  onAddFriend: (friend: Friend) => void;
+  onCancel: () => void;
 }
 
 export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
-  const [name, setName] = useState("")
-  const [color, setColor] = useState("#3b82f6")
-  const [timezone, setTimezone] = useState("UTC")
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("#3b82f6");
+  const [timezone, setTimezone] = useState("UTC");
   const t = useTranslations();
 
   // Common timezones
@@ -35,10 +41,10 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
     "Asia/Tokyo",
     "Australia/Sydney",
     "Pacific/Auckland",
-  ]
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (name.trim()) {
       onAddFriend({
         id: crypto.randomUUID(),
@@ -46,12 +52,12 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
         color,
         timezone,
         availableDates: [],
-      })
-      setName("")
-      setColor("#3b82f6")
-      setTimezone("UTC")
+      });
+      setName("");
+      setColor("#3b82f6");
+      setTimezone("UTC");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,6 +105,5 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
         </Button>
       </div>
     </form>
-  )
+  );
 }
-

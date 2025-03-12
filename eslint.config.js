@@ -7,6 +7,8 @@ export default {
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended"
-  ]
+    "plugin:react/recommended",
+    "next",
+    "prettier",
+  ],
 };

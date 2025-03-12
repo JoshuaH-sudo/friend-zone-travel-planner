@@ -1,54 +1,60 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { parseIcalFile } from "@/lib/ical"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import type { Friend } from "@/lib/types"
-import { ColorPicker } from "./color-picker"
-import { Download, Loader2 } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {useTranslations} from 'next-intl';
+import { useState } from "react";
+import { parseIcalFile } from "@/lib/ical";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { Friend } from "@/lib/types";
+import { ColorPicker } from "./color-picker";
+import { Download, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface ImportCalendarProps {
-  onImport: (friend: Friend) => void
-  onCancel: () => void
+  onImport: (friend: Friend) => void;
+  onCancel: () => void;
 }
 
 export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
   const t = useTranslations();
-  const [file, setFile] = useState<File | null>(null)
-  const [name, setName] = useState("")
-  const [color, setColor] = useState("#3b82f6")
-  const [timezone, setTimezone] = useState("UTC")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("#3b82f6");
+  const [timezone, setTimezone] = useState("UTC");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
-      setError(null)
+      setFile(e.target.files[0]);
+      setError(null);
     }
-  }
+  };
 
   const handleImport = async () => {
     if (!file) {
-      setError("Please select a file to import")
-      return
+      setError("Please select a file to import");
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const { name: calendarName, dates } = await parseIcalFile(file)
+      const { name: calendarName, dates } = await parseIcalFile(file);
 
       // Use the calendar name from the file if no custom name is provided
-      const friendName = name.trim() || calendarName
+      const friendName = name.trim() || calendarName;
 
       onImport({
         id: crypto.randomUUID(),
@@ -56,13 +62,15 @@ export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
         color,
         timezone,
         availableDates: dates,
-      })
+      });
     } catch (err) {
-      setError("Failed to parse the iCal file. Please make sure it's a valid .ics file.")
+      setError(
+        "Failed to parse the iCal file. Please make sure it's a valid .ics file.",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Common timezones
   const timezones = [
@@ -76,14 +84,22 @@ export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
     "Asia/Tokyo",
     "Australia/Sydney",
     "Pacific/Auckland",
-  ]
+  ];
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="calendar-file">{t("calendar.icalFile")}</Label>
-        <Input id="calendar-file" type="file" accept=".ics" onChange={handleFileChange} className="cursor-pointer" />
-        <p className="text-xs text-muted-foreground">{t("calendar.importCalendarDescription")}</p>
+        <Input
+          id="calendar-file"
+          type="file"
+          accept=".ics"
+          onChange={handleFileChange}
+          className="cursor-pointer"
+        />
+        <p className="text-xs text-muted-foreground">
+          {t("calendar.importCalendarDescription")}
+        </p>
       </div>
 
       {error && (
@@ -124,10 +140,19 @@ export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isLoading}
+        >
           {t("actions.cancel")}
         </Button>
-        <Button onClick={handleImport} disabled={!file || isLoading} className="gap-2">
+        <Button
+          onClick={handleImport}
+          disabled={!file || isLoading}
+          className="gap-2"
+        >
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -142,6 +167,5 @@ export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }
-
