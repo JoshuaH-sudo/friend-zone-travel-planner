@@ -1,0 +1,90 @@
+{
+  "app": {
+    "title": "Friend Availability Planner",
+    "groupNamePlaceholder": "Enter group name",
+    "noFriendsTitle": "No friends added yet",
+    "noFriendsDescription": "Add friends and their availability to see when everyone is free for your next hangout."
+  },
+  "navigation": {
+    "home": "Home",
+    "calendars": "Friend Calendars",
+    "overview": "Availability Overview"
+  },
+  "actions": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "import": "Import",
+    "export": "Export",
+    "addFriend": "Add Friend",
+    "importCalendar": "Import Calendar",
+    "exportCalendars": "Export Calendars",
+    "saveState": "Save State",
+    "restoreState": "Restore State"
+  },
+  "friend": {
+    "name": "Friend Name",
+    "namePlaceholder": "Enter friend's name",
+    "nameOptional": "Friend Name (Optional)",
+    "nameFromFile": "Leave blank to use name from file",
+    "color": "Calendar Color",
+    "timezone": "Timezone",
+    "availableDays": "{{count}} day selected",
+    "availableDaysPlural": "{{count}} days selected",
+    "remove": "Remove {{name}}?",
+    "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone."
+  },
+  "calendar": {
+    "exportAll": "Export All Calendars",
+    "exportIndividual": "Export Individual Calendars",
+    "importCalendarDescription": "Upload an iCal file to import availability dates",
+    "exportDescription": "Export calendars to iCal format (.ics) to use in other calendar applications",
+    "icalFile": "iCal File (.ics)",
+    "everyone": "Everyone",
+    "available": "Available:",
+    "noOneAvailable": "No one is available",
+    "presetColors": "Preset Colors",
+    "customColor": "Custom Color"
+  },
+  "state": {
+    "saveStateDescription": "Save the current state of all calendars to a file",
+    "restoreStateDescription": "Restore calendars from a previously saved file",
+    "stateFile": "State File (.json)",
+    "importing": "Importing...",
+    "exporting": "Exporting..."
+  },
+  "landing": {
+    "title": "Plan Events with Friends",
+    "titleHighlight": "Effortlessly",
+    "subtitle": "Coordinate schedules across different timezones and find the perfect day for your next hangout, meeting, or event.",
+    "startPlanning": "Start Planning Now",
+    "features": "Key Features",
+    "readyToStart": "Ready to Get Started?",
+    "readyDescription": "Plan your next event with friends in minutes, not hours.",
+    "goToPlanner": "Go to Planner",
+    "copyright": "© {{year}} Friend Planner. All rights reserved.",
+    "featureManagement": {
+      "title": "Friend Management",
+      "description": "Add friends, assign colors, and track everyone's availability in one place."
+    },
+    "featureTimezone": {
+      "title": "Timezone Support",
+      "description": "Coordinate across different timezones with built-in timezone selection for each friend."
+    },
+    "featureOverview": {
+      "title": "Availability Overview",
+      "description": "See at a glance which days work best for everyone with our visual availability overview."
+    },
+    "featureImport": {
+      "title": "Import Calendars",
+      "description": "Import existing calendars from iCal files to quickly set up availability."
+    },
+    "featureExport": {
+      "title": "Export to iCal",
+      "description": "Export individual or combined calendars to use in your favorite calendar app."
+    }
+  }
+}
+
