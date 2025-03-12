@@ -3,11 +3,10 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Calendar, Users, Clock, Upload, Download, Globe } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 export default function LandingPage() {
-  const { t } = useTranslation()
-  const currentYear = new Date().getFullYear()
+  const t = useTranslations();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -102,7 +101,6 @@ export default function LandingPage() {
 
       <footer className="border-t py-8 bg-muted/30">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>{t("landing.copyright", { year: currentYear.toString() })}</p>
         </div>
       </footer>
     </div>

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Save, Upload, Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface StateManagerProps {
   currentState: AppState
@@ -17,7 +17,7 @@ interface StateManagerProps {
 }
 
 export function StateManager({ currentState, onRestoreState }: StateManagerProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { ColorPicker } from "./color-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Globe } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface EditFriendFormProps {
   friend: Friend
@@ -19,7 +19,7 @@ interface EditFriendFormProps {
 }
 
 export function EditFriendForm({ friend, onSave, onCancel }: EditFriendFormProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
   const [name, setName] = useState(friend.name)
   const [color, setColor] = useState(friend.color)
   const [timezone, setTimezone] = useState(friend.timezone)

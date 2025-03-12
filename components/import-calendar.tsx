@@ -12,7 +12,7 @@ import { ColorPicker } from "./color-picker"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface ImportCalendarProps {
   onImport: (friend: Friend) => void
@@ -20,7 +20,7 @@ interface ImportCalendarProps {
 }
 
 export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
   const [file, setFile] = useState<File | null>(null)
   const [name, setName] = useState("")
   const [color, setColor] = useState("#3b82f6")

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { ColorPicker } from "./color-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Globe } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface AddFriendFormProps {
   onAddFriend: (friend: Friend) => void
@@ -21,7 +21,7 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
   const [name, setName] = useState("")
   const [color, setColor] = useState("#3b82f6")
   const [timezone, setTimezone] = useState("UTC")
-  const { t } = useTranslation()
+  const t = useTranslations();
 
   // Common timezones
   const timezones = [

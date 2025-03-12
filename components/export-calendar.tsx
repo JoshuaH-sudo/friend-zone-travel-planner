@@ -4,7 +4,7 @@ import type { Friend } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { generateFriendIcal, generateCombinedIcal, downloadFile } from "@/lib/ical"
 import { Upload } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface ExportCalendarProps {
   friends: Friend[]
@@ -12,7 +12,7 @@ interface ExportCalendarProps {
 }
 
 export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
 
   const exportSingleCalendar = (friend: Friend) => {
     const icalContent = generateFriendIcal(friend)

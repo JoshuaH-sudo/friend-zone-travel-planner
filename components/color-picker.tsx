@@ -6,7 +6,7 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface ColorPickerProps {
   color: string
@@ -27,7 +27,7 @@ const COLORS = [
 ]
 
 export function ColorPicker({ color, onChange }: ColorPickerProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
   const [customColor, setCustomColor] = useState(color)
 
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {

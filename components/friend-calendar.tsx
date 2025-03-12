@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label"
 import { generateFriendIcal, downloadFile } from "@/lib/ical"
 import { EditFriendForm } from "./edit-friend-form"
-import { useTranslation } from "react-i18next"
+import {useTranslations} from 'next-intl';
 
 interface FriendCalendarProps {
   friend: Friend
@@ -38,7 +38,7 @@ export function FriendCalendar({
   onUpdateTimezone,
   onUpdateFriend,
 }: FriendCalendarProps) {
-  const { t } = useTranslation()
+  const t = useTranslations();
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [isDragging, setIsDragging] = useState(false)
   const [dragStartDate, setDragStartDate] = useState<Date | null>(null)
