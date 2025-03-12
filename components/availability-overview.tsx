@@ -114,8 +114,7 @@ export function AvailabilityOverview({ friends }: AvailabilityOverviewProps) {
                         <div className='mt-auto flex flex-wrap justify-center gap-1'>
                           {availableCount === friends.length &&
                           friends.length > 0 ? (
-                            <Badge className='bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500'
-                            >
+                            <Badge className='bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500'>
                               Everyone
                             </Badge>
                           ) : (

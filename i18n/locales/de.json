@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Freund Zone Reiseplaner",
+    "groupNamePlaceholder": "Gruppennamen eingeben",
+    "noFriendsTitle": "Noch keine Freunde hinzugefügt",
+    "noFriendsDescription": "Fügen Sie Freunde und deren Verfügbarkeit hinzu, um zu sehen, wann alle für Ihr nächstes Treffen frei sind.",
+    "theme": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
+  },
+  "navigation": {
+    "home": "Startseite",
+    "calendars": "Freund Kalender",
+    "overview": "Verfügbarkeitsübersicht"
+  },
+  "actions": {
+    "add": "Hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "import": "Importieren",
+    "export": "Exportieren",
+    "addFriend": "Freund hinzufügen",
+    "importCalendar": "Kalender importieren",
+    "exportCalendars": "Kalender exportieren",
+    "saveState": "Zustand speichern",
+    "restoreState": "Zustand wiederherstellen"
+  },
+  "friend": {
+    "name": "Freund Name",
+    "namePlaceholder": "Name des Freundes eingeben",
+    "nameOptional": "Freund Name (Optional)",
+    "nameFromFile": "Leer lassen, um den Namen aus der Datei zu verwenden",
+    "color": "Kalenderfarbe",
+    "timezone": "Zeitzone",
+    "availableDays": "{{count}} Tag ausgewählt",
+    "availableDaysPlural": "{{count}} Tage ausgewählt",
+    "remove": "{{name}} entfernen?",
+    "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "calendar": {
+    "exportAll": "Alle Kalender exportieren",
+    "exportIndividual": "Einzelne Kalender exportieren",
+    "importCalendarDescription": "Laden Sie eine iCal-Datei hoch, um Verfügbarkeitsdaten zu importieren",
+    "exportDescription": "Kalender im iCal-Format (.ics) exportieren, um sie in anderen Kalenderanwendungen zu verwenden",
+    "icalFile": "iCal-Datei (.ics)",
+    "everyone": "Alle",
+    "available": "Verfügbar:",
+    "noOneAvailable": "Niemand ist verfügbar",
+    "presetColors": "Voreingestellte Farben",
+    "customColor": "Benutzerdefinierte Farbe"
+  },
+  "state": {
+    "saveStateDescription": "Speichern Sie den aktuellen Zustand aller Kalender in einer Datei",
+    "restoreStateDescription": "Stellen Sie Kalender aus einer zuvor gespeicherten Datei wieder her",
+    "stateFile": "Zustandsdatei (.json)",
+    "importing": "Importieren...",
+    "exporting": "Exportieren..."
+  },
+  "landing": {
+    "title": "Veranstaltungen mit Freunden planen",
+    "titleHighlight": "Mühelos",
+    "subtitle": "Koordinieren Sie Zeitpläne über verschiedene Zeitzonen hinweg und finden Sie den perfekten Tag für Ihr nächstes Treffen, Meeting oder Event.",
+    "startPlanning": "Jetzt planen",
+    "features": "Hauptmerkmale",
+    "readyToStart": "Bereit zu beginnen?",
+    "readyDescription": "Planen Sie Ihr nächstes Event mit Freunden in Minuten, nicht Stunden.",
+    "goToPlanner": "Zum Planer",
+    "featureManagement": {
+      "title": "Freund Verwaltung",
+      "description": "Fügen Sie Freunde hinzu, weisen Sie Farben zu und verfolgen Sie die Verfügbarkeit aller an einem Ort."
+    },
+    "featureTimezone": {
+      "title": "Zeitzonenunterstützung",
+      "description": "Koordinieren Sie über verschiedene Zeitzonen hinweg mit integrierter Zeitzonenauswahl für jeden Freund."
+    },
+    "featureOverview": {
+      "title": "Verfügbarkeitsübersicht",
+      "description": "Sehen Sie auf einen Blick, welche Tage für alle am besten passen, mit unserer visuellen Verfügbarkeitsübersicht."
+    },
+    "featureImport": {
+      "title": "Kalender importieren",
+      "description": "Importieren Sie vorhandene Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
+    },
+    "featureExport": {
+      "title": "In iCal exportieren",
+      "description": "Exportieren Sie einzelne oder kombinierte Kalender, um sie in Ihrer bevorzugten Kalender-App zu verwenden."
+    }
+  }
+}
