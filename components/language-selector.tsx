@@ -1,68 +1,72 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTranslations } from 'next-intl';
-import { routing } from '@/i18n/routing';
-import { redirect } from '@/i18n/navigation';
-import NavigationLink from './navigation-link';
+import { useState, useEffect, useTransition } from "react"
+import { Button } from "@/components/ui/button"
+import { Globe } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useTranslations } from "next-intl"
+import {usePathname, useRouter} from '@/i18n/navigation';
+import {useParams} from 'next/navigation';
 
 // Define available languages
 const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'de', name: 'Deutsch' },
-];
+  { code: "en", name: "English" },
+  { code: "de", name: "Deutsch" },
+]
 
 export function LanguageSwitcher() {
   const t = useTranslations();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false)
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const pathname = usePathname();
+  const params = useParams();
 
   // Avoid hydration mismatch by only rendering after mount
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
-  const changeLanguage = async (lng: string) => {
-    await redirect;
-  };
+  const changeLanguage = async (locale: string) => {
+    startTransition(() => {
+      router.replace(
+        // @ts-expect-error -- TypeScript will validate that only known `params`
+        // are used in combination with a given `pathname`. Since the two will
+        // always match for the current route, we can skip runtime checks.
+        {pathname, params},
+        {locale}
+      );
+    });
+  }
 
   if (!mounted) {
     return (
-      <Button variant='ghost' size='icon' className='h-9 w-9'>
-        <Globe className='h-4 w-4' />
-        <span className='sr-only'>{t('language.switch')}</span>
+      <Button variant="ghost" size="icon" className="w-9 h-9">
+        <Globe className="h-4 w-4" />
+        <span className="sr-only">{t("language.switch")}</span>
       </Button>
-    );
+    )
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon' className='h-9 w-9'>
-          <Globe className='h-4 w-4' />
-          <span className='sr-only'>{t('language.switch')}</span>
+        <Button variant="ghost" size="icon" className="w-9 h-9">
+          <Globe className="h-4 w-4" />
+          <span className="sr-only">{t("language.switch")}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
+      <DropdownMenuContent align="end">
         {languages.map((language) => (
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
-            // className={i18n.language === language.code ? "bg-muted" : ""}
           >
-            <NavigationLink href={`/${language.code}`}>
-              {language.name}
-            </NavigationLink>
+            {language.name}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }
+
