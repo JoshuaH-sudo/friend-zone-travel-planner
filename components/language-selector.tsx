@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
     return (
       <Button variant="ghost" size="icon" className="w-9 h-9">
         <Globe className="h-4 w-4" />
-        <span className="sr-only">{t("language.switch")}</span>
+        <span className="sr-only">switch</span>
       </Button>
     )
   }
@@ -53,7 +53,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="w-9 h-9">
           <Globe className="h-4 w-4" />
-          <span className="sr-only">{t("language.switch")}</span>
+          <span className="sr-only">switch</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
