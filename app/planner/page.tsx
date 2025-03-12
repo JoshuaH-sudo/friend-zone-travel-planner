@@ -26,6 +26,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PlannerPage() {
   const t = useTranslations();
@@ -160,6 +161,8 @@ export default function PlannerPage() {
               <PlusCircle className='h-4 w-4' />
               {t('actions.addFriend')}
             </Button>
+
+            <ThemeToggle />
           </div>
         </div>
 

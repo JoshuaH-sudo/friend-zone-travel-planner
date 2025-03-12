@@ -3,7 +3,12 @@
     "title": "Friend Zone Travel Planner",
     "groupNamePlaceholder": "Enter group name",
     "noFriendsTitle": "No friends added yet",
-    "noFriendsDescription": "Add friends and their availability to see when everyone is free for your next hangout."
+    "noFriendsDescription": "Add friends and their availability to see when everyone is free for your next hangout.",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "navigation": {
     "home": "Home",
