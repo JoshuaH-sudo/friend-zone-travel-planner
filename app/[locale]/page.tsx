@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/language-selector';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -16,9 +18,11 @@ export default function LandingPage() {
             <Calendar className='h-6 w-6 text-primary' />
             <span className='text-xl font-bold'>{t('app.title')}</span>
           </div>
-          <Link href='/planner'>
-            <Button>{t('actions.add')}</Button>
-          </Link>
+          <div className='flex gap-4'>
+            <LanguageSwitcher />
+                        
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

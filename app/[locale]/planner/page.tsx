@@ -163,9 +163,9 @@ export default function PlannerPage() {
               {t('actions.addFriend')}
             </Button>
 
-            <ThemeToggle />
-
             <LanguageSwitcher />
+            
+            <ThemeToggle />
           </div>
         </div>
 
