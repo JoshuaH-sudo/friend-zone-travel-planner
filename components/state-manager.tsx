@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   type AppState,
   downloadStateFile,
   readStateFile,
-} from "@/lib/json-export";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Save, Upload, Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+} from '@/lib/json-export';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Save, Upload, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface StateManagerProps {
   currentState: AppState;
@@ -42,7 +42,7 @@ export function StateManager({
 
   const handleImport = async () => {
     if (!file) {
-      setError("Please select a file to import");
+      setError('Please select a file to import');
       return;
     }
 
@@ -54,7 +54,7 @@ export function StateManager({
       onRestoreState(state);
     } catch (err) {
       setError(
-        "Failed to parse the state file. Please make sure it's a valid JSON file.",
+        "Failed to parse the state file. Please make sure it's a valid JSON file."
       );
     } finally {
       setIsLoading(false);
@@ -62,37 +62,37 @@ export function StateManager({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">{t("actions.saveState")}</h3>
-        <p className="text-sm text-muted-foreground">
-          {t("state.saveStateDescription")}
+    <div className='space-y-6'>
+      <div className='space-y-4'>
+        <h3 className='text-lg font-medium'>{t('actions.saveState')}</h3>
+        <p className='text-sm text-muted-foreground'>
+          {t('state.saveStateDescription')}
         </p>
-        <Button onClick={handleExport} className="gap-2">
-          <Save className="h-4 w-4" />
-          {t("actions.saveState")}
+        <Button onClick={handleExport} className='gap-2'>
+          <Save className='h-4 w-4' />
+          {t('actions.saveState')}
         </Button>
       </div>
 
-      <div className="border-t pt-6 space-y-4">
-        <h3 className="text-lg font-medium">{t("actions.restoreState")}</h3>
-        <p className="text-sm text-muted-foreground">
-          {t("state.restoreStateDescription")}
+      <div className='space-y-4 border-t pt-6'>
+        <h3 className='text-lg font-medium'>{t('actions.restoreState')}</h3>
+        <p className='text-sm text-muted-foreground'>
+          {t('state.restoreStateDescription')}
         </p>
 
-        <div className="space-y-2">
-          <Label htmlFor="state-file">{t("state.stateFile")}</Label>
+        <div className='space-y-2'>
+          <Label htmlFor='state-file'>{t('state.stateFile')}</Label>
           <Input
-            id="state-file"
-            type="file"
-            accept=".json"
+            id='state-file'
+            type='file'
+            accept='.json'
             onChange={handleFileChange}
-            className="cursor-pointer"
+            className='cursor-pointer'
           />
         </div>
 
         {error && (
-          <Alert variant="destructive">
+          <Alert variant='destructive'>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -100,17 +100,17 @@ export function StateManager({
         <Button
           onClick={handleImport}
           disabled={!file || isLoading}
-          className="gap-2"
+          className='gap-2'
         >
           {isLoading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t("state.importing")}
+              <Loader2 className='h-4 w-4 animate-spin' />
+              {t('state.importing')}
             </>
           ) : (
             <>
-              <Upload className="h-4 w-4" />
-              {t("actions.restoreState")}
+              <Upload className='h-4 w-4' />
+              {t('actions.restoreState')}
             </>
           )}
         </Button>

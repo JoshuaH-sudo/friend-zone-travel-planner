@@ -1,5 +1,5 @@
-import type { Friend } from "./types";
-import { format } from "date-fns";
+import type { Friend } from './types';
+import { format } from 'date-fns';
 
 // Generate iCal file content for a single friend
 export function generateFriendIcal(friend: Friend): string {
@@ -7,24 +7,24 @@ export function generateFriendIcal(friend: Friend): string {
   const timestamp = format(now, "yyyyMMdd'T'HHmmss'Z'");
 
   let icalContent = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Friend Availability Planner//EN",
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Friend Availability Planner//EN',
     `X-WR-CALNAME:${friend.name}'s Availability`,
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
   ];
 
   // Add each available date as an event
   friend.availableDates.forEach((date) => {
-    const dateStr = format(date, "yyyyMMdd");
+    const dateStr = format(date, 'yyyyMMdd');
     const nextDay = new Date(date);
     nextDay.setDate(nextDay.getDate() + 1);
-    const nextDayStr = format(nextDay, "yyyyMMdd");
+    const nextDayStr = format(nextDay, 'yyyyMMdd');
 
     icalContent = [
       ...icalContent,
-      "BEGIN:VEVENT",
+      'BEGIN:VEVENT',
       `DTSTART;VALUE=DATE:${dateStr}`,
       `DTEND;VALUE=DATE:${nextDayStr}`,
       `DTSTAMP:${timestamp}`,
@@ -32,13 +32,13 @@ export function generateFriendIcal(friend: Friend): string {
       `CREATED:${timestamp}`,
       `DESCRIPTION:${friend.name} is available on this day`,
       `SUMMARY:${friend.name} Available`,
-      "TRANSP:TRANSPARENT",
-      "END:VEVENT",
+      'TRANSP:TRANSPARENT',
+      'END:VEVENT',
     ];
   });
 
-  icalContent.push("END:VCALENDAR");
-  return icalContent.join("\r\n");
+  icalContent.push('END:VCALENDAR');
+  return icalContent.join('\r\n');
 }
 
 // Generate combined iCal file for all friends
@@ -47,25 +47,25 @@ export function generateCombinedIcal(friends: Friend[]): string {
   const timestamp = format(now, "yyyyMMdd'T'HHmmss'Z'");
 
   let icalContent = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Friend Availability Planner//EN",
-    "X-WR-CALNAME:Combined Friend Availability",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Friend Availability Planner//EN',
+    'X-WR-CALNAME:Combined Friend Availability',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
   ];
 
   // Process each friend's available dates
   friends.forEach((friend) => {
     friend.availableDates.forEach((date) => {
-      const dateStr = format(date, "yyyyMMdd");
+      const dateStr = format(date, 'yyyyMMdd');
       const nextDay = new Date(date);
       nextDay.setDate(nextDay.getDate() + 1);
-      const nextDayStr = format(nextDay, "yyyyMMdd");
+      const nextDayStr = format(nextDay, 'yyyyMMdd');
 
       icalContent = [
         ...icalContent,
-        "BEGIN:VEVENT",
+        'BEGIN:VEVENT',
         `DTSTART;VALUE=DATE:${dateStr}`,
         `DTEND;VALUE=DATE:${nextDayStr}`,
         `DTSTAMP:${timestamp}`,
@@ -74,19 +74,19 @@ export function generateCombinedIcal(friends: Friend[]): string {
         `DESCRIPTION:${friend.name} is available on this day`,
         `SUMMARY:${friend.name} Available`,
         `COLOR:${friend.color}`,
-        "TRANSP:TRANSPARENT",
-        "END:VEVENT",
+        'TRANSP:TRANSPARENT',
+        'END:VEVENT',
       ];
     });
   });
 
-  icalContent.push("END:VCALENDAR");
-  return icalContent.join("\r\n");
+  icalContent.push('END:VCALENDAR');
+  return icalContent.join('\r\n');
 }
 
 // Parse iCal file content
 export async function parseIcalFile(
-  file: File,
+  file: File
 ): Promise<{ name: string; dates: Date[] }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -96,32 +96,32 @@ export async function parseIcalFile(
         const content = e.target?.result as string;
         const lines = content.split(/\r\n|\n|\r/);
 
-        let name = file.name.replace(/\.ics$/, "");
+        let name = file.name.replace(/\.ics$/, '');
         const dates: Date[] = [];
         let inEvent = false;
         let currentDate: Date | null = null;
 
         // Extract calendar name if available
         const calNameLine = lines.find((line) =>
-          line.startsWith("X-WR-CALNAME:"),
+          line.startsWith('X-WR-CALNAME:')
         );
         if (calNameLine) {
-          name = calNameLine.substring(12).replace(/'s Availability$/, "");
+          name = calNameLine.substring(12).replace(/'s Availability$/, '');
         }
 
         // Parse events
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
 
-          if (line === "BEGIN:VEVENT") {
+          if (line === 'BEGIN:VEVENT') {
             inEvent = true;
             currentDate = null;
-          } else if (line === "END:VEVENT") {
+          } else if (line === 'END:VEVENT') {
             inEvent = false;
             if (currentDate) {
               dates.push(currentDate);
             }
-          } else if (inEvent && line.startsWith("DTSTART;VALUE=DATE:")) {
+          } else if (inEvent && line.startsWith('DTSTART;VALUE=DATE:')) {
             const dateStr = line.substring(19);
             const year = Number.parseInt(dateStr.substring(0, 4));
             const month = Number.parseInt(dateStr.substring(4, 6)) - 1;
@@ -132,12 +132,12 @@ export async function parseIcalFile(
 
         resolve({ name, dates });
       } catch (error) {
-        reject(new Error("Failed to parse iCal file"));
+        reject(new Error('Failed to parse iCal file'));
       }
     };
 
     reader.onerror = () => {
-      reject(new Error("Failed to read file"));
+      reject(new Error('Failed to read file'));
     };
 
     reader.readAsText(file);
@@ -146,11 +146,11 @@ export async function parseIcalFile(
 
 // Download file helper
 export function downloadFile(content: string, filename: string) {
-  const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
+  const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.setAttribute("download", filename);
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

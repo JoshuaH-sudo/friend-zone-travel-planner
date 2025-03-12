@@ -1,137 +1,137 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Calendar, Users, Clock, Upload, Download, Globe } from "lucide-react";
-import { useTranslations } from "next-intl";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function LandingPage() {
   const t = useTranslations();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container mx-auto py-4 px-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">{t("app.title")}</span>
+    <div className='flex min-h-screen flex-col'>
+      <header className='border-b'>
+        <div className='container mx-auto flex items-center justify-between px-4 py-4'>
+          <div className='flex items-center gap-2'>
+            <Calendar className='h-6 w-6 text-primary' />
+            <span className='text-xl font-bold'>{t('app.title')}</span>
           </div>
-          <Link href="/planner">
-            <Button>{t("actions.add")}</Button>
+          <Link href='/planner'>
+            <Button>{t('actions.add')}</Button>
           </Link>
         </div>
       </header>
 
       <main>
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-5xl text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              {t("landing.title")}{" "}
-              <span className="text-primary">
-                {t("landing.titleHighlight")}
+        <section className='px-4 py-20'>
+          <div className='container mx-auto max-w-5xl text-center'>
+            <h1 className='mb-6 text-4xl font-bold md:text-6xl'>
+              {t('landing.title')}{' '}
+              <span className='text-primary'>
+                {t('landing.titleHighlight')}
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              {t("landing.subtitle")}
+            <p className='mx-auto mb-10 max-w-3xl text-xl text-muted-foreground'>
+              {t('landing.subtitle')}
             </p>
-            <Link href="/planner">
-              <Button size="lg" className="gap-2">
-                <Calendar className="h-5 w-5" />
-                {t("landing.startPlanning")}
+            <Link href='/planner'>
+              <Button size='lg' className='gap-2'>
+                <Calendar className='h-5 w-5' />
+                {t('landing.startPlanning')}
               </Button>
             </Link>
           </div>
         </section>
 
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {t("landing.features")}
+        <section className='bg-muted/30 py-16'>
+          <div className='container mx-auto px-4'>
+            <h2 className='mb-12 text-center text-3xl font-bold'>
+              {t('landing.features')}
             </h2>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-card p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
-                  <Users className="h-8 w-8 text-primary" />
+            <div className='grid gap-8 md:grid-cols-3'>
+              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
+                <div className='mb-4 rounded-full bg-primary/10 p-3'>
+                  <Users className='h-8 w-8 text-primary' />
                 </div>
-                <h3 className="text-xl font-medium mb-2">
-                  {t("landing.featureManagement.title")}
+                <h3 className='mb-2 text-xl font-medium'>
+                  {t('landing.featureManagement.title')}
                 </h3>
-                <p className="text-muted-foreground">
-                  {t("landing.featureManagement.description")}
+                <p className='text-muted-foreground'>
+                  {t('landing.featureManagement.description')}
                 </p>
               </div>
 
-              <div className="bg-card p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
-                  <Globe className="h-8 w-8 text-primary" />
+              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
+                <div className='mb-4 rounded-full bg-primary/10 p-3'>
+                  <Globe className='h-8 w-8 text-primary' />
                 </div>
-                <h3 className="text-xl font-medium mb-2">
-                  {t("landing.featureTimezone.title")}
+                <h3 className='mb-2 text-xl font-medium'>
+                  {t('landing.featureTimezone.title')}
                 </h3>
-                <p className="text-muted-foreground">
-                  {t("landing.featureTimezone.description")}
+                <p className='text-muted-foreground'>
+                  {t('landing.featureTimezone.description')}
                 </p>
               </div>
 
-              <div className="bg-card p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
-                  <Clock className="h-8 w-8 text-primary" />
+              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
+                <div className='mb-4 rounded-full bg-primary/10 p-3'>
+                  <Clock className='h-8 w-8 text-primary' />
                 </div>
-                <h3 className="text-xl font-medium mb-2">
-                  {t("landing.featureOverview.title")}
+                <h3 className='mb-2 text-xl font-medium'>
+                  {t('landing.featureOverview.title')}
                 </h3>
-                <p className="text-muted-foreground">
-                  {t("landing.featureOverview.description")}
+                <p className='text-muted-foreground'>
+                  {t('landing.featureOverview.description')}
                 </p>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 mt-8">
-              <div className="bg-card p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
-                  <Download className="h-8 w-8 text-primary" />
+            <div className='mt-8 grid gap-8 md:grid-cols-2'>
+              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
+                <div className='mb-4 rounded-full bg-primary/10 p-3'>
+                  <Download className='h-8 w-8 text-primary' />
                 </div>
-                <h3 className="text-xl font-medium mb-2">
-                  {t("landing.featureImport.title")}
+                <h3 className='mb-2 text-xl font-medium'>
+                  {t('landing.featureImport.title')}
                 </h3>
-                <p className="text-muted-foreground">
-                  {t("landing.featureImport.description")}
+                <p className='text-muted-foreground'>
+                  {t('landing.featureImport.description')}
                 </p>
               </div>
 
-              <div className="bg-card p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
-                <div className="bg-primary/10 p-3 rounded-full mb-4">
-                  <Upload className="h-8 w-8 text-primary" />
+              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
+                <div className='mb-4 rounded-full bg-primary/10 p-3'>
+                  <Upload className='h-8 w-8 text-primary' />
                 </div>
-                <h3 className="text-xl font-medium mb-2">
-                  {t("landing.featureExport.title")}
+                <h3 className='mb-2 text-xl font-medium'>
+                  {t('landing.featureExport.title')}
                 </h3>
-                <p className="text-muted-foreground">
-                  {t("landing.featureExport.description")}
+                <p className='text-muted-foreground'>
+                  {t('landing.featureExport.description')}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 px-4 text-center">
-          <div className="container mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold mb-6">
-              {t("landing.readyToStart")}
+        <section className='px-4 py-20 text-center'>
+          <div className='container mx-auto max-w-3xl'>
+            <h2 className='mb-6 text-3xl font-bold'>
+              {t('landing.readyToStart')}
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              {t("landing.readyDescription")}
+            <p className='mb-8 text-xl text-muted-foreground'>
+              {t('landing.readyDescription')}
             </p>
-            <Link href="/planner">
-              <Button size="lg">{t("landing.goToPlanner")}</Button>
+            <Link href='/planner'>
+              <Button size='lg'>{t('landing.goToPlanner')}</Button>
             </Link>
           </div>
         </section>
       </main>
 
-      <footer className="border-t py-8 bg-muted/30">
-        <div className="container mx-auto px-4 text-center text-muted-foreground"></div>
+      <footer className='border-t bg-muted/30 py-8'>
+        <div className='container mx-auto px-4 text-center text-muted-foreground'></div>
       </footer>
     </div>
   );

@@ -1,4 +1,4 @@
-import type { Friend } from "./types";
+import type { Friend } from './types';
 
 // Type for the entire application state
 export interface AppState {
@@ -30,16 +30,16 @@ export function deserializeState(jsonString: string): AppState {
     const deserializedFriends = parsedState.friends.map((friend: any) => ({
       ...friend,
       availableDates: friend.availableDates.map(
-        (dateStr: string) => new Date(dateStr),
+        (dateStr: string) => new Date(dateStr)
       ),
     }));
 
     return {
-      groupName: parsedState.groupName || "",
+      groupName: parsedState.groupName || '',
       friends: deserializedFriends,
     };
   } catch (error) {
-    throw new Error("Failed to parse state file");
+    throw new Error('Failed to parse state file');
   }
 }
 
@@ -47,14 +47,14 @@ export function deserializeState(jsonString: string): AppState {
 export function downloadStateFile(state: AppState) {
   const serializedState = serializeState(state);
   const filename = state.groupName
-    ? `${state.groupName.replace(/\s+/g, "_")}_planner_state.json`
-    : "friend_planner_state.json";
+    ? `${state.groupName.replace(/\s+/g, '_')}_planner_state.json`
+    : 'friend_planner_state.json';
 
-  const blob = new Blob([serializedState], { type: "application/json" });
+  const blob = new Blob([serializedState], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.setAttribute("download", filename);
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -72,12 +72,12 @@ export async function readStateFile(file: File): Promise<AppState> {
         const state = deserializeState(content);
         resolve(state);
       } catch (error) {
-        reject(new Error("Failed to parse state file"));
+        reject(new Error('Failed to parse state file'));
       }
     };
 
     reader.onerror = () => {
-      reject(new Error("Failed to read file"));
+      reject(new Error('Failed to read file'));
     };
 
     reader.readAsText(file);
