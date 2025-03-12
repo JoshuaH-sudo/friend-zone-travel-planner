@@ -20,7 +20,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="w-9 h-9">
-        <span className="sr-only">{t("theme.toggle")}</span>
+        <span className="sr-only">toggle</span>
         <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
       </Button>
@@ -33,7 +33,7 @@ export function ThemeToggle() {
         <Button variant="ghost" size="icon" className="w-9 h-9">
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">{t("theme.toggle")}</span>
+          <span className="sr-only">toggle</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
