@@ -36,8 +36,7 @@
     "nameFromFile": "Leer lassen, um den Namen aus der Datei zu verwenden",
     "color": "Kalenderfarbe",
     "timezone": "Zeitzone",
-    "availableDays": "{{count}} Tag ausgewählt",
-    "availableDaysPlural": "{{count}} Tage ausgewählt",
+    "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",
     "remove": "{{name}} entfernen?",
     "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden."
   },

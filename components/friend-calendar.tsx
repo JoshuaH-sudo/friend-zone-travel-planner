@@ -315,11 +315,7 @@ export function FriendCalendar({
       </CardContent>
       <CardFooter className='flex flex-col items-start gap-2 px-3 pb-3 pt-0'>
         <div className='text-xs text-muted-foreground'>
-          {friend.availableDates.length === 1
-            ? t('friend.availableDays', { count: '1' })
-            : t('friend.availableDaysPlural', {
-                count: friend.availableDates.length.toString(),
-              })}
+          {t('friend.availableDays', { count: friend.availableDates.length })}
         </div>
 
         <div className='w-full'>

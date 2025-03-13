@@ -36,8 +36,7 @@
     "nameFromFile": "Leave blank to use name from file",
     "color": "Calendar Color",
     "timezone": "Timezone",
-    "availableDays": "{{count}} day selected",
-    "availableDaysPlural": "{{count}} days selected",
+    "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
     "remove": "Remove {{name}}?",
     "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone."
   },
