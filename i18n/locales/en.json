@@ -53,6 +53,28 @@
     "presetColors": "Preset Colors",
     "customColor": "Custom Color"
   },
+  "sharing": {
+    "share": "Share",
+    "shareCalendar": "Share Calendar",
+    "captureCalendar": "Capture Calendar",
+    "capturing": "Capturing...",
+    "calendarPreview": "Calendar Preview",
+    "copyImage": "Copy Image",
+    "downloadImage": "Download Image",
+    "shareToApps": "Share to Apps",
+    "whatsapp": "WhatsApp",
+    "messenger": "Facebook Messenger",
+    "instagram": "Instagram",
+    "copied": "Copied!",
+    "cancel": "Cancel",
+    "captureError": "Failed to capture calendar",
+    "copyError": "Failed to copy image to clipboard. Image downloaded instead.",
+    "downloadError": "Failed to download image",
+    "shareError": "Failed to share image",
+    "copyTooltip": "Copy image to clipboard",
+    "calendarTitle": "{{name}} Availability Calendar",
+    "calendarDescription": "Check out our availability calendar!"
+  },
   "state": {
     "saveStateDescription": "Save the current state of all calendars to a file",
     "restoreStateDescription": "Restore calendars from a previously saved file",

@@ -5,20 +5,11 @@ import type React from 'react';
 import { RefObject, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-  Facebook,
-  Instagram,
-  Share2,
-  MessageCircle,
   Copy,
   Download,
   Check,
   X,
 } from 'lucide-react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import {
   Tooltip,
   TooltipContent,
@@ -97,80 +88,6 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
     }
   };
 
-  // Share to WhatsApp
-  const shareToWhatsApp = () => {
-    if (!imageUrl) return;
-
-    // WhatsApp doesn't support direct image sharing via URL
-    // So we'll download the image first and suggest manual sharing
-    handleDownloadImage();
-    window.open('https://web.whatsapp.com/', '_blank');
-  };
-
-  // Share to Facebook Messenger
-  const shareToMessenger = () => {
-    if (!imageUrl) return;
-
-    // Facebook Messenger doesn't support direct image sharing via URL
-    // So we'll download the image first and suggest manual sharing
-    handleDownloadImage();
-    window.open('https://www.messenger.com/', '_blank');
-  };
-
-  // Share to Instagram
-  const shareToInstagram = () => {
-    if (!imageUrl) return;
-
-    // Instagram doesn't support direct image sharing via URL
-    // So we'll download the image first and suggest manual sharing
-    handleDownloadImage();
-    window.open('https://www.instagram.com/', '_blank');
-  };
-
-  // Use Web Share API if available
-  const useNativeShare = async () => {
-    if (!imageUrl) return;
-
-    if (navigator.share) {
-      try {
-        // Convert data URL to blob
-        const byteString = atob(imageUrl.split(',')[1]);
-        const mimeString = imageUrl.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-
-        const blob = new Blob([ab], { type: mimeString });
-        const file = new File(
-          [blob],
-          `${filename.replace(/\s+/g, '_')}_calendar.png`,
-          { type: 'image/png' }
-        );
-
-        await navigator.share({
-          title: t('sharing.calendarTitle', {
-            name: filename || t('app.title'),
-          }),
-          text: t('sharing.calendarDescription'),
-          files: [file],
-        });
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          setError(t('sharing.shareError'));
-          console.error('Error sharing:', err);
-          // Fallback to download
-          handleDownloadImage();
-        }
-      }
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      handleDownloadImage();
-    }
-  };
-
   useEffect(() => {
     captureCalendar();
   }, []);
@@ -232,70 +149,6 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
             <Download className='h-4 w-4' />
             {t('sharing.downloadImage')}
           </Button>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <Button onClick={useNativeShare} className='gap-2'>
-            <Share2 className='h-4 w-4' />
-            {t('sharing.share')}
-          </Button>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant='outline' className='gap-2'>
-                <MessageCircle className='h-4 w-4' />
-                {t('sharing.shareToApps')}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className='w-auto p-2'>
-              <div className='flex gap-2'>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size='icon'
-                        variant='outline'
-                        onClick={shareToWhatsApp}
-                      >
-                        <span className='text-lg'>📱</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('sharing.whatsapp')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size='icon'
-                        variant='outline'
-                        onClick={shareToMessenger}
-                      >
-                        <Facebook className='h-4 w-4' />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('sharing.messenger')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size='icon'
-                        variant='outline'
-                        onClick={shareToInstagram}
-                      >
-                        <Instagram className='h-4 w-4' />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('sharing.instagram')}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
 
         <Button
