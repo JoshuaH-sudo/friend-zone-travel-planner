@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   format,
   startOfMonth,
@@ -13,8 +13,14 @@ import {
 } from 'date-fns';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Camera, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,13 +29,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
+import { SocialShare } from './social-share';
+import { useTranslations } from 'next-intl';
 
 interface AvailabilityOverviewProps {
   friends: Friend[];
+  groupName?: string;
 }
 
-export function AvailabilityOverview({ friends }: AvailabilityOverviewProps) {
+export function AvailabilityOverview({
+  friends,
+  groupName,
+}: AvailabilityOverviewProps) {
+  const t = useTranslations();
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -59,9 +76,30 @@ export function AvailabilityOverview({ friends }: AvailabilityOverviewProps) {
   return (
     <Card>
       <CardHeader className='pb-2'>
-        <CardTitle>Availability Overview</CardTitle>
+        <div className='flex items-center justify-between'>
+          <CardTitle>{t('navigation.overview')}</CardTitle>
+          <div className='flex gap-2'>
+            <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+              <DialogTrigger asChild>
+                <Button variant='outline' size='sm' className='gap-2'>
+                  <Share2 className='h-4 w-4' />
+                  {t('sharing.share')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className='w-100'>
+                <h2 className='mb-4 text-xl font-bold'>
+                  {t('sharing.shareCalendar')}
+                </h2>
+                <SocialShare
+                  elementRef={calendarRef}
+                  filename={groupName || t('app.title')}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className='p-3'>
+      <CardContent className='p-3' ref={calendarRef}>
         <div className='mb-4 flex items-center justify-between'>
           <Button variant='ghost' size='icon' onClick={prevMonth}>
             <ChevronLeft className='h-4 w-4' />
