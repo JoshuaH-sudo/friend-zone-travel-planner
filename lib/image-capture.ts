@@ -9,6 +9,11 @@ export async function captureElementAsImage(element: HTMLElement): Promise<strin
     // Create a clone of the element to avoid modifying the original
     const clone = element.cloneNode(true) as HTMLElement
     const container = document.createElement("div")
+    
+    const computedStyle = window.getComputedStyle(element)
+    for (const key of computedStyle) {
+      clone.style.setProperty(key, computedStyle.getPropertyValue(key))
+    }
 
     // Set the background color based on the current theme
     container.style.backgroundColor = isDarkTheme ? "#1f1f1f" : "#ffffff"

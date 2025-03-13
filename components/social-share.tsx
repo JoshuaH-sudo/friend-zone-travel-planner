@@ -150,15 +150,6 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
             {t('sharing.downloadImage')}
           </Button>
         </div>
-
-        <Button
-          variant='ghost'
-          onClick={() => setImageUrl(null)}
-          className='w-full gap-2'
-        >
-          <X className='h-4 w-4' />
-          {t('sharing.cancel')}
-        </Button>
       </div>
     </div>
   );
