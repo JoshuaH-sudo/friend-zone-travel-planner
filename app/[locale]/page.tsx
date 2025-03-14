@@ -6,6 +6,7 @@ import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/language-selector';
 import { ThemeToggle } from '@/components/theme-toggle';
+import travelIcon from '@/public/travel.png';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -15,12 +16,17 @@ export default function LandingPage() {
       <header className='border-b'>
         <div className='container mx-auto flex items-center justify-between px-4 py-4'>
           <div className='flex items-center gap-2'>
-            <Calendar className='h-6 w-6 text-primary' />
+            {/* <Calendar className='h-6 w-6 text-primary' /> */}
+            <img
+              src={travelIcon.src}
+              alt='Travel Icon'
+              className='h-6 w-6 text-primary'
+            />
             <span className='text-xl font-bold'>{t('app.title')}</span>
           </div>
           <div className='flex gap-4'>
             <LanguageSwitcher />
-                        
+
             <ThemeToggle />
           </div>
         </div>
@@ -135,7 +141,14 @@ export default function LandingPage() {
       </main>
 
       <footer className='border-t bg-muted/30 py-8'>
-        <div className='container mx-auto px-4 text-center text-muted-foreground'></div>
+        <div className='container mx-auto px-4 text-center text-muted-foreground'>
+          <a
+            href='https://www.flaticon.com/free-icons/travel'
+            title='travel icons'
+          >
+            Travel icons created by Freepik - Flaticon
+          </a>
+        </div>
       </footer>
     </div>
   );
