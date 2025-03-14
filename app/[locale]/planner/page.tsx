@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AddFriendForm } from '@/components/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview';
@@ -85,6 +85,23 @@ export default function PlannerPage() {
     setShowStateManager(false);
   };
 
+
+  useEffect(() => {
+    if (localStorage.getItem('plannerState')) {
+      const state = JSON.parse(localStorage.getItem('plannerState') as string);
+      setGroupName(state.groupName);
+      setFriends(state.friends);
+    }
+  }, []);
+
+  const updateLocalStorage = () => {
+    localStorage.setItem('plannerState', JSON.stringify(getCurrentState()));
+  };
+
+  useEffect(() => {
+    updateLocalStorage();
+  }, [groupName, friends]);
+
   return (
     <main className='container mx-auto max-w-6xl p-4'>
       <div className='flex flex-col gap-6'>
@@ -164,7 +181,7 @@ export default function PlannerPage() {
             </Button>
 
             <LanguageSwitcher />
-            
+
             <ThemeToggle />
           </div>
         </div>
