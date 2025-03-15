@@ -7,7 +7,7 @@ import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ColorPicker } from './color-picker';
+import { ColorPicker, PRESET_COLORS } from './color-picker';
 import {
   Select,
   SelectContent,
@@ -19,15 +19,25 @@ import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 interface AddFriendFormProps {
+  friends: Friend[];
   onAddFriend: (friend: Friend) => void;
   onCancel: () => void;
 }
 
-export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
+export function AddFriendForm({
+  friends,
+  onAddFriend,
+  onCancel,
+}: AddFriendFormProps) {
+  const t = useTranslations('friend');
   const [name, setName] = useState('');
-  const [color, setColor] = useState('#3b82f6');
+  const availableColors = PRESET_COLORS.filter(
+    (c) => !friends.some((f) => f.color === c)
+  );
+  const randomColor =
+    availableColors[Math.floor(Math.random() * availableColors.length)];
+  const [color, setColor] = useState(randomColor);
   const [timezone, setTimezone] = useState('UTC');
-  const t = useTranslations();
 
   // Common timezones
   const timezones = [
@@ -62,19 +72,23 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
       <div className='space-y-2'>
-        <Label htmlFor='friend-name'>{t('friend_name')}</Label>
+        <Label htmlFor='friend-name'>{t('name')}</Label>
         <Input
           id='friend-name'
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={t('enter_friend_name')}
+          placeholder={t('namePlaceholder')}
           required
         />
       </div>
 
       <div className='space-y-2'>
-        <Label>{t('calendar_color')}</Label>
-        <ColorPicker color={color} onChange={setColor} />
+        <Label>{t('color')}</Label>
+        <ColorPicker
+          availableColors={availableColors}
+          color={color}
+          onChange={setColor}
+        />
       </div>
 
       <div className='space-y-2'>
@@ -84,7 +98,7 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
         </div>
         <Select value={timezone} onValueChange={setTimezone}>
           <SelectTrigger id='timezone'>
-            <SelectValue placeholder={t('select_timezone')} />
+            <SelectValue placeholder={t('timezonePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {timezones.map((tz) => (
@@ -101,7 +115,7 @@ export function AddFriendForm({ onAddFriend, onCancel }: AddFriendFormProps) {
           {t('cancel')}
         </Button>
         <Button type='submit' disabled={!name.trim()}>
-          {t('add_friend')}
+          {t('addFriend')}
         </Button>
       </div>
     </form>

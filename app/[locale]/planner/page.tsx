@@ -85,7 +85,6 @@ export default function PlannerPage() {
     setShowStateManager(false);
   };
 
-
   useEffect(() => {
     if (localStorage.getItem('plannerState')) {
       const state = JSON.parse(localStorage.getItem('plannerState') as string);
@@ -200,6 +199,7 @@ export default function PlannerPage() {
         {showAddFriend && (
           <div className='rounded-lg border bg-card p-4'>
             <AddFriendForm
+              friends={friends}
               onAddFriend={addFriend}
               onCancel={() => setShowAddFriend(false)}
             />

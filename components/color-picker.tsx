@@ -9,11 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslations } from 'next-intl';
 
 interface ColorPickerProps {
+  availableColors?: string[];
   color: string;
   onChange: (color: string) => void;
 }
 
-const COLORS = [
+export const PRESET_COLORS = [
   '#ef4444', // red
   '#f97316', // orange
   '#f59e0b', // amber
@@ -26,7 +27,11 @@ const COLORS = [
   '#ec4899', // pink
 ];
 
-export function ColorPicker({ color, onChange }: ColorPickerProps) {
+export function ColorPicker({
+  availableColors,
+  color,
+  onChange,
+}: ColorPickerProps) {
   const t = useTranslations();
   const [customColor, setCustomColor] = useState(color);
 
@@ -44,21 +49,28 @@ export function ColorPicker({ color, onChange }: ColorPickerProps) {
 
       <TabsContent value='preset' className='pt-2'>
         <div className='flex flex-wrap gap-2'>
-          {COLORS.map((c) => (
-            <button
-              key={c}
-              type='button'
-              className={cn(
-                'h-8 w-8 rounded-full border-2 transition-all',
-                color === c
-                  ? 'scale-110 border-black dark:border-white'
-                  : 'border-transparent hover:scale-110'
-              )}
-              style={{ backgroundColor: c }}
-              onClick={() => onChange(c)}
-              aria-label={`Select color ${c}`}
-            />
-          ))}
+          {PRESET_COLORS.map((c) => {
+            const isColorTaken = availableColors && !availableColors.includes(c);
+            return (
+              <button
+                key={c}
+                type='button'
+                className={cn(
+                  'h-8 w-8 rounded-full border-2 transition-all',
+                  color === c
+                    ? `${isColorTaken ?? 'scale-110'} border-black dark:border-white`
+                    : 'border-transparent hover:scale-110'
+                )}
+                style={{
+                  backgroundColor: c,
+                  opacity: isColorTaken ? 0.5 : 1,
+                }}
+                disabled={isColorTaken}
+                onClick={() => onChange(c)}
+                aria-label={`Select color ${c}`}
+              />
+            );
+          })}
         </div>
       </TabsContent>
 
