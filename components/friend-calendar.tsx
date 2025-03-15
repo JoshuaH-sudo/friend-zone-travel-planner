@@ -59,6 +59,11 @@ export function FriendCalendar({
   };
 
   useEffect(() => {
+    if (selected === undefined) {
+      return;
+    }
+    console.log('selected', selected);
+    console.log('friend', friend);
     onUpdateAvailability(friend.id, selected || []);
   }, [selected]);
 
