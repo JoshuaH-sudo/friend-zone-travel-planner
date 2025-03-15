@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from './edit-friend-form';
 import { useTranslations } from 'next-intl';
-import { DayPicker, OnSelectHandler } from 'react-day-picker';
+import { CalendarDay, DayPicker, OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
 
 interface FriendCalendarProps {
@@ -155,6 +155,9 @@ export function FriendCalendar({
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
+            monthGridClassName='w-full'
+            weekClassName='w-full'
+            weekdayClassName=' w-full'
             selected={friend.availableDates}
             onSelect={onDaySelect}
           />

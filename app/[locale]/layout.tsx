@@ -4,10 +4,9 @@ import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import "react-day-picker/style.css";
 
 export const metadata = {
-  title: 'Friend Calendar Planner',
+  title: 'Friend Zoned Travel Planner',
   description: 'Plan events with friends across different timezones',
 };
 
