@@ -43,7 +43,6 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations();
-  const [selected, setSelected] = useState<Date[]>();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +59,6 @@ export function FriendCalendar({
 
   const onDaySelect: OnSelectHandler<Date[] | undefined> = (dates?: Date[]) => {
     if (!dates) return;
-    setSelected(dates);
     onUpdateAvailability(friend.id, dates);
   };
 
@@ -155,9 +153,9 @@ export function FriendCalendar({
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
-            monthGridClassName='w-full'
-            weekClassName='w-full'
-            weekdayClassName=' w-full'
+            monthGridClassName='text-lg w-full'
+            weekClassName='text-lg w-full'
+            weekdayClassName='text-lg w-full'
             selected={friend.availableDates}
             onSelect={onDaySelect}
           />
