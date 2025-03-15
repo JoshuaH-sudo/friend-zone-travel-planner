@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from './edit-friend-form';
 import { useTranslations } from 'next-intl';
-import { DayPicker } from 'react-day-picker';
+import { DayPicker, OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
 
 interface FriendCalendarProps {
@@ -58,12 +58,11 @@ export function FriendCalendar({
     setShowEditDialog(false);
   };
 
-  useEffect(() => {
-    if (selected === undefined) {
-      return;
-    }
-    onUpdateAvailability(friend.id, selected);
-  }, [selected]);
+  const onDaySelect: OnSelectHandler<Date[] | undefined> = (dates?: Date[]) => {
+    if (!dates) return;
+    setSelected(dates);
+    onUpdateAvailability(friend.id, dates);
+  };
 
   // Common timezones
   const timezones = [
@@ -153,10 +152,11 @@ export function FriendCalendar({
         <div ref={calendarRef}>
           <Calendar
             animate
+            required={false}
             mode='multiple'
             style={{ width: '100%' }}
             selected={friend.availableDates}
-            onSelect={setSelected}
+            onSelect={onDaySelect}
           />
         </div>
       </CardContent>
