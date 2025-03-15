@@ -1,16 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  isSameMonth,
-  isSameDay,
-  addMonths,
-  subMonths,
-} from 'date-fns';
+import { useState, useRef, useEffect } from 'react';
+import { eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,15 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Trash2,
-  Globe,
-  Upload,
-  Edit,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Trash2, Globe, Upload, Edit } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import {
   Select,
@@ -41,6 +24,8 @@ import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from './edit-friend-form';
 import { useTranslations } from 'next-intl';
+import { DayPicker } from 'react-day-picker';
+import { Calendar } from './ui/calander';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -58,106 +43,9 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartDate, setDragStartDate] = useState<Date | null>(null);
-  const [dragOperation, setDragOperation] = useState<'add' | 'remove' | null>(
-    null
-  );
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [selected, setSelected] = useState<Date[]>();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
-
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(currentMonth);
-  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-
-  const toggleDate = (date: Date) => {
-    if (!isSameMonth(date, currentMonth)) return;
-
-    const isSelected = friend.availableDates.some((d) => isSameDay(d, date));
-    let newDates: Date[];
-
-    if (isSelected) {
-      newDates = friend.availableDates.filter((d) => !isSameDay(d, date));
-    } else {
-      newDates = [...friend.availableDates, date];
-    }
-
-    onUpdateAvailability(friend.id, newDates);
-  };
-
-  const isDateSelected = (date: Date) => {
-    return friend.availableDates.some((d) => isSameDay(d, date));
-  };
-
-  const handleMouseDown = (date: Date) => {
-    if (!isSameMonth(date, currentMonth)) return;
-
-    setIsDragging(true);
-    setDragStartDate(date);
-
-    // Determine if we're adding or removing dates
-    const isSelected = isDateSelected(date);
-    setDragOperation(isSelected ? 'remove' : 'add');
-
-    // Toggle the initial date
-    toggleDate(date);
-
-    // Add event listeners to handle drag outside the calendar
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseEnter = (date: Date) => {
-    setHoveredDate(date);
-
-    if (!isDragging || !dragStartDate || !isSameMonth(date, currentMonth))
-      return;
-
-    // Get all dates between dragStartDate and current date
-    const startDate = new Date(
-      Math.min(dragStartDate.getTime(), date.getTime())
-    );
-    const endDate = new Date(Math.max(dragStartDate.getTime(), date.getTime()));
-    const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
-
-    // Filter to only include dates in the current month
-    const monthDates = dateRange.filter((d) => isSameMonth(d, currentMonth));
-
-    // Create a new set of dates based on the drag operation
-    let newDates: Date[];
-
-    if (dragOperation === 'add') {
-      // Add all dates in the range that aren't already selected
-      const existingDates = friend.availableDates.filter(
-        (d) => !monthDates.some((md) => isSameDay(md, d))
-      );
-      newDates = [...existingDates, ...monthDates];
-    } else {
-      // Remove all dates in the range
-      newDates = friend.availableDates.filter(
-        (d) => !monthDates.some((md) => isSameDay(md, d))
-      );
-    }
-
-    onUpdateAvailability(friend.id, newDates);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredDate(null);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setDragStartDate(null);
-    setDragOperation(null);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
 
   const exportCalendar = () => {
     const icalContent = generateFriendIcal(friend);
@@ -169,6 +57,10 @@ export function FriendCalendar({
     onUpdateFriend(updatedFriend);
     setShowEditDialog(false);
   };
+
+  useEffect(() => {
+    onUpdateAvailability(friend.id, selected || []);
+  }, [selected]);
 
   // Common timezones
   const timezones = [
@@ -253,66 +145,19 @@ export function FriendCalendar({
           </div>
         </div>
       </CardHeader>
+
       <CardContent className='p-3'>
-        <div className='mb-2 flex items-center justify-between'>
-          <Button variant='ghost' size='icon' onClick={prevMonth}>
-            <ChevronLeft className='h-4 w-4' />
-            <span className='sr-only'>Previous month</span>
-          </Button>
-          <h3 className='font-medium'>{format(currentMonth, 'MMMM yyyy')}</h3>
-          <Button variant='ghost' size='icon' onClick={nextMonth}>
-            <ChevronRight className='h-4 w-4' />
-            <span className='sr-only'>Next month</span>
-          </Button>
-        </div>
-
-        <div
-          ref={calendarRef}
-          className='grid grid-cols-7 gap-1 text-center'
-          onMouseLeave={() => {
-            handleMouseUp();
-            handleMouseLeave();
-          }}
-        >
-          {weekdays.map((day) => (
-            <div
-              key={day}
-              className='py-1 text-xs font-medium text-muted-foreground'
-            >
-              {day}
-            </div>
-          ))}
-
-          {Array.from({ length: monthStart.getDay() }).map((_, i) => (
-            <div key={`empty-start-${i}`} className='h-8' />
-          ))}
-
-          {monthDays.map((day) => {
-            const isSelected = isDateSelected(day);
-            const isHovered = hoveredDate && isSameDay(day, hoveredDate);
-
-            return (
-              <div
-                key={day.toString()}
-                className={cn(
-                  'flex h-8 w-8 cursor-pointer select-none items-center justify-center rounded-full text-sm transition-colors',
-                  isSelected
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-muted',
-                  isHovered && !isSelected && 'bg-muted/80',
-                  isHovered && isSelected && 'ring-2 ring-primary ring-offset-2'
-                )}
-                style={isSelected ? { backgroundColor: friend.color } : {}}
-                onMouseDown={() => handleMouseDown(day)}
-                onMouseEnter={() => handleMouseEnter(day)}
-                onMouseLeave={handleMouseLeave}
-              >
-                {format(day, 'd')}
-              </div>
-            );
-          })}
+        <div ref={calendarRef}>
+          <Calendar
+            animate
+            mode='multiple'
+            style={{ width: '100%' }}
+            selected={friend.availableDates}
+            onSelect={setSelected}
+          />
         </div>
       </CardContent>
+
       <CardFooter className='flex flex-col items-start gap-2 px-3 pb-3 pt-0'>
         <div className='text-xs text-muted-foreground'>
           {t('friend.availableDays', { count: friend.availableDates.length })}
