@@ -62,9 +62,7 @@ export function FriendCalendar({
     if (selected === undefined) {
       return;
     }
-    console.log('selected', selected);
-    console.log('friend', friend);
-    onUpdateAvailability(friend.id, selected || []);
+    onUpdateAvailability(friend.id, selected);
   }, [selected]);
 
   // Common timezones
