@@ -2,21 +2,15 @@
 
 import type React from 'react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ColorPicker, PRESET_COLORS } from './color-picker';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { Globe, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { getAddressCoordinates } from '@/lib/actions';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -37,21 +31,7 @@ export function AddFriendForm({
   const randomColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
   const [color, setColor] = useState(randomColor);
-  const [timezone, setTimezone] = useState('UTC');
-
-  // Common timezones
-  const timezones = [
-    'UTC',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-  ];
+  const [address, setAddress] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,12 +40,20 @@ export function AddFriendForm({
         id: crypto.randomUUID(),
         name: name.trim(),
         color,
-        timezone,
+        timezone: address,
         availableDates: [],
       });
       setName('');
       setColor('#3b82f6');
-      setTimezone('UTC');
+      setAddress('UTC');
+    }
+  };
+
+  const searchAddress = async () => {
+    const result = await getAddressCoordinates(address);
+    if (result) {
+      const { lat, lng } = result.geometry.location;
+      console.log('Coordinates', { lat, lng });
     }
   };
 
@@ -93,21 +81,19 @@ export function AddFriendForm({
 
       <div className='space-y-2'>
         <div className='flex items-center gap-2'>
-          <Globe className='h-4 w-4 text-muted-foreground' />
-          <Label htmlFor='timezone'>{t('timezone')}</Label>
+          <MapPin className='h-4 w-4 text-muted-foreground' />
+          <Label htmlFor='city'>{t('city')}</Label>
         </div>
-        <Select value={timezone} onValueChange={setTimezone}>
-          <SelectTrigger id='timezone'>
-            <SelectValue placeholder={t('timezonePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {timezones.map((tz) => (
-              <SelectItem key={tz} value={tz}>
-                {tz.replace('_', ' ')}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className='flex flex-row gap-2'>
+          <Input
+            id='city'
+            className=' w-[calc(50%-4rem)]'
+            value={address}
+            onChange={(event) => setAddress(event.target.value)}
+          />
+          <p className='text-xs text-muted-foreground'>e.g. San Francisco</p>
+          <Button onClick={searchAddress}>Search</Button>
+        </div>
       </div>
 
       <div className='flex justify-end gap-2'>
