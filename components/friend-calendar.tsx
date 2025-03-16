@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
+import { useState, useRef } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +23,7 @@ import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from './edit-friend-form';
 import { useTranslations } from 'next-intl';
-import { CalendarDay, DayPicker, OnSelectHandler } from 'react-day-picker';
+import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
 import { cn } from '@/lib/utils';
 
