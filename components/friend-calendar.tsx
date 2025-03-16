@@ -26,6 +26,7 @@ import { EditFriendForm } from './edit-friend-form';
 import { useTranslations } from 'next-intl';
 import { CalendarDay, DayPicker, OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
+import { cn } from '@/lib/utils';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -156,6 +157,23 @@ export function FriendCalendar({
             monthGridClassName='text-lg w-full'
             weekClassName='text-lg w-full'
             weekdayClassName='text-lg w-full'
+            components={{
+              DayButton: ({ modifiers, className, ...props }) => (
+                <Button
+                  className={cn(
+                    'size-8 rounded-md p-0 font-normal transition-none hover:opacity-70',
+                    className
+                  )}
+                  variant='ghost'
+                  {...props}
+                  style={{
+                    backgroundColor: modifiers.selected
+                      ? friend.color
+                      : undefined,
+                  }}
+                />
+              ),
+            }}
             selected={friend.availableDates}
             onSelect={onDaySelect}
           />
