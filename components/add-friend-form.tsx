@@ -1,7 +1,6 @@
 'use client';
 
 import type React from 'react';
-
 import { useEffect, useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -10,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { ColorPicker, PRESET_COLORS } from './color-picker';
 import { Globe, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { getAddressCoordinates } from '@/lib/actions';
 import useFetchAddress from './hooks/useFetchAddressCoordinates';
+import useFetchTimezoneInformation from './hooks/useFetchTimeZoneInformation';
+import { Coordinates } from '@/lib/actions';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -33,13 +33,17 @@ export function AddFriendForm({
     availableColors[Math.floor(Math.random() * availableColors.length)];
   const [color, setColor] = useState(randomColor);
   const [address, setAddress] = useState('');
-  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
+  const [coordinates, setCoordinates] = useState<Coordinates>();
   const {
     data: addressDetails,
     refetch: fetchAddress,
     isFetching: isFetchingAddress,
     isSuccess: isAddressSuccess,
   } = useFetchAddress(address);
+  const {
+    data: timezoneInformation,
+    isFetching: isFetchingTimezone,
+  } = useFetchTimezoneInformation(coordinates);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +52,7 @@ export function AddFriendForm({
         id: crypto.randomUUID(),
         name: name.trim(),
         color,
-        coordinates: { lat: 0, lng: 0 },
+        coordinates: coordinates!,
         address,
         timezone: 'UTC',
         availableDates: [],
@@ -61,10 +65,8 @@ export function AddFriendForm({
 
   const searchAddress = async () => {
     const result = await fetchAddress();
-    console.log('query results', result);
     if (result.data) {
       const { lat, lng } = result.data.geometry.location;
-      console.log('Coordinates', { lat, lng });
       setCoordinates({ lat, lng });
     }
   };
@@ -73,6 +75,11 @@ export function AddFriendForm({
   if (isFetchingAddress) citySearchText = 'Searching...';
   if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
 
+  let timezoneText = 'input a city';
+  if (isAddressSuccess && timezoneInformation)
+    timezoneText = timezoneInformation.timeZoneName;
+
+  const isLoading = isFetchingAddress || isFetchingTimezone;
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
       <div className='space-y-2'>
@@ -95,25 +102,35 @@ export function AddFriendForm({
         />
       </div>
 
-      <div className='space-y-2'>
-        <div className='flex items-center gap-2'>
-          <MapPin className='h-4 w-4 text-muted-foreground' />
-          <Label htmlFor='city'>{t('city')}</Label>
-        </div>
-        <div className='flex flex-row gap-2'>
-          <div className='flex w-[calc(50%-4rem)] flex-col items-start gap-2'>
-            <Input
-              id='city'
-              disabled={isFetchingAddress}
-              value={address}
-              onChange={(event) => setAddress(event.target.value)}
-            />
-            <p className='text-xs text-muted-foreground'>{citySearchText}</p>
+      <div className='flex flex-row items-center gap-4'>
+        <div className='w-[calc(50%-4rem)] space-y-2'>
+          <div className='flex items-center gap-2'>
+            <MapPin className='h-4 w-4 text-muted-foreground' />
+            <Label htmlFor='city'>{t('city')}</Label>
           </div>
+          <div className='flex flex-row gap-2'>
+            <div className='flex flex-col items-start gap-2'>
+              <Input
+                id='city'
+                disabled={isLoading}
+                value={address}
+                onChange={(event) => setAddress(event.target.value)}
+              />
+              <p className='text-xs text-muted-foreground'>{citySearchText}</p>
+            </div>
 
-          <Button onClick={searchAddress} disabled={isFetchingAddress}>
-            Search
-          </Button>
+            <Button onClick={searchAddress} disabled={isLoading}>
+              Search
+            </Button>
+          </div>
+        </div>
+
+        <div className='space-y-2'>
+          <div className='flex items-center gap-2'>
+            <Globe className='h-4 w-4 text-muted-foreground' />
+            <Label htmlFor='timezone'>{t('timezone')}</Label>
+          </div>
+          <p className='text-xs text-muted-foreground'>{timezoneText}</p>
         </div>
       </div>
 
