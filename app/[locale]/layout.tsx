@@ -4,15 +4,18 @@ import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const metadata = {
   title: 'Friend Zoned Travel Planner',
-  description: 'Plan events with friends across different timezones',
+  description: 'Plan trips with friends across different timezones',
 };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+const queryClient = new QueryClient();
 
 export default async function RootLayout({
   children,
@@ -28,14 +31,16 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );
