@@ -38,6 +38,7 @@ export function AddFriendForm({
     data: addressDetails,
     refetch: fetchAddress,
     isFetching: isFetchingAddress,
+    isSuccess: isAddressSuccess,
   } = useFetchAddress(address);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,7 +69,9 @@ export function AddFriendForm({
     }
   };
 
-  console.log('fetching', isFetchingAddress)
+  let citySearchText = 'e.g. San Francisco';
+  if (isFetchingAddress) citySearchText = 'Searching...';
+  if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
@@ -98,14 +101,16 @@ export function AddFriendForm({
           <Label htmlFor='city'>{t('city')}</Label>
         </div>
         <div className='flex flex-row gap-2'>
-          <Input
-            id='city'
-            className='w-[calc(50%-4rem)]'
-            disabled={isFetchingAddress}
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-          />
-          <p className='text-xs text-muted-foreground'>e.g. San Francisco</p>
+          <div className='flex w-[calc(50%-4rem)] flex-col items-start gap-2'>
+            <Input
+              id='city'
+              disabled={isFetchingAddress}
+              value={address}
+              onChange={(event) => setAddress(event.target.value)}
+            />
+            <p className='text-xs text-muted-foreground'>{citySearchText}</p>
+          </div>
+
           <Button onClick={searchAddress} disabled={isFetchingAddress}>
             Search
           </Button>

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 const useFetchAddress = (address: string) => {
   return useQuery({
     enabled: false,
-    queryKey: ['address'],
+    queryKey: ['address', address],
     queryFn: () => getAddressCoordinates(address),
   });
 };

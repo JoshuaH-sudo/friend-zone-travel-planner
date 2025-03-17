@@ -12,6 +12,5 @@ export const getAddressCoordinates = async (address: string) => {
     }
   );
 
-  console.log("result", result.data);
   return result.data.results[0];
 }
