@@ -11,6 +11,7 @@ import { ColorPicker, PRESET_COLORS } from './color-picker';
 import { Globe, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { getAddressCoordinates } from '@/lib/actions';
+import useFetchAddress from './hooks/useFetchAddressCoordinates';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -32,6 +33,12 @@ export function AddFriendForm({
     availableColors[Math.floor(Math.random() * availableColors.length)];
   const [color, setColor] = useState(randomColor);
   const [address, setAddress] = useState('');
+  const [coordinates, setCoordinates] = useState({ lat: 0, lng: 0 });
+  const {
+    data: addressDetails,
+    refetch: fetchAddress,
+    isFetching: isFetchingAddress,
+  } = useFetchAddress(address);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +47,9 @@ export function AddFriendForm({
         id: crypto.randomUUID(),
         name: name.trim(),
         color,
-        timezone: address,
+        coordinates: { lat: 0, lng: 0 },
+        address,
+        timezone: 'UTC',
         availableDates: [],
       });
       setName('');
@@ -50,12 +59,16 @@ export function AddFriendForm({
   };
 
   const searchAddress = async () => {
-    const result = await getAddressCoordinates(address);
-    if (result) {
-      const { lat, lng } = result.geometry.location;
+    const result = await fetchAddress();
+    console.log('query results', result);
+    if (result.data) {
+      const { lat, lng } = result.data.geometry.location;
       console.log('Coordinates', { lat, lng });
+      setCoordinates({ lat, lng });
     }
   };
+
+  console.log('fetching', isFetchingAddress)
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
@@ -87,12 +100,15 @@ export function AddFriendForm({
         <div className='flex flex-row gap-2'>
           <Input
             id='city'
-            className=' w-[calc(50%-4rem)]'
+            className='w-[calc(50%-4rem)]'
+            disabled={isFetchingAddress}
             value={address}
             onChange={(event) => setAddress(event.target.value)}
           />
           <p className='text-xs text-muted-foreground'>e.g. San Francisco</p>
-          <Button onClick={searchAddress}>Search</Button>
+          <Button onClick={searchAddress} disabled={isFetchingAddress}>
+            Search
+          </Button>
         </div>
       </div>
 

@@ -36,6 +36,7 @@
     "nameFromFile": "Leave blank to use name from file",
     "color": "Calendar Color",
     "timezone": "Timezone",
+    "city": "City",
     "timezonePlaceholder": "Select timezone",
     "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
     "remove": "Remove {{name}}?",
