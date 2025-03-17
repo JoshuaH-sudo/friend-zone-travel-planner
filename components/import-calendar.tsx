@@ -62,6 +62,9 @@ export function ImportCalendar({ onImport, onCancel }: ImportCalendarProps) {
         color,
         timezone,
         availableDates: dates,
+        // TODO: Save and extract address from iCal file
+        coordinates: { lat: 0, lng: 0 },
+        address: '',
       });
     } catch (err) {
       setError(

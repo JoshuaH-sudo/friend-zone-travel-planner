@@ -53,7 +53,7 @@ export function AddFriendForm({
         color,
         coordinates: coordinates!,
         address,
-        timezone: 'UTC',
+        timezone: timezoneInformation?.timeZoneName!,
         availableDates: [],
       });
       setName('');
