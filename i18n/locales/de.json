@@ -36,9 +36,12 @@
     "nameFromFile": "Leer lassen, um den Namen aus der Datei zu verwenden",
     "color": "Kalenderfarbe",
     "timezone": "Zeitzone",
+    "location": "Ort",
     "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",
     "remove": "{{name}} entfernen?",
-    "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden."
+    "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "addFriend": "Freund hinzufügen",
+    "cancel": "Abbrechen"
   },
   "calendar": {
     "exportAll": "Alle Kalender exportieren",

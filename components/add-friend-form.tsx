@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl';
 import useFetchAddress from './hooks/useFetchAddressCoordinates';
 import useFetchTimezoneInformation from './hooks/useFetchTimeZoneInformation';
 import { Coordinates } from '@/lib/actions';
+import { secondsToHours } from 'date-fns';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -40,10 +41,8 @@ export function AddFriendForm({
     isFetching: isFetchingAddress,
     isSuccess: isAddressSuccess,
   } = useFetchAddress(address);
-  const {
-    data: timezoneInformation,
-    isFetching: isFetchingTimezone,
-  } = useFetchTimezoneInformation(coordinates);
+  const { data: timezoneInformation, isFetching: isFetchingTimezone } =
+    useFetchTimezoneInformation(coordinates);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,8 +75,12 @@ export function AddFriendForm({
   if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
 
   let timezoneText = 'input a city';
-  if (isAddressSuccess && timezoneInformation)
-    timezoneText = timezoneInformation.timeZoneName;
+  if (isAddressSuccess && timezoneInformation) {
+    const timezoneOffsetSeconds =
+      timezoneInformation.rawOffset + timezoneInformation.dstOffset;
+    const timezoneOffsetHours = secondsToHours(timezoneOffsetSeconds);
+    timezoneText = `${timezoneInformation.timeZoneName} (UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
+  }
 
   const isLoading = isFetchingAddress || isFetchingTimezone;
   return (
@@ -106,12 +109,12 @@ export function AddFriendForm({
         <div className='w-[calc(50%-4rem)] space-y-2'>
           <div className='flex items-center gap-2'>
             <MapPin className='h-4 w-4 text-muted-foreground' />
-            <Label htmlFor='city'>{t('city')}</Label>
+            <Label htmlFor='location'>{t('location')}</Label>
           </div>
           <div className='flex flex-row gap-2'>
             <div className='flex flex-col items-start gap-2'>
               <Input
-                id='city'
+                id='location'
                 disabled={isLoading}
                 value={address}
                 onChange={(event) => setAddress(event.target.value)}
