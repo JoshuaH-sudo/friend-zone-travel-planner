@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,8 +57,8 @@ export function AddFriendForm({
         availableDates: [],
       });
       setName('');
-      setColor('#3b82f6');
-      setAddress('UTC');
+      setColor(randomColor);
+      setAddress('');
     }
   };
 
@@ -122,7 +122,7 @@ export function AddFriendForm({
               <p className='text-xs text-muted-foreground'>{citySearchText}</p>
             </div>
 
-            <Button onClick={searchAddress} disabled={isLoading}>
+            <Button type='button' onClick={searchAddress} disabled={isLoading}>
               Search
             </Button>
           </div>
@@ -141,7 +141,7 @@ export function AddFriendForm({
         <Button type='button' variant='outline' onClick={onCancel}>
           {t('cancel')}
         </Button>
-        <Button disabled={!name.trim()} onClick={handleSubmit}>
+        <Button type='button' disabled={!name.trim()} onClick={handleSubmit}>
           {t('addFriend')}
         </Button>
       </div>
