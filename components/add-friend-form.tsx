@@ -84,7 +84,7 @@ export function AddFriendForm({
 
   const isLoading = isFetchingAddress || isFetchingTimezone;
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
+    <form className='space-y-4'>
       <div className='space-y-2'>
         <Label htmlFor='friend-name'>{t('name')}</Label>
         <Input
@@ -141,7 +141,7 @@ export function AddFriendForm({
         <Button type='button' variant='outline' onClick={onCancel}>
           {t('cancel')}
         </Button>
-        <Button type='submit' disabled={!name.trim()}>
+        <Button disabled={!name.trim()} onClick={handleSubmit}>
           {t('addFriend')}
         </Button>
       </div>
