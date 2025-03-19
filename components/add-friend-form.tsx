@@ -13,6 +13,18 @@ import useFetchAddress from './hooks/useFetchAddressCoordinates';
 import useFetchTimezoneInformation from './hooks/useFetchTimeZoneInformation';
 import { Coordinates } from '@/lib/actions';
 import { secondsToHours } from 'date-fns';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from './ui/form';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -20,20 +32,58 @@ interface AddFriendFormProps {
   onCancel: () => void;
 }
 
+const formSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  color: z.string(),
+  coordinates: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  address: z.string(),
+  timezone: z.string(),
+  // availableDates: z.array(z.string()),
+});
+
 export function AddFriendForm({
   friends,
   onAddFriend,
   onCancel,
 }: AddFriendFormProps) {
   const t = useTranslations('friend');
-  const [name, setName] = useState('');
   const availableColors = PRESET_COLORS.filter(
     (c) => !friends.some((f) => f.color === c)
   );
   const randomColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
-  const [color, setColor] = useState(randomColor);
-  const [address, setAddress] = useState('');
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      id: crypto.randomUUID(),
+      name: '',
+      color: randomColor,
+      coordinates: { lat: 0, lng: 0 },
+      address: '',
+      timezone: '',
+    },
+  });
+  const isValid = form.formState.isValid;
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const { id, name, color, coordinates, address } = values;
+    onAddFriend({
+      id,
+      name: name.trim(),
+      color,
+      coordinates,
+      address,
+      timezone: timezoneInformation?.timeZoneName!,
+      availableDates: [],
+    });
+  }
+
+  const address = form.watch('address');
   const [coordinates, setCoordinates] = useState<Coordinates>();
   const {
     data: addressDetails,
@@ -42,25 +92,7 @@ export function AddFriendForm({
     isSuccess: isAddressSuccess,
   } = useFetchAddress(address);
   const { data: timezoneInformation, isFetching: isFetchingTimezone } =
-    useFetchTimezoneInformation(coordinates);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onAddFriend({
-        id: crypto.randomUUID(),
-        name: name.trim(),
-        color,
-        coordinates: coordinates!,
-        address,
-        timezone: timezoneInformation?.timeZoneName!,
-        availableDates: [],
-      });
-      setName('');
-      setColor(randomColor);
-      setAddress('');
-    }
-  };
+    useFetchTimezoneInformation();
 
   const searchAddress = async () => {
     const result = await fetchAddress();
@@ -84,47 +116,82 @@ export function AddFriendForm({
 
   const isLoading = isFetchingAddress || isFetchingTimezone;
   return (
-    <form className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='friend-name'>{t('name')}</Label>
-        <Input
-          id='friend-name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={t('namePlaceholder')}
-          required
-        />
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+        <div className='space-y-2'>
+          <FormField
+            control={form.control}
+            name='name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('name')}</FormLabel>
 
-      <div className='space-y-2'>
-        <Label>{t('color')}</Label>
-        <ColorPicker
-          availableColors={availableColors}
-          color={color}
-          onChange={setColor}
-        />
-      </div>
+                <FormControl>
+                  <Input placeholder='You friends name' {...field} />
+                </FormControl>
 
-      <div className='flex flex-row items-center gap-4'>
-        <div className='w-[calc(50%-4rem)] space-y-2'>
-          <div className='flex items-center gap-2'>
-            <MapPin className='h-4 w-4 text-muted-foreground' />
-            <Label htmlFor='location'>{t('location')}</Label>
-          </div>
-          <div className='flex flex-row gap-2'>
-            <div className='flex flex-col items-start gap-2'>
-              <Input
-                id='location'
-                disabled={isLoading}
-                value={address}
-                onChange={(event) => setAddress(event.target.value)}
-              />
-              <p className='text-xs text-muted-foreground'>{citySearchText}</p>
-            </div>
+                <FormDescription>
+                  This is your public display name.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-            <Button type='button' onClick={searchAddress} disabled={isLoading}>
-              Search
-            </Button>
+        <div className='space-y-2'>
+          <FormField
+            control={form.control}
+            name='name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('color')}</FormLabel>
+                <FormControl>
+                  <ColorPicker
+                    availableColors={availableColors}
+                    color={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormDescription>
+                  This is your public display name.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='flex flex-row items-center gap-4'>
+          <div className='w-[calc(50%-4rem)] space-y-2'>
+            <FormField
+              control={form.control}
+              name='address'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='flex items-center gap-2'>
+                    <MapPin className='h-4 w-4 text-muted-foreground' />
+                    <Label htmlFor='location'>{t('location')}</Label>
+                  </FormLabel>
+
+                  <FormControl>
+                    <div className='flex items-center gap-2'>
+                      <Input {...field} />
+                      <Button
+                        type='button'
+                        onClick={searchAddress}
+                        disabled={isLoading}
+                      >
+                        Search
+                      </Button>
+                    </div>
+                  </FormControl>
+
+                  <FormDescription>{citySearchText}</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
 
@@ -135,16 +202,16 @@ export function AddFriendForm({
           </div>
           <p className='text-xs text-muted-foreground'>{timezoneText}</p>
         </div>
-      </div>
 
-      <div className='flex justify-end gap-2'>
-        <Button type='button' variant='outline' onClick={onCancel}>
-          {t('cancel')}
-        </Button>
-        <Button type='button' disabled={!name.trim()} onClick={handleSubmit}>
-          {t('addFriend')}
-        </Button>
-      </div>
-    </form>
+        <div className='flex justify-end gap-2'>
+          <Button type='button' variant='outline' onClick={onCancel}>
+            {t('cancel')}
+          </Button>
+          <Button type='submit' disabled={!isValid}>
+            {t('addFriend')}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
