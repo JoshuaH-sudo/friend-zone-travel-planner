@@ -34,13 +34,19 @@ interface AddFriendFormProps {
 
 const formSchema = z.object({
   id: z.string(),
-  name: z.string(),
-  color: z.string(),
+  name: z.string().nonempty({
+    message: 'Name is required',
+  }),
+  color: z.string({
+    message: 'Must select a color',
+  }),
   coordinates: z.object({
     lat: z.number(),
     lng: z.number(),
   }),
-  address: z.string(),
+  address: z.string({
+    message: 'Address is required',
+  }),
   timezone: z.string(),
   // availableDates: z.array(z.string()),
 });
@@ -84,7 +90,7 @@ export function AddFriendForm({
   }
 
   const address = form.watch('address');
-  const [coordinates, setCoordinates] = useState<Coordinates>();
+  const coordinates = form.watch('coordinates');
   const {
     data: addressDetails,
     refetch: fetchAddress,
@@ -92,13 +98,13 @@ export function AddFriendForm({
     isSuccess: isAddressSuccess,
   } = useFetchAddress(address);
   const { data: timezoneInformation, isFetching: isFetchingTimezone } =
-    useFetchTimezoneInformation();
+    useFetchTimezoneInformation(coordinates);
 
   const searchAddress = async () => {
     const result = await fetchAddress();
     if (result.data) {
       const { lat, lng } = result.data.geometry.location;
-      setCoordinates({ lat, lng });
+      form.setValue('coordinates', { lat, lng });
     }
   };
 
@@ -142,7 +148,7 @@ export function AddFriendForm({
         <div className='space-y-2'>
           <FormField
             control={form.control}
-            name='name'
+            name='color'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('color')}</FormLabel>
