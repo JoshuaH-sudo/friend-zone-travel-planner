@@ -9,8 +9,8 @@ export const getAddressCoordinates = async (address: string) => {
       key: process.env.GOOGLE_MAPS_API_KEY!,
     },
   });
-
-  return result.data.results[0];
+  
+  return result.data;
 };
 
 export type Coordinates = {

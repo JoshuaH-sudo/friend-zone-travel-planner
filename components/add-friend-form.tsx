@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,44 +32,44 @@ interface AddFriendFormProps {
   onCancel: () => void;
 }
 
-const formSchema = z.object({
-  id: z.string(),
-  name: z.string().nonempty({
-    message: 'Name is required',
-  }),
-  color: z.string({
-    message: 'Must select a color',
-  }),
-  coordinates: z.object({
-    lat: z.number(),
-    lng: z.number(),
-  }),
-  address: z.string({
-    message: 'Address is required',
-  }),
-  timezone: z.string(),
-  // availableDates: z.array(z.string()),
-});
-
 export function AddFriendForm({
   friends,
   onAddFriend,
   onCancel,
 }: AddFriendFormProps) {
   const t = useTranslations('friend');
+  const takenColors = friends.map((f) => f.color);
   const availableColors = PRESET_COLORS.filter(
-    (c) => !friends.some((f) => f.color === c)
+    (color) => !takenColors.includes(color)
   );
-  const randomColor =
+  const randomPreselectColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
+
+  const formSchema = z.object({
+    id: z.string(),
+    name: z.string().nonempty({
+      message: 'Name is required',
+    }),
+    color: z.string({
+      message: 'Must select a color',
+    }),
+    coordinates: z.object({
+      lat: z.number(),
+      lng: z.number(),
+    }),
+    address: z.string({
+      message: 'Address is required',
+    }),
+    timezone: z.string(),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: crypto.randomUUID(),
       name: '',
-      color: randomColor,
-      coordinates: { lat: 0, lng: 0 },
+      color: randomPreselectColor,
+      coordinates: undefined,
       address: '',
       timezone: '',
     },
@@ -96,9 +96,32 @@ export function AddFriendForm({
     refetch: fetchAddress,
     isFetching: isFetchingAddress,
     isSuccess: isAddressSuccess,
+    error: addressError,
   } = useFetchAddress(address);
-  const { data: timezoneInformation, isFetching: isFetchingTimezone } =
-    useFetchTimezoneInformation(coordinates);
+
+  const {
+    data: timezoneInformation,
+    isFetching: isFetchingTimezone,
+    error: timezoneInformationError,
+  } = useFetchTimezoneInformation(coordinates);
+
+  useEffect(() => {
+    if (addressError) {
+      form.setError('address', {
+        type: 'manual',
+        message: addressError.message,
+      });
+    }
+  }, [addressError]);
+
+  useEffect(() => {
+    if (timezoneInformationError) {
+      form.setError('timezone', {
+        type: 'manual',
+        message: timezoneInformationError.message,
+      });
+    }
+  }, [timezoneInformationError]);
 
   const searchAddress = async () => {
     const result = await fetchAddress();
@@ -193,7 +216,7 @@ export function AddFriendForm({
                     </div>
                   </FormControl>
 
-                  <FormDescription>{citySearchText}</FormDescription>
+                  <FormDescription>{addressError === null && citySearchText}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

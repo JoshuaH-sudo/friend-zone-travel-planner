@@ -33,10 +33,8 @@ export function ColorPicker({
   onChange,
 }: ColorPickerProps) {
   const t = useTranslations();
-  const [customColor, setCustomColor] = useState(color);
 
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomColor(e.target.value);
     onChange(e.target.value);
   };
 
@@ -78,17 +76,17 @@ export function ColorPicker({
         <div className='flex items-center gap-3'>
           <div
             className='h-8 w-8 rounded-full border'
-            style={{ backgroundColor: customColor }}
+            style={{ backgroundColor: color }}
           />
           <Input
             type='color'
-            value={customColor}
+            value={color}
             onChange={handleCustomColorChange}
             className='h-8 w-16 overflow-hidden p-0'
           />
           <Input
             type='text'
-            value={customColor}
+            value={color}
             onChange={handleCustomColorChange}
             placeholder='#RRGGBB'
             className='flex-1'

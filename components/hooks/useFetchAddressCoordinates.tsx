@@ -5,7 +5,12 @@ const useFetchAddress = (address: string) => {
   return useQuery({
     enabled: false,
     queryKey: ['address', address],
-    queryFn: () => getAddressCoordinates(address),
+    queryFn: async () => { 
+      const response = await getAddressCoordinates(address)
+      if (response.status === "ZERO_RESULTS") throw new Error("No results found")
+      console.log(response)
+      return response.results[0]
+    },
   });
 };
 
