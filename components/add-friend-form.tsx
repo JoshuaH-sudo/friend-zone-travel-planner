@@ -1,17 +1,15 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ColorPicker, PRESET_COLORS } from './color-picker';
-import { Globe, MapPin } from 'lucide-react';
+import { PRESET_COLORS } from './color-picker';
+import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import useFetchAddress from './hooks/useFetchAddressCoordinates';
 import useFetchTimezoneInformation from './hooks/useFetchTimeZoneInformation';
-import { Coordinates } from '@/lib/actions';
 import { secondsToHours } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,13 +17,13 @@ import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from './ui/form';
 import AddressField from './add-friend-form/address-field';
+import ColorPickerField from './add-friend-form/color-picker-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -138,25 +136,7 @@ export function AddFriendForm({
           />
         </div>
 
-        <div id="color-form-field" className='space-y-2'>
-          <FormField
-            control={form.control}
-            name='color'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('color')}</FormLabel>
-                <FormControl>
-                  <ColorPicker
-                    availableColors={availableColors}
-                    color={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <ColorPickerField friends={friends} />
 
         <AddressField friends={friends} />
 
