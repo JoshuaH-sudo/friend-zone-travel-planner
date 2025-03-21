@@ -137,12 +137,14 @@ export function AddFriendForm({
   }, [addressDetails, isAddressSuccess]);
 
   const onClickSearch = () => fetchAddress();
-  
+
+  // TODO: Add a loading spinner
+  // TODO: Translate the placeholder text
   let citySearchText = 'e.g. San Francisco';
   if (isFetchingAddress) citySearchText = 'Searching...';
   if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
 
-  let timezoneText = 'input a city';
+  let timezoneText = 'input location';
   if (isAddressSuccess && timezoneInformation) {
     const timezoneOffsetSeconds =
       timezoneInformation.rawOffset + timezoneInformation.dstOffset;
