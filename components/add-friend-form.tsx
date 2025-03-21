@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from './ui/form';
+import AddressField from './add-friend-form/address-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -89,32 +90,12 @@ export function AddFriendForm({
     });
   }
 
-  const address = form.watch('address');
   const coordinates = form.watch('coordinates');
-  const {
-    data: addressDetails,
-    refetch: fetchAddress,
-    isFetching: isFetchingAddress,
-    isSuccess: isAddressSuccess,
-    error: addressError,
-  } = useFetchAddress(address);
-
   const {
     data: timezoneInformation,
     isFetching: isFetchingTimezone,
     error: timezoneInformationError,
   } = useFetchTimezoneInformation(coordinates);
-
-  useEffect(() => {
-    if (addressError) {
-      form.setError('address', {
-        type: 'manual',
-        message: addressError.message,
-      });
-    } else {
-      form.clearErrors('address');
-    }
-  }, [addressError]);
 
   useEffect(() => {
     if (timezoneInformationError) {
@@ -127,36 +108,19 @@ export function AddFriendForm({
     }
   }, [timezoneInformationError]);
 
-  useEffect(() => {
-    if (addressDetails && isAddressSuccess) {
-      form.clearErrors('address');
-      // If the address is successfully (pre-)fetched, update the coordinates without the user having to click search
-      const { lat, lng } = addressDetails.geometry.location;
-      form.setValue('coordinates', { lat, lng });
-    }
-  }, [addressDetails, isAddressSuccess]);
-
-  const onClickSearch = () => fetchAddress();
-
-  // TODO: Add a loading spinner
-  // TODO: Translate the placeholder text
-  let citySearchText = 'e.g. San Francisco';
-  if (isFetchingAddress) citySearchText = 'Searching...';
-  if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
-
   let timezoneText = 'input location';
-  if (isAddressSuccess && timezoneInformation) {
+  if (timezoneInformation) {
     const timezoneOffsetSeconds =
       timezoneInformation.rawOffset + timezoneInformation.dstOffset;
     const timezoneOffsetHours = secondsToHours(timezoneOffsetSeconds);
     timezoneText = `${timezoneInformation.timeZoneName} (UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
   }
 
-  const isLoading = isFetchingAddress || isFetchingTimezone;
+  const isLoading = isFetchingTimezone;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-        <div className='space-y-2'>
+        <div id="name-form-field" className='space-y-2'>
           <FormField
             control={form.control}
             name='name'
@@ -168,16 +132,13 @@ export function AddFriendForm({
                   <Input placeholder='You friends name' {...field} />
                 </FormControl>
 
-                <FormDescription>
-                  This is your public display name.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <div className='space-y-2'>
+        <div id="color-form-field" className='space-y-2'>
           <FormField
             control={form.control}
             name='color'
@@ -197,42 +158,9 @@ export function AddFriendForm({
           />
         </div>
 
-        <div className='flex flex-row items-center gap-4'>
-          <div className='w-[calc(50%-4rem)] space-y-2'>
-            <FormField
-              control={form.control}
-              name='address'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='flex items-center gap-2'>
-                    <MapPin className='h-4 w-4 text-muted-foreground' />
-                    <Label htmlFor='location'>{t('location')}</Label>
-                  </FormLabel>
+        <AddressField friends={friends} />
 
-                  <FormControl>
-                    <div className='flex items-center gap-2'>
-                      <Input {...field} />
-                      <Button
-                        type='button'
-                        onClick={onClickSearch}
-                        disabled={isLoading}
-                      >
-                        Search
-                      </Button>
-                    </div>
-                  </FormControl>
-
-                  <FormDescription>
-                    {addressError === null && citySearchText}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <div className='space-y-2'>
+        <div id="timezone-form-field" className='space-y-2'>
           <div className='flex items-center gap-2'>
             <Globe className='h-4 w-4 text-muted-foreground' />
             <Label htmlFor='timezone'>{t('timezone')}</Label>
