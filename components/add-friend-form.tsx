@@ -111,6 +111,8 @@ export function AddFriendForm({
         type: 'manual',
         message: addressError.message,
       });
+    } else {
+      form.clearErrors('address');
     }
   }, [addressError]);
 
@@ -120,17 +122,22 @@ export function AddFriendForm({
         type: 'manual',
         message: timezoneInformationError.message,
       });
+    } else {
+      form.clearErrors('timezone');
     }
   }, [timezoneInformationError]);
 
-  const searchAddress = async () => {
-    const result = await fetchAddress();
-    if (result.data) {
-      const { lat, lng } = result.data.geometry.location;
+  useEffect(() => {
+    if (addressDetails && isAddressSuccess) {
+      form.clearErrors('address');
+      // If the address is successfully (pre-)fetched, update the coordinates without the user having to click search
+      const { lat, lng } = addressDetails.geometry.location;
       form.setValue('coordinates', { lat, lng });
     }
-  };
+  }, [addressDetails, isAddressSuccess]);
 
+  const onClickSearch = () => fetchAddress();
+  
   let citySearchText = 'e.g. San Francisco';
   if (isFetchingAddress) citySearchText = 'Searching...';
   if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
@@ -182,9 +189,6 @@ export function AddFriendForm({
                     onChange={field.onChange}
                   />
                 </FormControl>
-                <FormDescription>
-                  This is your public display name.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -208,7 +212,7 @@ export function AddFriendForm({
                       <Input {...field} />
                       <Button
                         type='button'
-                        onClick={searchAddress}
+                        onClick={onClickSearch}
                         disabled={isLoading}
                       >
                         Search
@@ -216,7 +220,9 @@ export function AddFriendForm({
                     </div>
                   </FormControl>
 
-                  <FormDescription>{addressError === null && citySearchText}</FormDescription>
+                  <FormDescription>
+                    {addressError === null && citySearchText}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

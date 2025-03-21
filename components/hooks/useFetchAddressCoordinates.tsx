@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const useFetchAddress = (address: string) => {
   return useQuery({
+    // Only want to fetch the address once the user has entered it completely
     enabled: false,
     queryKey: ['address', address],
     queryFn: async () => { 
