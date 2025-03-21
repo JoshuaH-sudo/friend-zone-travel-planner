@@ -13,6 +13,7 @@ import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import TimezoneFormField from './add-friend-form/timezone-form-field';
 import NameFormField from './add-friend-form/name-form-field';
+import { timezone } from '@googlemaps/google-maps-services-js/dist/timezone';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -20,12 +21,34 @@ interface AddFriendFormProps {
   onCancel: () => void;
 }
 
+export const addFriendSchema = z.object({
+  id: z.string(),
+  name: z.string().nonempty({
+    message: 'Name is required',
+  }),
+  color: z.string({
+    message: 'Must select a color',
+  }),
+  coordinates: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  address: z.string({
+    message: 'Address is required',
+  }),
+  timezone: z.string(),
+  timezoneOffset: z.number(),
+});
+
+export type addFriendFormContext = z.infer<typeof addFriendSchema>;
+
 export function AddFriendForm({
   friends,
   onAddFriend,
   onCancel,
 }: AddFriendFormProps) {
   const t = useTranslations('friend');
+
   const takenColors = friends.map((f) => f.color);
   const availableColors = PRESET_COLORS.filter(
     (color) => !takenColors.includes(color)
@@ -33,26 +56,9 @@ export function AddFriendForm({
   const randomPreselectColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
 
-  const formSchema = z.object({
-    id: z.string(),
-    name: z.string().nonempty({
-      message: 'Name is required',
-    }),
-    color: z.string({
-      message: 'Must select a color',
-    }),
-    coordinates: z.object({
-      lat: z.number(),
-      lng: z.number(),
-    }),
-    address: z.string({
-      message: 'Address is required',
-    }),
-    timezone: z.string(),
-  });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof addFriendSchema>>({
+    resolver: zodResolver(addFriendSchema),
     defaultValues: {
       id: crypto.randomUUID(),
       name: '',
@@ -63,7 +69,7 @@ export function AddFriendForm({
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof addFriendSchema>) {
     const { id, name, color, coordinates, address, timezone } = values;
     onAddFriend({
       id,

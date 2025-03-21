@@ -6,11 +6,12 @@ import { useTranslations } from 'next-intl';
 import { useFormContext } from 'react-hook-form';
 import useFetchTimezoneInformation from '../hooks/useFetchTimeZoneInformation';
 import { useEffect } from 'react';
+import { addFriendFormContext } from '../add-friend-form';
 
 interface TimezoneFormFieldProps {}
 
 function TimezoneFormField({}: TimezoneFormFieldProps) {
-  const form = useFormContext();
+  const form = useFormContext<addFriendFormContext>();
   const t = useTranslations('friend');
 
   const coordinates = form.watch('coordinates');
@@ -29,7 +30,10 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
   }, [timezoneInformationError]);
 
   useEffect(() => {
-    form.setValue('timezone', timezoneInformation?.timeZoneName);
+    if (timezoneInformation) {
+      form.setValue('timezone', timezoneInformation?.timeZoneName);
+      form.setValue('timezoneOffset', timezoneInformation?.rawOffset + timezoneInformation?.dstOffset);
+    }
   }, [timezoneInformation]);
 
   let timezoneText = 'input location';
