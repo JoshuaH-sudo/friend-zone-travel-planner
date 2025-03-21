@@ -1,16 +1,11 @@
 'use client';
 
 import type React from 'react';
-import { useEffect } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { PRESET_COLORS } from './color-picker';
-import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import useFetchTimezoneInformation from './hooks/useFetchTimeZoneInformation';
-import { secondsToHours } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -24,6 +19,7 @@ import {
 } from './ui/form';
 import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
+import TimezoneFormField from './add-friend-form/timezone-form-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -88,33 +84,6 @@ export function AddFriendForm({
     });
   }
 
-  const coordinates = form.watch('coordinates');
-  const {
-    data: timezoneInformation,
-    isFetching: isFetchingTimezone,
-    error: timezoneInformationError,
-  } = useFetchTimezoneInformation(coordinates);
-
-  useEffect(() => {
-    if (timezoneInformationError) {
-      form.setError('timezone', {
-        type: 'manual',
-        message: timezoneInformationError.message,
-      });
-    } else {
-      form.clearErrors('timezone');
-    }
-  }, [timezoneInformationError]);
-
-  let timezoneText = 'input location';
-  if (timezoneInformation) {
-    const timezoneOffsetSeconds =
-      timezoneInformation.rawOffset + timezoneInformation.dstOffset;
-    const timezoneOffsetHours = secondsToHours(timezoneOffsetSeconds);
-    timezoneText = `${timezoneInformation.timeZoneName} (UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
-  }
-
-  const isLoading = isFetchingTimezone;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -140,13 +109,7 @@ export function AddFriendForm({
 
         <AddressField friends={friends} />
 
-        <div id="timezone-form-field" className='space-y-2'>
-          <div className='flex items-center gap-2'>
-            <Globe className='h-4 w-4 text-muted-foreground' />
-            <Label htmlFor='timezone'>{t('timezone')}</Label>
-          </div>
-          <p className='text-xs text-muted-foreground'>{timezoneText}</p>
-        </div>
+        <TimezoneFormField />
 
         <div className='flex justify-end gap-2'>
           <Button type='button' variant='outline' onClick={onCancel}>
