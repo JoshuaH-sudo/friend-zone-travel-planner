@@ -3,23 +3,16 @@
 import type React from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { PRESET_COLORS } from './color-picker';
 import { useTranslations } from 'next-intl';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from './ui/form';
+import { Form } from './ui/form';
 import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import TimezoneFormField from './add-friend-form/timezone-form-field';
+import NameFormField from './add-friend-form/name-form-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -69,41 +62,25 @@ export function AddFriendForm({
       timezone: '',
     },
   });
-  const isValid = form.formState.isValid;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const { id, name, color, coordinates, address } = values;
+    const { id, name, color, coordinates, address, timezone } = values;
     onAddFriend({
       id,
       name: name.trim(),
       color,
       coordinates,
       address,
-      timezone: timezoneInformation?.timeZoneName!,
+      timezone,
       availableDates: [],
     });
   }
 
+  const isValid = form.formState.isValid;
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-        <div id="name-form-field" className='space-y-2'>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('name')}</FormLabel>
-
-                <FormControl>
-                  <Input placeholder='You friends name' {...field} />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <NameFormField />
 
         <ColorPickerField friends={friends} />
 
