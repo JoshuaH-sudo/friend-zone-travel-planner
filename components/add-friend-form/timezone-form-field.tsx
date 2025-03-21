@@ -28,6 +28,10 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
     }
   }, [timezoneInformationError]);
 
+  useEffect(() => {
+    form.setValue('timezone', timezoneInformation?.timeZoneName);
+  }, [timezoneInformation]);
+
   let timezoneText = 'input location';
   if (timezoneInformation) {
     const timezoneOffsetSeconds =
