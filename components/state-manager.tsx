@@ -68,10 +68,19 @@ export function StateManager({
         <p className='text-sm text-muted-foreground'>
           {t('state.saveStateDescription')}
         </p>
-        <Button onClick={handleExport} className='gap-2'>
+        <Button
+          onClick={handleExport}
+          disabled={!currentState.groupName}
+          className='gap-2'
+        >
           <Save className='h-4 w-4' />
           {t('actions.saveState')}
         </Button>
+        {!currentState.groupName && (
+          <p className='text-xs text-destructive'>
+            Need to give your group a name before you can save the state.
+          </p>
+        )}
       </div>
 
       <div className='space-y-4 border-t pt-6'>

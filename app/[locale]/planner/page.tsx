@@ -146,6 +146,7 @@ export default function PlannerPage() {
                   {t('actions.importCalendar')}
                 </h2>
                 <ImportCalendar
+                  friends={friends}
                   onImport={addFriend}
                   onCancel={() => setShowImport(false)}
                 />
@@ -228,9 +229,9 @@ export default function PlannerPage() {
                     <FriendCalendar
                       key={friend.id}
                       friend={friend}
+                      friends={friends}
                       onUpdateAvailability={updateFriendAvailability}
                       onRemoveFriend={removeFriend}
-                      onUpdateTimezone={updateFriendTimezone}
                       onUpdateFriend={updateFriend}
                     />
                   ))}

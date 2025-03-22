@@ -26,20 +26,21 @@ import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
 import { cn } from '@/lib/utils';
+import { displayTimezoneOffset } from './timezone-display';
 
 interface FriendCalendarProps {
   friend: Friend;
+  friends: Friend[];
   onUpdateAvailability: (friendId: string, dates: Date[]) => void;
   onRemoveFriend: (friendId: string) => void;
-  onUpdateTimezone: (friendId: string, timezone: string) => void;
   onUpdateFriend: (updatedFriend: Friend) => void;
 }
 
 export function FriendCalendar({
   friend,
+  friends,
   onUpdateAvailability,
   onRemoveFriend,
-  onUpdateTimezone,
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations();
@@ -62,20 +63,9 @@ export function FriendCalendar({
     onUpdateAvailability(friend.id, dates);
   };
 
-  // Common timezones
-  const timezones = [
-    'UTC',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-  ];
+  const { timezone, timezoneOffset } = friend;
 
+  const timezoneDisplayText = displayTimezoneOffset(timezone, timezoneOffset);
   return (
     <Card className='overflow-hidden'>
       <CardHeader
@@ -111,6 +101,7 @@ export function FriendCalendar({
                 </h2>
                 <EditFriendForm
                   friend={friend}
+                  friends={friends}
                   onSave={handleSaveEdit}
                   onCancel={() => setShowEditDialog(false)}
                 />
@@ -153,9 +144,9 @@ export function FriendCalendar({
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
-            monthGridClassName='text-lg w-full'
-            weekClassName='text-lg w-full'
-            weekdayClassName='text-lg w-full'
+            monthGridClassName='w-full'
+            weekClassName='w-full'
+            weekdayClassName='w-full'
             components={{
               DayButton: ({ modifiers, className, ...props }) => (
                 <Button
@@ -191,21 +182,7 @@ export function FriendCalendar({
               {t('friend.timezone')}
             </Label>
           </div>
-          <Select
-            value={friend.timezone}
-            onValueChange={(value) => onUpdateTimezone(friend.id, value)}
-          >
-            <SelectTrigger id={`timezone-${friend.id}`} className='h-8 text-xs'>
-              <SelectValue placeholder={t('friend.timezone')} />
-            </SelectTrigger>
-            <SelectContent>
-              {timezones.map((tz) => (
-                <SelectItem key={tz} value={tz} className='text-xs'>
-                  {tz.replace('_', ' ')}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <p className='text-xs text-muted-foreground'>{timezoneDisplayText}</p>
         </div>
       </CardFooter>
     </Card>

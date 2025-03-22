@@ -1,22 +1,18 @@
 'use client';
 
 import type React from 'react';
-
-import { useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ColorPicker, PRESET_COLORS } from './color-picker';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+import { PRESET_COLORS } from './color-picker';
 import { useTranslations } from 'next-intl';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { Form } from './ui/form';
+import AddressField from './add-friend-form/address-field';
+import ColorPickerField from './add-friend-form/color-picker-field';
+import TimezoneFormField from './add-friend-form/timezone-form-field';
+import NameFormField from './add-friend-form/name-form-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -24,100 +20,89 @@ interface AddFriendFormProps {
   onCancel: () => void;
 }
 
+export const addFriendSchema = z.object({
+  id: z.string(),
+  name: z.string().nonempty({
+    message: 'Name is required',
+  }),
+  color: z.string({
+    message: 'Must select a color',
+  }),
+  coordinates: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  address: z.string({
+    message: 'Address is required',
+  }),
+  timezone: z.string(),
+  timezoneOffset: z.number(),
+});
+
+export type addFriendFormContext = z.infer<typeof addFriendSchema>;
+
 export function AddFriendForm({
   friends,
   onAddFriend,
   onCancel,
 }: AddFriendFormProps) {
   const t = useTranslations('friend');
-  const [name, setName] = useState('');
+
+  const takenColors = friends.map((f) => f.color);
   const availableColors = PRESET_COLORS.filter(
-    (c) => !friends.some((f) => f.color === c)
+    (color) => !takenColors.includes(color)
   );
-  const randomColor =
+  const randomPreselectColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
-  const [color, setColor] = useState(randomColor);
-  const [timezone, setTimezone] = useState('UTC');
 
-  // Common timezones
-  const timezones = [
-    'UTC',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-  ];
+  const form = useForm<z.infer<typeof addFriendSchema>>({
+    resolver: zodResolver(addFriendSchema),
+    defaultValues: {
+      id: crypto.randomUUID(),
+      name: '',
+      color: randomPreselectColor,
+      coordinates: undefined,
+      address: '',
+      timezone: '',
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onAddFriend({
-        id: crypto.randomUUID(),
-        name: name.trim(),
-        color,
-        timezone,
-        availableDates: [],
-      });
-      setName('');
-      setColor('#3b82f6');
-      setTimezone('UTC');
-    }
-  };
+  function onSubmit(values: z.infer<typeof addFriendSchema>) {
+    const { id, name, color, coordinates, address, timezone, timezoneOffset } =
+      values;
+    onAddFriend({
+      id,
+      name: name.trim(),
+      color,
+      coordinates,
+      address,
+      timezone,
+      timezoneOffset,
+      availableDates: [],
+    });
+  }
 
+  const isValid = form.formState.isValid;
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='friend-name'>{t('name')}</Label>
-        <Input
-          id='friend-name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={t('namePlaceholder')}
-          required
-        />
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+        <NameFormField />
 
-      <div className='space-y-2'>
-        <Label>{t('color')}</Label>
-        <ColorPicker
-          availableColors={availableColors}
-          color={color}
-          onChange={setColor}
-        />
-      </div>
+        <ColorPickerField friends={friends} />
 
-      <div className='space-y-2'>
-        <div className='flex items-center gap-2'>
-          <Globe className='h-4 w-4 text-muted-foreground' />
-          <Label htmlFor='timezone'>{t('timezone')}</Label>
+        <AddressField friends={friends} className='w-[50%]' />
+
+        <TimezoneFormField />
+
+        <div className='flex justify-end gap-2'>
+          <Button type='button' variant='outline' onClick={onCancel}>
+            {t('cancel')}
+          </Button>
+          <Button type='submit' disabled={!isValid}>
+            {t('addFriend')}
+          </Button>
         </div>
-        <Select value={timezone} onValueChange={setTimezone}>
-          <SelectTrigger id='timezone'>
-            <SelectValue placeholder={t('timezonePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {timezones.map((tz) => (
-              <SelectItem key={tz} value={tz}>
-                {tz.replace('_', ' ')}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className='flex justify-end gap-2'>
-        <Button type='button' variant='outline' onClick={onCancel}>
-          {t('cancel')}
-        </Button>
-        <Button type='submit' disabled={!name.trim()}>
-          {t('addFriend')}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }

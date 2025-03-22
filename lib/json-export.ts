@@ -8,36 +8,13 @@ export interface AppState {
 
 // Convert dates to strings for JSON serialization
 export function serializeState(state: AppState): string {
-  const serializedFriends = state.friends.map((friend) => ({
-    ...friend,
-    availableDates: friend.availableDates.map((date) => date.toISOString()),
-  }));
-
-  const serializedState = {
-    ...state,
-    friends: serializedFriends,
-  };
-
-  return JSON.stringify(serializedState, null, 2);
+  return JSON.stringify(state, null, 2);
 }
 
 // Parse the serialized state back to the AppState format
 export function deserializeState(jsonString: string): AppState {
   try {
-    const parsedState = JSON.parse(jsonString);
-
-    // Convert date strings back to Date objects
-    const deserializedFriends = parsedState.friends.map((friend: any) => ({
-      ...friend,
-      availableDates: friend.availableDates.map(
-        (dateStr: string) => new Date(dateStr)
-      ),
-    }));
-
-    return {
-      groupName: parsedState.groupName || '',
-      friends: deserializedFriends,
-    };
+    return JSON.parse(jsonString);
   } catch (error) {
     throw new Error('Failed to parse state file');
   }
