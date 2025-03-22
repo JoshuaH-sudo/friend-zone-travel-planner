@@ -11,14 +11,20 @@ import { Friend } from '@/lib/types';
 import { ColorPicker, PRESET_COLORS } from '../color-picker';
 
 interface ColorPickerFieldProps {
+  selectedFriendId?: string;
   friends: Friend[];
 }
 
-function ColorPickerField({ friends }: ColorPickerFieldProps) {
+function ColorPickerField({
+  selectedFriendId,
+  friends,
+}: ColorPickerFieldProps) {
   const form = useFormContext();
   const t = useTranslations('friend');
 
-  const takenColors = friends.map((f) => f.color);
+  let takenColors = friends
+    .filter((friend) => friend.id !== selectedFriendId)
+    .map((f) => f.color);
   const availableColors = PRESET_COLORS.filter(
     (color) => !takenColors.includes(color)
   );

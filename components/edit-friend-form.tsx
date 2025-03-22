@@ -51,6 +51,7 @@ export function EditFriendForm({
     resolver: zodResolver(addFriendSchema),
     defaultValues: {
       ...friend,
+      coordinates: undefined,
     },
   });
 
@@ -74,7 +75,7 @@ export function EditFriendForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <NameFormField />
 
-        <ColorPickerField friends={friends} />
+        <ColorPickerField selectedFriendId={friend.id} friends={friends} />
 
         <AddressField friends={friends} />
 
