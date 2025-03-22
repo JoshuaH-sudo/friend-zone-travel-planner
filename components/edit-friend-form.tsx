@@ -2,20 +2,8 @@
 
 import type React from 'react';
 
-import { useState } from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ColorPicker } from './color-picker';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -79,7 +67,7 @@ export function EditFriendForm({
       timezoneOffset,
     });
   }
-  
+
   const isValid = form.formState.isValid;
   return (
     <Form {...form}>
@@ -91,6 +79,7 @@ export function EditFriendForm({
         <AddressField friends={friends} />
 
         <TimezoneFormField />
+
         <div className='flex justify-end gap-2'>
           <Button type='button' variant='outline' onClick={onCancel}>
             {t('actions.cancel')}
