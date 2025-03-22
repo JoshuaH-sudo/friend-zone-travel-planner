@@ -8,17 +8,18 @@ export interface AppState {
 
 // Convert dates to strings for JSON serialization
 export function serializeState(state: AppState): string {
-  const serializedFriends = state.friends.map((friend) => ({
-    ...friend,
-    availableDates: friend.availableDates.map((date) => date.toISOString()),
-  }));
+  // console.log(state);
+  // const serializedFriends = state.friends.map((friend) => ({
+  //   ...friend,
+  //   availableDates: friend.availableDates.map((date) => date.toISOString()),
+  // }));
 
-  const serializedState = {
-    ...state,
-    friends: serializedFriends,
-  };
+  // const serializedState = {
+  //   ...state,
+  //   friends: serializedFriends,
+  // };
 
-  return JSON.stringify(serializedState, null, 2);
+  return JSON.stringify(state, null, 2);
 }
 
 // Parse the serialized state back to the AppState format
