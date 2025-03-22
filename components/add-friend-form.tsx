@@ -56,7 +56,6 @@ export function AddFriendForm({
   const randomPreselectColor =
     availableColors[Math.floor(Math.random() * availableColors.length)];
 
-
   const form = useForm<z.infer<typeof addFriendSchema>>({
     resolver: zodResolver(addFriendSchema),
     defaultValues: {
@@ -70,7 +69,8 @@ export function AddFriendForm({
   });
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone } = values;
+    const { id, name, color, coordinates, address, timezone, timezoneOffset } =
+      values;
     onAddFriend({
       id,
       name: name.trim(),
@@ -78,6 +78,7 @@ export function AddFriendForm({
       coordinates,
       address,
       timezone,
+      timezoneOffset,
       availableDates: [],
     });
   }
