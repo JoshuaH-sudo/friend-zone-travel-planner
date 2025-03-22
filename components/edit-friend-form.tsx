@@ -17,94 +17,89 @@ import {
 } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form } from './ui/form';
+import AddressField from './add-friend-form/address-field';
+import ColorPickerField from './add-friend-form/color-picker-field';
+import NameFormField from './add-friend-form/name-form-field';
+import TimezoneFormField from './add-friend-form/timezone-form-field';
 
 interface EditFriendFormProps {
   friend: Friend;
+  friends: Friend[];
   onSave: (updatedFriend: Friend) => void;
   onCancel: () => void;
 }
 
+export const addFriendSchema = z.object({
+  name: z.string().nonempty({
+    message: 'Name is required',
+  }),
+  color: z.string({
+    message: 'Must select a color',
+  }),
+  coordinates: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  address: z.string({
+    message: 'Address is required',
+  }),
+  timezone: z.string(),
+  timezoneOffset: z.number(),
+});
+
 export function EditFriendForm({
   friend,
+  friends,
   onSave,
   onCancel,
 }: EditFriendFormProps) {
   const t = useTranslations();
-  const [name, setName] = useState(friend.name);
-  const [color, setColor] = useState(friend.color);
-  const [timezone, setTimezone] = useState(friend.timezone);
 
-  // Common timezones
-  const timezones = [
-    'UTC',
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'Europe/London',
-    'Europe/Paris',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-  ];
+  const form = useForm<z.infer<typeof addFriendSchema>>({
+    resolver: zodResolver(addFriendSchema),
+    defaultValues: {
+      ...friend,
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onSave({
-        ...friend,
-        name: name.trim(),
-        color,
-        timezone,
-      });
-    }
-  };
-
+  function onSubmit(values: z.infer<typeof addFriendSchema>) {
+    const { name, color, coordinates, address, timezone, timezoneOffset } =
+      values;
+    onSave({
+      ...friend,
+      name: name.trim(),
+      color,
+      coordinates,
+      address,
+      timezone,
+      timezoneOffset,
+    });
+  }
+  
+  const isValid = form.formState.isValid;
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='friend-name'>{t('friend.name')}</Label>
-        <Input
-          id='friend-name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={t('friend.namePlaceholder')}
-          required
-        />
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+        <NameFormField />
 
-      <div className='space-y-2'>
-        <Label>{t('friend.color')}</Label>
-        <ColorPicker color={color} onChange={setColor} />
-      </div>
+        <ColorPickerField friends={friends} />
 
-      <div className='space-y-2'>
-        <div className='flex items-center gap-2'>
-          <Globe className='h-4 w-4 text-muted-foreground' />
-          <Label htmlFor='timezone'>{t('friend.timezone')}</Label>
+        <AddressField friends={friends} />
+
+        <TimezoneFormField />
+        <div className='flex justify-end gap-2'>
+          <Button type='button' variant='outline' onClick={onCancel}>
+            {t('actions.cancel')}
+          </Button>
+          <Button type='submit' disabled={!isValid}>
+            {t('actions.save')}
+          </Button>
         </div>
-        <Select value={timezone} onValueChange={setTimezone}>
-          <SelectTrigger id='timezone'>
-            <SelectValue placeholder={t('friend.timezone')} />
-          </SelectTrigger>
-          <SelectContent>
-            {timezones.map((tz) => (
-              <SelectItem key={tz} value={tz}>
-                {tz.replace('_', ' ')}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className='flex justify-end gap-2'>
-        <Button type='button' variant='outline' onClick={onCancel}>
-          {t('actions.cancel')}
-        </Button>
-        <Button type='submit' disabled={!name.trim()}>
-          {t('actions.save')}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 }

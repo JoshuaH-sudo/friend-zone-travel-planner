@@ -17,11 +17,13 @@ import useFetchAddress from '../hooks/useFetchAddressCoordinates';
 import { useEffect } from 'react';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 interface AddressFieldProps {
   friends: Friend[];
+  className?: string;
 }
-function AddressField({ friends }: AddressFieldProps) {
+function AddressField({ friends, className }: AddressFieldProps) {
   const form = useFormContext();
   const t = useTranslations('friend');
 
@@ -63,39 +65,37 @@ function AddressField({ friends }: AddressFieldProps) {
 
   const isLoading = isFetchingAddress;
   return (
-    <div id='address-form-field' className='flex flex-row items-center gap-4'>
-      <div className='w-[calc(50%-4rem)] space-y-2'>
-        <FormField
-          control={form.control}
-          name='address'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className='flex items-center gap-2'>
-                <MapPin className='h-4 w-4 text-muted-foreground' />
-                <Label htmlFor='location'>{t('location')}</Label>
-              </FormLabel>
+    <div id='address-form-field' className={cn('space-y-2', className)}>
+      <FormField
+        control={form.control}
+        name='address'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className='flex items-center gap-2'>
+              <MapPin className='h-4 w-4 text-muted-foreground' />
+              <Label htmlFor='location'>{t('location')}</Label>
+            </FormLabel>
 
-              <FormControl>
-                <div className='flex items-center gap-2'>
-                  <Input {...field} />
-                  <Button
-                    type='button'
-                    onClick={onClickSearch}
-                    disabled={isLoading}
-                  >
-                    Search
-                  </Button>
-                </div>
-              </FormControl>
+            <FormControl>
+              <div className='flex items-center gap-2'>
+                <Input {...field} />
+                <Button
+                  type='button'
+                  onClick={onClickSearch}
+                  disabled={isLoading}
+                >
+                  Search
+                </Button>
+              </div>
+            </FormControl>
 
-              <FormDescription>
-                {addressError === null && citySearchText}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+            <FormDescription>
+              {addressError === null && citySearchText}
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

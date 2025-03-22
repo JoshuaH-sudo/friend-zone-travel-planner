@@ -228,9 +228,9 @@ export default function PlannerPage() {
                     <FriendCalendar
                       key={friend.id}
                       friend={friend}
+                      friends={friends}
                       onUpdateAvailability={updateFriendAvailability}
                       onRemoveFriend={removeFriend}
-                      onUpdateTimezone={updateFriendTimezone}
                       onUpdateFriend={updateFriend}
                     />
                   ))}

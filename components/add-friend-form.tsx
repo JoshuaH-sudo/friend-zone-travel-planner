@@ -13,7 +13,6 @@ import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import TimezoneFormField from './add-friend-form/timezone-form-field';
 import NameFormField from './add-friend-form/name-form-field';
-import { timezone } from '@googlemaps/google-maps-services-js/dist/timezone';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -91,7 +90,7 @@ export function AddFriendForm({
 
         <ColorPickerField friends={friends} />
 
-        <AddressField friends={friends} />
+        <AddressField friends={friends} className='w-[50%]' />
 
         <TimezoneFormField />
 

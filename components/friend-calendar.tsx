@@ -30,17 +30,17 @@ import { displayTimezoneOffset } from './timezone-display';
 
 interface FriendCalendarProps {
   friend: Friend;
+  friends: Friend[];
   onUpdateAvailability: (friendId: string, dates: Date[]) => void;
   onRemoveFriend: (friendId: string) => void;
-  onUpdateTimezone: (friendId: string, timezone: string) => void;
   onUpdateFriend: (updatedFriend: Friend) => void;
 }
 
 export function FriendCalendar({
   friend,
+  friends,
   onUpdateAvailability,
   onRemoveFriend,
-  onUpdateTimezone,
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations();
@@ -101,6 +101,7 @@ export function FriendCalendar({
                 </h2>
                 <EditFriendForm
                   friend={friend}
+                  friends={friends}
                   onSave={handleSaveEdit}
                   onCancel={() => setShowEditDialog(false)}
                 />
