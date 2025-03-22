@@ -143,9 +143,9 @@ export function FriendCalendar({
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
-            monthGridClassName='text-lg w-full'
-            weekClassName='text-lg w-full'
-            weekdayClassName='text-lg w-full'
+            monthGridClassName='w-full'
+            weekClassName='w-full'
+            weekdayClassName='w-full'
             components={{
               DayButton: ({ modifiers, className, ...props }) => (
                 <Button
