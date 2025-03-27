@@ -12,13 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Trash2, Globe, Upload, Edit } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from './edit-friend-form';
