@@ -66,8 +66,9 @@ export function FriendCalendar({
   const { timezone, timezoneOffset } = friend;
 
   const timezoneDisplayText = displayTimezoneOffset(timezone, timezoneOffset);
+  console.log(friend.availableDates);
   return (
-    <Card className='overflow-hidden'>
+    <Card className='overflow-hidden flex flex-col h-[500px]'>
       <CardHeader
         className='pb-2'
         style={{ backgroundColor: `${friend.color}20` }}
@@ -137,10 +138,9 @@ export function FriendCalendar({
         </div>
       </CardHeader>
 
-      <CardContent className='p-3'>
+      <CardContent className='p-3 grow'>
         <div ref={calendarRef}>
           <Calendar
-            animate
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
