@@ -66,6 +66,7 @@ export function FriendCalendar({
   const { timezone, timezoneOffset } = friend;
 
   const timezoneDisplayText = displayTimezoneOffset(timezone, timezoneOffset);
+  console.log(friend.availableDates);
   return (
     <Card className='overflow-hidden'>
       <CardHeader
@@ -140,7 +141,6 @@ export function FriendCalendar({
       <CardContent className='p-3'>
         <div ref={calendarRef}>
           <Calendar
-            animate
             required={false}
             mode='multiple'
             style={{ width: '100%' }}
