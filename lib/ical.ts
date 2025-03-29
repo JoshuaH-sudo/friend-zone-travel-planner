@@ -17,6 +17,7 @@ export function generateFriendIcal(friend: Friend): string {
       description: `${friend.name} is available on this day`,
       summary: `${friend.name} Available`,
       transparency: ICalEventTransparency.TRANSPARENT,
+      location: friend.address,
     });
   });
 
@@ -48,7 +49,7 @@ export function generateCombinedIcal(friends: Friend[]): string {
 // Parse iCal file content
 export async function parseIcalFile(
   file: File
-): Promise<{ name: string; dates: Date[] }> {
+): Promise<{ name: string; dates: Date[], location?: string }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -61,16 +62,22 @@ export async function parseIcalFile(
 
         const name = (calendar.getFirstPropertyValue('x-wr-calname') ||
           file.name.replace(/\.ics$/, '')) as string;
+
         const dates: Date[] = [];
 
+        let location: string | undefined = undefined;
         events.forEach((event) => {
           const dtstart = event.getFirstPropertyValue('dtstart') as ICAL.Time;
           if (dtstart) {
             dates.push(dtstart.toJSDate() as Date);
           }
+          const locationProp = event.getFirstPropertyValue('location') as string;
+          if (locationProp) {
+            location = locationProp;
+          }
         });
 
-        resolve({ name, dates });
+        resolve({ name, dates, location });
       } catch (error) {
         reject(new Error('Failed to parse iCal file'));
       }

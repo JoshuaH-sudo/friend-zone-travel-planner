@@ -59,10 +59,17 @@ export function ImportCalendar({
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setFile(file);
       setError(null);
+
+      // Set the location automatically if it exists in the file
+      const { location } = await parseIcalFile(file);
+      if (location) {
+        form.setValue('address', location);
+      }
     }
   };
 
