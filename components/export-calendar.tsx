@@ -25,7 +25,7 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
   };
 
   const exportAllCalendars = () => {
-    const icalContent = generateCombinedIcal(friends);
+    const icalContent = generateCombinedIcal(groupName, friends);
     const filename = groupName
       ? `${groupName.replace(/\s+/g, '_')}_availability.ics`
       : 'all_friends_availability.ics';

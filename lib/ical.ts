@@ -25,9 +25,9 @@ export function generateFriendIcal(friend: Friend): string {
 }
 
 // Generate combined iCal file for all friends
-export function generateCombinedIcal(friends: Friend[]): string {
+export function generateCombinedIcal(tripName: string, friends: Friend[]): string {
   const now = new Date();
-  const calendar = ical({ name: 'Combined Friend Availability' });
+  const calendar = ical({ name: `${tripName} Availability` });
 
   friends.forEach((friend) => {
     friend.availableDates.forEach((date) => {
