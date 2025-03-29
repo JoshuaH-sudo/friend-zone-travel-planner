@@ -27,6 +27,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "html2canvas": "^1.4.1",
+    "ical-generator": "^8.1.1",
+    "ical.js": "^2.1.0",
     "lucide-react": "^0.479.0",
     "next": "^15.2.4",
     "next-intl": "^4.0.0",
