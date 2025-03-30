@@ -53,7 +53,10 @@ function AddressField({ friends, className }: AddressFieldProps) {
       form.clearErrors('address');
       // If the address is successfully (pre-)fetched, update the coordinates without the user having to click search
       const { lat, lng } = addressDetails.geometry.location;
-      form.setValue('coordinates', { lat, lng });
+      form.setValue('coordinates', { lat, lng }, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   }, [addressDetails, isAddressSuccess]);
 

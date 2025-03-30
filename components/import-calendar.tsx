@@ -68,7 +68,10 @@ export function ImportCalendar({
       // Set the location automatically if it exists in the file
       const { location } = await parseIcalFile(file);
       if (location) {
-        form.setValue('address', location);
+        form.setValue('address', location, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       }
     }
   };
