@@ -32,10 +32,17 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
 
   useEffect(() => {
     if (timezoneInformation) {
-      form.setValue('timezone', timezoneInformation?.timeZoneName);
+      form.setValue('timezone', timezoneInformation?.timeZoneName, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
       form.setValue(
         'timezoneOffset',
-        timezoneInformation?.rawOffset + timezoneInformation?.dstOffset
+        timezoneInformation?.rawOffset + timezoneInformation?.dstOffset,
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        }
       );
     }
   }, [timezoneInformation]);

@@ -60,18 +60,11 @@ export function AddFriendForm({
     resolver: zodResolver(addFriendSchema),
     defaultValues: {
       id: crypto.randomUUID(),
+      name: '',
+      color: randomPreselectColor,
+      address: '',
     },
   });
-
-  useEffect(() => {
-    form.setValue('color', randomPreselectColor, {
-      // Need to trigger validation and dirty state manually
-      // Or else the form will not be valid automatically
-      // when the timezone and coordinates are set at the end.
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-  }, [randomPreselectColor]);
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
     const { id, name, color, coordinates, address, timezone, timezoneOffset } =
