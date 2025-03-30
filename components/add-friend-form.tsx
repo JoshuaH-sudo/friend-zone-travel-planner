@@ -13,6 +13,7 @@ import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import TimezoneFormField from './add-friend-form/timezone-form-field';
 import NameFormField from './add-friend-form/name-form-field';
+import { useEffect } from 'react';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -59,13 +60,18 @@ export function AddFriendForm({
     resolver: zodResolver(addFriendSchema),
     defaultValues: {
       id: crypto.randomUUID(),
-      name: '',
-      color: randomPreselectColor,
-      coordinates: undefined,
-      address: '',
-      timezone: '',
     },
   });
+
+  useEffect(() => {
+    form.setValue('color', randomPreselectColor, {
+      // Need to trigger validation and dirty state manually
+      // Or else the form will not be valid automatically
+      // when the timezone and coordinates are set at the end.
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }, [randomPreselectColor]);
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
     const { id, name, color, coordinates, address, timezone, timezoneOffset } =
