@@ -13,6 +13,8 @@ const useFetchTimezoneInformation = (coordinates?: Coordinates) => {
 
       return response.results!
     },
+    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+    gcTime: 1000 * 60 * 10, // Keep unused data in cache for 10 minutes
   });
 };
 
