@@ -11,8 +11,6 @@ import type { Friend } from '@/lib/types';
 import { Download, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslations } from 'next-intl';
-import { timezone } from '@googlemaps/google-maps-services-js/dist/timezone';
-import { color } from 'html2canvas/dist/types/css/types/color';
 import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import NameFormField from './add-friend-form/name-form-field';
