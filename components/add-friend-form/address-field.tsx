@@ -84,7 +84,7 @@ function AddressField({ friends, className }: AddressFieldProps) {
             </FormLabel>
 
             <FormControl>
-              <div className='flex items-center gap-2'>
+              <div className='w-[60%]'>
                 <Input {...field} isLoading={isLoading} clearable placeholder='City name'/>
               </div>
             </FormControl>
