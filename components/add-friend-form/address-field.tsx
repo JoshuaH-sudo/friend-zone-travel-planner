@@ -12,14 +12,12 @@ import {
 } from '../ui/form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { useDebounce } from "@uidotdev/usehooks";
+import { useDebounce } from '@uidotdev/usehooks';
 import { Input } from '../ui/input';
 import useFetchAddress from '../hooks/useFetchAddressCoordinates';
 import { useEffect } from 'react';
 import { Label } from '../ui/label';
-import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface AddressFieldProps {
   friends: Friend[];
@@ -33,18 +31,10 @@ function AddressField({ friends, className }: AddressFieldProps) {
   const debouncedSearchTerm = useDebounce<string>(address, 300);
   const {
     data: addressDetails,
-    refetch: fetchAddress,
-    isPending: isFetchingAddress,
+    isFetching: isFetchingAddress,
     isSuccess: isAddressSuccess,
     error: addressError,
   } = useFetchAddress(debouncedSearchTerm);
-  
-  const queryClient = useQueryClient();
-  const onClickSearch = () => { 
-    const cachedData = queryClient.getQueryData(['address', address]);
-    
-    fetchAddress();
-  }
 
   useEffect(() => {
     if (addressError) {
@@ -62,10 +52,14 @@ function AddressField({ friends, className }: AddressFieldProps) {
       form.clearErrors('address');
       // If the address is successfully (pre-)fetched, update the coordinates without the user having to click search
       const { lat, lng } = addressDetails.geometry.location;
-      form.setValue('coordinates', { lat, lng }, {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+      form.setValue(
+        'coordinates',
+        { lat, lng },
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        }
+      );
     }
   }, [addressDetails, isAddressSuccess]);
 
@@ -73,7 +67,8 @@ function AddressField({ friends, className }: AddressFieldProps) {
   // TODO: Translate the placeholder text
   let citySearchText = 'e.g. San Francisco';
   if (isFetchingAddress) citySearchText = 'Searching...';
-  if (isAddressSuccess && !isFetchingAddress) citySearchText = addressDetails.formatted_address;
+  if (isAddressSuccess && !isFetchingAddress)
+    citySearchText = addressDetails.formatted_address;
 
   const isLoading = isFetchingAddress;
   return (
@@ -89,15 +84,8 @@ function AddressField({ friends, className }: AddressFieldProps) {
             </FormLabel>
 
             <FormControl>
-              <div className='flex items-center gap-2'>
-                <Input {...field} />
-                <Button
-                  type='button'
-                  onClick={onClickSearch}
-                  disabled={isLoading}
-                >
-                  Search
-                </Button>
+              <div className='flex w-[70%] items-center gap-2'>
+                <Input {...field} isLoading={isLoading} clearable />
               </div>
             </FormControl>
 
