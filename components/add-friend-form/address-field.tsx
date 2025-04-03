@@ -37,6 +37,7 @@ function AddressField({ friends, className }: AddressFieldProps) {
     isSuccess: isAddressSuccess,
     error: addressError,
   } = useFetchAddress(debouncedSearchTerm);
+  
   const onClickSearch = () => fetchAddress();
 
   useEffect(() => {
@@ -66,7 +67,7 @@ function AddressField({ friends, className }: AddressFieldProps) {
   // TODO: Translate the placeholder text
   let citySearchText = 'e.g. San Francisco';
   if (isFetchingAddress) citySearchText = 'Searching...';
-  if (isAddressSuccess) citySearchText = addressDetails.formatted_address;
+  if (isAddressSuccess && !isFetchingAddress) citySearchText = addressDetails.formatted_address;
 
   const isLoading = isFetchingAddress;
   return (

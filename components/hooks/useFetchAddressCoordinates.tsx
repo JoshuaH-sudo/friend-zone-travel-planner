@@ -8,9 +8,11 @@ const useFetchAddress = (address: string) => {
     queryKey: ['address', address], // Cache results based on the address
     queryFn: async () => { 
       const response = await getAddressCoordinates(address);
-      if (response.status === "ZERO_RESULTS") throw new Error("No results found");
       console.log(response);
-      return response.results[0];
+
+      if (response.status === "ERROR") throw new Error(response.message);
+
+      return response.results!
     },
     staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
     gcTime: 1000 * 60 * 10, // Keep unused data in cache for 10 minutes
