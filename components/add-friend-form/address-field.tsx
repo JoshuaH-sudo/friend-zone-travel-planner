@@ -85,7 +85,12 @@ function AddressField({ friends, className }: AddressFieldProps) {
 
             <FormControl>
               <div className='w-[60%]'>
-                <Input {...field} isLoading={isLoading} clearable placeholder='City name'/>
+                <Input
+                  {...field}
+                  isLoading={isLoading}
+                  clearable
+                  placeholder='City name'
+                />
               </div>
             </FormControl>
 
