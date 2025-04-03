@@ -32,6 +32,7 @@ interface SocialShareProps {
 export function SocialShare({ elementRef, filename }: SocialShareProps) {
   const t = useTranslations();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +45,9 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
     setError(null);
 
     try {
-      const dataUrl = await captureElementAsImage(elementRef.current);
+      const { dataUrl, dataBlob } = await captureElementAsImage(elementRef.current);
       setImageUrl(dataUrl);
+      setImageBlob(dataBlob);
     } catch (err) {
       setError(t('sharing.captureError'));
       console.error('Failed to capture calendar:', err);
@@ -56,10 +58,10 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
 
   // Copy image to clipboard
   const handleCopyImage = async () => {
-    if (!imageUrl) return;
+    if (!imageBlob) return;
 
     try {
-      const success = await copyImageToClipboard(imageUrl);
+      const success = await copyImageToClipboard(imageBlob);
       if (success) {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
