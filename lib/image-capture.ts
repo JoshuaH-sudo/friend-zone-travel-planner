@@ -1,4 +1,3 @@
-import html2canvas from 'html2canvas';
 import { toBlob } from 'html-to-image';
 
 // Capture an element as an image and return the data URL
