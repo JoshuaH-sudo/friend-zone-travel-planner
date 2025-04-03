@@ -12,6 +12,7 @@ import {
 } from '../ui/form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { useDebounce } from "@uidotdev/usehooks";
 import { Input } from '../ui/input';
 import useFetchAddress from '../hooks/useFetchAddressCoordinates';
 import { useEffect } from 'react';
@@ -28,13 +29,14 @@ function AddressField({ friends, className }: AddressFieldProps) {
   const t = useTranslations('friend');
 
   const address = form.watch('address');
+  const debouncedSearchTerm = useDebounce<string>(address, 300);
   const {
     data: addressDetails,
     refetch: fetchAddress,
-    isFetching: isFetchingAddress,
+    isPending: isFetchingAddress,
     isSuccess: isAddressSuccess,
     error: addressError,
-  } = useFetchAddress(address);
+  } = useFetchAddress(debouncedSearchTerm);
   const onClickSearch = () => fetchAddress();
 
   useEffect(() => {

@@ -4,7 +4,8 @@ import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
   title: 'Friend Zoned Travel Planner',
@@ -14,8 +15,6 @@ export const metadata = {
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
-
-const queryClient = new QueryClient();
 
 export default async function RootLayout({
   children,
@@ -37,7 +36,11 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            {children}
+            <SpeedInsights />
+            <Analytics />
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
