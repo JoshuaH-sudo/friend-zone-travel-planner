@@ -5,7 +5,14 @@ const useFetchTimezoneInformation = (coordinates?: Coordinates) => {
   return useQuery({
     enabled: !!coordinates,
     queryKey: ['timezone', coordinates?.lat, coordinates?.lng],
-    queryFn: () => getTimezoneInformation(coordinates!),
+    queryFn: async () => {
+      const response = await getTimezoneInformation(coordinates!)
+      console.log(response);
+
+      if (response.status === "ERROR") throw new Error(response.message);
+
+      return response.results!
+    },
   });
 };
 

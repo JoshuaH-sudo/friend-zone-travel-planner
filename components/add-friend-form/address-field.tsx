@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AddressFieldProps {
   friends: Friend[];
@@ -38,7 +39,12 @@ function AddressField({ friends, className }: AddressFieldProps) {
     error: addressError,
   } = useFetchAddress(debouncedSearchTerm);
   
-  const onClickSearch = () => fetchAddress();
+  const queryClient = useQueryClient();
+  const onClickSearch = () => { 
+    const cachedData = queryClient.getQueryData(['address', address]);
+    
+    fetchAddress();
+  }
 
   useEffect(() => {
     if (addressError) {

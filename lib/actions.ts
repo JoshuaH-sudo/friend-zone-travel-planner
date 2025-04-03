@@ -83,7 +83,10 @@ export const getTimezoneInformation = async (coordinates: Coordinates) => {
     },
   });
 
-  return result.data;
+  return {
+    status: "OK",
+    results: result.data
+  }
 };
 
 const decisionHandler = async () => {
