@@ -137,9 +137,14 @@ export function TimezoneComparison({
   };
 
   // Function to adjust color saturation based on daytime or nighttime
-  const adjustColorSaturation = (baseColor: string, isDaytime: boolean): string => {
+  const adjustColorSaturation = (
+    baseColor: string,
+    isDaytime: boolean
+  ): string => {
     // Example logic: Adjust the brightness of the base color
-    return isDaytime ? lightenColor(baseColor, 0.05) : darkenColor(baseColor, 0.05);
+    return isDaytime
+      ? lightenColor(baseColor, 0.05)
+      : darkenColor(baseColor, 0.05);
   };
 
   // Helper function to lighten a color
@@ -177,7 +182,7 @@ export function TimezoneComparison({
   const allTimezones = [baseTimezone, ...timezones];
 
   return (
-    <div className='mx-auto w-full max-w-4xl overflow-hidden rounded-lg bg-muted p-2 shadow-md'>
+    <div className='mx-auto w-full overflow-hidden rounded-lg bg-muted p-2 shadow-md'>
       <div className='flex items-center justify-between border-b bg-card p-4'>
         <button
           onClick={goToPreviousDay}
@@ -267,11 +272,7 @@ export function TimezoneComparison({
                       return (
                         <div
                           key={`date-${hourIndex}`}
-                          className={cn(
-                            'flex h-12 min-w-16 items-center justify-center border-b border-l',
-                            // `bg-${timezone.color}-500`,
-                            'text-white' // Date cells always use white text
-                          )}
+                          className='flex h-12 min-w-16 items-center justify-center border-b border-l text-white'
                           style={{
                             backgroundColor: timezone.color,
                           }}
@@ -309,10 +310,15 @@ export function TimezoneComparison({
                     const isDaytime = adjustedHour >= 6 && adjustedHour < 18;
 
                     // Adjust the background color based on daytime or nighttime
-                    const adjustedColor = adjustColorSaturation(timezone.color, isDaytime);
+                    const adjustedColor = adjustColorSaturation(
+                      timezone.color,
+                      isDaytime
+                    );
 
                     // Determine text color based on background intensity
-                    const textColorClass = getTextColorForBackground(isDaytime ? '400' : '800');
+                    const textColorClass = getTextColorForBackground(
+                      isDaytime ? '400' : '800'
+                    );
 
                     return (
                       <div
