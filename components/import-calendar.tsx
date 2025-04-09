@@ -11,8 +11,6 @@ import type { Friend } from '@/lib/types';
 import { Download, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslations } from 'next-intl';
-import { timezone } from '@googlemaps/google-maps-services-js/dist/timezone';
-import { color } from 'html2canvas/dist/types/css/types/color';
 import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import NameFormField from './add-friend-form/name-form-field';
@@ -59,10 +57,20 @@ export function ImportCalendar({
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setFile(file);
       setError(null);
+
+      // Set the location automatically if it exists in the file
+      const { location } = await parseIcalFile(file);
+      if (location) {
+        form.setValue('address', location, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
     }
   };
 

@@ -99,7 +99,7 @@ export function AvailabilityOverview({
           </div>
         </div>
       </CardHeader>
-      <CardContent className='p-3' ref={calendarRef}>
+      <CardContent className='p-3 bg-card' ref={calendarRef}>
         <div className='mb-4 flex items-center justify-between'>
           <Button variant='ghost' size='icon' onClick={prevMonth}>
             <ChevronLeft className='h-4 w-4' />

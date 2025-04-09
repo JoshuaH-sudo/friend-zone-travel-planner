@@ -28,6 +28,18 @@ import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSwitcher } from '@/components/language-selector';
+import { TimezoneComparison, TimezoneData } from '@/components/timezone-comparison';
+
+
+
+// Base timezone to compare against
+const baseTimezone = {
+  city: 'San Francisco',
+  country: 'USA',
+  timezone: 'PST',
+  offset: -8 * 60 * 60 * 1000, // UTC-8 in milliseconds
+  color: '#84cc16',
+};
 
 export default function PlannerPage() {
   const t = useTranslations();
@@ -100,6 +112,14 @@ export default function PlannerPage() {
   useEffect(() => {
     updateLocalStorage();
   }, [groupName, friends]);
+
+  const timezones: TimezoneData[] = friends.map((friend) => ({
+    city: friend.address,
+    country: friend.address,
+    timezone: friend.timezone,
+    offset: friend.timezoneOffset,
+    color: friend.color,
+  }));
 
   return (
     <main className='container mx-auto max-w-6xl p-4'>
@@ -209,13 +229,17 @@ export default function PlannerPage() {
 
         {friends.length > 0 ? (
           <Tabs defaultValue='calendars'>
-            <TabsList className='grid w-full grid-cols-2'>
+            <TabsList className='grid w-full grid-cols-3'>
               <TabsTrigger
                 value='calendars'
                 className='flex items-center gap-2'
               >
                 <Calendar className='h-4 w-4' />
                 {t('navigation.calendars')}
+              </TabsTrigger>
+              <TabsTrigger value='timezone' className='flex items-center gap-2'>
+                <Calendar className='h-4 w-4' />
+                {t('navigation.timezone')}
               </TabsTrigger>
               <TabsTrigger value='overview' className='flex items-center gap-2'>
                 <Users className='h-4 w-4' />
@@ -237,6 +261,13 @@ export default function PlannerPage() {
                   ))}
                 </div>
               </ScrollArea>
+            </TabsContent>
+            <TabsContent value='timezone' className='mt-4'>
+              <TimezoneComparison
+                timezones={timezones}
+                baseTimezone={baseTimezone}
+                startDate={new Date('2024-04-05T00:00:00')}
+              />
             </TabsContent>
             <TabsContent value='overview' className='mt-4'>
               <AvailabilityOverview friends={friends} />
