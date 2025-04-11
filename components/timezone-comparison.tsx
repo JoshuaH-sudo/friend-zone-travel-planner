@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { adjustColorSaturation, cn } from '@/lib/utils';
 
 export interface TimezoneData {
   city: string;
@@ -14,13 +14,11 @@ export interface TimezoneData {
 
 interface TimezoneComparisonProps {
   timezones: TimezoneData[];
-  baseTimezone: TimezoneData;
   startDate?: Date;
 }
 
 export function TimezoneComparison({
   timezones,
-  baseTimezone,
   startDate = new Date(),
 }: TimezoneComparisonProps) {
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
@@ -66,7 +64,6 @@ export function TimezoneComparison({
   // Calculate hours based on timezone offset differences
   const getHoursForTimezone = (timezone: TimezoneData, date: Date) => {
     const baseHours = [];
-    const offsetDiffMs = timezone.offset - baseTimezone.offset;
 
     // Set midnight in base timezone as reference point
     const baseDate = new Date(date);
@@ -76,7 +73,7 @@ export function TimezoneComparison({
     for (let i = 0; i < 24; i++) {
       // Calculate the exact time in this timezone
       const hourInBaseDateMs = baseDate.getTime() + i * 60 * 60 * 1000;
-      const hourInTimezoneDateMs = hourInBaseDateMs + offsetDiffMs;
+      const hourInTimezoneDateMs = hourInBaseDateMs;
       const hourInTimezoneDate = new Date(hourInTimezoneDateMs);
 
       // Get hour, day offset
@@ -136,50 +133,7 @@ export function TimezoneComparison({
     return 'text-black';
   };
 
-  // Function to adjust color saturation based on daytime or nighttime
-  const adjustColorSaturation = (
-    baseColor: string,
-    isDaytime: boolean
-  ): string => {
-    // Example logic: Adjust the brightness of the base color
-    return isDaytime
-      ? lightenColor(baseColor, 0.05)
-      : darkenColor(baseColor, 0.05);
-  };
 
-  // Helper function to lighten a color
-  const lightenColor = (color: string, amount: number): string => {
-    const [r, g, b] = hexToRgb(color);
-    return rgbToHex(
-      Math.min(255, Math.floor(r + 255 * amount)),
-      Math.min(255, Math.floor(g + 255 * amount)),
-      Math.min(255, Math.floor(b + 255 * amount))
-    );
-  };
-
-  // Helper function to darken a color
-  const darkenColor = (color: string, amount: number): string => {
-    const [r, g, b] = hexToRgb(color);
-    return rgbToHex(
-      Math.max(0, Math.floor(r - 255 * amount)),
-      Math.max(0, Math.floor(g - 255 * amount)),
-      Math.max(0, Math.floor(b - 255 * amount))
-    );
-  };
-
-  // Convert hex color to RGB
-  const hexToRgb = (hex: string): [number, number, number] => {
-    const bigint = parseInt(hex.slice(1), 16);
-    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
-  };
-
-  // Convert RGB to hex color
-  const rgbToHex = (r: number, g: number, b: number): string => {
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-  };
-
-  // Combine base timezone and other timezones for display
-  const allTimezones = [baseTimezone, ...timezones];
 
   return (
     <div className='mx-auto w-full overflow-hidden rounded-lg bg-muted p-2 shadow-md'>
@@ -203,13 +157,12 @@ export function TimezoneComparison({
       </div>
 
       <div className='overflow-x-auto'>
-        {allTimezones.map((timezone, index) => {
+        {timezones.map((timezone) => {
           const hours = getHoursForTimezone(timezone, currentDate);
           const dayName = getDayNameForTimezone(timezone, currentDate);
 
           // Calculate unique displayed hours
           const displayedHours = [];
-          const currentDayOffset = hours[0].dayOffset;
           let currentMonthDay = '';
 
           for (let i = 0; i < hours.length; i++) {
@@ -254,11 +207,6 @@ export function TimezoneComparison({
                         {timezone.city}
                       </div>
                       <div className='text-gray-500'>{timezone.country}</div>
-                      {index === 0 && (
-                        <div className='mt-1 text-xs font-medium text-gray-600'>
-                          Base Timezone
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
