@@ -28,18 +28,10 @@ import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LanguageSwitcher } from '@/components/language-selector';
-import { TimezoneComparison, TimezoneData } from '@/components/timezone-comparison';
-
-
-
-// Base timezone to compare against
-const baseTimezone = {
-  city: 'San Francisco',
-  country: 'USA',
-  timezone: 'PST',
-  offset: -8 * 60 * 60 * 1000, // UTC-8 in milliseconds
-  color: '#84cc16',
-};
+import {
+  TimezoneComparison,
+  TimezoneData,
+} from '@/components/timezone-comparison';
 
 export default function PlannerPage() {
   const t = useTranslations();
@@ -60,14 +52,6 @@ export default function PlannerPage() {
     setFriends(
       friends.map((friend) =>
         friend.id === friendId ? { ...friend, availableDates: dates } : friend
-      )
-    );
-  };
-
-  const updateFriendTimezone = (friendId: string, timezone: string) => {
-    setFriends(
-      friends.map((friend) =>
-        friend.id === friendId ? { ...friend, timezone } : friend
       )
     );
   };
@@ -112,14 +96,6 @@ export default function PlannerPage() {
   useEffect(() => {
     updateLocalStorage();
   }, [groupName, friends]);
-
-  const timezones: TimezoneData[] = friends.map((friend) => ({
-    city: friend.address,
-    country: friend.address,
-    timezone: friend.timezone,
-    offset: friend.timezoneOffset,
-    color: friend.color,
-  }));
 
   return (
     <main className='container mx-auto max-w-6xl p-4'>
@@ -264,8 +240,7 @@ export default function PlannerPage() {
             </TabsContent>
             <TabsContent value='timezone' className='mt-4'>
               <TimezoneComparison
-                timezones={timezones}
-                startDate={new Date('2024-04-05T00:00:00')}
+                friends={friends}
               />
             </TabsContent>
             <TabsContent value='overview' className='mt-4'>

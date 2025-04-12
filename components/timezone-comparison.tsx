@@ -3,24 +3,38 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
 import { adjustColorSaturation, cn } from '@/lib/utils';
+import { Friend } from '@/lib/types';
+import { secondsToHours } from 'date-fns';
+import { TZDate } from '@date-fns/tz';
 
 export interface TimezoneData {
   city: string;
   country: string;
   timezone: string;
+  timezoneId: string;
   offset: number; // In milliseconds
   color: string;
 }
 
 interface TimezoneComparisonProps {
-  timezones: TimezoneData[];
+  friends: Friend[];
   startDate?: Date;
 }
 
 export function TimezoneComparison({
-  timezones,
+  friends,
   startDate = new Date(),
 }: TimezoneComparisonProps) {
+  const timezones: TimezoneData[] = friends.map((friend) => ({
+    city: friend.timezone,
+    country: friend.address,
+    timezone: friend.timezone,
+    timezoneId: friend.timeZoneId,
+    offset: friend.timezoneOffset,
+    color: friend.color,
+  }));
+
+  console.log(timezones);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
 
   const goToNextDay = () => {
@@ -46,81 +60,33 @@ export function TimezoneComparison({
   };
 
   // Format offset from milliseconds to human-readable format (+8:30)
-  const formatOffset = (offsetMs: number) => {
-    const offsetHours = Math.floor(Math.abs(offsetMs) / (60 * 60 * 1000));
-    const offsetMinutes = Math.floor(
-      (Math.abs(offsetMs) % (60 * 60 * 1000)) / (60 * 1000)
-    );
-
-    const sign = offsetMs >= 0 ? '+' : '-';
-
-    if (offsetMinutes === 0) {
-      return `${sign}${offsetHours}`;
-    } else {
-      return `${sign}${offsetHours}:${offsetMinutes.toString().padStart(2, '0')}`;
-    }
+  const formatOffset = (timezone: string, timezoneOffset: number) => {
+    const timezoneOffsetHours = secondsToHours(timezoneOffset);
+    return `(UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
   };
 
   // Calculate hours based on timezone offset differences
-  const getHoursForTimezone = (timezone: TimezoneData, date: Date) => {
+  const getHoursForTimezone = (timezoneData: TimezoneData, date: Date) => {
     const baseHours = [];
 
-    // Set midnight in base timezone as reference point
-    const baseDate = new Date(date);
-    baseDate.setHours(0, 0, 0, 0);
+    // Set midnight in UTC as reference point
+    const utcDate = new TZDate(date).withTimeZone('UTC');
+    utcDate.setUTCHours(0, 0, 0, 0);
+    const timezoneDate = new TZDate(date, timezoneData.timezoneId);
+
+    console.log(
+      utcDate.toString(),
+      timezoneDate.toString(),
+    );
 
     // Generate 24 hours
     for (let i = 0; i < 24; i++) {
-      // Calculate the exact time in this timezone
-      const hourInBaseDateMs = baseDate.getTime() + i * 60 * 60 * 1000;
-      const hourInTimezoneDateMs = hourInBaseDateMs;
-      const hourInTimezoneDate = new Date(hourInTimezoneDateMs);
+      timezoneDate.setUTCHours(i);
 
-      // Get hour, day offset
-      const hourInTimezone = hourInTimezoneDate.getHours();
-
-      // Calculate day offset by comparing dates
-      const baseDayStart = new Date(date);
-      baseDayStart.setHours(0, 0, 0, 0);
-
-      const timezoneDayStart = new Date(hourInTimezoneDate);
-      timezoneDayStart.setHours(0, 0, 0, 0);
-
-      const dayOffsetMs = timezoneDayStart.getTime() - baseDayStart.getTime();
-      const dayOffset = dayOffsetMs / (24 * 60 * 60 * 1000);
-
-      // Determine if it's day or night (simple implementation: 6am-6pm is day)
-      const isDaytime = hourInTimezone >= 6 && hourInTimezone < 18;
-
-      // Convert from 0-23 format to 1-24 format
-      const displayHour = hourInTimezone === 0 ? 24 : hourInTimezone + 1;
-
-      baseHours.push({
-        hour: displayHour.toString().padStart(2, '0'),
-        hourValue: hourInTimezone, // Keep original 0-23 value for calculations
-        isDaytime,
-        dayOffset,
-        hourDate: new Date(hourInTimezoneDate),
-        // For hour 1, mark it as day start for alignment purposes
-        isDayStart: displayHour === 1,
-      });
+      baseHours.push(timezoneDate.getUTCHours());
     }
 
     return baseHours;
-  };
-
-  // Modify the day name determination to align with hour 01
-  const getDayNameForTimezone = (timezone: TimezoneData, date: Date) => {
-    const hours = getHoursForTimezone(timezone, date);
-
-    // Find the hour that represents "01" (start of day)
-    const dayStartHour = hours.find((h) => h.hour === '01');
-
-    if (dayStartHour) {
-      return getDayName(dayStartHour.hourDate);
-    }
-
-    return getDayName(date);
   };
 
   // Determine text color based on background color intensity
@@ -132,8 +98,6 @@ export function TimezoneComparison({
     // For lighter shades (300, 400, 500), use black text
     return 'text-black';
   };
-
-
 
   return (
     <div className='mx-auto w-full overflow-hidden rounded-lg bg-muted p-2 shadow-md'>
@@ -159,55 +123,21 @@ export function TimezoneComparison({
       <div className='overflow-x-auto'>
         {timezones.map((timezone) => {
           const hours = getHoursForTimezone(timezone, currentDate);
-          const dayName = getDayNameForTimezone(timezone, currentDate);
-
-          // Calculate unique displayed hours
-          const displayedHours = [];
-          let currentMonthDay = '';
-
-          for (let i = 0; i < hours.length; i++) {
-            const hour = hours[i];
-
-            // When day changes, add the date info
-            if (i > 0 && hour.dayOffset !== hours[i - 1].dayOffset) {
-              currentMonthDay = getMonthDay(hour.hourDate);
-
-              displayedHours.push({
-                type: 'date',
-                value: currentMonthDay,
-              });
-            }
-
-            // When we reach hour "01", we want to include the day name
-            if (hour.hour === '01') {
-              displayedHours.push({
-                type: 'dayname',
-                value: getDayName(hour.hourDate),
-              });
-            }
-
-            displayedHours.push({
-              type: 'hour',
-              value: hour.hour,
-              isDaytime: hour.isDaytime,
-            });
-          }
-
           return (
             <div key={timezone.city} className='flex border-t'>
               {/* Left sidebar with timezone info - increased width */}
               <div className='w-52 flex-none border-r bg-card'>
                 <div className='flex h-full items-center p-4'>
-                  <div className='flex items-center gap-3'>
-                    <span className='w-10 text-right font-medium text-gray-500'>
-                      {formatOffset(timezone.offset)}
-                    </span>
+                  <div className='gap-3'>
                     <div>
                       <div className='truncate text-lg font-bold'>
-                        {timezone.city}
+                        {timezone.country}
                       </div>
-                      <div className='text-gray-500'>{timezone.country}</div>
+                      {/* <div className='text-gray-500'>{timezone.country}</div> */}
                     </div>
+                    <span className='w-10 text-right font-medium text-gray-500'>
+                      {formatOffset(timezone.timezone, timezone.offset)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -215,47 +145,9 @@ export function TimezoneComparison({
               {/* Right side with hours */}
               <div className='flex-1'>
                 <div className='flex'>
-                  {displayedHours.map((item, hourIndex) => {
-                    if (item.type === 'date') {
-                      return (
-                        <div
-                          key={`date-${hourIndex}`}
-                          className='flex h-12 min-w-16 items-center justify-center border-b border-l text-white'
-                          style={{
-                            backgroundColor: timezone.color,
-                          }}
-                        >
-                          <div className='text-base font-medium'>
-                            {item.value}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    if (item.type === 'dayname') {
-                      return (
-                        <div
-                          key={`dayname-${hourIndex}`}
-                          className={cn(
-                            'flex h-12 min-w-16 items-center justify-center border-b border-l',
-                            'bg-gray-100'
-                          )}
-                        >
-                          <div className='text-base font-medium'>
-                            {item.value}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    // Parse the hour for determining color
-                    const hourNum = Number.parseInt(item.value, 10);
-
-                    // Adjust for 1-24 format
-                    const adjustedHour = hourNum === 24 ? 0 : hourNum - 1;
-
+                  {hours.map((hour, hourIndex) => {
                     // Day is 6-18 in 0-23 format, which is 7-19 in 1-24 format
-                    const isDaytime = adjustedHour >= 6 && adjustedHour < 18;
+                    const isDaytime = hour >= 6 && hour < 18;
 
                     // Adjust the background color based on daytime or nighttime
                     const adjustedColor = adjustColorSaturation(
@@ -279,7 +171,7 @@ export function TimezoneComparison({
                         <div
                           className={cn('text-lg font-medium', textColorClass)}
                         >
-                          {item.value}
+                          {hour}
                         </div>
                       </div>
                     );

@@ -5,6 +5,7 @@ export interface Friend {
   address: string;
   coordinates: { lat: number; lng: number };
   timezone: string;
+  timeZoneId: string;
   timezoneOffset: number;
   availableDates: Date[];
 }
