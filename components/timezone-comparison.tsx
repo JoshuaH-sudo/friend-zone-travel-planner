@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
-import { adjustColorSaturation, cn } from '@/lib/utils';
 import { Friend } from '@/lib/types';
 import { secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
+import { TimezoneHour } from './timezone-hour';
 
 export interface TimezoneData {
   city: string;
@@ -34,7 +34,6 @@ export function TimezoneComparison({
     color: friend.color,
   }));
 
-  console.log(timezones);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
 
   const goToNextDay = () => {
@@ -51,7 +50,7 @@ export function TimezoneComparison({
 
   // Get month and day (April 5)
   const getMonthDay = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    return date.toLocaleDateString(, { month: 'long', day: 'numeric' });
   };
 
   // Format offset from milliseconds to human-readable format (+8:30)
@@ -159,46 +158,7 @@ export function TimezoneComparison({
 
               {/* Right side with hours */}
               <div className='flex'>
-                {hours.map((hourData, hourIndex) => {
-                  const { hour, date, shouldHighlightHour } = hourData;
-                  // Day is 6-18 in 0-23 format, which is 7-19 in 1-24 format
-                  const isDaytime =
-                    typeof hourData === 'string'
-                      ? false
-                      : hour >= 6 && hour < 18;
-
-                  // Adjust the background color based on daytime or nighttime
-                  const adjustedColor = adjustColorSaturation(
-                    timezone.color,
-                    isDaytime
-                  );
-
-                  // Determine text color based on background intensity
-                  const textColorClass = getTextColorForBackground(
-                    isDaytime ? '400' : '800'
-                  );
-
-                  return (
-                    <div
-                      key={`hour-${hourIndex}`}
-                      className='flex h-14 min-w-14 items-center justify-center border-b border-l'
-                      style={{
-                        backgroundColor: shouldHighlightHour
-                          ? 'red'
-                          : adjustedColor,
-                      }}
-                    >
-                      <div
-                        className={cn(
-                          'p-2 text-center text-lg font-medium',
-                          textColorClass
-                        )}
-                      >
-                        {hour}
-                      </div>
-                    </div>
-                  );
-                })}
+                <TimezoneHour hours={hours} timezoneColor={timezone.color} />
               </div>
             </div>
           );
