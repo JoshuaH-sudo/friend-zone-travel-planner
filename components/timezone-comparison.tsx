@@ -49,11 +49,6 @@ export function TimezoneComparison({
     setCurrentDate(prevDay);
   };
 
-  // Get day name (Monday, Tuesday, etc.)
-  const getDayName = (date: Date) => {
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
-  };
-
   // Get month and day (April 5)
   const getMonthDay = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
@@ -65,9 +60,15 @@ export function TimezoneComparison({
     return `(UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
   };
 
+  interface HoursData {
+    hour: number;
+    monthDay: string;
+    date: string;
+  }
+
   // Calculate hours based on timezone offset differences
   const getHoursForTimezone = (timezoneData: TimezoneData, date: Date) => {
-    const baseHours: Array<string | number> = [];
+    const baseHours: HoursData[] = [];
 
     // Set midnight in UTC as reference point
     const utcDate = new TZDate(date, 'UTC');
@@ -80,14 +81,13 @@ export function TimezoneComparison({
     for (let i = 0; i < 24; i++) {
       timezoneDate.setUTCHours(i);
       const hour = timezoneDate.getHours();
-      if (hour === 0) {
-        // Get the name of the month and day number
-        const monthDay = getMonthDay(timezoneDate);
+      const monthDay = getMonthDay(timezoneDate);
 
-        baseHours.push(monthDay);
-      }
-
-      baseHours.push(timezoneDate.getHours());
+      baseHours.push({
+        hour,
+        monthDay,
+        date: timezoneDate.toString(),
+      });
     }
 
     return baseHours;
@@ -148,10 +148,11 @@ export function TimezoneComparison({
 
               {/* Right side with hours */}
               <div className='flex'>
-                {hours.map((hour, hourIndex) => {
+                {hours.map((hourData, hourIndex) => {
+                  const { hour, date } = hourData;
                   // Day is 6-18 in 0-23 format, which is 7-19 in 1-24 format
                   const isDaytime =
-                    typeof hour === 'string' ? false : hour >= 6 && hour < 18;
+                    typeof hourData === 'string' ? false : hour >= 6 && hour < 18;
 
                   // Adjust the background color based on daytime or nighttime
                   const adjustedColor = adjustColorSaturation(
@@ -164,12 +165,17 @@ export function TimezoneComparison({
                     isDaytime ? '400' : '800'
                   );
 
+                  const currentDateInTimezone = new TZDate(new Date(), timezone.timezoneId);
+                  const isCurrentDay = currentDateInTimezone.getDate() === currentDate.getDate();
+                  const isCurrentHour = currentDateInTimezone.getHours() === hour;
+                  const shouldHighlightHour = isCurrentHour && isCurrentDay
+
                   return (
                     <div
                       key={`hour-${hourIndex}`}
                       className='flex h-14 min-w-14 items-center justify-center border-b border-l'
                       style={{
-                        backgroundColor: adjustedColor,
+                        backgroundColor: shouldHighlightHour ? "red" : adjustedColor,
                       }}
                     >
                       <div
