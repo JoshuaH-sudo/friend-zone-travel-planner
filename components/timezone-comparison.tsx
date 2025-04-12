@@ -60,7 +60,7 @@ export function TimezoneComparison({
   };
 
   // Format offset from milliseconds to human-readable format (+8:30)
-  const formatOffset = (timezone: string, timezoneOffset: number) => {
+  const formatOffset = (timezoneOffset: number) => {
     const timezoneOffsetHours = secondsToHours(timezoneOffset);
     return `(UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
   };
@@ -70,20 +70,19 @@ export function TimezoneComparison({
     const baseHours = [];
 
     // Set midnight in UTC as reference point
-    const utcDate = new TZDate(date).withTimeZone('UTC');
+    const utcDate = new TZDate(date, 'UTC');
     utcDate.setUTCHours(0, 0, 0, 0);
     const timezoneDate = new TZDate(date, timezoneData.timezoneId);
+    timezoneDate.setUTCHours(0, 0, 0, 0);
 
-    console.log(
-      utcDate.toString(),
-      timezoneDate.toString(),
-    );
+    console.log("utcDate", utcDate.toString());
+    console.log("timezoneDate", timezoneDate.toString());
 
     // Generate 24 hours
     for (let i = 0; i < 24; i++) {
       timezoneDate.setUTCHours(i);
 
-      baseHours.push(timezoneDate.getUTCHours());
+      baseHours.push(timezoneDate.getHours());
     }
 
     return baseHours;
@@ -136,7 +135,7 @@ export function TimezoneComparison({
                       {/* <div className='text-gray-500'>{timezone.country}</div> */}
                     </div>
                     <span className='w-10 text-right font-medium text-gray-500'>
-                      {formatOffset(timezone.timezone, timezone.offset)}
+                      {formatOffset(timezone.offset)}
                     </span>
                   </div>
                 </div>
