@@ -67,20 +67,25 @@ export function TimezoneComparison({
 
   // Calculate hours based on timezone offset differences
   const getHoursForTimezone = (timezoneData: TimezoneData, date: Date) => {
-    const baseHours = [];
+    const baseHours: Array<string | number> = [];
 
     // Set midnight in UTC as reference point
     const utcDate = new TZDate(date, 'UTC');
     utcDate.setUTCHours(0, 0, 0, 0);
+
     const timezoneDate = new TZDate(date, timezoneData.timezoneId);
     timezoneDate.setUTCHours(0, 0, 0, 0);
-
-    console.log("utcDate", utcDate.toString());
-    console.log("timezoneDate", timezoneDate.toString());
 
     // Generate 24 hours
     for (let i = 0; i < 24; i++) {
       timezoneDate.setUTCHours(i);
+      const hour = timezoneDate.getHours();
+      if (hour === 0) {
+        // Get the name of the month and day number
+        const monthDay = getMonthDay(timezoneDate);
+
+        baseHours.push(monthDay);
+      }
 
       baseHours.push(timezoneDate.getHours());
     }
@@ -95,7 +100,7 @@ export function TimezoneComparison({
       return 'text-white';
     }
     // For lighter shades (300, 400, 500), use black text
-    return 'text-black';
+    return 'text-gray-800';
   };
 
   return (
@@ -123,7 +128,7 @@ export function TimezoneComparison({
         {timezones.map((timezone) => {
           const hours = getHoursForTimezone(timezone, currentDate);
           return (
-            <div key={timezone.city} className='flex border-t'>
+            <div key={timezone.city} className='flex border-t items-center'>
               {/* Left sidebar with timezone info - increased width */}
               <div className='w-52 flex-none border-r bg-card'>
                 <div className='flex h-full items-center p-4'>
@@ -142,40 +147,42 @@ export function TimezoneComparison({
               </div>
 
               {/* Right side with hours */}
-              <div className='flex-1'>
-                <div className='flex'>
-                  {hours.map((hour, hourIndex) => {
-                    // Day is 6-18 in 0-23 format, which is 7-19 in 1-24 format
-                    const isDaytime = hour >= 6 && hour < 18;
+              <div className='flex'>
+                {hours.map((hour, hourIndex) => {
+                  // Day is 6-18 in 0-23 format, which is 7-19 in 1-24 format
+                  const isDaytime =
+                    typeof hour === 'string' ? false : hour >= 6 && hour < 18;
 
-                    // Adjust the background color based on daytime or nighttime
-                    const adjustedColor = adjustColorSaturation(
-                      timezone.color,
-                      isDaytime
-                    );
+                  // Adjust the background color based on daytime or nighttime
+                  const adjustedColor = adjustColorSaturation(
+                    timezone.color,
+                    isDaytime
+                  );
 
-                    // Determine text color based on background intensity
-                    const textColorClass = getTextColorForBackground(
-                      isDaytime ? '400' : '800'
-                    );
+                  // Determine text color based on background intensity
+                  const textColorClass = getTextColorForBackground(
+                    isDaytime ? '400' : '800'
+                  );
 
-                    return (
+                  return (
+                    <div
+                      key={`hour-${hourIndex}`}
+                      className='flex h-14 min-w-14 items-center justify-center border-b border-l'
+                      style={{
+                        backgroundColor: adjustedColor,
+                      }}
+                    >
                       <div
-                        key={`hour-${hourIndex}`}
-                        className='flex h-12 min-w-14 items-center justify-center border-b border-l'
-                        style={{
-                          backgroundColor: adjustedColor,
-                        }}
+                        className={cn(
+                          'p-2 text-center text-lg font-medium',
+                          textColorClass
+                        )}
                       >
-                        <div
-                          className={cn('text-lg font-medium', textColorClass)}
-                        >
-                          {hour}
-                        </div>
+                        {hour}
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
