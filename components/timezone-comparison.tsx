@@ -50,7 +50,7 @@ export function TimezoneComparison({
 
   // Get month and day (April 5)
   const getMonthDay = (date: Date) => {
-    return date.toLocaleDateString(, { month: 'long', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
   };
 
   // Format offset from milliseconds to human-readable format (+8:30)
