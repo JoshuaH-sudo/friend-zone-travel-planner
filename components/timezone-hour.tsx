@@ -2,8 +2,9 @@
 
 import { adjustColorSaturation, cn } from '@/lib/utils';
 
-interface HourData {
+export interface HourData {
   hour: number;
+  monthDay: string;
   date: string;
   shouldHighlightHour: boolean;
 }
@@ -24,13 +25,10 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
   return (
     <>
       {hours.map((hourData, hourIndex) => {
-        const { hour, shouldHighlightHour } = hourData;
+        const { hour, shouldHighlightHour, monthDay } = hourData;
         const isDaytime = hour >= 6 && hour < 18;
 
-        const adjustedColor = adjustColorSaturation(
-          timezoneColor,
-          isDaytime
-        );
+        const adjustedColor = adjustColorSaturation(timezoneColor, isDaytime);
 
         const textColorClass = getTextColorForBackground(
           isDaytime ? '400' : '800'
@@ -50,7 +48,7 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
                 textColorClass
               )}
             >
-              {hour}
+              {hour === 0 ? monthDay : hour}
             </div>
           </div>
         );

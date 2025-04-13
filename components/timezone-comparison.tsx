@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
 import { Friend } from '@/lib/types';
 import { secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
-import { TimezoneHour } from './timezone-hour';
+import { HourData, TimezoneHour } from './timezone-hour';
 
 export interface TimezoneData {
   city: string;
@@ -53,23 +53,16 @@ export function TimezoneComparison({
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
   };
 
-  // Format offset from milliseconds to human-readable format (+8:30)
+  // Format offset from milliseconds to human-readable format (+8)
   const formatOffset = (timezoneOffset: number) => {
     const timezoneOffsetHours = secondsToHours(timezoneOffset);
     return `(UTC${timezoneOffsetHours >= 0 ? '+' : ''}${timezoneOffsetHours})`;
   };
 
-  interface HoursData {
-    hour: number;
-    monthDay: string;
-    date: string;
-    shouldHighlightHour: boolean;
-  }
-
   // Calculate hours based on timezone offset differences
   const getHoursForTimezone = (timezoneData: TimezoneData, selectedDate: Date) => {
     const today = new Date();
-    const baseHours: HoursData[] = [];
+    const baseHours: HourData[] = [];
 
     // Set midnight in UTC as reference point
     const utcDate = new TZDate(selectedDate, 'UTC');
@@ -101,16 +94,6 @@ export function TimezoneComparison({
     }
 
     return baseHours;
-  };
-
-  // Determine text color based on background color intensity
-  const getTextColorForBackground = (intensity: string) => {
-    // For darker shades (600, 800), use white text
-    if (intensity === '600' || intensity === '800') {
-      return 'text-white';
-    }
-    // For lighter shades (300, 400, 500), use black text
-    return 'text-gray-800';
   };
 
   return (
