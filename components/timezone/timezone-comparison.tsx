@@ -50,7 +50,7 @@ export function TimezoneComparison({
 
   // Get month and day (April 5)
   const getMonthDay = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   // Format offset from milliseconds to human-readable format (+8)
@@ -60,7 +60,7 @@ export function TimezoneComparison({
   };
 
   // Calculate hours based on timezone offset differences
-  const getHoursForTimezone = (timezoneData: TimezoneData, selectedDate: Date) => {
+  const getHoursForTimezone = (friend: Friend, selectedDate: Date) => {
     const today = new Date();
     const baseHours: HourData[] = [];
 
@@ -68,13 +68,16 @@ export function TimezoneComparison({
     const utcDate = new TZDate(selectedDate, 'UTC');
     utcDate.setUTCHours(0, 0, 0, 0);
 
-    const timezoneDate = new TZDate(selectedDate, timezoneData.timezoneId);
+    const timezoneDate = new TZDate(selectedDate, friend.timeZoneId);
     timezoneDate.setUTCHours(0, 0, 0, 0);
 
     // Generate 24 hours
     for (let i = 0; i < 24; i++) {
       timezoneDate.setUTCHours(i);
-      const hour = timezoneDate.getHours();
+      let hour = timezoneDate.getHours();
+      if (hour === 0) {
+        hour = 24;
+      }
       const monthDay = getMonthDay(timezoneDate);
 
       // Translate today and the current timezone to a common date to compare
@@ -118,31 +121,34 @@ export function TimezoneComparison({
         </button>
       </div>
 
-      <div className='overflow-x-auto'>
-        {timezones.map((timezone) => {
-          const hours = getHoursForTimezone(timezone, currentDate);
+      <div>
+        {friends.map((friend) => {
+          const hours = getHoursForTimezone(friend, currentDate);
           return (
-            <div key={timezone.city} className='flex items-center border-t'>
+            <div key={friend.id} className='flex items-center border-t'>
               {/* Left sidebar with timezone info - increased width */}
               <div className='w-52 flex-none border-r bg-card'>
-                <div className='flex h-full items-center p-4'>
-                  <div className='gap-3'>
-                    <div>
-                      <div className='truncate text-lg font-bold'>
-                        {timezone.country}
-                      </div>
-                      {/* <div className='text-gray-500'>{timezone.country}</div> */}
-                    </div>
-                    <span className='w-10 text-right font-medium text-gray-500'>
-                      {formatOffset(timezone.offset)}
-                    </span>
+                <div className='flex h-full justify-between gap-3 p-6'>
+                  <div className='truncate text-lg font-bold capitalize'>
+                    {friend.name}
+                  </div>
+                  <div className='w-20 flex items-start flex-col gap-1 text-xs'>
+                    <p className='text-gray-500 capitalize truncate'>
+                      {friend.address}
+                    </p>
+                    <p className=' text-gray-500 truncate'>
+                      {friend.timeZoneId}
+                    </p>
+                    <p className='font-medium text-gray-500'>
+                      {formatOffset(friend.timezoneOffset)}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Right side with hours */}
-              <div className='flex'>
-                <TimezoneHour hours={hours} timezoneColor={timezone.color} />
+              <div className='flex overflow-x-auto'>
+                <TimezoneHour hours={hours} timezoneColor={friend.color} />
               </div>
             </div>
           );

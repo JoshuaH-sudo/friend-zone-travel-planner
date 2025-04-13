@@ -1,6 +1,6 @@
 'use client';
 
-import { adjustColorSaturation, cn } from '@/lib/utils';
+import { adjustColorSaturation, cn, darkenColor, lightenColor } from '@/lib/utils';
 
 export interface HourData {
   hour: number;
@@ -29,27 +29,30 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
         const isDaytime = hour >= 6 && hour < 18;
 
         const adjustedColor = adjustColorSaturation(timezoneColor, isDaytime);
+        const borderColor = darkenColor(timezoneColor, 0.3);
+        const highlightColour = lightenColor(timezoneColor, 0.3);
 
         const textColorClass = getTextColorForBackground(
           isDaytime ? '400' : '800'
         );
 
+        let roundedClass = hour === 23 ? 'rounded-r-lg mr-0.5 border-r-2' : '';
+        roundedClass = hour === 24 ? 'rounded-l-lg ml-0.5 border-l-2' : roundedClass;
+
         return (
           <div
             key={`hour-${hourIndex}`}
-            className='flex h-14 min-w-14 items-center justify-center border-b border-l'
+            className={cn(
+              'flex h-14 w-14 items-center justify-center border-y-2 p-2 text-center text-sm font-medium',
+              textColorClass,
+              roundedClass
+            )}
             style={{
-              backgroundColor: shouldHighlightHour ? 'red' : adjustedColor,
+              backgroundColor: shouldHighlightHour ? highlightColour : adjustedColor,
+              borderColor,
             }}
           >
-            <div
-              className={cn(
-                'p-2 text-center text-lg font-medium',
-                textColorClass
-              )}
-            >
-              {hour === 0 ? monthDay : hour}
-            </div>
+            <p>{hour === 24 ? monthDay : hour}</p>
           </div>
         );
       })}
