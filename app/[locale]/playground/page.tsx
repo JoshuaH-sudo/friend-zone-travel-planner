@@ -1,4 +1,4 @@
-import TimezoneCompare from "@/components/timezone-compare";
+import TimezoneCompare from "@/components/timezone/timezone-compare";
 
 export default function Playground() {
   return (

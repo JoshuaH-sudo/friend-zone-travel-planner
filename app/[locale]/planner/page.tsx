@@ -31,7 +31,7 @@ import { LanguageSwitcher } from '@/components/language-selector';
 import {
   TimezoneComparison,
   TimezoneData,
-} from '@/components/timezone-comparison';
+} from '@/components/timezone/timezone-comparison';
 
 export default function PlannerPage() {
   const t = useTranslations();

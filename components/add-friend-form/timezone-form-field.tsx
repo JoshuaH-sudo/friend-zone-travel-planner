@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import useFetchTimezoneInformation from '../hooks/useFetchTimeZoneInformation';
 import { useEffect } from 'react';
 import { addFriendFormContext } from '../add-friend-form';
-import { displayTimezoneOffset } from '../timezone-display';
+import { displayTimezoneOffset } from '../timezone/timezone-display';
 
 interface TimezoneFormFieldProps {}
 

@@ -19,7 +19,7 @@ import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from './ui/calander';
 import { cn } from '@/lib/utils';
-import { displayTimezoneOffset } from './timezone-display';
+import { displayTimezoneOffset } from './timezone/timezone-display';
 
 interface FriendCalendarProps {
   friend: Friend;
