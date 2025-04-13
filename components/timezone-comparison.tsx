@@ -77,11 +77,12 @@ export function TimezoneComparison({
       const hour = timezoneDate.getHours();
       const monthDay = getMonthDay(timezoneDate);
 
-      const inCurrentDay = timezoneDate.getDate() === today.getDate();
-      const inCurrentHour = timezoneDate.getHours() === today.getHours();
-      const inCurrentMonth = timezoneDate.getMonth() === today.getMonth();
+      // Translate today and the current timezone to a common date to compare
+      const inCurrentDay = timezoneDate.getUTCDate() === today.getUTCDate();
+      const inCurrentHour = timezoneDate.getUTCHours() === today.getUTCHours();
+      const inCurrentMonth = timezoneDate.getUTCMonth() === today.getUTCMonth();
       const inCurrentYear =
-        timezoneDate.getFullYear() === today.getFullYear();
+        timezoneDate.getUTCFullYear() === today.getUTCFullYear();
       const shouldHighlightHour =
         inCurrentHour && inCurrentDay && inCurrentMonth && inCurrentYear;
 
