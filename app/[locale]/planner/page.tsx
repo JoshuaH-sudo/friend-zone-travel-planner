@@ -20,6 +20,7 @@ import {
   Upload,
   Home,
   Save,
+  Clock,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
@@ -214,7 +215,7 @@ export default function PlannerPage() {
                 {t('navigation.calendars')}
               </TabsTrigger>
               <TabsTrigger value='timezone' className='flex items-center gap-2'>
-                <Calendar className='h-4 w-4' />
+                <Clock className='h-4 w-4' />
                 {t('navigation.timezone')}
               </TabsTrigger>
               <TabsTrigger value='overview' className='flex items-center gap-2'>

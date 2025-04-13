@@ -15,11 +15,18 @@ interface TimezoneHourProps {
 }
 
 export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
-  const getTextColorForBackground = (intensity: string) => {
-    if (intensity === '600' || intensity === '800') {
-      return 'text-white';
-    }
-    return 'text-gray-800';
+  const getTextColorForBackground = (backgroundColor: string) => {
+    // Convert hex to RGB
+    const hex = backgroundColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+    
+    // Calculate relative luminance using the WCAG formula
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    
+    // Use white text on dark backgrounds (luminance < 0.5) and black text on light backgrounds
+    return luminance < 0.5 ? 'text-white' : 'text-gray-800';
   };
 
   return (
@@ -33,7 +40,7 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
         const highlightColour = lightenColor(timezoneColor, 0.3);
 
         const textColorClass = getTextColorForBackground(
-          isDaytime ? '400' : '800'
+          shouldHighlightHour ? highlightColour : adjustedColor
         );
 
         let roundedClass = hour === 23 ? 'rounded-r-lg mr-0.5 border-r-2' : '';
