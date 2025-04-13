@@ -75,7 +75,7 @@ export function ImportCalendar({
   };
 
   async function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone, timezoneOffset } =
+    const { id, name, color, coordinates, address, timezone, timezoneOffset, timeZoneId } =
       values;
     if (!file) {
       setError('Please select a file to import');
@@ -96,6 +96,7 @@ export function ImportCalendar({
         address,
         timezone,
         timezoneOffset,
+        timeZoneId,
         availableDates: dates,
       });
     } catch (err) {

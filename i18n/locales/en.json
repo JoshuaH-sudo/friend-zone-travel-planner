@@ -13,7 +13,8 @@
   "navigation": {
     "home": "Home",
     "calendars": "Friend Calendars",
-    "overview": "Availability Overview"
+    "overview": "Availability Overview",
+    "timezone": "Timezones"
   },
   "actions": {
     "add": "Add",
