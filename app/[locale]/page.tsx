@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { LanguageSwitcher } from '@/components/language-selector';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Header } from '@/components/header';
 import travelIcon from '@/public/travel.png';
 
 export default function LandingPage() {
@@ -13,25 +12,6 @@ export default function LandingPage() {
 
   return (
     <div className='flex min-h-screen flex-col'>
-      <header className='border-b'>
-        <div className='container mx-auto flex items-center justify-between px-4 py-4'>
-          <div className='flex items-center gap-2'>
-            {/* <Calendar className='h-6 w-6 text-primary' /> */}
-            <img
-              src={travelIcon.src}
-              alt='Travel Icon'
-              className='h-6 w-6 text-primary'
-            />
-            <span className='text-xl font-bold'>{t('app.title')}</span>
-          </div>
-          <div className='flex gap-4'>
-            <LanguageSwitcher />
-
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
       <main>
         <section className='px-4 py-20'>
           <div className='container mx-auto max-w-5xl text-center'>

@@ -88,26 +88,8 @@ export default function PlannerPage() {
 
   return (
     <div className='flex flex-col gap-6'>
-      <div id='app-header' className='flex items-center justify-between'>
-        <div id='home-actions' className='flex items-center gap-4'>
-          <Link
-            href='/'
-            className='flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground'
-          >
-            <Home className='h-4 w-4' />
-            <span className='text-sm'>{t('navigation.home')}</span>
-          </Link>
-          <h1 className='text-3xl font-bold'>{t('app.title')}</h1>
-        </div>
-
-        <div className='flex items-center'>
-          <LanguageSwitcher />
-          <ThemeToggle />
-        </div>
-      </div>
-
       <div className='flex flex-row items-end justify-between'>
-        <div className='space-y-2 flex-grow'>
+        <div className='flex-grow space-y-2'>
           <Label htmlFor='group-name'>{t('app.groupName')}</Label>
           <Input
             id='group-name'
