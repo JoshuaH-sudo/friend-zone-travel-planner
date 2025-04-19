@@ -47,7 +47,9 @@ const Input = React.forwardRef<
           )}
           onClick={handleClear}
         >
-          <XIcon className='h-4 w-4' />
+          <XIcon className='h-4 w-4' style={{
+            visibility: isLoading ? 'hidden' : 'visible',
+          }} />
           <span className='sr-only'>Clear</span>
         </Button>
       )}

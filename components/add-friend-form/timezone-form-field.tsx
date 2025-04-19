@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import useFetchTimezoneInformation from '../hooks/useFetchTimeZoneInformation';
 import { useEffect } from 'react';
 import { addFriendFormContext } from '../add-friend-form';
-import { displayTimezoneOffset } from '../timezone-display';
+import { displayTimezoneOffset } from '../timezone/timezone-display';
 
 interface TimezoneFormFieldProps {}
 
@@ -32,6 +32,7 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
 
   useEffect(() => {
     if (timezoneInformation) {
+      console.log('Timezone information:', timezoneInformation);
       form.setValue('timezone', timezoneInformation?.timeZoneName, {
         shouldValidate: true,
         shouldDirty: true,
@@ -44,6 +45,10 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
           shouldDirty: true,
         }
       );
+      form.setValue('timeZoneId', timezoneInformation?.timeZoneId, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   }, [timezoneInformation]);
 

@@ -13,6 +13,8 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <main className='container mx-auto max-w-6xl p-4'>{children}</main>
+    </QueryClientProvider>
   );
 }

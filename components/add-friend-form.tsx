@@ -37,6 +37,7 @@ export const addFriendSchema = z.object({
     message: 'Address is required',
   }),
   timezone: z.string(),
+  timeZoneId: z.string(),
   timezoneOffset: z.number(),
 });
 
@@ -67,7 +68,7 @@ export function AddFriendForm({
   });
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone, timezoneOffset } =
+    const { id, name, color, coordinates, address, timezone, timeZoneId, timezoneOffset } =
       values;
     onAddFriend({
       id,
@@ -77,6 +78,7 @@ export function AddFriendForm({
       address,
       timezone,
       timezoneOffset,
+      timeZoneId,
       availableDates: [],
     });
   }

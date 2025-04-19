@@ -1,7 +1,7 @@
 'use client';
 
 import { Friend } from '@/lib/types';
-import { MapPin } from 'lucide-react';
+import { Check, Loader, Loader2, MapPin, Redo, RotateCw } from 'lucide-react';
 import {
   FormField,
   FormItem,
@@ -18,6 +18,7 @@ import useFetchAddress from '../hooks/useFetchAddressCoordinates';
 import { useEffect } from 'react';
 import { Label } from '../ui/label';
 import { cn } from '@/lib/utils';
+import { Button } from '../ui/button';
 
 interface AddressFieldProps {
   friends: Friend[];
@@ -31,8 +32,10 @@ function AddressField({ friends, className }: AddressFieldProps) {
   const debouncedSearchTerm = useDebounce<string>(address, 300);
   const {
     data: addressDetails,
+    refetch: refetchAddress,
     isFetching: isFetchingAddress,
     isSuccess: isAddressSuccess,
+    isError: isAddressError,
     error: addressError,
   } = useFetchAddress(debouncedSearchTerm);
 
@@ -84,13 +87,18 @@ function AddressField({ friends, className }: AddressFieldProps) {
             </FormLabel>
 
             <FormControl>
-              <div className='w-[60%]'>
+              <div className='flex w-[70%] items-center gap-2'>
                 <Input
                   {...field}
                   isLoading={isLoading}
                   clearable
                   placeholder='City name'
                 />
+                <Button onClick={() => refetchAddress()} disabled={isLoading || !address } style={{
+                  visibility: isAddressError ? 'visible' : 'hidden',
+                }}>
+                  <RotateCw className={cn('h-4 w-4')} />
+                </Button>
               </div>
             </FormControl>
 

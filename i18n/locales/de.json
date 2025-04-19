@@ -13,7 +13,8 @@
   "navigation": {
     "home": "Startseite",
     "calendars": "Freund Kalender",
-    "overview": "Verfügbarkeitsübersicht"
+    "overview": "Verfügbarkeitsübersicht",
+    "timezone": "Zeitzonen"
   },
   "actions": {
     "add": "Hinzufügen",
