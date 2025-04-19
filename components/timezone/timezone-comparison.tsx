@@ -127,7 +127,7 @@ export function TimezoneComparison({
           return (
             <div key={friend.id} className='flex items-center border-t'>
               {/* Left sidebar with timezone info - increased width */}
-              <div className='w-52 flex-none border-r bg-card'>
+              <div className='w-64 flex-none border-r bg-card'>
                 <div className='flex h-full justify-between gap-3 p-6'>
                   <div className='truncate text-lg font-bold capitalize'>
                     {friend.name}
