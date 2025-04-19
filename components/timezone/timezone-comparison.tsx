@@ -6,6 +6,7 @@ import { Friend } from '@/lib/types';
 import { secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
+import { Card } from '../ui/card';
 
 export interface TimezoneData {
   city: string;
@@ -101,8 +102,8 @@ export function TimezoneComparison({
   };
 
   return (
-    <div className='mx-auto w-full overflow-hidden rounded-lg bg-muted p-2 shadow-md'>
-      <div className='flex items-center justify-between border-b bg-card p-4'>
+    <Card>
+      <div className='flex items-center justify-between p-4'>
         <button
           onClick={goToPreviousDay}
           className='rounded-full p-2 hover:bg-gray-100'
@@ -121,13 +122,13 @@ export function TimezoneComparison({
         </button>
       </div>
 
-      <div>
+      <div className='m-3 border rounded-md'>
         {friends.map((friend) => {
           const hours = getHoursForTimezone(friend, currentDate);
           return (
             <div key={friend.id} className='flex items-center border-t'>
               {/* Left sidebar with timezone info - increased width */}
-              <div className='w-64 flex-none border-r bg-card'>
+              <div className='w-64 flex-none border-r'>
                 <div className='flex h-full justify-between gap-3 p-6'>
                   <div className='truncate text-lg font-bold capitalize'>
                     {friend.name}
@@ -154,6 +155,6 @@ export function TimezoneComparison({
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 }

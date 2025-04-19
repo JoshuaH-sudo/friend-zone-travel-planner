@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { AddFriendForm } from '@/components/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview';
 import { FriendCalendar } from '@/components/friend-calendar';
@@ -10,13 +9,9 @@ import { EmptyState } from '@/components/empty-state';
 import type { Friend } from '@/lib/types';
 import type { AppState } from '@/lib/json-export';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import {
-  PlusCircle,
   Calendar,
   Users,
-  Download,
-  Home,
   Clock,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,8 +19,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
 import { TimezoneComparison } from '@/components/timezone/timezone-comparison';
-import { LanguageSwitcher } from '@/components/language-selector';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PlannerPage() {
   const t = useTranslations();
