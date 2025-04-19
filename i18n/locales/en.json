@@ -1,6 +1,7 @@
 {
   "app": {
     "title": "Friend Zone Travel Planner",
+    "groupName": "Group Name",
     "groupNamePlaceholder": "Enter group name",
     "noFriendsTitle": "No friends added yet",
     "noFriendsDescription": "Add friends and their availability to see when everyone is free for your next hangout.",

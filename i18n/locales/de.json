@@ -1,6 +1,7 @@
 {
   "app": {
     "title": "Freund Zone Reiseplaner",
+    "groupName": "Gruppenname",
     "groupNamePlaceholder": "Gruppennamen eingeben",
     "noFriendsTitle": "Noch keine Freunde hinzugefügt",
     "noFriendsDescription": "Fügen Sie Freunde und deren Verfügbarkeit hinzu, um zu sehen, wann alle für Ihr nächstes Treffen frei sind.",

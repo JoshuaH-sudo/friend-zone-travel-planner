@@ -108,7 +108,7 @@ export default function PlannerPage() {
 
       <div className='flex flex-row items-end justify-between'>
         <div className='space-y-2 flex-grow'>
-          <Label htmlFor='group-name'>{t('app.title')}</Label>
+          <Label htmlFor='group-name'>{t('app.groupName')}</Label>
           <Input
             id='group-name'
             value={groupName}
