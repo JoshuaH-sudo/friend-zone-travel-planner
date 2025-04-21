@@ -1,18 +1,17 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { MultiPointSlider } from "@/components/ui/multi-point-slider"
+import * as React from 'react';
+import { MultiPointSlider } from '@/components/ui/multi-point-slider';
+import { lightenColor } from '@/lib/utils';
 
 interface TimeRangeSliderProps {
-  label: string
-  min?: number
-  max?: number
-  step?: number
-  onChange?: (values: number[]) => void
-  className?: string
-  trackColor?: string
-  inactiveTrackColor?: string
-  thumbColor?: string
+  label: string;
+  colour: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  onChange?: (values: number[]) => void;
+  className?: string;
 }
 
 export function TimeRangeSlider({
@@ -22,29 +21,31 @@ export function TimeRangeSlider({
   step = 1,
   onChange,
   className,
-  trackColor = "bg-[#e84393]",
-  inactiveTrackColor = "bg-[#f8a5c2]",
-  thumbColor = "bg-[#e84393]",
+  colour,
 }: TimeRangeSliderProps) {
-  const [range, setRange] = React.useState<[number, number]>([min, max])
+  const [range, setRange] = React.useState<[number, number]>([min, max]);
 
   const handleValueChange = (newValues: number[]) => {
-    setRange(newValues as [number, number])
-    onChange?.(newValues)
-  }
+    setRange(newValues as [number, number]);
+    onChange?.(newValues);
+  };
+
+  const trackColor = colour;
+  const inactiveTrackColor = lightenColor(colour, 0.5); // Lighten the color for inactive track
+  const thumbColor = colour;
 
   return (
-    <div className="space-y-4 w-full max-w-3xl">
-      <div className="flex justify-between items-center">
-        <div className="text-lg font-medium">{label}</div>
-        <div className="flex space-x-4">
-          <div className="text-lg font-medium">
+    <div className='w-full max-w-3xl space-y-4'>
+      <div className='flex items-center justify-between'>
+        <div className='text-lg font-medium'>{label}</div>
+        <div className='flex space-x-4'>
+          <div className='text-lg font-medium'>
             {range[0]} - {range[1]}
           </div>
         </div>
       </div>
 
-      <div className="pb-8">
+      <div className='pb-8'>
         {/* Container with padding to accommodate labels */}
         <MultiPointSlider
           min={min}
@@ -59,5 +60,5 @@ export function TimeRangeSlider({
         />
       </div>
     </div>
-  )
+  );
 }
