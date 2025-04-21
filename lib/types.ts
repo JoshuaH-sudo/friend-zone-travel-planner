@@ -1,3 +1,12 @@
+export type DayRange = number[];
+export type AvailableHours = {
+  weekdays: DayRange;
+  weekends: DayRange;
+  dates: {
+    [utcDate: string]: DayRange;
+  };
+};
+
 export interface Friend {
   id: string;
   name: string;
@@ -8,4 +17,5 @@ export interface Friend {
   timeZoneId: string;
   timezoneOffset: number;
   availableDates: Date[];
+  availableHours: AvailableHours;
 }

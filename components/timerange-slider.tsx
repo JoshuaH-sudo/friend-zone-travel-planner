@@ -10,6 +10,7 @@ interface TimeRangeSliderProps {
   min?: number;
   max?: number;
   step?: number;
+  value: number[];
   onChange?: (values: number[]) => void;
   className?: string;
 }
@@ -19,14 +20,12 @@ export function TimeRangeSlider({
   min = 1,
   max = 24,
   step = 1,
+  value = [min, max],
   onChange,
   className,
   colour,
 }: TimeRangeSliderProps) {
-  const [range, setRange] = React.useState<[number, number]>([min, max]);
-
   const handleValueChange = (newValues: number[]) => {
-    setRange(newValues as [number, number]);
     onChange?.(newValues);
   };
 
@@ -40,7 +39,7 @@ export function TimeRangeSlider({
         <div className='text-lg font-medium'>{label}</div>
         <div className='flex space-x-4'>
           <div className='text-lg font-medium'>
-            {range[0]} - {range[1]}
+            {value[0]} - {value[1]}
           </div>
         </div>
       </div>
@@ -51,6 +50,7 @@ export function TimeRangeSlider({
           min={min}
           max={max}
           step={step}
+          value={value}
           onValueChange={handleValueChange}
           className={className}
           trackColor={trackColor}

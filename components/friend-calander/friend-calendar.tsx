@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import type { Friend } from '@/lib/types';
+import type { AvailableHours, Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,7 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Trash2, Globe, Upload, Edit, Clock, CalendarRange } from 'lucide-react';
+import {
+  Trash2,
+  Globe,
+  Upload,
+  Edit,
+  Clock,
+  CalendarRange,
+} from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
@@ -26,7 +33,11 @@ import { TimeRangeSlider } from '../timerange-slider';
 interface FriendCalendarProps {
   friend: Friend;
   friends: Friend[];
-  onUpdateAvailability: (friendId: string, dates: Date[]) => void;
+  onUpdateAvailableDates: (friendId: string, dates: Date[]) => void;
+  onUpdateAvailableHours: (
+    friendId: string,
+    availableHours: Partial<AvailableHours>
+  ) => void;
   onRemoveFriend: (friendId: string) => void;
   onUpdateFriend: (updatedFriend: Friend) => void;
 }
@@ -34,14 +45,12 @@ interface FriendCalendarProps {
 export function FriendCalendar({
   friend,
   friends,
-  onUpdateAvailability,
+  onUpdateAvailableDates,
+  onUpdateAvailableHours,
   onRemoveFriend,
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations();
-  const [availabilityMode, setAvailabilityMode] = useState<'dates' | 'hours'>(
-    'dates'
-  );
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -58,7 +67,7 @@ export function FriendCalendar({
 
   const onDaySelect: OnSelectHandler<Date[] | undefined> = (dates?: Date[]) => {
     if (!dates) return;
-    onUpdateAvailability(friend.id, dates);
+    onUpdateAvailableDates(friend.id, dates);
   };
 
   const { timezone, timezoneOffset } = friend;
@@ -150,7 +159,7 @@ export function FriendCalendar({
           </div>
         </CardHeader>
 
-        <CardContent className='grow p-3 h-full'>
+        <CardContent className='h-full grow p-3'>
           <TabsContent value='dates'>
             <div ref={calendarRef}>
               <Calendar
@@ -183,8 +192,26 @@ export function FriendCalendar({
             </div>
           </TabsContent>
           <TabsContent value='hours'>
-            <TimeRangeSlider label='Mon - Fri' colour={friend.color}/>
-            <TimeRangeSlider label='Sat - Sun' colour={friend.color}/>
+            <TimeRangeSlider
+              label='Mon - Fri'
+              colour={friend.color}
+              value={friend.availableHours.weekdays}
+              onChange={(value) =>
+                onUpdateAvailableHours(friend.id, {
+                  weekdays: value,
+                })
+              }
+            />
+            <TimeRangeSlider
+              label='Sat - Sun'
+              colour={friend.color}
+              value={friend.availableHours.weekends}
+              onChange={(value) =>
+                onUpdateAvailableHours(friend.id, {
+                  weekends: value,
+                })
+              }
+            />
           </TabsContent>
         </CardContent>
 
