@@ -98,6 +98,12 @@ export function ImportCalendar({
         timezoneOffset,
         timeZoneId,
         availableDates: dates,
+        // TODO: check to see if the available hours can be derived from the iCal file.
+        availableHours: {
+          weekdays: [1, 24],
+          weekends: [1, 24],
+          dates: {},
+        },
       });
     } catch (err) {
       setError(
