@@ -14,12 +14,12 @@ import { Trash2, Globe, Upload, Edit } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
-import { EditFriendForm } from './edit-friend-form';
+import { EditFriendForm } from '../edit-friend-form';
 import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
-import { Calendar } from './ui/calander';
+import { Calendar } from '../ui/calander';
 import { cn } from '@/lib/utils';
-import { displayTimezoneOffset } from './timezone/timezone-display';
+import { displayTimezoneOffset } from '../timezone/timezone-display';
 
 interface FriendCalendarProps {
   friend: Friend;

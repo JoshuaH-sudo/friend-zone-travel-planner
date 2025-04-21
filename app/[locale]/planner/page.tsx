@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview';
-import { FriendCalendar } from '@/components/friend-calendar';
+import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
 import { WorkspaceActions } from '@/components/workspace-actions';
 import { EmptyState } from '@/components/empty-state';
 import type { Friend } from '@/lib/types';
