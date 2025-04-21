@@ -39,7 +39,6 @@ export default function PlannerPage() {
     friendId: string,
     availableHours: Partial<AvailableHours>
   ) => {
-    console.log('onUpdateAvailableHours', availableHours);
     setFriends(
       friends.map((friend) =>
         friend.id === friendId
@@ -92,7 +91,6 @@ export default function PlannerPage() {
     updateLocalStorage();
   }, [groupName, friends]);
 
-  console.log('friends', friends);
   return (
     <div className='flex flex-col gap-6'>
       <div className='flex flex-row items-end justify-between'>

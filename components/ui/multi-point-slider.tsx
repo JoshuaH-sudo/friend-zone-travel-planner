@@ -57,6 +57,7 @@ const MultiPointSlider = React.forwardRef<
             className='relative h-2 w-full grow overflow-hidden rounded-full'
             style={{
               backgroundColor: inactiveTrackColor,
+              opacity: 0.5,
             }}
           >
             {/* Active track (between thumbs) */}
