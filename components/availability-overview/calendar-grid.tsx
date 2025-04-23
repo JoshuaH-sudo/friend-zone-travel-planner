@@ -59,7 +59,7 @@ export function CalendarGrid({ currentMonth, friends }: CalendarGridProps) {
           return (
             <TooltipProvider key={day.toString()}>
               <Tooltip>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                   <DayCell
                     day={day}
                     currentMonth={currentMonth}
