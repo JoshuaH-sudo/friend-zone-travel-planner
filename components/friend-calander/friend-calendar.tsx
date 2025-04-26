@@ -17,6 +17,7 @@ import {
   Edit,
   Clock,
   CalendarRange,
+  CalendarIcon,
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -28,7 +29,9 @@ import { Calendar } from '../ui/calander';
 import { cn } from '@/lib/utils';
 import { displayTimezoneOffset } from '../timezone/timezone-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { TimeRangeSlider } from '../timerange-slider';
+import { TimeRangeSlider } from './timerange-slider';
+import { DatePicker } from './date-picker';
+import { format } from 'date-fns';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -53,6 +56,7 @@ export function FriendCalendar({
   const t = useTranslations();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>();
 
   const exportCalendar = () => {
     const icalContent = generateFriendIcal(friend);
@@ -73,6 +77,16 @@ export function FriendCalendar({
   const { timezone, timezoneOffset } = friend;
 
   const timezoneDisplayText = displayTimezoneOffset(timezone, timezoneOffset);
+  const addDayAvailability = (date: Date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    onUpdateAvailableHours(friend.id, {
+      dates: {
+        ...friend.availableHours.dates,
+        [newDate.toISOString()]: [0, 24],
+      },
+    });
+  };
   return (
     <Card className='flex h-[500px] flex-col overflow-hidden'>
       <Tabs defaultValue='dates'>
@@ -191,28 +205,79 @@ export function FriendCalendar({
               />
             </div>
           </TabsContent>
-          <TabsContent value='hours'>
-            <TimeRangeSlider
-              label='Mon - Fri'
-              colour={friend.color}
-              value={friend.availableHours.weekdays}
-              onChange={(value) =>
-                onUpdateAvailableHours(friend.id, {
-                  weekdays: value,
-                })
-              }
-            />
-            <TimeRangeSlider
-              label='Sat - Sun'
-              colour={friend.color}
-              value={friend.availableHours.weekends}
-              onChange={(value) =>
-                onUpdateAvailableHours(friend.id, {
-                  weekends: value,
-                })
-              }
-            />
-            
+          <TabsContent
+            value='hours'
+            className='flex flex-col justify-between gap-4'
+          >
+            <div className='h-64 overflow-hidden overflow-y-auto px-4'>
+              <TimeRangeSlider
+                label='Mon - Fri'
+                colour={friend.color}
+                value={friend.availableHours.weekdays}
+                onChange={(value) =>
+                  onUpdateAvailableHours(friend.id, {
+                    weekdays: value,
+                  })
+                }
+              />
+              <TimeRangeSlider
+                label='Sat - Sun'
+                colour={friend.color}
+                value={friend.availableHours.weekends}
+                onChange={(value) =>
+                  onUpdateAvailableHours(friend.id, {
+                    weekends: value,
+                  })
+                }
+              />
+              {Object.keys(friend.availableHours.dates).sort((dateA, dateB) => {
+                const dateAObj = new Date(dateA);
+                const dateBObj = new Date(dateB);
+                return dateAObj.getTime() - dateBObj.getTime();
+              }).map((date) => (
+                <TimeRangeSlider
+                  key={date.toString()}
+                  label={format(date, 'LLLL dd')}
+                  colour={friend.color}
+                  value={friend.availableHours.dates[date.toString()]}
+                  onChange={(value) =>
+                    onUpdateAvailableHours(friend.id, {
+                      dates: {
+                        ...friend.availableHours.dates,
+                        [date.toString()]: value,
+                      },
+                    })
+                  }
+                />
+              ))}
+            </div>
+            <div className='flex items-center justify-end gap-2'>
+              <DatePicker
+                selectedDate={selectedDate}
+                onDateChange={(date) => {
+                  if (!date) {
+                    setSelectedDate(undefined);
+                    return;
+                  }
+
+                  const newDate = new Date(date);
+                  newDate.setHours(0, 0, 0, 0);
+                  setSelectedDate(date);
+                }}
+              />
+              <Button
+                variant='default'
+                disabled={!selectedDate}
+                onClick={() => {
+                  addDayAvailability(selectedDate!);
+                  setSelectedDate(undefined);
+                }}
+              >
+                <CalendarIcon className='mr-2 h-4 w-4' />
+                Add Day
+                {/* {t('friend.addDateAvailability')} */}
+              </Button>
+            </div>
           </TabsContent>
         </CardContent>
 

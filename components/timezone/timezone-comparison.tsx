@@ -7,7 +7,7 @@ import { secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
 import { Card } from '../ui/card';
-import { TimeRangeSlider } from '../timerange-slider';
+import { TimeRangeSlider } from '../friend-calander/timerange-slider';
 
 export interface TimezoneData {
   city: string;
