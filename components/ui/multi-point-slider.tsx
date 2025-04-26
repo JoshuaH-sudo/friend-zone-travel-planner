@@ -91,28 +91,16 @@ const MultiPointSlider = React.forwardRef<
           />
         </SliderPrimitive.Root>
 
-        {/* Labels with precise positioning */}
         {showLabels && (
-          <div className='absolute left-0 right-0 top-4 pt-2'>
+          <div className='pt-2'>
             {/* Reduced spacing */}
-            <div className='relative h-6 w-full'>
+            <div className='relative flex h-6 w-full flex-row justify-between'>
               {scaleMarks.map((mark) => {
-                // Calculate the position as a percentage
-                const position = ((mark - min) / (max - min)) * 100;
-
+                const position = (100 / max) * mark; // Calculate position based on the mark value 
                 return (
-                  <div
-                    key={mark}
-                    className='absolute flex flex-col items-center'
-                    style={{
-                      left: `${position}%`,
-                      transform: 'translateX(-50%)', // Center the label
-                    }}
-                  >
-                    <span className='text-xs text-muted-foreground font-mono'>
+                    <span key={mark} className='absolute font-mono text-xs text-muted-foreground' style={{ left: `calc(${position}% - 15px)` }}>
                       {mark}
                     </span>
-                  </div>
                 );
               })}
             </div>

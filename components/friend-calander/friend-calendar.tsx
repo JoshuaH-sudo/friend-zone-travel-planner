@@ -32,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
+import { ScrollArea } from '../ui/scroll-area';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -205,11 +206,8 @@ export function FriendCalendar({
               />
             </div>
           </TabsContent>
-          <TabsContent
-            value='hours'
-            className='flex flex-col justify-between gap-4'
-          >
-            <div className='h-64 overflow-hidden overflow-y-auto px-4'>
+          <TabsContent value='hours' className='flex flex-col justify-between'>
+            <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto px-4'>
               <TimeRangeSlider
                 label='Mon - Fri'
                 colour={friend.color}
@@ -252,7 +250,7 @@ export function FriendCalendar({
                     }
                   />
                 ))}
-            </div>
+            </ScrollArea>
             <div className='flex items-center justify-end gap-2'>
               <DatePicker
                 selectedDate={selectedDate}
