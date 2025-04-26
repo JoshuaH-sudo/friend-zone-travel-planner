@@ -57,7 +57,6 @@ const MultiPointSlider = React.forwardRef<
             className='relative h-2 w-full grow overflow-hidden rounded-full'
             style={{
               backgroundColor: inactiveTrackColor,
-              opacity: 0.5,
             }}
           >
             {/* Active track (between thumbs) */}
@@ -110,7 +109,7 @@ const MultiPointSlider = React.forwardRef<
                       transform: 'translateX(-50%)', // Center the label
                     }}
                   >
-                    <span className='text-xs text-muted-foreground'>
+                    <span className='text-xs text-muted-foreground font-mono'>
                       {mark}
                     </span>
                   </div>

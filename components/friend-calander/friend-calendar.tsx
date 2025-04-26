@@ -159,7 +159,7 @@ export function FriendCalendar({
           </div>
         </CardHeader>
 
-        <CardContent className='h-full grow p-3'>
+        <CardContent className='h-full grow p-4'>
           <TabsContent value='dates'>
             <div ref={calendarRef}>
               <Calendar
@@ -212,6 +212,7 @@ export function FriendCalendar({
                 })
               }
             />
+            
           </TabsContent>
         </CardContent>
 
