@@ -1,6 +1,11 @@
 'use client';
 
-import { adjustColorSaturation, cn, darkenColor, lightenColor } from '@/lib/utils';
+import {
+  adjustColorSaturation,
+  cn,
+  darkenColor,
+  lightenColor,
+} from '@/lib/utils';
 
 export interface HourData {
   hour: number;
@@ -21,10 +26,10 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
     const b = parseInt(hex.substring(4, 6), 16) / 255;
-    
+
     // Calculate relative luminance using the WCAG formula
     const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    
+
     // Use white text on dark backgrounds (luminance < 0.5) and black text on light backgrounds
     return luminance < 0.5 ? 'text-white' : 'text-gray-800';
   };
@@ -43,23 +48,25 @@ export function TimezoneHour({ hours, timezoneColor }: TimezoneHourProps) {
           shouldHighlightHour ? highlightColour : adjustedColor
         );
 
-        let roundedClass = hour === 23 ? 'rounded-r-lg mr-0.5 border-r-2' : '';
-        roundedClass = hour === 24 ? 'rounded-l-lg ml-0.5 border-l-2' : roundedClass;
+        let roundedClass = hour === 23 ? 'rounded-r-lg border-r-2' : '';
+        roundedClass = hour === 24 ? 'rounded-l-lg border-l-2' : roundedClass;
 
         return (
           <div
             key={`hour-${hourIndex}`}
             className={cn(
-              'flex h-14 w-14 items-center justify-center border-y-2 p-2 text-center text-sm font-medium',
+              'flex h-14 min-w-8 w-full items-center justify-center border-y-2 p-2 text-center font-mono text-sm font-medium',
               textColorClass,
               roundedClass
             )}
             style={{
-              backgroundColor: shouldHighlightHour ? highlightColour : adjustedColor,
+              backgroundColor: shouldHighlightHour
+                ? highlightColour
+                : adjustedColor,
               borderColor,
             }}
           >
-            <p>{hour === 24 ? monthDay : hour}</p>
+            {hour === 24 ? monthDay : hour}
           </div>
         );
       })}

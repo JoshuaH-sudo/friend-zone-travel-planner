@@ -123,7 +123,7 @@ export function TimezoneComparison({
         </button>
       </div>
 
-      <div className='m-3 border rounded-md'>
+      <div className='m-3 rounded-md border'>
         {friends.map((friend) => {
           const hours = getHoursForTimezone(friend, currentDate);
           return (
@@ -134,11 +134,11 @@ export function TimezoneComparison({
                   <div className='truncate text-lg font-bold capitalize'>
                     {friend.name}
                   </div>
-                  <div className='w-20 flex items-start flex-col gap-1 text-xs'>
-                    <p className='text-gray-500 capitalize truncate'>
+                  <div className='flex w-20 flex-col items-start gap-1 text-xs'>
+                    <p className='truncate capitalize text-gray-500'>
                       {friend.address}
                     </p>
-                    <p className=' text-gray-500 truncate'>
+                    <p className='truncate text-gray-500'>
                       {friend.timeZoneId}
                     </p>
                     <p className='font-medium text-gray-500'>
@@ -149,7 +149,7 @@ export function TimezoneComparison({
               </div>
 
               {/* Right side with hours */}
-              <div className='flex overflow-x-auto'>
+              <div className='flex w-full overflow-x-auto'>
                 <TimezoneHour hours={hours} timezoneColor={friend.color} />
               </div>
             </div>
