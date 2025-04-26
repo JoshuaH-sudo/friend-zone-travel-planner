@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { MultiPointSlider } from '@/components/ui/multi-point-slider';
-import { lightenColor } from '@/lib/utils';
+import { adjustOpacity, lightenColor } from '@/lib/utils';
 
 interface TimeRangeSliderProps {
   label: string;
@@ -29,8 +29,9 @@ export function TimeRangeSlider({
     onChange?.(newValues);
   };
 
-  const trackColor = colour;
-  const inactiveTrackColor = lightenColor(colour, 0.5); // Lighten the color for inactive track
+  const lightenedColor = lightenColor(colour, 0.3); // Lighten the color for track color
+  const trackColor = colour // Adjust opacity for track color
+  const inactiveTrackColor =  adjustOpacity(lightenedColor, 0.5); // Lighten the color for inactive track
   const thumbColor = colour;
 
   return (

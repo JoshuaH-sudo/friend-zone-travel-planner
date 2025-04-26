@@ -25,6 +25,13 @@ export const lightenColor = (color: string, amount: number): string => {
   );
 };
 
+export const adjustOpacity = (color: string, opacity: number): string => {
+  const [r, g, b] = hexToRgb(color);
+  const alpha = Math.max(0, Math.min(1, opacity)); // Clamp opacity between 0 and 1
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+
 // Helper function to darken a color
 export const darkenColor = (color: string, amount: number): string => {
   const [r, g, b] = hexToRgb(color);
