@@ -88,7 +88,7 @@ export function FriendCalendar({
     });
   };
   return (
-    <Card className='flex h-[500px] flex-col overflow-hidden'>
+    <Card className='flex h-[500px] flex-col justify-between overflow-hidden'>
       <Tabs defaultValue='dates'>
         <CardHeader
           className='pb-2'
@@ -173,7 +173,7 @@ export function FriendCalendar({
           </div>
         </CardHeader>
 
-        <CardContent className='h-full grow p-4'>
+        <CardContent className='grow p-4'>
           <TabsContent value='dates'>
             <div ref={calendarRef}>
               <Calendar
@@ -230,26 +230,28 @@ export function FriendCalendar({
                   })
                 }
               />
-              {Object.keys(friend.availableHours.dates).sort((dateA, dateB) => {
-                const dateAObj = new Date(dateA);
-                const dateBObj = new Date(dateB);
-                return dateAObj.getTime() - dateBObj.getTime();
-              }).map((date) => (
-                <TimeRangeSlider
-                  key={date.toString()}
-                  label={format(date, 'LLLL dd')}
-                  colour={friend.color}
-                  value={friend.availableHours.dates[date.toString()]}
-                  onChange={(value) =>
-                    onUpdateAvailableHours(friend.id, {
-                      dates: {
-                        ...friend.availableHours.dates,
-                        [date.toString()]: value,
-                      },
-                    })
-                  }
-                />
-              ))}
+              {Object.keys(friend.availableHours.dates)
+                .sort((dateA, dateB) => {
+                  const dateAObj = new Date(dateA);
+                  const dateBObj = new Date(dateB);
+                  return dateAObj.getTime() - dateBObj.getTime();
+                })
+                .map((date) => (
+                  <TimeRangeSlider
+                    key={date.toString()}
+                    label={format(date, 'LLLL dd')}
+                    colour={friend.color}
+                    value={friend.availableHours.dates[date.toString()]}
+                    onChange={(value) =>
+                      onUpdateAvailableHours(friend.id, {
+                        dates: {
+                          ...friend.availableHours.dates,
+                          [date.toString()]: value,
+                        },
+                      })
+                    }
+                  />
+                ))}
             </div>
             <div className='flex items-center justify-end gap-2'>
               <DatePicker
@@ -280,25 +282,22 @@ export function FriendCalendar({
             </div>
           </TabsContent>
         </CardContent>
-
-        <CardFooter className='flex flex-col items-start gap-2 px-3 pb-3 pt-0'>
-          <div className='text-xs text-muted-foreground'>
-            {t('friend.availableDays', { count: friend.availableDates.length })}
-          </div>
-
-          <div className='w-full'>
-            <div className='mb-1 flex items-center gap-2'>
-              <Globe className='h-3 w-3 text-muted-foreground' />
-              <Label htmlFor={`timezone-${friend.id}`} className='text-xs'>
-                {t('friend.timezone')}
-              </Label>
-            </div>
-            <p className='text-xs text-muted-foreground'>
-              {timezoneDisplayText}
-            </p>
-          </div>
-        </CardFooter>
       </Tabs>
+      <CardFooter className='flex flex-col items-start gap-2 px-3 pb-3 pt-0'>
+        <div className='text-xs text-muted-foreground'>
+          {t('friend.availableDays', { count: friend.availableDates.length })}
+        </div>
+
+        <div className='w-full'>
+          <div className='mb-1 flex items-center gap-2'>
+            <Globe className='h-3 w-3 text-muted-foreground' />
+            <Label htmlFor={`timezone-${friend.id}`} className='text-xs'>
+              {t('friend.timezone')}
+            </Label>
+          </div>
+          <p className='text-xs text-muted-foreground'>{timezoneDisplayText}</p>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
