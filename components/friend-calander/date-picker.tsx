@@ -15,11 +15,15 @@ import { Calendar } from '../ui/calander';
 
 interface DatePickerProps {
   selectedDate?: Date;
+  defaultMonth?: Date;
   onDateChange: (date?: Date) => void;
 }
 
-export function DatePicker({ selectedDate, onDateChange}: DatePickerProps) {
-
+export function DatePicker({
+  selectedDate,
+  defaultMonth,
+  onDateChange,
+}: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -31,13 +35,18 @@ export function DatePicker({ selectedDate, onDateChange}: DatePickerProps) {
           )}
         >
           <CalendarIcon />
-          {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+          {selectedDate ? (
+            format(selectedDate, 'PPP')
+          ) : (
+            <span>Pick a date</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-auto p-0' align='start'>
         <Calendar
           mode='single'
           selected={selectedDate}
+          defaultMonth={defaultMonth}
           onSelect={onDateChange}
         />
       </PopoverContent>

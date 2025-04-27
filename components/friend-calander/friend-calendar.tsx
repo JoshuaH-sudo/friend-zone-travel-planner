@@ -58,6 +58,7 @@ export function FriendCalendar({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
 
   const exportCalendar = () => {
     const icalContent = generateFriendIcal(friend);
@@ -201,13 +202,14 @@ export function FriendCalendar({
                     />
                   ),
                 }}
+                onMonthChange={setSelectedMonth}
                 selected={friend.availableDates}
                 onSelect={onDaySelect}
               />
             </div>
           </TabsContent>
           <TabsContent value='hours' className='flex flex-col justify-between'>
-            <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto p-4 bg-foreground/5 rounded-sm'>
+            <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto rounded-sm bg-foreground/5 p-4'>
               <TimeRangeSlider
                 label='Mon - Fri'
                 colour={friend.color}
@@ -234,6 +236,14 @@ export function FriendCalendar({
                   const dateBObj = new Date(dateB);
                   return dateAObj.getTime() - dateBObj.getTime();
                 })
+                .filter((date) => {
+                  // Filter out dates that are not in the selected month
+                  const dateObj = new Date(date);
+                  return (
+                    dateObj.getMonth() === selectedMonth.getMonth() &&
+                    dateObj.getFullYear() === selectedMonth.getFullYear()
+                  );
+                })
                 .map((date) => (
                   <TimeRangeSlider
                     key={date.toString()}
@@ -251,10 +261,11 @@ export function FriendCalendar({
                   />
                 ))}
             </ScrollArea>
-            <div className='border-b border-b-slate-200 my-2' />
+            <div className='my-2 border-b border-b-slate-200' />
             <div className='flex items-center justify-end gap-2'>
               <DatePicker
                 selectedDate={selectedDate}
+                defaultMonth={selectedMonth}
                 onDateChange={(date) => {
                   if (!date) {
                     setSelectedDate(undefined);
