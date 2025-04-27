@@ -6,7 +6,7 @@ import { Friend } from '@/lib/types';
 import { format, secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
-import { Card, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
@@ -108,30 +108,27 @@ export function TimezoneComparison({
           </CardTitle>
 
           <div className='flex gap-2'>
-            <ShareDialog elementRef={containerRef} filename={`timezone-comparison-${format(currentDate, 'yyyy-MM-dd')}`} />
+            <ShareDialog
+              elementRef={containerRef}
+              filename={`timezone-comparison-${format(currentDate, 'yyyy-MM-dd')}`}
+            />
           </div>
         </div>
       </CardHeader>
 
-      <div className='flex items-center justify-between'>
-        <button
-          onClick={goToPreviousDay}
-          className='rounded-full p-2 hover:bg-gray-100'
-        >
-          <ChevronLeft className='h-5 w-5' />
-        </button>
-        <div className='flex items-center gap-2'>
-          <span className='font-medium'>{format(currentDate, 'PPP')}</span>
+      <CardContent className='bg-card p-3' ref={containerRef}>
+         <div className='mb-4 flex items-center justify-between'>
+          <Button variant='ghost' size='icon' onClick={goToPreviousDay}>
+            <ChevronLeft className='h-4 w-4' />
+            <span className='sr-only'>Previous day</span>
+          </Button>
+          <h3 className='font-medium'>{format(currentDate, 'PPP')}</h3>
+          <Button variant='ghost' size='icon' onClick={goToNextDay}>
+            <ChevronRight className='h-4 w-4' />
+            <span className='sr-only'>Next day</span>
+          </Button>
         </div>
-        <button
-          onClick={goToNextDay}
-          className='rounded-full p-2 hover:bg-gray-100'
-        >
-          <ChevronRight className='h-5 w-5' />
-        </button>
-      </div>
 
-      <div id='sharing-frame' ref={containerRef} className='bg-background p-3'>
         <div id='timezone-list' className='rounded-md border bg-background'>
           {friends.map((friend) => {
             const hours = getHoursForTimezone(friend, currentDate);
@@ -165,7 +162,7 @@ export function TimezoneComparison({
             );
           })}
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }
