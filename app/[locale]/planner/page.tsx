@@ -2,18 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/add-friend-form';
-import { AvailabilityOverview } from '@/components/availability-overview';
-import { FriendCalendar } from '@/components/friend-calendar';
+import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
+import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
 import { WorkspaceActions } from '@/components/workspace-actions';
 import { EmptyState } from '@/components/empty-state';
-import type { Friend } from '@/lib/types';
+import type { AvailableHours, Friend } from '@/lib/types';
 import type { AppState } from '@/lib/json-export';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Calendar,
-  Users,
-  Clock,
-} from 'lucide-react';
+import { Calendar, Users, Clock } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,10 +27,26 @@ export default function PlannerPage() {
     setShowAddFriend(false);
   };
 
-  const updateFriendAvailability = (friendId: string, dates: Date[]) => {
+  const onUpdateAvailableDates = (friendId: string, dates: Date[]) => {
     setFriends(
       friends.map((friend) =>
         friend.id === friendId ? { ...friend, availableDates: dates } : friend
+      )
+    );
+  };
+
+  const onUpdateAvailableHours = (
+    friendId: string,
+    availableHours: Partial<AvailableHours>
+  ) => {
+    setFriends(
+      friends.map((friend) =>
+        friend.id === friendId
+          ? {
+              ...friend,
+              availableHours: { ...friend.availableHours, ...availableHours },
+            }
+          : friend
       )
     );
   };
@@ -136,7 +148,8 @@ export default function PlannerPage() {
                     key={friend.id}
                     friend={friend}
                     friends={friends}
-                    onUpdateAvailability={updateFriendAvailability}
+                    onUpdateAvailableDates={onUpdateAvailableDates}
+                    onUpdateAvailableHours={onUpdateAvailableHours}
                     onRemoveFriend={removeFriend}
                     onUpdateFriend={updateFriend}
                   />

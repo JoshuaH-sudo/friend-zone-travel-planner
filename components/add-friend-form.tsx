@@ -68,8 +68,16 @@ export function AddFriendForm({
   });
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone, timeZoneId, timezoneOffset } =
-      values;
+    const {
+      id,
+      name,
+      color,
+      coordinates,
+      address,
+      timezone,
+      timeZoneId,
+      timezoneOffset,
+    } = values;
     onAddFriend({
       id,
       name: name.trim(),
@@ -80,6 +88,11 @@ export function AddFriendForm({
       timezoneOffset,
       timeZoneId,
       availableDates: [],
+      availableHours: {
+        weekdays: [1, 24],
+        weekends: [1, 24],
+        dates: {},
+      },
     });
   }
 
