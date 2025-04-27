@@ -8,13 +8,10 @@ import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
 import { Card, CardHeader, CardTitle } from '../ui/card';
 
-import {
-  captureElementAsImage,
-  copyImageToClipboard,
-  downloadImage,
-} from '@/lib/image-capture';
 import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
+import { SocialShare } from '../social-share';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 
 export interface TimezoneData {
   city: string;
@@ -37,6 +34,7 @@ export function TimezoneComparison({
   const t = useTranslations();
   const containerRef = useRef(null);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   const goToNextDay = () => {
     const nextDay = new Date(currentDate);
@@ -102,15 +100,6 @@ export function TimezoneComparison({
     return baseHours;
   };
 
-  const shareTimezoneComparison = async () => {
-    if (!containerRef.current) return;
-
-    const { dataUrl, dataBlob } = await captureElementAsImage(
-      containerRef.current
-    );
-    await copyImageToClipboard(dataBlob);
-  };
-
   return (
     <Card>
       <CardHeader className='pb-2'>
@@ -120,15 +109,28 @@ export function TimezoneComparison({
             <span className='font-medium'>Timezone Comparison</span>
           </CardTitle>
 
-          <Button
-            variant='outline'
-            size='sm'
-            className='gap-2'
-            onClick={shareTimezoneComparison}
-          >
-            <Share2 className='h-4 w-4' />
-            {t('sharing.share')}
-          </Button>
+          <div className='flex gap-2'>
+            <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+              <DialogTrigger asChild>
+                <Button variant='outline' size='sm' className='gap-2'>
+                  <Share2 className='h-4 w-4' />
+                  {t('sharing.share')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className='w-100'>
+                <h2 className='mb-4 text-xl font-bold'>
+                  {t('sharing.shareCalendar')}
+                </h2>
+                <SocialShare
+                  elementRef={containerRef}
+                  filename={`timezone-comparison-${format(
+                    currentDate,
+                    'yyyy-MM-dd'
+                  )}`}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardHeader>
 
