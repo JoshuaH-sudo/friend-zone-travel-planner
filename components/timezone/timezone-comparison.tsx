@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { Friend } from '@/lib/types';
-import { secondsToHours } from 'date-fns';
+import { format, secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
-import { Card } from '../ui/card';
-import { TimeRangeSlider } from '../friend-calander/timerange-slider';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+
+import { Button } from '../ui/button';
+import { useTranslations } from 'next-intl';
+import { ShareDialog } from '../share-dialog';
 
 export interface TimezoneData {
   city: string;
@@ -27,15 +30,8 @@ export function TimezoneComparison({
   friends,
   startDate = new Date(),
 }: TimezoneComparisonProps) {
-  const timezones: TimezoneData[] = friends.map((friend) => ({
-    city: friend.timezone,
-    country: friend.address,
-    timezone: friend.timezone,
-    timezoneId: friend.timeZoneId,
-    offset: friend.timezoneOffset,
-    color: friend.color,
-  }));
-
+  const t = useTranslations();
+  const containerRef = useRef(null);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
 
   const goToNextDay = () => {
@@ -104,58 +100,69 @@ export function TimezoneComparison({
 
   return (
     <Card>
-      <div className='flex items-center justify-between p-4'>
-        <button
-          onClick={goToPreviousDay}
-          className='rounded-full p-2 hover:bg-gray-100'
-        >
-          <ChevronLeft className='h-5 w-5' />
-        </button>
-        <div className='flex items-center gap-2'>
-          <Home className='h-5 w-5' />
-          <span className='font-medium'>Timezone Comparison</span>
-        </div>
-        <button
-          onClick={goToNextDay}
-          className='rounded-full p-2 hover:bg-gray-100'
-        >
-          <ChevronRight className='h-5 w-5' />
-        </button>
-      </div>
+      <CardHeader className='pb-2'>
+        <div className='flex items-center justify-between'>
+          <CardTitle className='flex items-center gap-1'>
+            <Clock className='h-4 w-4' />
+            <span className='font-medium'>Timezone Comparison</span>
+          </CardTitle>
 
-      <div className='m-3 rounded-md border'>
-        {friends.map((friend) => {
-          const hours = getHoursForTimezone(friend, currentDate);
-          return (
-            <div key={friend.id} className='flex items-center border-t'>
-              {/* Left sidebar with timezone info - increased width */}
-              <div className='w-64 flex-none border-r'>
-                <div className='flex h-full justify-between gap-3 p-6'>
-                  <div className='truncate text-lg font-bold capitalize'>
-                    {friend.name}
-                  </div>
-                  <div className='flex w-20 flex-col items-start gap-1 text-xs'>
-                    <p className='truncate capitalize text-gray-500'>
-                      {friend.address}
-                    </p>
-                    <p className='truncate text-gray-500'>
-                      {friend.timeZoneId}
-                    </p>
-                    <p className='font-medium text-gray-500'>
-                      {formatOffset(friend.timezoneOffset)}
-                    </p>
+          <div className='flex gap-2'>
+            <ShareDialog
+              elementRef={containerRef}
+              filename={`timezone-comparison-${format(currentDate, 'yyyy-MM-dd')}`}
+            />
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className='bg-card p-3' ref={containerRef}>
+         <div className='mb-4 flex items-center justify-between'>
+          <Button variant='ghost' size='icon' onClick={goToPreviousDay}>
+            <ChevronLeft className='h-4 w-4' />
+            <span className='sr-only'>Previous day</span>
+          </Button>
+          <h3 className='font-medium'>{format(currentDate, 'PPP')}</h3>
+          <Button variant='ghost' size='icon' onClick={goToNextDay}>
+            <ChevronRight className='h-4 w-4' />
+            <span className='sr-only'>Next day</span>
+          </Button>
+        </div>
+
+        <div id='timezone-list' className='rounded-md border bg-background'>
+          {friends.map((friend) => {
+            const hours = getHoursForTimezone(friend, currentDate);
+            return (
+              <div key={friend.id} className='flex items-center border-t'>
+                {/* Left sidebar with timezone info - increased width */}
+                <div className='w-64 flex-none border-r'>
+                  <div className='flex h-full justify-between gap-3 p-6'>
+                    <div className='truncate text-lg font-bold capitalize'>
+                      {friend.name}
+                    </div>
+                    <div className='flex w-20 flex-col items-start gap-1 text-xs'>
+                      <p className='truncate capitalize text-gray-500'>
+                        {friend.address}
+                      </p>
+                      <p className='truncate text-gray-500'>
+                        {friend.timeZoneId}
+                      </p>
+                      <p className='font-medium text-gray-500'>
+                        {formatOffset(friend.timezoneOffset)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right side with hours */}
-              <div className='flex w-full overflow-x-auto'>
-                <TimezoneHour hours={hours} timezoneColor={friend.color} />
+                {/* Right side with hours */}
+                <div className='flex w-full overflow-x-auto'>
+                  <TimezoneHour hours={hours} timezoneColor={friend.color} />
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </CardContent>
     </Card>
   );
 }
