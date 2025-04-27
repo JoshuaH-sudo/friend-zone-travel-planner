@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle } from '../ui/card';
 
 import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
-import { ShareDialog } from '../ui/share-dialog';
+import { ShareDialog } from '../share-dialog';
 
 export interface TimezoneData {
   city: string;
