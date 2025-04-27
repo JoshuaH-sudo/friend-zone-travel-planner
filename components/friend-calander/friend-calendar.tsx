@@ -210,6 +210,7 @@ export function FriendCalendar({
             </div>
           </TabsContent>
           <TabsContent value='hours' className='flex flex-col justify-between'>
+            <h5 className='mb-2 text-sm font-medium text-center'>{selectedMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</h5>
             <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto rounded-sm bg-foreground/5 p-4'>
               <TimeRangeSlider
                 label='Mon - Fri'
