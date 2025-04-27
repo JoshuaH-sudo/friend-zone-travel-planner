@@ -202,6 +202,7 @@ export function FriendCalendar({
                     />
                   ),
                 }}
+                month={selectedMonth}
                 onMonthChange={setSelectedMonth}
                 selected={friend.availableDates}
                 onSelect={onDaySelect}
@@ -261,7 +262,9 @@ export function FriendCalendar({
                   />
                 ))}
             </ScrollArea>
+
             <div className='my-2 border-b border-b-slate-200' />
+
             <div className='flex items-center justify-end gap-2'>
               <DatePicker
                 selectedDate={selectedDate}

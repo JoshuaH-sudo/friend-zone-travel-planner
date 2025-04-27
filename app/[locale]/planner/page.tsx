@@ -27,7 +27,7 @@ export default function PlannerPage() {
     setShowAddFriend(false);
   };
 
-  const updateFriendAvailability = (friendId: string, dates: Date[]) => {
+  const onUpdateAvailableDates = (friendId: string, dates: Date[]) => {
     setFriends(
       friends.map((friend) =>
         friend.id === friendId ? { ...friend, availableDates: dates } : friend
@@ -148,7 +148,7 @@ export default function PlannerPage() {
                     key={friend.id}
                     friend={friend}
                     friends={friends}
-                    onUpdateAvailableDates={updateFriendAvailability}
+                    onUpdateAvailableDates={onUpdateAvailableDates}
                     onUpdateAvailableHours={onUpdateAvailableHours}
                     onRemoveFriend={removeFriend}
                     onUpdateFriend={updateFriend}
