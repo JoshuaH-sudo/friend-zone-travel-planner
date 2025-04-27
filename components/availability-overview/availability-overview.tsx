@@ -1,20 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import {
-  format,
-  addMonths,
-  subMonths,
-} from 'date-fns';
+import { format, addMonths, subMonths } from 'date-fns';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronLeft, ChevronRight, Share2, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import { SocialShare } from '../social-share';
 import { useTranslations } from 'next-intl';
@@ -42,7 +33,11 @@ export function AvailabilityOverview({
     <Card>
       <CardHeader className='pb-2'>
         <div className='flex items-center justify-between'>
-          <CardTitle>{t('navigation.overview')}</CardTitle>
+          <CardTitle className='flex items-center gap-1'>
+            <Users className='h-4 w-4' />
+            {t('navigation.overview')}
+          </CardTitle>
+
           <div className='flex gap-2'>
             <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
               <DialogTrigger asChild>
@@ -64,7 +59,7 @@ export function AvailabilityOverview({
           </div>
         </div>
       </CardHeader>
-      <CardContent className='p-3 bg-card' ref={calendarRef}>
+      <CardContent className='bg-card p-3' ref={calendarRef}>
         <div className='mb-4 flex items-center justify-between'>
           <Button variant='ghost' size='icon' onClick={prevMonth}>
             <ChevronLeft className='h-4 w-4' />
