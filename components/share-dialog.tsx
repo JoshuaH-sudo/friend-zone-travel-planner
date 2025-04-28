@@ -10,19 +10,19 @@ interface ShareDialogProps {
 }
 
 export function ShareDialog({ elementRef, filename }: ShareDialogProps) {
-  const t = useTranslations();
+  const t = useTranslations('sharing');
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant='outline' size='sm' className='gap-2'>
           <Share2 className='h-4 w-4' />
-          {t('sharing.share')}
+          {t('share')}
         </Button>
       </DialogTrigger>
       <DialogContent className='w-100'>
         <h2 className='mb-4 text-xl font-bold'>
-          {t('sharing.shareCalendar')}
+          {t('shareCalendar')}
         </h2>
         <SocialShare elementRef={elementRef} filename={filename} />
       </DialogContent>

@@ -19,7 +19,7 @@ export function AvailabilityOverview({
   friends,
   groupName,
 }: AvailabilityOverviewProps) {
-  const t = useTranslations();
+  const t = useTranslations('availabilityOverview');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -33,11 +33,11 @@ export function AvailabilityOverview({
         <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center gap-1'>
             <Users className='h-4 w-4' />
-            {t('navigation.overview')}
+            {t('title')}
           </CardTitle>
 
           <div className='flex gap-2'>
-            <ShareDialog elementRef={calendarRef} filename={groupName || t('app.title')} />
+            <ShareDialog elementRef={calendarRef} filename={groupName || t('title')} />
           </div>
         </div>
       </CardHeader>

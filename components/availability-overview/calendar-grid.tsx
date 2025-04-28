@@ -24,12 +24,12 @@ interface CalendarGridProps {
 }
 
 export function CalendarGrid({ currentMonth, friends }: CalendarGridProps) {
-  const t = useTranslations();
+  const t = useTranslations('availabilityOverview');
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekdays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
   const getAvailableFriends = (date: Date) => {
     return friends.filter((friend) =>
@@ -45,7 +45,7 @@ export function CalendarGrid({ currentMonth, friends }: CalendarGridProps) {
             key={day}
             className='py-1 text-xs font-medium text-muted-foreground'
           >
-            {day}
+            {t(`weekDayColumn.${day}`)}
           </div>
         ))}
 

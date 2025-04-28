@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import type { Friend } from '@/lib/types';
+import { useTranslations } from 'next-intl';
 
 interface TooltipContentProps {
   day: Date;
@@ -10,6 +11,7 @@ export function AvailabilityTooltipContent({
   day,
   availableFriends,
 }: TooltipContentProps) {
+  const t = useTranslations('availabilityOverview');
   return (
     <>
       <div className='text-sm font-medium'>
@@ -48,7 +50,7 @@ export function AvailabilityTooltipContent({
                     ({friend.timezone})
                   </span>
                   <span className='text-xs text-muted-foreground'>
-                    { isAllDay ? 'All Day' : `${startHour}:00 - ${endHour}:00`}
+                    { isAllDay ? t('allDay'): `${startHour}:00 - ${endHour}:00`}
                     </span>
                 </li>
               );

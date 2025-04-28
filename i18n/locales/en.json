@@ -58,9 +58,29 @@
     "presetColors": "Preset Colors",
     "customColor": "Custom Color"
   },
+  "availabilityOverview": {
+    "title": "Availability Overview",
+    "description": "See at a glance which days work best for everyone.",
+    "noData": "No availability data available",
+    "loading": "Loading availability data...",
+    "weekDayColumn": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "everyone": "Everyone",
+    "allDay": "All Day",
+    "exportImage": "Export Image",
+    "exportImageDescription": "Export the availability overview as an image to share with friends."
+  },
   "sharing": {
     "share": "Share",
     "shareCalendar": "Share Calendar",
+    "loading": "Loading...",
     "captureCalendar": "Capture Calendar",
     "capturing": "Capturing...",
     "calendarPreview": "Calendar Preview",

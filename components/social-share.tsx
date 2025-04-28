@@ -30,7 +30,7 @@ interface SocialShareProps {
 }
 
 export function SocialShare({ elementRef, filename }: SocialShareProps) {
-  const t = useTranslations();
+  const t = useTranslations('sharing');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -49,7 +49,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
       setImageUrl(dataUrl);
       setImageBlob(dataBlob);
     } catch (err) {
-      setError(t('sharing.captureError'));
+      setError(t('captureError'));
       console.error('Failed to capture calendar:', err);
     } finally {
       setIsCapturing(false);
@@ -67,12 +67,12 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
         setTimeout(() => setIsCopied(false), 2000);
       } else {
         // If the copy failed but didn't throw an error, show a message
-        setError(t('sharing.copyError'));
+        setError(t('copyError'));
         // Suggest download as alternative
         handleDownloadImage();
       }
     } catch (err) {
-      setError(t('sharing.copyError'));
+      setError(t('copyError'));
       console.error('Failed to copy image:', err);
       // Suggest download as alternative
       handleDownloadImage();
@@ -85,7 +85,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
     try {
       downloadImage(imageUrl, `${filename.replace(/\s+/g, '_')}_calendar.png`);
     } catch (err) {
-      setError(t('sharing.downloadError'));
+      setError(t('downloadError'));
       console.error('Failed to download image:', err);
     }
   };
@@ -100,13 +100,13 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
         <div className='overflow-hidden rounded-md border'>
           {isCapturing && (
             <div className='flex items-center justify-center h-64'>
-              loading...
+              {t('capturing')}
             </div>
           )}
 
           <img
             src={imageUrl || '/placeholder.svg'}
-            alt={t('sharing.calendarPreview')}
+            alt={t('calendarPreview')}
             className='h-auto w-full'
           />
         </div>
@@ -129,17 +129,17 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
                   {isCopied ? (
                     <>
                       <Check className='h-4 w-4' />
-                      {t('sharing.copied')}
+                      {t('copied')}
                     </>
                   ) : (
                     <>
                       <Copy className='h-4 w-4' />
-                      {t('sharing.copyImage')}
+                      {t('copyImage')}
                     </>
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{t('sharing.copyTooltip')}</TooltipContent>
+              <TooltipContent>{t('copyTooltip')}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -149,7 +149,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
             className='gap-2'
           >
             <Download className='h-4 w-4' />
-            {t('sharing.downloadImage')}
+            {t('downloadImage')}
           </Button>
         </div>
       </div>
