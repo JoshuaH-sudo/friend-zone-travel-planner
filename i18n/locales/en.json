@@ -71,13 +71,12 @@
         "failedToParse": "Failed to parse the iCal file. Please make sure it's a valid .ics file."
       },
       "description": "Upload an iCal file to import availability dates",
+      "state": {
+        "importing": "Importing..."
+      },
       "actions": {
         "import": "Import",
         "cancel": "Cancel"
-      },
-      "state": {
-        "importing": "Importing...",
-        "exporting": "Exporting..."
       }
     },
     "export": {
@@ -90,6 +89,9 @@
         "exportIndividual": "Export Individual Calendars"
       }
     }
+  },
+  "timezoneComparison": {
+    "title": "Timezone Comparison"
   },
   "availabilityOverview": {
     "title": "Availability Overview",
