@@ -33,7 +33,7 @@ export function ImportCalendar({
   onImport,
   onCancel,
 }: ImportCalendarProps) {
-  const t = useTranslations('calendar.import');
+  const t = useTranslations('import');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

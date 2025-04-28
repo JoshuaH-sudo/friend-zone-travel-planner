@@ -35,10 +35,16 @@
     "form": {
       "name": {
         "label": "Friend Name",
-        "placeholder": "Enter friend's name"
+        "placeholder": "Enter friend's name",
+        "error": {
+          "required": "Name is required"
+        }
       },
       "color": {
-        "label": "Calendar Color"
+        "label": "Calendar Color",
+        "error": {
+          "required": "Must select a color"
+        }
       },
       "timezone": {
         "label": "Timezone",
@@ -48,10 +54,12 @@
         "label": "Address",
         "searching": "Searching...",
         "placeholder": "Enter address",
-        "example": "e.g., San Francisco"
+        "example": "e.g., San Francisco",
+        "error": {
+          "required": "Address is required"
+        }
       }
     },
-    "nameFromFile": "Leave blank to use name from file",
     "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
     "remove": "Remove {{name}}?",
     "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone.",
@@ -63,31 +71,49 @@
     "customColor": "Custom Color",
     "helperText": "Enter a hex color code (e.g., #FF5500) or use the colour picker"
   },
-  "calendar": {
-    "import": {
-      "icalFile": "iCal File (.ics)",
-      "error": {
-        "noFile": "Please select a file",
-        "failedToParse": "Failed to parse the iCal file. Please make sure it's a valid .ics file."
-      },
-      "description": "Upload an iCal file to import availability dates",
-      "state": {
-        "importing": "Importing..."
-      },
-      "actions": {
-        "import": "Import",
-        "cancel": "Cancel"
-      }
+  "import": {
+    "icalFile": "iCal File (.ics)",
+    "error": {
+      "noFile": "Please select a file",
+      "failedToParse": "Failed to parse the iCal file. Please make sure it's a valid .ics file."
     },
-    "export": {
-      "title": "Export Calendars",
-      "allCalendars": "Export All Calendars",
-      "individualCalendars": "Export Individual Calendars",
-      "description": "Export calendars to iCal format (.ics) to use in other calendar applications",
-      "actions": {
-        "exportAll": "Export All Calendars",
-        "exportIndividual": "Export Individual Calendars"
-      }
+    "description": "Upload an iCal file to import availability dates",
+    "state": {
+      "importing": "Importing..."
+    },
+    "actions": {
+      "import": "Import",
+      "cancel": "Cancel"
+    }
+  },
+  "export": {
+    "title": "Export Calendars",
+    "allCalendars": "Export All Calendars",
+    "individualCalendars": "Export Individual Calendars",
+    "description": "Export calendars to iCal format (.ics) to use in other calendar applications",
+    "actions": {
+      "exportAll": "Export All Calendars",
+      "exportIndividual": "Export Individual Calendars"
+    }
+  },
+  "friendCalendar": {
+    "dates": {
+      "label": "Dates"
+    },
+    "hours": {
+      "label": "Hours",
+      "weekdayRange": "Mon - Fri",
+      "weekendRange": "Sat - Sun",
+      "allDay": "All Day"
+    },
+    "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
+    "timezone": {
+      "label": "Timezone"
+    },
+    "actions": {
+      "edit": "Edit",
+      "export": "Export",
+      "delete": "Delete"
     }
   },
   "timezoneComparison": {

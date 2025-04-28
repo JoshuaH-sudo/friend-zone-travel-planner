@@ -13,7 +13,6 @@ import AddressField from './add-friend-form/address-field';
 import ColorPickerField from './add-friend-form/color-picker-field';
 import TimezoneFormField from './add-friend-form/timezone-form-field';
 import NameFormField from './add-friend-form/name-form-field';
-import { useEffect } from 'react';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -24,17 +23,17 @@ interface AddFriendFormProps {
 export const addFriendSchema = z.object({
   id: z.string(),
   name: z.string().nonempty({
-    message: 'Name is required',
+    message: 'required',
   }),
   color: z.string({
-    message: 'Must select a color',
+    message: 'required',
   }),
   coordinates: z.object({
     lat: z.number(),
     lng: z.number(),
   }),
   address: z.string({
-    message: 'Address is required',
+    message: 'required',
   }),
   timezone: z.string(),
   timeZoneId: z.string(),

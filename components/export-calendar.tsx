@@ -16,7 +16,7 @@ interface ExportCalendarProps {
 }
 
 export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
-  const t = useTranslations('calendar.export');
+  const t = useTranslations('export');
 
   const exportSingleCalendar = (friend: Friend) => {
     const icalContent = generateFriendIcal(friend);
@@ -35,12 +35,8 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
   return (
     <div className='space-y-4'>
       <div>
-        <h3 className='mb-2 text-lg font-medium'>
-          {t('title')}
-        </h3>
-        <p className='mb-4 text-sm text-muted-foreground'>
-          {t('description')}
-        </p>
+        <h3 className='mb-2 text-lg font-medium'>{t('title')}</h3>
+        <p className='mb-4 text-sm text-muted-foreground'>{t('description')}</p>
 
         <div className='flex flex-wrap gap-2'>
           <Button
