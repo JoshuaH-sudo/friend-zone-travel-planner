@@ -16,7 +16,7 @@ interface ExportCalendarProps {
 }
 
 export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
-  const t = useTranslations();
+  const t = useTranslations('calendar.export');
 
   const exportSingleCalendar = (friend: Friend) => {
     const icalContent = generateFriendIcal(friend);
@@ -36,10 +36,10 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
     <div className='space-y-4'>
       <div>
         <h3 className='mb-2 text-lg font-medium'>
-          {t('actions.exportCalendars')}
+          {t('title')}
         </h3>
         <p className='mb-4 text-sm text-muted-foreground'>
-          {t('calendar.exportDescription')}
+          {t('description')}
         </p>
 
         <div className='flex flex-wrap gap-2'>
@@ -49,7 +49,7 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
             className='gap-2'
           >
             <Upload className='h-4 w-4' />
-            {t('calendar.exportAll')}
+            {t('allCalendars')}
           </Button>
         </div>
       </div>
@@ -57,7 +57,7 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
       {friends.length > 0 && (
         <div>
           <h4 className='mb-2 text-sm font-medium'>
-            {t('calendar.exportIndividual')}
+            {t('individualCalendars')}
           </h4>
           <div className='grid gap-2 sm:grid-cols-2 md:grid-cols-3'>
             {friends.map((friend) => (

@@ -81,17 +81,15 @@
       }
     },
     "export": {
-      "all": "Export All Calendars",
-      "individual": "Export Individual Calendars",
-      "description": "Export calendars to iCal format (.ics) to use in other calendar applications"
-    },
-    "exportAll": "Export All Calendars",
-    "exportIndividual": "Export Individual Calendars",
-    "importCalendarDescription": "Upload an iCal file to import availability dates",
-    "exportDescription": "Export calendars to iCal format (.ics) to use in other calendar applications",
-    "everyone": "Everyone",
-    "available": "Available:",
-    "noOneAvailable": "No one is available"
+      "title": "Export Calendars",
+      "allCalendars": "Export All Calendars",
+      "individualCalendars": "Export Individual Calendars",
+      "description": "Export calendars to iCal format (.ics) to use in other calendar applications",
+      "actions": {
+        "exportAll": "Export All Calendars",
+        "exportIndividual": "Export Individual Calendars"
+      }
+    }
   },
   "availabilityOverview": {
     "title": "Availability Overview",
