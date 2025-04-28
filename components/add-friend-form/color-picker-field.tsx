@@ -20,7 +20,7 @@ function ColorPickerField({
   friends,
 }: ColorPickerFieldProps) {
   const form = useFormContext();
-  const t = useTranslations('friend');
+  const t = useTranslations('friend.form.color');
 
   let takenColors = friends
     .filter((friend) => friend.id !== selectedFriendId)
@@ -36,7 +36,7 @@ function ColorPickerField({
         name='color'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t('color')}</FormLabel>
+            <FormLabel>{t('label')}</FormLabel>
             <FormControl>
               <ColorPicker
                 availableColors={availableColors}

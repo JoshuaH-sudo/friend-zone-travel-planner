@@ -13,7 +13,7 @@ interface TimezoneFormFieldProps {}
 
 function TimezoneFormField({}: TimezoneFormFieldProps) {
   const form = useFormContext<addFriendFormContext>();
-  const t = useTranslations('friend');
+  const t = useTranslations('friend.form.timezone');
 
   const coordinates = form.watch('coordinates');
   const { data: timezoneInformation, error: timezoneInformationError } =
@@ -52,7 +52,7 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
     }
   }, [timezoneInformation]);
 
-  let timezoneText = 'input location';
+  let timezoneText = t('placeholder');
   if (timezoneInformation) {
     timezoneText = displayTimezoneOffset(
       timezoneInformation.timeZoneName,
@@ -64,7 +64,7 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
     <div id='timezone-form-field' className='space-y-2'>
       <div className='flex items-center gap-2'>
         <Globe className='h-4 w-4 text-muted-foreground' />
-        <Label htmlFor='timezone'>{t('timezone')}</Label>
+        <Label htmlFor='timezone'>{t('label')}</Label>
       </div>
       <p className='text-xs text-muted-foreground'>{timezoneText}</p>
     </div>

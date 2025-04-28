@@ -24,9 +24,9 @@ interface AddressFieldProps {
   friends: Friend[];
   className?: string;
 }
-function AddressField({ friends, className }: AddressFieldProps) {
+function AddressField({ className }: AddressFieldProps) {
   const form = useFormContext();
-  const t = useTranslations('friend');
+  const t = useTranslations('friend.form.address');
 
   const address = form.watch('address');
   const debouncedSearchTerm = useDebounce<string>(address, 300);
@@ -67,9 +67,8 @@ function AddressField({ friends, className }: AddressFieldProps) {
   }, [addressDetails, isAddressSuccess]);
 
   // TODO: Add a loading spinner
-  // TODO: Translate the placeholder text
-  let citySearchText = 'e.g. San Francisco';
-  if (isFetchingAddress) citySearchText = 'Searching...';
+  let citySearchText = t('example');
+  if (isFetchingAddress) citySearchText = t('searching');
   if (isAddressSuccess && !isFetchingAddress)
     citySearchText = addressDetails.formatted_address;
 
@@ -83,7 +82,7 @@ function AddressField({ friends, className }: AddressFieldProps) {
           <FormItem>
             <FormLabel className='flex items-center gap-2'>
               <MapPin className='h-4 w-4 text-muted-foreground' />
-              <Label htmlFor='location'>{t('location')}</Label>
+              <Label htmlFor='address'>{t('label')}</Label>
             </FormLabel>
 
             <FormControl>
@@ -92,7 +91,7 @@ function AddressField({ friends, className }: AddressFieldProps) {
                   {...field}
                   isLoading={isLoading}
                   clearable
-                  placeholder='City name'
+                  placeholder={t('placeholder')}
                 />
                 <Button onClick={() => refetchAddress()} disabled={isLoading || !address } style={{
                   visibility: isAddressError ? 'visible' : 'hidden',

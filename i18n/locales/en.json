@@ -32,19 +32,36 @@
     "restoreState": "Restore State"
   },
   "friend": {
-    "name": "Friend Name",
-    "namePlaceholder": "Enter friend's name",
-    "nameOptional": "Friend Name (Optional)",
+    "form": {
+      "name": {
+        "label": "Friend Name",
+        "placeholder": "Enter friend's name"
+      },
+      "color": {
+        "label": "Calendar Color"
+      },
+      "timezone": {
+        "label": "Timezone",
+        "placeholder": "Select timezone"
+      },
+      "address": {
+        "label": "Address",
+        "searching": "Searching...",
+        "placeholder": "Enter address",
+        "example": "e.g., San Francisco"
+      }
+    },
     "nameFromFile": "Leave blank to use name from file",
-    "color": "Calendar Color",
-    "timezone": "Timezone",
-    "location": "Location",
-    "timezonePlaceholder": "Select timezone",
     "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
     "remove": "Remove {{name}}?",
     "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone.",
     "addFriend": "Add Friend",
     "cancel": "Cancel"
+  },
+  "colourPicker": {
+    "presetColors": "Preset Colors",
+    "customColor": "Custom Color",
+    "helperText": "Enter a hex color code (e.g., #FF5500) or use the colour picker"
   },
   "calendar": {
     "exportAll": "Export All Calendars",
@@ -54,9 +71,7 @@
     "icalFile": "iCal File (.ics)",
     "everyone": "Everyone",
     "available": "Available:",
-    "noOneAvailable": "No one is available",
-    "presetColors": "Preset Colors",
-    "customColor": "Custom Color"
+    "noOneAvailable": "No one is available"
   },
   "availabilityOverview": {
     "title": "Availability Overview",
