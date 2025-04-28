@@ -9,6 +9,10 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "actions": {
+      "import": "Import",
+      "addFriend": "Add Friend"
     }
   },
   "navigation": {
