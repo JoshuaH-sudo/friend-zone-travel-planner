@@ -33,7 +33,7 @@ export function ImportCalendar({
   onImport,
   onCancel,
 }: ImportCalendarProps) {
-  const t = useTranslations();
+  const t = useTranslations('calendar.import');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,10 +75,18 @@ export function ImportCalendar({
   };
 
   async function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone, timezoneOffset, timeZoneId } =
-      values;
+    const {
+      id,
+      name,
+      color,
+      coordinates,
+      address,
+      timezone,
+      timezoneOffset,
+      timeZoneId,
+    } = values;
     if (!file) {
-      setError('Please select a file to import');
+      setError(t('error.noFile'));
       return;
     }
 
@@ -106,9 +114,7 @@ export function ImportCalendar({
         },
       });
     } catch (err) {
-      setError(
-        "Failed to parse the iCal file. Please make sure it's a valid .ics file."
-      );
+      setError(t('error.failedToParse'));
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +125,7 @@ export function ImportCalendar({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <div className='space-y-2'>
-          <Label htmlFor='calendar-file'>{t('calendar.icalFile')}</Label>
+          <Label htmlFor='calendar-file'>{t('icalFile')}</Label>
           <Input
             id='calendar-file'
             type='file'
@@ -128,7 +134,7 @@ export function ImportCalendar({
             className='cursor-pointer'
           />
           <p className='text-xs text-muted-foreground'>
-            {t('calendar.importCalendarDescription')}
+            {t('description')}
           </p>
         </div>
 

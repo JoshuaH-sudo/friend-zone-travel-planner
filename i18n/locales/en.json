@@ -64,11 +64,31 @@
     "helperText": "Enter a hex color code (e.g., #FF5500) or use the colour picker"
   },
   "calendar": {
+    "import": {
+      "icalFile": "iCal File (.ics)",
+      "error": {
+        "noFile": "Please select a file",
+        "failedToParse": "Failed to parse the iCal file. Please make sure it's a valid .ics file."
+      },
+      "description": "Upload an iCal file to import availability dates",
+      "actions": {
+        "import": "Import",
+        "cancel": "Cancel"
+      },
+      "state": {
+        "importing": "Importing...",
+        "exporting": "Exporting..."
+      }
+    },
+    "export": {
+      "all": "Export All Calendars",
+      "individual": "Export Individual Calendars",
+      "description": "Export calendars to iCal format (.ics) to use in other calendar applications"
+    },
     "exportAll": "Export All Calendars",
     "exportIndividual": "Export Individual Calendars",
     "importCalendarDescription": "Upload an iCal file to import availability dates",
     "exportDescription": "Export calendars to iCal format (.ics) to use in other calendar applications",
-    "icalFile": "iCal File (.ics)",
     "everyone": "Everyone",
     "available": "Available:",
     "noOneAvailable": "No one is available"
