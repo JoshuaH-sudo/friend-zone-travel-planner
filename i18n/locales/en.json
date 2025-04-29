@@ -21,7 +21,7 @@
     "overview": "Availability Overview",
     "timezone": "Timezones"
   },
-  "actions": {
+  "workspace-actions": {
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
