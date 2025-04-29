@@ -8,11 +8,11 @@ import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from './ui/form';
-import AddressField from './add-friend-form/address-field';
-import ColorPickerField from './add-friend-form/color-picker-field';
-import NameFormField from './add-friend-form/name-form-field';
-import TimezoneFormField from './add-friend-form/timezone-form-field';
+import { Form } from '../ui/form';
+import AddressField from './address-field';
+import ColorPickerField from './color-picker-field';
+import NameFormField from './name-form-field';
+import TimezoneFormField from './timezone-form-field';
 
 interface EditFriendFormProps {
   friend: Friend;

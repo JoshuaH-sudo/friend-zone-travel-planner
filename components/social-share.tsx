@@ -1,15 +1,8 @@
 'use client';
-
 import type React from 'react';
-
 import { RefObject, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Copy,
-  Download,
-  Check,
-  X,
-} from 'lucide-react';
+import { Copy, Download, Check } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -45,7 +38,9 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
     setError(null);
 
     try {
-      const { dataUrl, dataBlob } = await captureElementAsImage(elementRef.current);
+      const { dataUrl, dataBlob } = await captureElementAsImage(
+        elementRef.current
+      );
       setImageUrl(dataUrl);
       setImageBlob(dataBlob);
     } catch (err) {
@@ -99,7 +94,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
       <div className='space-y-4'>
         <div className='overflow-hidden rounded-md border'>
           {isCapturing && (
-            <div className='flex items-center justify-center h-64'>
+            <div className='flex h-64 items-center justify-center'>
               {t('capturing')}
             </div>
           )}

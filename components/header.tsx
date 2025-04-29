@@ -7,7 +7,7 @@ import travelIcon from '@/public/travel.png';
 import Link from 'next/link';
 
 export function Header() {
-  const t = useTranslations();
+  const t = useTranslations('app');
 
   return (
     <header className='border-b'>
@@ -22,7 +22,7 @@ export function Header() {
               alt='Travel Icon'
               className='h-6 w-6 text-primary'
             />
-            <span className='text-xl font-bold'>{t('app.title')}</span>
+            <span className='text-xl font-bold'>{t('title')}</span>
           </div>
         </Link>
         
