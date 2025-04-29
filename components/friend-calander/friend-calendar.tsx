@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from '../friend-form/edit-friend-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from '../ui/calander';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
+import { de, enUS } from 'date-fns/locale';
 import { ScrollArea } from '../ui/scroll-area';
+import { useParams } from 'next/navigation';
+import { dateLocaleMaps } from '@/i18n/utils';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -55,6 +58,7 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations('friendCalendar');
+  const locale = useLocale();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -208,7 +212,9 @@ export function FriendCalendar({
             </div>
           </TabsContent>
           <TabsContent value='hours' className='flex flex-col justify-between'>
-            <h5 className='mb-2 text-sm font-medium text-center'>{selectedMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</h5>
+            <h5 className='mb-2 text-center text-sm font-medium'>
+              {format(selectedMonth, 'MMMM yyyy')}
+            </h5>
             <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto rounded-sm bg-foreground/5 p-4'>
               <TimeRangeSlider
                 label={t('hours.weekdayRange')}
@@ -246,7 +252,6 @@ export function FriendCalendar({
                 })
                 .map((date) => (
                   <TimeRangeSlider
-                    key={date.toString()}
                     label={format(date, 'LLLL dd')}
                     colour={friend.color}
                     value={friend.availableHours.dates[date.toString()]}
