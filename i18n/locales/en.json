@@ -22,9 +22,6 @@
     "timezone": "Timezones"
   },
   "workspace-actions": {
-    "add": "Add",
-    "edit": "Edit",
-    "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
     "import": "Import",
