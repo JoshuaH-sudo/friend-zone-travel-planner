@@ -165,12 +165,22 @@
     "calendarTitle": "{{name}} Availability Calendar",
     "calendarDescription": "Check out our availability calendar!"
   },
-  "state": {
+  "stateManager": {
     "saveStateDescription": "Save the current state of all calendars to a file",
     "restoreStateDescription": "Restore calendars from a previously saved file",
-    "stateFile": "State File (.json)",
+    "label": "State File (.json)",
     "importing": "Importing...",
-    "exporting": "Exporting..."
+    "exporting": "Exporting...",
+    "error": {
+      "noFileSelected": "Please select a file",
+      "failedToParse": "Failed to parse the state file. Please make sure it's a valid .json file.",
+      "failedToExport": "Failed to export the state. Please try again.",
+      "noGroupName": "Need to give your group a name before you can save the state."
+    },
+    "actions": {
+      "saveState": "Save State",
+      "restoreState": "Restore State"
+    }
   },
   "landing": {
     "title": "Plan Events with Friends",

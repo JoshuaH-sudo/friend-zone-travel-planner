@@ -31,7 +31,7 @@ export function EmptyState({ onShowAddFriend }: EmptyStateProps) {
           className='gap-2'
         >
           <Download className='h-4 w-4' />
-          {t('import')}
+          {t('actions.import')}
         </Button>
       </div>
     </div>
