@@ -4,7 +4,7 @@
     "groupName": "Gruppenname",
     "groupNamePlaceholder": "Gruppennamen eingeben",
     "noFriendsTitle": "Noch keine Freunde hinzugefügt",
-    "noFriendsDescription": "Füge Freunde und ihre Verfügbarkeit hinzu, um zu sehen, wann alle Zeit für das nächste Treffen haben.",
+    "noFriendsDescription": "Fügen Sie Freunde und deren Verfügbarkeit hinzu, um zu sehen, wann alle für Ihr nächstes Treffen frei sind.",
     "theme": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -17,14 +17,11 @@
   },
   "navigation": {
     "home": "Startseite",
-    "calendars": "Freundeskalender",
+    "calendars": "Freund-Kalender",
     "overview": "Verfügbarkeitsübersicht",
     "timezone": "Zeitzonen"
   },
-  "actions": {
-    "add": "Hinzufügen",
-    "edit": "Bearbeiten",
-    "delete": "Löschen",
+  "workspace-actions": {
     "cancel": "Abbrechen",
     "save": "Speichern",
     "import": "Importieren",
@@ -56,9 +53,9 @@
       },
       "address": {
         "label": "Adresse",
-        "searching": "Suche...",
+        "searching": "Suchen...",
         "placeholder": "Adresse eingeben",
-        "example": "z.B. Berlin",
+        "example": "z. B. San Francisco",
         "error": {
           "required": "Adresse ist erforderlich"
         }
@@ -66,24 +63,24 @@
     },
     "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",
     "remove": "{{name}} entfernen?",
-    "removeConfirm": "Dies wird {{name}} und die Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
     "addFriend": "Freund hinzufügen",
     "cancel": "Abbrechen"
   },
   "colourPicker": {
     "presetColors": "Voreingestellte Farben",
     "customColor": "Benutzerdefinierte Farbe",
-    "helperText": "Geben Sie einen Hex-Farbcode ein (z.B. #FF5500) oder nutzen Sie den Farbwähler"
+    "helperText": "Geben Sie einen Hex-Farbcode ein (z. B. #FF5500) oder verwenden Sie den Farbwähler"
   },
   "import": {
     "icalFile": "iCal-Datei (.ics)",
     "error": {
       "noFile": "Bitte wählen Sie eine Datei aus",
-      "failedToParse": "Fehler beim Verarbeiten der iCal-Datei. Bitte stellen Sie sicher, dass es sich um eine gültige .ics-Datei handelt."
+      "failedToParse": "Die iCal-Datei konnte nicht analysiert werden. Bitte stellen Sie sicher, dass es sich um eine gültige .ics-Datei handelt."
     },
-    "description": "Laden Sie eine iCal-Datei hoch, um Verfügbarkeitstermine zu importieren",
+    "description": "Laden Sie eine iCal-Datei hoch, um Verfügbarkeitsdaten zu importieren",
     "state": {
-      "importing": "Importiere..."
+      "importing": "Importieren..."
     },
     "actions": {
       "import": "Importieren",
@@ -94,7 +91,7 @@
     "title": "Kalender exportieren",
     "allCalendars": "Alle Kalender exportieren",
     "individualCalendars": "Einzelne Kalender exportieren",
-    "description": "Exportieren Sie Kalender im iCal-Format (.ics) zur Verwendung in anderen Kalenderanwendungen",
+    "description": "Exportieren Sie Kalender im iCal-Format (.ics), um sie in anderen Kalenderanwendungen zu verwenden",
     "actions": {
       "exportAll": "Alle Kalender exportieren",
       "exportIndividual": "Einzelne Kalender exportieren"
@@ -102,7 +99,7 @@
   },
   "friendCalendar": {
     "dates": {
-      "label": "Termine"
+      "label": "Daten"
     },
     "hours": {
       "label": "Stunden",
@@ -126,8 +123,8 @@
   "availabilityOverview": {
     "title": "Verfügbarkeitsübersicht",
     "description": "Sehen Sie auf einen Blick, welche Tage für alle am besten passen.",
-    "noData": "Keine Verfügbarkeitsdaten vorhanden",
-    "loading": "Lade Verfügbarkeitsdaten...",
+    "noData": "Keine Verfügbarkeitsdaten verfügbar",
+    "loading": "Verfügbarkeitsdaten werden geladen...",
     "weekDayColumn": {
       "mon": "Mo",
       "tue": "Di",
@@ -140,66 +137,72 @@
     "everyone": "Alle",
     "allDay": "Ganztägig",
     "exportImage": "Bild exportieren",
-    "exportImageDescription": "Exportieren Sie die Verfügbarkeitsübersicht als Bild zum Teilen mit Freunden."
+    "exportImageDescription": "Exportieren Sie die Verfügbarkeitsübersicht als Bild, um sie mit Freunden zu teilen."
   },
   "sharing": {
     "share": "Teilen",
     "shareCalendar": "Kalender teilen",
-    "loading": "Lädt...",
+    "loading": "Laden...",
     "captureCalendar": "Kalender erfassen",
-    "capturing": "Erfasse...",
+    "capturing": "Erfassen...",
     "calendarPreview": "Kalendervorschau",
     "copyImage": "Bild kopieren",
     "downloadImage": "Bild herunterladen",
-    "shareToApps": "In Apps teilen",
-    "whatsapp": "WhatsApp",
-    "messenger": "Facebook Messenger",
-    "instagram": "Instagram",
     "copied": "Kopiert!",
     "cancel": "Abbrechen",
-    "captureError": "Fehler beim Erfassen des Kalenders",
-    "copyError": "Fehler beim Kopieren des Bildes in die Zwischenablage. Bild wurde stattdessen heruntergeladen.",
-    "downloadError": "Fehler beim Herunterladen des Bildes",
-    "shareError": "Fehler beim Teilen des Bildes",
-    "copyTooltip": "Bild in Zwischenablage kopieren",
+    "captureError": "Kalender konnte nicht erfasst werden",
+    "copyError": "Bild konnte nicht in die Zwischenablage kopiert werden. Bild stattdessen heruntergeladen.",
+    "downloadError": "Bild konnte nicht heruntergeladen werden",
+    "shareError": "Bild konnte nicht geteilt werden",
+    "copyTooltip": "Bild in die Zwischenablage kopieren",
     "calendarTitle": "{{name}} Verfügbarkeitskalender",
-    "calendarDescription": "Schau dir unseren Verfügbarkeitskalender an!"
+    "calendarDescription": "Schauen Sie sich unseren Verfügbarkeitskalender an!"
   },
-  "state": {
-    "saveStateDescription": "Aktuellen Status aller Kalender in einer Datei speichern",
-    "restoreStateDescription": "Kalender aus einer zuvor gespeicherten Datei wiederherstellen",
-    "stateFile": "Statusdatei (.json)",
-    "importing": "Importiere...",
-    "exporting": "Exportiere..."
+  "stateManager": {
+    "saveStateDescription": "Speichern Sie den aktuellen Status aller Kalender in einer Datei",
+    "restoreStateDescription": "Stellen Sie Kalender aus einer zuvor gespeicherten Datei wieder her",
+    "label": "Statusdatei (.json)",
+    "importing": "Importieren...",
+    "exporting": "Exportieren...",
+    "error": {
+      "noFileSelected": "Bitte wählen Sie eine Datei aus",
+      "failedToParse": "Die Statusdatei konnte nicht analysiert werden. Bitte stellen Sie sicher, dass es sich um eine gültige .json-Datei handelt.",
+      "failedToExport": "Der Status konnte nicht exportiert werden. Bitte versuchen Sie es erneut.",
+      "noGroupName": "Sie müssen Ihrer Gruppe einen Namen geben, bevor Sie den Status speichern können."
+    },
+    "actions": {
+      "saveState": "Status speichern",
+      "restoreState": "Status wiederherstellen"
+    }
   },
   "landing": {
-    "title": "Plane Events mit Freunden",
+    "title": "Planen Sie Veranstaltungen mit Freunden",
     "titleHighlight": "Mühelos",
-    "subtitle": "Koordiniere Termine über verschiedene Zeitzonen hinweg und finde den perfekten Tag für dein nächstes Treffen, Meeting oder Event.",
-    "startPlanning": "Jetzt mit der Planung beginnen",
-    "features": "Hauptfunktionen",
-    "readyToStart": "Bereit loszulegen?",
-    "readyDescription": "Plane dein nächstes Event mit Freunden in Minuten, nicht Stunden.",
-    "goToPlanner": "Zum Planer",
+    "subtitle": "Koordinieren Sie Zeitpläne über verschiedene Zeitzonen hinweg und finden Sie den perfekten Tag für Ihr nächstes Treffen, Meeting oder Event.",
+    "startPlanning": "Jetzt planen",
+    "features": "Hauptmerkmale",
+    "readyToStart": "Bereit, loszulegen?",
+    "readyDescription": "Planen Sie Ihr nächstes Event mit Freunden in Minuten, nicht Stunden.",
+    "goToPlanner": "Zum Planer gehen",
     "featureManagement": {
-      "title": "Freundesverwaltung",
-      "description": "Füge Freunde hinzu, weise Farben zu und verfolge die Verfügbarkeit aller an einem Ort."
+      "title": "Freundeverwaltung",
+      "description": "Fügen Sie Freunde hinzu, weisen Sie Farben zu und verfolgen Sie die Verfügbarkeit aller an einem Ort."
     },
     "featureTimezone": {
-      "title": "Zeitzonen-Unterstützung",
-      "description": "Koordiniere über verschiedene Zeitzonen hinweg mit integrierter Zeitzonenauswahl für jeden Freund."
+      "title": "Zeitzonenunterstützung",
+      "description": "Koordinieren Sie über verschiedene Zeitzonen hinweg mit integrierter Zeitzonenauswahl für jeden Freund."
     },
     "featureOverview": {
       "title": "Verfügbarkeitsübersicht",
-      "description": "Siehe auf einen Blick, welche Tage für alle am besten passen, mit unserer visuellen Verfügbarkeitsübersicht."
+      "description": "Sehen Sie auf einen Blick, welche Tage für alle am besten passen, mit unserer visuellen Verfügbarkeitsübersicht."
     },
     "featureImport": {
       "title": "Kalender importieren",
-      "description": "Importiere bestehende Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
+      "description": "Importieren Sie bestehende Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
     },
     "featureExport": {
-      "title": "Nach iCal exportieren",
-      "description": "Exportiere einzelne oder kombinierte Kalender zur Verwendung in deiner bevorzugten Kalender-App."
+      "title": "Export nach iCal",
+      "description": "Exportieren Sie einzelne oder kombinierte Kalender, um sie in Ihrer bevorzugten Kalender-App zu verwenden."
     }
   }
 }
