@@ -20,6 +20,7 @@ export function Header() {
           <div className='flex items-center gap-2'>
             <Image
               src={travelIcon.src}
+              width={24}
               alt='Travel Icon'
               className='h-6 w-6 text-primary'
             />

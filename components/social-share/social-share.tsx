@@ -101,6 +101,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
           )}
 
           <Image
+            width={500}
             src={imageUrl || '/placeholder.svg'}
             alt={t('calendarPreview')}
             className='h-auto w-full'
