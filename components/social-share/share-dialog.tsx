@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { Button } from '../ui/button';
 import { Share2 } from 'lucide-react';
 import { SocialShare } from './social-share';
 import { useTranslations } from 'next-intl';

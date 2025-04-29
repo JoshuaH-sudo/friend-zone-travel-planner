@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CalendarGrid } from './calendar-grid';
-import { ShareDialog } from '../share-dialog';
+import { ShareDialog } from '../social-share/share-dialog';
 
 interface AvailabilityOverviewProps {
   friends: Friend[];
