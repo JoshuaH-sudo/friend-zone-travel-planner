@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { StateManager } from '@/components/state-manager';
-import { ImportCalendar } from '@/components/import-calendar';
-import { ExportCalendar } from '@/components/export-calendar';
+import { StateManager } from './state-manager';
+import { ImportCalendar } from './import-calendar';
+import { ExportCalendar } from './export-calendar';
 import { PlusCircle, Download, Upload, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Friend } from '@/lib/types';

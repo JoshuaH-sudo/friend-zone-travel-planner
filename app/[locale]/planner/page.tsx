@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/friend-form/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
 import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
-import { WorkspaceActions } from '@/components/workspace-actions';
+import { WorkspaceActions } from '@/components/workspace-actions/workspace-actions';
 import { EmptyState } from '@/components/empty-state';
 import type { AvailableHours, Friend } from '@/lib/types';
 import type { AppState } from '@/lib/json-export';
