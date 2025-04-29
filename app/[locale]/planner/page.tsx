@@ -63,13 +63,6 @@ export default function PlannerPage() {
     setFriends(friends.filter((friend) => friend.id !== friendId));
   };
 
-  const getCurrentState = (): AppState => {
-    return {
-      groupName,
-      friends,
-    };
-  };
-
   const restoreState = (state: AppState) => {
     setGroupName(state.groupName);
     setFriends(state.friends);
@@ -84,8 +77,11 @@ export default function PlannerPage() {
   }, []);
 
   const updateLocalStorage = useCallback(() => {
-    localStorage.setItem('plannerState', JSON.stringify(getCurrentState()));
-  }, []);
+    localStorage.setItem('plannerState', JSON.stringify({
+      groupName,
+      friends,
+    }));
+  }, [groupName, friends]);
 
   useEffect(() => {
     updateLocalStorage();

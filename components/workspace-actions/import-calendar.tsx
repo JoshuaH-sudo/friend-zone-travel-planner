@@ -114,7 +114,8 @@ export function ImportCalendar({
           dates: {},
         },
       });
-    } catch (err) {
+    } catch (error) {
+      console.error('Error importing calendar:', error);
       setError(t('error.failedToParse'));
     } finally {
       setIsLoading(false);

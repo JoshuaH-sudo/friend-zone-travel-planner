@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from '../friend-form/edit-friend-form';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from '../ui/calander';
 import { cn } from '@/lib/utils';

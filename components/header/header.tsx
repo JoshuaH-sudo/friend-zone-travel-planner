@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/header/language-switcher';
 import { ThemeToggle } from '@/components/header/theme-toggle';
 import travelIcon from '@/public/travel.png';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Header() {
   const t = useTranslations('app');
@@ -17,7 +18,7 @@ export function Header() {
           className='flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground'
         >
           <div className='flex items-center gap-2'>
-            <img
+            <Image
               src={travelIcon.src}
               alt='Travel Icon'
               className='h-6 w-6 text-primary'

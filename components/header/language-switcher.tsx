@@ -4,7 +4,6 @@ import { useState, useEffect, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Globe } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useTranslations } from "next-intl"
 import {usePathname, useRouter} from '@/i18n/navigation';
 import {useParams} from 'next/navigation';
 
@@ -15,10 +14,9 @@ const languages = [
 ]
 
 export function LanguageSwitcher() {
-  const t = useTranslations();
   const [mounted, setMounted] = useState(false)
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
   const pathname = usePathname();
   const params = useParams();
 
