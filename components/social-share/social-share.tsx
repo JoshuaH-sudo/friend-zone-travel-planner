@@ -1,6 +1,6 @@
 'use client';
 import type React from 'react';
-import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, Download, Check } from 'lucide-react';
 import {
@@ -16,6 +16,7 @@ import {
 } from '@/lib/image-capture';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
 interface SocialShareProps {
   elementRef: RefObject<HTMLElement | null>;
@@ -31,7 +32,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
   const [error, setError] = useState<string | null>(null);
 
   // Capture the calendar as an image
-  const captureCalendar = async () => {
+  const captureCalendar = useCallback(async () => {
     if (!elementRef?.current) return;
 
     setIsCapturing(true);
@@ -49,7 +50,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
     } finally {
       setIsCapturing(false);
     }
-  };
+  }, [t, elementRef]);
 
   // Copy image to clipboard
   const handleCopyImage = async () => {
@@ -87,7 +88,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
 
   useEffect(() => {
     captureCalendar();
-  }, []);
+  }, [captureCalendar]);
 
   return (
     <div className='space-y-4'>
@@ -99,7 +100,7 @@ export function SocialShare({ elementRef, filename }: SocialShareProps) {
             </div>
           )}
 
-          <img
+          <Image
             src={imageUrl || '/placeholder.svg'}
             alt={t('calendarPreview')}
             className='h-auto w-full'
