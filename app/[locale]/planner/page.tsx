@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/friend-form/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
 import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
@@ -83,13 +83,13 @@ export default function PlannerPage() {
     }
   }, []);
 
-  const updateLocalStorage = () => {
+  const updateLocalStorage = useCallback(() => {
     localStorage.setItem('plannerState', JSON.stringify(getCurrentState()));
-  };
+  }, []);
 
   useEffect(() => {
     updateLocalStorage();
-  }, [groupName, friends]);
+  }, [groupName, friends, updateLocalStorage]);
 
   return (
     <div className='flex flex-col gap-6'>

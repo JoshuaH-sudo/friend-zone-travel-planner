@@ -16,6 +16,7 @@ export function deserializeState(jsonString: string): AppState {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
+    console.error('Error parsing state file:', error);
     throw new Error('Failed to parse state file');
   }
 }
@@ -49,6 +50,7 @@ export async function readStateFile(file: File): Promise<AppState> {
         const state = deserializeState(content);
         resolve(state);
       } catch (error) {
+        console.error('Error reading state file:', error);
         reject(new Error('Failed to parse state file'));
       }
     };

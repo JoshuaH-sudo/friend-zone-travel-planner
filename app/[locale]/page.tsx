@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Header } from '@/components/header/header';
-import travelIcon from '@/public/travel.png';
 
 export default function LandingPage() {
   const t = useTranslations();

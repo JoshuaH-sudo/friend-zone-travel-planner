@@ -1,6 +1,6 @@
 'use server';
 
-import arcjet, { shield, detectBot, fixedWindow, request, ArcjetDecision } from '@arcjet/next';
+import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
 import { googleMapsClient } from './google-maps';
 
 const aj = arcjet({

@@ -32,10 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
-import { de, enUS } from 'date-fns/locale';
 import { ScrollArea } from '../ui/scroll-area';
-import { useParams } from 'next/navigation';
-import { dateLocaleMaps } from '@/i18n/utils';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -58,7 +55,6 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations('friendCalendar');
-  const locale = useLocale();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -252,6 +248,7 @@ export function FriendCalendar({
                 })
                 .map((date) => (
                   <TimeRangeSlider
+                    key={date}
                     label={format(date, 'LLLL dd')}
                     colour={friend.color}
                     value={friend.availableHours.dates[date.toString()]}

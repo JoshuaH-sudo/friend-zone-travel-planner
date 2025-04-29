@@ -54,7 +54,8 @@ export function StateManager({
     try {
       const state = await readStateFile(file);
       onRestoreState(state);
-    } catch (err) {
+    } catch (error) {
+      console.error('Error importing state:', error);
       setError(t('error.failedToParse'));
     } finally {
       setIsLoading(false);

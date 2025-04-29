@@ -22,7 +22,7 @@ function ColorPickerField({
   const form = useFormContext();
   const t = useTranslations('friend.form.color');
 
-  let takenColors = friends
+  const takenColors = friends
     .filter((friend) => friend.id !== selectedFriendId)
     .map((f) => f.color);
   const availableColors = PRESET_COLORS.filter(

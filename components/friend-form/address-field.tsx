@@ -1,7 +1,7 @@
 'use client';
 
 import { Friend } from '@/lib/types';
-import { Check, Loader, Loader2, MapPin, Redo, RotateCw } from 'lucide-react';
+import { MapPin, RotateCw } from 'lucide-react';
 import {
   FormField,
   FormItem,
@@ -48,7 +48,7 @@ function AddressField({ className }: AddressFieldProps) {
     } else {
       form.clearErrors('address');
     }
-  }, [addressError]);
+  }, [addressError, form]);
 
   useEffect(() => {
     if (addressDetails && isAddressSuccess) {
@@ -64,7 +64,7 @@ function AddressField({ className }: AddressFieldProps) {
         }
       );
     }
-  }, [addressDetails, isAddressSuccess]);
+  }, [addressDetails, isAddressSuccess, form]);
 
   // TODO: Add a loading spinner
   let citySearchText = t('example');
