@@ -79,6 +79,7 @@ export async function parseIcalFile(
 
         resolve({ name, dates, location });
       } catch (error) {
+        console.error('Error parsing iCal file:', error);
         reject(new Error('Failed to parse iCal file'));
       }
     };

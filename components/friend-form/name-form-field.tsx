@@ -11,7 +11,7 @@ import { Input } from '../ui/input';
 
 function NameFormField() {
   const form = useFormContext();
-  const t = useTranslations('friend');
+  const t = useTranslations('friend.form.name');
 
   return (
     <div id='name-form-field' className='space-y-2'>
@@ -20,10 +20,10 @@ function NameFormField() {
         name='name'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{t('name')}</FormLabel>
+            <FormLabel>{t('label')}</FormLabel>
 
             <FormControl>
-              <Input placeholder='You friends name' {...field} />
+              <Input placeholder={t('placeholder')} {...field} />
             </FormControl>
 
             <FormMessage />

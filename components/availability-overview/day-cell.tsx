@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { FriendAvatars } from './friend-avatars';
 import type { Friend } from '@/lib/types';
+import { useTranslations } from 'next-intl';
 
 interface DayCellProps {
   day: Date;
@@ -14,6 +15,7 @@ interface DayCellProps {
 }
 
 export function DayCell({ day, currentMonth, availableFriends, totalFriends }: DayCellProps) {
+  const t = useTranslations('availabilityOverview');
   const availableCount = availableFriends.length;
   const allAvailable = availableCount === totalFriends && totalFriends > 0;
 
@@ -34,7 +36,7 @@ export function DayCell({ day, currentMonth, availableFriends, totalFriends }: D
         <div className='mt-auto flex flex-wrap justify-center gap-1'>
           {availableCount === totalFriends && totalFriends > 0 ? (
             <Badge className='bg-green-500 hover:bg-green-600 dark:bg-green-400 dark:hover:bg-green-500'>
-              Everyone
+              {t('everyone')}
             </Badge>
           ) : (
             <Badge variant='outline'>

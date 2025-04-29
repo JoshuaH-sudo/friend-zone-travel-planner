@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AddFriendForm } from '@/components/add-friend-form';
+import { useCallback, useEffect, useState } from 'react';
+import { AddFriendForm } from '@/components/friend-form/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
 import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
-import { WorkspaceActions } from '@/components/workspace-actions';
+import { WorkspaceActions } from '@/components/workspace-actions/workspace-actions';
 import { EmptyState } from '@/components/empty-state';
 import type { AvailableHours, Friend } from '@/lib/types';
 import type { AppState } from '@/lib/json-export';
@@ -63,13 +63,6 @@ export default function PlannerPage() {
     setFriends(friends.filter((friend) => friend.id !== friendId));
   };
 
-  const getCurrentState = (): AppState => {
-    return {
-      groupName,
-      friends,
-    };
-  };
-
   const restoreState = (state: AppState) => {
     setGroupName(state.groupName);
     setFriends(state.friends);
@@ -83,13 +76,16 @@ export default function PlannerPage() {
     }
   }, []);
 
-  const updateLocalStorage = () => {
-    localStorage.setItem('plannerState', JSON.stringify(getCurrentState()));
-  };
+  const updateLocalStorage = useCallback(() => {
+    localStorage.setItem('plannerState', JSON.stringify({
+      groupName,
+      friends,
+    }));
+  }, [groupName, friends]);
 
   useEffect(() => {
     updateLocalStorage();
-  }, [groupName, friends]);
+  }, [groupName, friends, updateLocalStorage]);
 
   return (
     <div className='flex flex-col gap-6'>

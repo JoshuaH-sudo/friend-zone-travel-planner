@@ -29,7 +29,7 @@ const MultiPointSlider = React.forwardRef<
     const min = props.min || 0;
     const max = props.max || 100;
     const step = props.step || 1;
-    const defaultValue = props.defaultValue || [min, max];
+    // const defaultValue = props.defaultValue || [min, max];
 
     // Generate scale marks
     const scaleMarks = React.useMemo(() => {

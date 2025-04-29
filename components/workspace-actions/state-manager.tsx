@@ -24,7 +24,7 @@ export function StateManager({
   currentState,
   onRestoreState,
 }: StateManagerProps) {
-  const t = useTranslations();
+  const t = useTranslations('stateManager');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,8 @@ export function StateManager({
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
       setError(null);
+    } else {
+      setFile(null);
     }
   };
 
@@ -42,7 +44,7 @@ export function StateManager({
 
   const handleImport = async () => {
     if (!file) {
-      setError('Please select a file to import');
+      setError(t('error.noFileSelected'));
       return;
     }
 
@@ -52,10 +54,9 @@ export function StateManager({
     try {
       const state = await readStateFile(file);
       onRestoreState(state);
-    } catch (err) {
-      setError(
-        "Failed to parse the state file. Please make sure it's a valid JSON file."
-      );
+    } catch (error) {
+      console.error('Error importing state:', error);
+      setError(t('error.failedToParse'));
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +67,7 @@ export function StateManager({
       <div className='space-y-4'>
         <h3 className='text-lg font-medium'>{t('actions.saveState')}</h3>
         <p className='text-sm text-muted-foreground'>
-          {t('state.saveStateDescription')}
+          {t('saveStateDescription')}
         </p>
         <Button
           onClick={handleExport}
@@ -77,20 +78,18 @@ export function StateManager({
           {t('actions.saveState')}
         </Button>
         {!currentState.groupName && (
-          <p className='text-xs text-destructive'>
-            Need to give your group a name before you can save the state.
-          </p>
+          <p className='text-xs text-destructive'>{t('error.noGroupName')}</p>
         )}
       </div>
 
       <div className='space-y-4 border-t pt-6'>
         <h3 className='text-lg font-medium'>{t('actions.restoreState')}</h3>
         <p className='text-sm text-muted-foreground'>
-          {t('state.restoreStateDescription')}
+          {t('restoreStateDescription')}
         </p>
 
         <div className='space-y-2'>
-          <Label htmlFor='state-file'>{t('state.stateFile')}</Label>
+          <Label htmlFor='state-file'>{t('label')}</Label>
           <Input
             id='state-file'
             type='file'
@@ -114,7 +113,7 @@ export function StateManager({
           {isLoading ? (
             <>
               <Loader2 className='h-4 w-4 animate-spin' />
-              {t('state.importing')}
+              {t('importing')}
             </>
           ) : (
             <>

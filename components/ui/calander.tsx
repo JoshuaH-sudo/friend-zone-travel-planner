@@ -45,7 +45,7 @@ export type CalendarProps = DayPickerProps & {
   hiddenClassName?: string;
 };
 
-type NavView = 'days' | 'years';
+// type NavView = 'days' | 'years';
 
 /**
  * A custom calendar component built on top of react-day-picker.
@@ -56,9 +56,9 @@ type NavView = 'days' | 'years';
 function Calendar({
   className,
   showOutsideDays = true,
-  showYearSwitcher = true,
-  yearRange = 12,
-  numberOfMonths,
+  // showYearSwitcher = true,
+  // yearRange = 12,
+  // numberOfMonths,
   ...props
 }: CalendarProps) {
   const _monthsClassName = cn('relative flex', props.monthsClassName);

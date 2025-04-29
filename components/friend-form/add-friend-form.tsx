@@ -3,17 +3,16 @@
 import type React from 'react';
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { PRESET_COLORS } from './color-picker';
+import { PRESET_COLORS } from '../color-picker';
 import { useTranslations } from 'next-intl';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { Form } from './ui/form';
-import AddressField from './add-friend-form/address-field';
-import ColorPickerField from './add-friend-form/color-picker-field';
-import TimezoneFormField from './add-friend-form/timezone-form-field';
-import NameFormField from './add-friend-form/name-form-field';
-import { useEffect } from 'react';
+import { Form } from '../ui/form';
+import AddressField from './address-field';
+import ColorPickerField from './color-picker-field';
+import TimezoneFormField from './timezone-form-field';
+import NameFormField from './name-form-field';
 
 interface AddFriendFormProps {
   friends: Friend[];
@@ -24,17 +23,17 @@ interface AddFriendFormProps {
 export const addFriendSchema = z.object({
   id: z.string(),
   name: z.string().nonempty({
-    message: 'Name is required',
+    message: 'required',
   }),
   color: z.string({
-    message: 'Must select a color',
+    message: 'required',
   }),
   coordinates: z.object({
     lat: z.number(),
     lng: z.number(),
   }),
   address: z.string({
-    message: 'Address is required',
+    message: 'required',
   }),
   timezone: z.string(),
   timeZoneId: z.string(),

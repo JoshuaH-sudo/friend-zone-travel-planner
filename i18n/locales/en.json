@@ -9,6 +9,10 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "actions": {
+      "import": "Import",
+      "addFriend": "Add Friend"
     }
   },
   "navigation": {
@@ -17,10 +21,7 @@
     "overview": "Availability Overview",
     "timezone": "Timezones"
   },
-  "actions": {
-    "add": "Add",
-    "edit": "Edit",
-    "delete": "Delete",
+  "workspace-actions": {
     "cancel": "Cancel",
     "save": "Save",
     "import": "Import",
@@ -32,44 +33,121 @@
     "restoreState": "Restore State"
   },
   "friend": {
-    "name": "Friend Name",
-    "namePlaceholder": "Enter friend's name",
-    "nameOptional": "Friend Name (Optional)",
-    "nameFromFile": "Leave blank to use name from file",
-    "color": "Calendar Color",
-    "timezone": "Timezone",
-    "location": "Location",
-    "timezonePlaceholder": "Select timezone",
+    "form": {
+      "name": {
+        "label": "Friend Name",
+        "placeholder": "Enter friend's name",
+        "error": {
+          "required": "Name is required"
+        }
+      },
+      "color": {
+        "label": "Calendar Color",
+        "error": {
+          "required": "Must select a color"
+        }
+      },
+      "timezone": {
+        "label": "Timezone",
+        "placeholder": "Select timezone"
+      },
+      "address": {
+        "label": "Address",
+        "searching": "Searching...",
+        "placeholder": "Enter address",
+        "example": "e.g., San Francisco",
+        "error": {
+          "required": "Address is required"
+        }
+      }
+    },
     "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
     "remove": "Remove {{name}}?",
     "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone.",
     "addFriend": "Add Friend",
     "cancel": "Cancel"
   },
-  "calendar": {
-    "exportAll": "Export All Calendars",
-    "exportIndividual": "Export Individual Calendars",
-    "importCalendarDescription": "Upload an iCal file to import availability dates",
-    "exportDescription": "Export calendars to iCal format (.ics) to use in other calendar applications",
-    "icalFile": "iCal File (.ics)",
-    "everyone": "Everyone",
-    "available": "Available:",
-    "noOneAvailable": "No one is available",
+  "colourPicker": {
     "presetColors": "Preset Colors",
-    "customColor": "Custom Color"
+    "customColor": "Custom Color",
+    "helperText": "Enter a hex color code (e.g., #FF5500) or use the colour picker"
+  },
+  "import": {
+    "icalFile": "iCal File (.ics)",
+    "error": {
+      "noFile": "Please select a file",
+      "failedToParse": "Failed to parse the iCal file. Please make sure it's a valid .ics file."
+    },
+    "description": "Upload an iCal file to import availability dates",
+    "state": {
+      "importing": "Importing..."
+    },
+    "actions": {
+      "import": "Import",
+      "cancel": "Cancel"
+    }
+  },
+  "export": {
+    "title": "Export Calendars",
+    "allCalendars": "Export All Calendars",
+    "individualCalendars": "Export Individual Calendars",
+    "description": "Export calendars to iCal format (.ics) to use in other calendar applications",
+    "actions": {
+      "exportAll": "Export All Calendars",
+      "exportIndividual": "Export Individual Calendars"
+    }
+  },
+  "friendCalendar": {
+    "dates": {
+      "label": "Dates"
+    },
+    "hours": {
+      "label": "Hours",
+      "weekdayRange": "Mon - Fri",
+      "weekendRange": "Sat - Sun",
+      "allDay": "All Day"
+    },
+    "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",
+    "timezone": {
+      "label": "Timezone"
+    },
+    "actions": {
+      "edit": "Edit",
+      "export": "Export",
+      "delete": "Delete"
+    }
+  },
+  "timezoneComparison": {
+    "title": "Timezone Comparison"
+  },
+  "availabilityOverview": {
+    "title": "Availability Overview",
+    "description": "See at a glance which days work best for everyone.",
+    "noData": "No availability data available",
+    "loading": "Loading availability data...",
+    "weekDayColumn": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "everyone": "Everyone",
+    "allDay": "All Day",
+    "exportImage": "Export Image",
+    "exportImageDescription": "Export the availability overview as an image to share with friends."
   },
   "sharing": {
     "share": "Share",
     "shareCalendar": "Share Calendar",
+    "loading": "Loading...",
     "captureCalendar": "Capture Calendar",
     "capturing": "Capturing...",
     "calendarPreview": "Calendar Preview",
     "copyImage": "Copy Image",
     "downloadImage": "Download Image",
-    "shareToApps": "Share to Apps",
-    "whatsapp": "WhatsApp",
-    "messenger": "Facebook Messenger",
-    "instagram": "Instagram",
     "copied": "Copied!",
     "cancel": "Cancel",
     "captureError": "Failed to capture calendar",
@@ -80,12 +158,22 @@
     "calendarTitle": "{{name}} Availability Calendar",
     "calendarDescription": "Check out our availability calendar!"
   },
-  "state": {
+  "stateManager": {
     "saveStateDescription": "Save the current state of all calendars to a file",
     "restoreStateDescription": "Restore calendars from a previously saved file",
-    "stateFile": "State File (.json)",
+    "label": "State File (.json)",
     "importing": "Importing...",
-    "exporting": "Exporting..."
+    "exporting": "Exporting...",
+    "error": {
+      "noFileSelected": "Please select a file",
+      "failedToParse": "Failed to parse the state file. Please make sure it's a valid .json file.",
+      "failedToExport": "Failed to export the state. Please try again.",
+      "noGroupName": "Need to give your group a name before you can save the state."
+    },
+    "actions": {
+      "saveState": "Save State",
+      "restoreState": "Restore State"
+    }
   },
   "landing": {
     "title": "Plan Events with Friends",

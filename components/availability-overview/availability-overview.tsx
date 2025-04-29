@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CalendarGrid } from './calendar-grid';
-import { ShareDialog } from '../share-dialog';
+import { ShareDialog } from '../social-share/share-dialog';
 
 interface AvailabilityOverviewProps {
   friends: Friend[];
@@ -19,7 +19,7 @@ export function AvailabilityOverview({
   friends,
   groupName,
 }: AvailabilityOverviewProps) {
-  const t = useTranslations();
+  const t = useTranslations('availabilityOverview');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -33,11 +33,11 @@ export function AvailabilityOverview({
         <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center gap-1'>
             <Users className='h-4 w-4' />
-            {t('navigation.overview')}
+            {t('title')}
           </CardTitle>
 
           <div className='flex gap-2'>
-            <ShareDialog elementRef={calendarRef} filename={groupName || t('app.title')} />
+            <ShareDialog elementRef={calendarRef} filename={groupName || t('title')} />
           </div>
         </div>
       </CardHeader>

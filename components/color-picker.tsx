@@ -1,8 +1,5 @@
 'use client';
-
 import type React from 'react';
-
-import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,7 +29,7 @@ export function ColorPicker({
   color,
   onChange,
 }: ColorPickerProps) {
-  const t = useTranslations();
+  const t = useTranslations('colourPicker');
 
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
@@ -41,14 +38,15 @@ export function ColorPicker({
   return (
     <Tabs defaultValue='preset' className='w-full'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='preset'>{t('calendar.presetColors')}</TabsTrigger>
-        <TabsTrigger value='custom'>{t('calendar.customColor')}</TabsTrigger>
+        <TabsTrigger value='preset'>{t('presetColors')}</TabsTrigger>
+        <TabsTrigger value='custom'>{t('customColor')}</TabsTrigger>
       </TabsList>
 
       <TabsContent value='preset' className='pt-2'>
         <div className='flex flex-wrap gap-2'>
           {PRESET_COLORS.map((c) => {
-            const isColorTaken = availableColors && !availableColors.includes(c);
+            const isColorTaken =
+              availableColors && !availableColors.includes(c);
             return (
               <button
                 key={c}
@@ -94,9 +92,7 @@ export function ColorPicker({
             pattern='^#[0-9A-Fa-f]{6}$'
           />
         </div>
-        <p className='text-xs text-muted-foreground'>
-          Enter a hex color code (e.g., #FF5500) or use the color picker
-        </p>
+        <p className='text-xs text-muted-foreground'>{t('helperText')}</p>
       </TabsContent>
     </Tabs>
   );

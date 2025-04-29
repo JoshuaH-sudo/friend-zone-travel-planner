@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Freund Zone Reiseplaner",
+    "title": "Friend Zone Reiseplaner",
     "groupName": "Gruppenname",
     "groupNamePlaceholder": "Gruppennamen eingeben",
     "noFriendsTitle": "Noch keine Freunde hinzugefügt",
@@ -9,18 +9,19 @@
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System"
+    },
+    "actions": {
+      "import": "Importieren",
+      "addFriend": "Freund hinzufügen"
     }
   },
   "navigation": {
     "home": "Startseite",
-    "calendars": "Freund Kalender",
+    "calendars": "Freund-Kalender",
     "overview": "Verfügbarkeitsübersicht",
     "timezone": "Zeitzonen"
   },
-  "actions": {
-    "add": "Hinzufügen",
-    "edit": "Bearbeiten",
-    "delete": "Löschen",
+  "workspace-actions": {
     "cancel": "Abbrechen",
     "save": "Speichern",
     "import": "Importieren",
@@ -28,53 +29,163 @@
     "addFriend": "Freund hinzufügen",
     "importCalendar": "Kalender importieren",
     "exportCalendars": "Kalender exportieren",
-    "saveState": "Zustand speichern",
-    "restoreState": "Zustand wiederherstellen"
+    "saveState": "Status speichern",
+    "restoreState": "Status wiederherstellen"
   },
   "friend": {
-    "name": "Freund Name",
-    "namePlaceholder": "Name des Freundes eingeben",
-    "nameOptional": "Freund Name (Optional)",
-    "nameFromFile": "Leer lassen, um den Namen aus der Datei zu verwenden",
-    "color": "Kalenderfarbe",
-    "timezone": "Zeitzone",
-    "location": "Ort",
+    "form": {
+      "name": {
+        "label": "Name des Freundes",
+        "placeholder": "Name des Freundes eingeben",
+        "error": {
+          "required": "Name ist erforderlich"
+        }
+      },
+      "color": {
+        "label": "Kalenderfarbe",
+        "error": {
+          "required": "Farbe muss ausgewählt werden"
+        }
+      },
+      "timezone": {
+        "label": "Zeitzone",
+        "placeholder": "Zeitzone auswählen"
+      },
+      "address": {
+        "label": "Adresse",
+        "searching": "Suchen...",
+        "placeholder": "Adresse eingeben",
+        "example": "z. B. San Francisco",
+        "error": {
+          "required": "Adresse ist erforderlich"
+        }
+      }
+    },
     "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",
     "remove": "{{name}} entfernen?",
     "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
     "addFriend": "Freund hinzufügen",
     "cancel": "Abbrechen"
   },
-  "calendar": {
-    "exportAll": "Alle Kalender exportieren",
-    "exportIndividual": "Einzelne Kalender exportieren",
-    "importCalendarDescription": "Laden Sie eine iCal-Datei hoch, um Verfügbarkeitsdaten zu importieren",
-    "exportDescription": "Kalender im iCal-Format (.ics) exportieren, um sie in anderen Kalenderanwendungen zu verwenden",
-    "icalFile": "iCal-Datei (.ics)",
-    "everyone": "Alle",
-    "available": "Verfügbar:",
-    "noOneAvailable": "Niemand ist verfügbar",
+  "colourPicker": {
     "presetColors": "Voreingestellte Farben",
-    "customColor": "Benutzerdefinierte Farbe"
+    "customColor": "Benutzerdefinierte Farbe",
+    "helperText": "Geben Sie einen Hex-Farbcode ein (z. B. #FF5500) oder verwenden Sie den Farbwähler"
   },
-  "state": {
-    "saveStateDescription": "Speichern Sie den aktuellen Zustand aller Kalender in einer Datei",
+  "import": {
+    "icalFile": "iCal-Datei (.ics)",
+    "error": {
+      "noFile": "Bitte wählen Sie eine Datei aus",
+      "failedToParse": "Die iCal-Datei konnte nicht analysiert werden. Bitte stellen Sie sicher, dass es sich um eine gültige .ics-Datei handelt."
+    },
+    "description": "Laden Sie eine iCal-Datei hoch, um Verfügbarkeitsdaten zu importieren",
+    "state": {
+      "importing": "Importieren..."
+    },
+    "actions": {
+      "import": "Importieren",
+      "cancel": "Abbrechen"
+    }
+  },
+  "export": {
+    "title": "Kalender exportieren",
+    "allCalendars": "Alle Kalender exportieren",
+    "individualCalendars": "Einzelne Kalender exportieren",
+    "description": "Exportieren Sie Kalender im iCal-Format (.ics), um sie in anderen Kalenderanwendungen zu verwenden",
+    "actions": {
+      "exportAll": "Alle Kalender exportieren",
+      "exportIndividual": "Einzelne Kalender exportieren"
+    }
+  },
+  "friendCalendar": {
+    "dates": {
+      "label": "Daten"
+    },
+    "hours": {
+      "label": "Stunden",
+      "weekdayRange": "Mo - Fr",
+      "weekendRange": "Sa - So",
+      "allDay": "Ganztägig"
+    },
+    "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",
+    "timezone": {
+      "label": "Zeitzone"
+    },
+    "actions": {
+      "edit": "Bearbeiten",
+      "export": "Exportieren",
+      "delete": "Löschen"
+    }
+  },
+  "timezoneComparison": {
+    "title": "Zeitzonenvergleich"
+  },
+  "availabilityOverview": {
+    "title": "Verfügbarkeitsübersicht",
+    "description": "Sehen Sie auf einen Blick, welche Tage für alle am besten passen.",
+    "noData": "Keine Verfügbarkeitsdaten verfügbar",
+    "loading": "Verfügbarkeitsdaten werden geladen...",
+    "weekDayColumn": {
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa",
+      "sun": "So"
+    },
+    "everyone": "Alle",
+    "allDay": "Ganztägig",
+    "exportImage": "Bild exportieren",
+    "exportImageDescription": "Exportieren Sie die Verfügbarkeitsübersicht als Bild, um sie mit Freunden zu teilen."
+  },
+  "sharing": {
+    "share": "Teilen",
+    "shareCalendar": "Kalender teilen",
+    "loading": "Laden...",
+    "captureCalendar": "Kalender erfassen",
+    "capturing": "Erfassen...",
+    "calendarPreview": "Kalendervorschau",
+    "copyImage": "Bild kopieren",
+    "downloadImage": "Bild herunterladen",
+    "copied": "Kopiert!",
+    "cancel": "Abbrechen",
+    "captureError": "Kalender konnte nicht erfasst werden",
+    "copyError": "Bild konnte nicht in die Zwischenablage kopiert werden. Bild stattdessen heruntergeladen.",
+    "downloadError": "Bild konnte nicht heruntergeladen werden",
+    "shareError": "Bild konnte nicht geteilt werden",
+    "copyTooltip": "Bild in die Zwischenablage kopieren",
+    "calendarTitle": "{{name}} Verfügbarkeitskalender",
+    "calendarDescription": "Schauen Sie sich unseren Verfügbarkeitskalender an!"
+  },
+  "stateManager": {
+    "saveStateDescription": "Speichern Sie den aktuellen Status aller Kalender in einer Datei",
     "restoreStateDescription": "Stellen Sie Kalender aus einer zuvor gespeicherten Datei wieder her",
-    "stateFile": "Zustandsdatei (.json)",
+    "label": "Statusdatei (.json)",
     "importing": "Importieren...",
-    "exporting": "Exportieren..."
+    "exporting": "Exportieren...",
+    "error": {
+      "noFileSelected": "Bitte wählen Sie eine Datei aus",
+      "failedToParse": "Die Statusdatei konnte nicht analysiert werden. Bitte stellen Sie sicher, dass es sich um eine gültige .json-Datei handelt.",
+      "failedToExport": "Der Status konnte nicht exportiert werden. Bitte versuchen Sie es erneut.",
+      "noGroupName": "Sie müssen Ihrer Gruppe einen Namen geben, bevor Sie den Status speichern können."
+    },
+    "actions": {
+      "saveState": "Status speichern",
+      "restoreState": "Status wiederherstellen"
+    }
   },
   "landing": {
-    "title": "Veranstaltungen mit Freunden planen",
+    "title": "Planen Sie Veranstaltungen mit Freunden",
     "titleHighlight": "Mühelos",
     "subtitle": "Koordinieren Sie Zeitpläne über verschiedene Zeitzonen hinweg und finden Sie den perfekten Tag für Ihr nächstes Treffen, Meeting oder Event.",
     "startPlanning": "Jetzt planen",
     "features": "Hauptmerkmale",
-    "readyToStart": "Bereit zu beginnen?",
+    "readyToStart": "Bereit, loszulegen?",
     "readyDescription": "Planen Sie Ihr nächstes Event mit Freunden in Minuten, nicht Stunden.",
-    "goToPlanner": "Zum Planer",
+    "goToPlanner": "Zum Planer gehen",
     "featureManagement": {
-      "title": "Freund Verwaltung",
+      "title": "Freundeverwaltung",
       "description": "Fügen Sie Freunde hinzu, weisen Sie Farben zu und verfolgen Sie die Verfügbarkeit aller an einem Ort."
     },
     "featureTimezone": {
@@ -87,10 +198,10 @@
     },
     "featureImport": {
       "title": "Kalender importieren",
-      "description": "Importieren Sie vorhandene Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
+      "description": "Importieren Sie bestehende Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
     },
     "featureExport": {
-      "title": "In iCal exportieren",
+      "title": "Export nach iCal",
       "description": "Exportieren Sie einzelne oder kombinierte Kalender, um sie in Ihrer bevorzugten Kalender-App zu verwenden."
     }
   }

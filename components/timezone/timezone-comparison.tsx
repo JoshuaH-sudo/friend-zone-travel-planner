@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
-import { ShareDialog } from '../share-dialog';
+import { ShareDialog } from '../social-share/share-dialog';
 
 export interface TimezoneData {
   city: string;
@@ -30,7 +30,7 @@ export function TimezoneComparison({
   friends,
   startDate = new Date(),
 }: TimezoneComparisonProps) {
-  const t = useTranslations();
+  const t = useTranslations('timezoneComparison');
   const containerRef = useRef(null);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
 
@@ -104,7 +104,7 @@ export function TimezoneComparison({
         <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center gap-1'>
             <Clock className='h-4 w-4' />
-            <span className='font-medium'>Timezone Comparison</span>
+            <span className='font-medium'>{t('title')}</span>
           </CardTitle>
 
           <div className='flex gap-2'>

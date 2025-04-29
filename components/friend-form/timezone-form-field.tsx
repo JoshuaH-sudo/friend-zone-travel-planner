@@ -1,19 +1,15 @@
-import { Friend } from '@/lib/types';
 import { Globe } from 'lucide-react';
 import { Label } from '../ui/label';
-import { secondsToHours } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import { useFormContext } from 'react-hook-form';
 import useFetchTimezoneInformation from '../hooks/useFetchTimeZoneInformation';
 import { useEffect } from 'react';
-import { addFriendFormContext } from '../add-friend-form';
+import { addFriendFormContext } from './add-friend-form';
 import { displayTimezoneOffset } from '../timezone/timezone-display';
 
-interface TimezoneFormFieldProps {}
-
-function TimezoneFormField({}: TimezoneFormFieldProps) {
+function TimezoneFormField() {
   const form = useFormContext<addFriendFormContext>();
-  const t = useTranslations('friend');
+  const t = useTranslations('friend.form.timezone');
 
   const coordinates = form.watch('coordinates');
   const { data: timezoneInformation, error: timezoneInformationError } =
@@ -28,7 +24,7 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
     } else {
       form.clearErrors('timezone');
     }
-  }, [timezoneInformationError]);
+  }, [timezoneInformationError, form]);
 
   useEffect(() => {
     if (timezoneInformation) {
@@ -50,9 +46,9 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
         shouldDirty: true,
       });
     }
-  }, [timezoneInformation]);
+  }, [timezoneInformation, form]);
 
-  let timezoneText = 'input location';
+  let timezoneText = t('placeholder');
   if (timezoneInformation) {
     timezoneText = displayTimezoneOffset(
       timezoneInformation.timeZoneName,
@@ -64,7 +60,7 @@ function TimezoneFormField({}: TimezoneFormFieldProps) {
     <div id='timezone-form-field' className='space-y-2'>
       <div className='flex items-center gap-2'>
         <Globe className='h-4 w-4 text-muted-foreground' />
-        <Label htmlFor='timezone'>{t('timezone')}</Label>
+        <Label htmlFor='timezone'>{t('label')}</Label>
       </div>
       <p className='text-xs text-muted-foreground'>{timezoneText}</p>
     </div>

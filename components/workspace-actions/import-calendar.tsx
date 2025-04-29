@@ -11,16 +11,16 @@ import type { Friend } from '@/lib/types';
 import { Download, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslations } from 'next-intl';
-import AddressField from './add-friend-form/address-field';
-import ColorPickerField from './add-friend-form/color-picker-field';
-import NameFormField from './add-friend-form/name-form-field';
-import TimezoneFormField from './add-friend-form/timezone-form-field';
-import { addFriendSchema } from './add-friend-form';
+import AddressField from '@/components/friend-form/address-field';
+import ColorPickerField from '@/components/friend-form/color-picker-field';
+import NameFormField from '@/components/friend-form/name-form-field';
+import TimezoneFormField from '@/components/friend-form/timezone-form-field';
+import { addFriendSchema } from '@/components/friend-form/add-friend-form';
 import { z } from 'zod';
-import { Form } from './ui/form';
+import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PRESET_COLORS } from './color-picker';
+import { PRESET_COLORS } from '@/components/color-picker';
 
 interface ImportCalendarProps {
   friends: Friend[];
@@ -33,7 +33,7 @@ export function ImportCalendar({
   onImport,
   onCancel,
 }: ImportCalendarProps) {
-  const t = useTranslations();
+  const t = useTranslations('import');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +58,7 @@ export function ImportCalendar({
   });
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File changed', e.target.files);
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setFile(file);
@@ -75,10 +76,18 @@ export function ImportCalendar({
   };
 
   async function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { id, name, color, coordinates, address, timezone, timezoneOffset, timeZoneId } =
-      values;
+    const {
+      id,
+      name,
+      color,
+      coordinates,
+      address,
+      timezone,
+      timezoneOffset,
+      timeZoneId,
+    } = values;
     if (!file) {
-      setError('Please select a file to import');
+      setError(t('error.noFile'));
       return;
     }
 
@@ -105,10 +114,9 @@ export function ImportCalendar({
           dates: {},
         },
       });
-    } catch (err) {
-      setError(
-        "Failed to parse the iCal file. Please make sure it's a valid .ics file."
-      );
+    } catch (error) {
+      console.error('Error importing calendar:', error);
+      setError(t('error.failedToParse'));
     } finally {
       setIsLoading(false);
     }
@@ -119,7 +127,7 @@ export function ImportCalendar({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <div className='space-y-2'>
-          <Label htmlFor='calendar-file'>{t('calendar.icalFile')}</Label>
+          <Label htmlFor='calendar-file'>{t('icalFile')}</Label>
           <Input
             id='calendar-file'
             type='file'
@@ -127,9 +135,7 @@ export function ImportCalendar({
             onChange={handleFileChange}
             className='cursor-pointer'
           />
-          <p className='text-xs text-muted-foreground'>
-            {t('calendar.importCalendarDescription')}
-          </p>
+          <p className='text-xs text-muted-foreground'>{t('description')}</p>
         </div>
 
         {error && (

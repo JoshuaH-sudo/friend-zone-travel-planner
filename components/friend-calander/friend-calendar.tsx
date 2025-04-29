@@ -22,7 +22,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
-import { EditFriendForm } from '../edit-friend-form';
+import { EditFriendForm } from '../friend-form/edit-friend-form';
 import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from '../ui/calander';
@@ -54,7 +54,7 @@ export function FriendCalendar({
   onRemoveFriend,
   onUpdateFriend,
 }: FriendCalendarProps) {
-  const t = useTranslations();
+  const t = useTranslations('friendCalendar');
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -90,7 +90,7 @@ export function FriendCalendar({
     });
   };
   return (
-    <Card className='flex h-[500px] flex-col justify-between overflow-hidden'>
+    <Card className='flex h-[520px] flex-col justify-between overflow-hidden'>
       <Tabs defaultValue='dates'>
         <CardHeader
           className='pb-2'
@@ -109,13 +109,11 @@ export function FriendCalendar({
               <TabsList className='grid grid-cols-2'>
                 <TabsTrigger value='dates' className='flex items-center gap-2'>
                   <CalendarRange className='h-4 w-4' />
-                  Dates
-                  {/* {t('navigation.calendars')} */}
+                  {t('dates.label')}
                 </TabsTrigger>
                 <TabsTrigger value='hours' className='flex items-center gap-2'>
                   <Clock className='h-4 w-4' />
-                  Hours
-                  {/* {t('navigation.timezone')} */}
+                  {t('hours.label')}
                 </TabsTrigger>
               </TabsList>
 
@@ -210,10 +208,12 @@ export function FriendCalendar({
             </div>
           </TabsContent>
           <TabsContent value='hours' className='flex flex-col justify-between'>
-            <h5 className='mb-2 text-sm font-medium text-center'>{selectedMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}</h5>
+            <h5 className='mb-2 text-center text-sm font-medium'>
+              {format(selectedMonth, 'MMMM yyyy')}
+            </h5>
             <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto rounded-sm bg-foreground/5 p-4'>
               <TimeRangeSlider
-                label='Mon - Fri'
+                label={t('hours.weekdayRange')}
                 colour={friend.color}
                 value={friend.availableHours.weekdays}
                 onChange={(value) =>
@@ -223,7 +223,7 @@ export function FriendCalendar({
                 }
               />
               <TimeRangeSlider
-                label='Sat - Sun'
+                label={t('hours.weekendRange')}
                 colour={friend.color}
                 value={friend.availableHours.weekends}
                 onChange={(value) =>
@@ -248,7 +248,7 @@ export function FriendCalendar({
                 })
                 .map((date) => (
                   <TimeRangeSlider
-                    key={date.toString()}
+                    key={date}
                     label={format(date, 'LLLL dd')}
                     colour={friend.color}
                     value={friend.availableHours.dates[date.toString()]}
@@ -290,8 +290,7 @@ export function FriendCalendar({
                 }}
               >
                 <CalendarIcon className='mr-2 h-4 w-4' />
-                Add Day
-                {/* {t('friend.addDateAvailability')} */}
+                {t('hours.allDay')}
               </Button>
             </div>
           </TabsContent>
@@ -299,14 +298,14 @@ export function FriendCalendar({
       </Tabs>
       <CardFooter className='flex flex-col items-start gap-2 px-3 pb-3 pt-0'>
         <div className='text-xs text-muted-foreground'>
-          {t('friend.availableDays', { count: friend.availableDates.length })}
+          {t('availableDays', { count: friend.availableDates.length })}
         </div>
 
         <div className='w-full'>
           <div className='mb-1 flex items-center gap-2'>
             <Globe className='h-3 w-3 text-muted-foreground' />
             <Label htmlFor={`timezone-${friend.id}`} className='text-xs'>
-              {t('friend.timezone')}
+              {t('timezone.label')}
             </Label>
           </div>
           <p className='text-xs text-muted-foreground'>{timezoneDisplayText}</p>
