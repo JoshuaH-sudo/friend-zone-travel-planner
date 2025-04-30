@@ -12,7 +12,8 @@ const Progress = React.forwardRef<
   }
 >(({ className, value, indeterminate = false, ...props }, ref) => { 
   const determinateClassname = 'rounded-full'
-  const indeterminateClassname = 'rounded-full bg-primary/20 h-1'
+  const indeterminateClassname = 'bg-primary/20 h-1'
+  
   return (
   <ProgressPrimitive.Root
     ref={ref}
