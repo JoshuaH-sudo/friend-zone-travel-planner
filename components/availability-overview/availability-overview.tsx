@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CalendarGrid } from './calendar-grid';
 import { ShareDialog } from '../social-share/share-dialog';
+import useGetDateLocale from '../hooks/useGetDateLocale';
 
 interface AvailabilityOverviewProps {
   friends: Friend[];
@@ -20,6 +21,7 @@ export function AvailabilityOverview({
   groupName,
 }: AvailabilityOverviewProps) {
   const t = useTranslations('availabilityOverview');
+  const dateLocale = useGetDateLocale();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -37,7 +39,10 @@ export function AvailabilityOverview({
           </CardTitle>
 
           <div className='flex gap-2'>
-            <ShareDialog elementRef={calendarRef} filename={groupName || t('title')} />
+            <ShareDialog
+              elementRef={calendarRef}
+              filename={groupName || t('title')}
+            />
           </div>
         </div>
       </CardHeader>
@@ -47,7 +52,11 @@ export function AvailabilityOverview({
             <ChevronLeft className='h-4 w-4' />
             <span className='sr-only'>Previous month</span>
           </Button>
-          <h3 className='font-medium'>{format(currentMonth, 'MMMM yyyy')}</h3>
+          <h3 className='font-medium'>
+            {format(currentMonth, 'MMMM yyyy', {
+              locale: dateLocale,
+            })}
+          </h3>
           <Button variant='ghost' size='icon' onClick={nextMonth}>
             <ChevronRight className='h-4 w-4' />
             <span className='sr-only'>Next month</span>
