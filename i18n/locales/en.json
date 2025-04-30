@@ -56,6 +56,7 @@
         "searching": "Searching...",
         "placeholder": "Enter address",
         "example": "e.g., San Francisco",
+        "no_results": "No results found",
         "error": {
           "required": "Address is required"
         }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Friend } from '@/lib/types';
-import { MapPin, RotateCw } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import {
   FormField,
   FormItem,
@@ -12,48 +12,42 @@ import {
 } from '../ui/form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { useDebounce } from '@uidotdev/usehooks';
-import { Input } from '../ui/input';
-import useFetchAddress from '../hooks/useFetchAddressCoordinates';
-import { useEffect } from 'react';
 import { Label } from '../ui/label';
 import { cn } from '@/lib/utils';
-import { Button } from '../ui/button';
+import { Autocomplete } from '../ui/autocomplete';
+import { useAddressAutocomplete } from '../hooks/useAddressAutocomplete';
+import useFetchAddress from '../hooks/useFetchAddressCoordinates';
+import { useEffect } from 'react';
 
 interface AddressFieldProps {
   friends: Friend[];
   className?: string;
 }
+
 function AddressField({ className }: AddressFieldProps) {
   const form = useFormContext();
   const t = useTranslations('friend.form.address');
 
   const address = form.watch('address');
-  const debouncedSearchTerm = useDebounce<string>(address, 300);
-  const {
-    data: addressDetails,
-    refetch: refetchAddress,
-    isFetching: isFetchingAddress,
-    isSuccess: isAddressSuccess,
-    isError: isAddressError,
-    error: addressError,
-  } = useFetchAddress(debouncedSearchTerm);
+  const { suggestions, isLoading, error } = useAddressAutocomplete(address || '');
+
+  const { data: addressDetails, isSuccess: isAddressSuccess } = useFetchAddress(address);
 
   useEffect(() => {
-    if (addressError) {
+    if (error) {
       form.setError('address', {
         type: 'manual',
-        message: addressError.message,
+        message: error.message,
       });
     } else {
       form.clearErrors('address');
     }
-  }, [addressError]);
+  }, [error]);
 
   useEffect(() => {
     if (addressDetails && isAddressSuccess) {
       form.clearErrors('address');
-      // If the address is successfully (pre-)fetched, update the coordinates without the user having to click search
+      // If the address is successfully fetched, update the coordinates
       const { lat, lng } = addressDetails.geometry.location;
       form.setValue(
         'coordinates',
@@ -66,13 +60,6 @@ function AddressField({ className }: AddressFieldProps) {
     }
   }, [addressDetails, isAddressSuccess]);
 
-  // TODO: Add a loading spinner
-  let citySearchText = t('example');
-  if (isFetchingAddress) citySearchText = t('searching');
-  if (isAddressSuccess && !isFetchingAddress)
-    citySearchText = addressDetails.formatted_address;
-
-  const isLoading = isFetchingAddress;
   return (
     <div id='address-form-field' className={cn('space-y-2', className)}>
       <FormField
@@ -86,23 +73,22 @@ function AddressField({ className }: AddressFieldProps) {
             </FormLabel>
 
             <FormControl>
-              <div className='flex w-[70%] items-center gap-2'>
-                <Input
+              <div className='flex w-[70%]'>
+                <Autocomplete
                   {...field}
-                  isLoading={isLoading}
-                  clearable
                   placeholder={t('placeholder')}
+                  loading={isLoading}
+                  options={suggestions}
+                  emptyMessage={t('no_results')}
+                  onInputChange={(value) => {
+                    field.onChange(value);
+                  }}
                 />
-                <Button onClick={() => refetchAddress()} disabled={isLoading || !address } style={{
-                  visibility: isAddressError ? 'visible' : 'hidden',
-                }}>
-                  <RotateCw className={cn('h-4 w-4')} />
-                </Button>
               </div>
             </FormControl>
 
             <FormDescription>
-              {addressError === null && citySearchText}
+              {address && !error && t('searching')}
             </FormDescription>
             <FormMessage />
           </FormItem>
