@@ -96,7 +96,7 @@ export default function PlannerPage() {
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='flex flex-row items-end justify-between'>
+      <div className='flex flex-row items-end justify-between gap-2'>
         <div className='flex-grow space-y-2'>
           <Label htmlFor='group-name'>{t('app.groupName')}</Label>
           <Input

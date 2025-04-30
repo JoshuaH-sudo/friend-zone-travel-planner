@@ -29,7 +29,7 @@
     "addFriend": "Add Friend",
     "importCalendar": "Import Calendar",
     "exportCalendars": "Export Calendars",
-    "saveState": "Save State",
+    "saveState": "Save/Load State",
     "restoreState": "Restore State"
   },
   "friend": {
