@@ -10,11 +10,15 @@ const Progress = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
     indeterminate?: boolean
   }
->(({ className, value, indeterminate = false, ...props }, ref) => (
+>(({ className, value, indeterminate = false, ...props }, ref) => { 
+  const determinateClassname = 'rounded-full'
+  const indeterminateClassname = 'rounded-full bg-primary/20 h-1'
+  return (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
-      "relative h-2 w-full overflow-hidden rounded-full bg-primary/20",
+      "relative h-2 w-full overflow-hidden bg-primary/20",
+      indeterminate ? indeterminateClassname : determinateClassname,
       className
     )}
     {...props}
@@ -27,7 +31,7 @@ const Progress = React.forwardRef<
       style={!indeterminate ? { transform: `translateX(-${100 - (value || 0)}%)` } : undefined}
     />
   </ProgressPrimitive.Root>
-))
+)})
 Progress.displayName = ProgressPrimitive.Root.displayName
 
 export { Progress }
