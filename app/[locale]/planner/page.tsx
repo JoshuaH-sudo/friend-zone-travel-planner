@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/friend-form/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
 import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
