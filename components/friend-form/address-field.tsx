@@ -18,6 +18,7 @@ import { Autocomplete } from '../ui/autocomplete';
 import { useAddressAutocomplete } from '../hooks/useAddressAutocomplete';
 import useFetchAddress from '../hooks/useFetchAddressCoordinates';
 import { useEffect } from 'react';
+import { useDebounce } from '@uidotdev/usehooks';
 
 interface AddressFieldProps {
   friends: Friend[];
@@ -29,7 +30,8 @@ function AddressField({ className }: AddressFieldProps) {
   const t = useTranslations('friend.form.address');
 
   const address = form.watch('address');
-  const { suggestions, isLoading, error } = useAddressAutocomplete(address || '');
+  const debouncedSearchTerm = useDebounce<string>(address, 300);
+  const { suggestions, isLoading, error } = useAddressAutocomplete(debouncedSearchTerm || '');
 
   const { data: addressDetails, isSuccess: isAddressSuccess } = useFetchAddress(address);
 
