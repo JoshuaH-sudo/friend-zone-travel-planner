@@ -71,7 +71,6 @@ export default function PlannerPage() {
 
   useEffect(() => {
     const storedState = localStorage.getItem('plannerState');
-    console.log('Stored state:', storedState);
     if (storedState) {
       const state = JSON.parse(storedState as string);
       setGroupName(state.groupName);
