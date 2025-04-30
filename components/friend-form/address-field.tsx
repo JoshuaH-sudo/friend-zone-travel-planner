@@ -48,7 +48,7 @@ function AddressField({ className }: AddressFieldProps) {
     } else {
       form.clearErrors('address');
     }
-  }, [addressError, form]);
+  }, [addressError]);
 
   useEffect(() => {
     if (addressDetails && isAddressSuccess) {
@@ -64,7 +64,7 @@ function AddressField({ className }: AddressFieldProps) {
         }
       );
     }
-  }, [addressDetails, isAddressSuccess, form]);
+  }, [addressDetails, isAddressSuccess]);
 
   // TODO: Add a loading spinner
   let citySearchText = t('example');

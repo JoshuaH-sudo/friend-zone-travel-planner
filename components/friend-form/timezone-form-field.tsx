@@ -24,7 +24,7 @@ function TimezoneFormField() {
     } else {
       form.clearErrors('timezone');
     }
-  }, [timezoneInformationError, form]);
+  }, [timezoneInformationError]);
 
   useEffect(() => {
     if (timezoneInformation) {
@@ -46,7 +46,7 @@ function TimezoneFormField() {
         shouldDirty: true,
       });
     }
-  }, [timezoneInformation, form]);
+  }, [timezoneInformation]);
 
   let timezoneText = t('placeholder');
   if (timezoneInformation) {
