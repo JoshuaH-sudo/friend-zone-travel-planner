@@ -29,7 +29,7 @@ export default function RootLayout({
 function LoadingArea() {
   const isFetching = useIsFetching();
   if (!isFetching) {
-    return <div className='h-2' />;
+    return <div className='h-1' />;
   }
   return (
     <Progress indeterminate />
