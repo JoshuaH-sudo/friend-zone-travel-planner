@@ -23,7 +23,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from '../friend-form/edit-friend-form';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from '../ui/calander';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,7 @@ import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
+import { dateLocaleMaps, SupportedLocales } from '@/i18n/utils';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -55,6 +56,7 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations('friendCalendar');
+  const locale = useLocale();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -179,6 +181,7 @@ export function FriendCalendar({
               <Calendar
                 required={false}
                 mode='multiple'
+                locale={dateLocaleMaps[locale as SupportedLocales]}
                 style={{ width: '100%' }}
                 monthGridClassName='w-full'
                 weekClassName='w-full'
