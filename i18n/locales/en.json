@@ -105,6 +105,7 @@
       "label": "Hours",
       "weekdayRange": "Mon - Fri",
       "weekendRange": "Sat - Sun",
+      "pickDate": "Pick Date",
       "allDay": "All Day"
     },
     "availableDays": "{count, plural, =1 {1 day} other {# days}} selected",

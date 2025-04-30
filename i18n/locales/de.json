@@ -105,6 +105,7 @@
       "label": "Stunden",
       "weekdayRange": "Mo - Fr",
       "weekendRange": "Sa - So",
+      "pickDate": "Date auswählen",
       "allDay": "Ganztägig"
     },
     "availableDays": "{count, plural, =1 {1 Tag} other {# Tage}} ausgewählt",

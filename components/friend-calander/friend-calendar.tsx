@@ -34,6 +34,7 @@ import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
 import { dateLocaleMaps, SupportedLocales } from '@/i18n/utils';
+import useGetDateLocale from '../hooks/useGetDateLocale';
 
 interface FriendCalendarProps {
   friend: Friend;
@@ -56,7 +57,7 @@ export function FriendCalendar({
   onUpdateFriend,
 }: FriendCalendarProps) {
   const t = useTranslations('friendCalendar');
-  const locale = useLocale();
+  const dateLocale = useGetDateLocale();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -181,7 +182,7 @@ export function FriendCalendar({
               <Calendar
                 required={false}
                 mode='multiple'
-                locale={dateLocaleMaps[locale as SupportedLocales]}
+                locale={dateLocale}
                 style={{ width: '100%' }}
                 monthGridClassName='w-full'
                 weekClassName='w-full'
@@ -212,7 +213,9 @@ export function FriendCalendar({
           </TabsContent>
           <TabsContent value='hours' className='flex flex-col justify-between'>
             <h5 className='mb-2 text-center text-sm font-medium'>
-              {format(selectedMonth, 'MMMM yyyy')}
+              {format(selectedMonth, 'MMMM yyyy', {
+                locale: dateLocale,
+              })}
             </h5>
             <ScrollArea className='flex h-64 flex-col gap-1 overflow-hidden overflow-y-auto rounded-sm bg-foreground/5 p-4'>
               <TimeRangeSlider
@@ -252,7 +255,9 @@ export function FriendCalendar({
                 .map((date) => (
                   <TimeRangeSlider
                     key={date}
-                    label={format(date, 'LLLL dd')}
+                    label={format(date, 'LLLL dd', {
+                      locale: dateLocale,
+                    })}
                     colour={friend.color}
                     value={friend.availableHours.dates[date.toString()]}
                     onChange={(value) =>

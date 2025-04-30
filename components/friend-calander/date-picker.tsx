@@ -10,6 +10,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '../ui/calander';
+import useGetDateLocale from '../hooks/useGetDateLocale';
+import { useTranslations } from 'next-intl';
 
 interface DatePickerProps {
   selectedDate?: Date;
@@ -22,6 +24,8 @@ export function DatePicker({
   defaultMonth,
   onDateChange,
 }: DatePickerProps) {
+  const t = useTranslations('friendCalendar.hours');
+  const dateLocale = useGetDateLocale();
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -34,15 +38,18 @@ export function DatePicker({
         >
           <CalendarIcon />
           {selectedDate ? (
-            format(selectedDate, 'PPP')
+            format(selectedDate, 'PPP', {
+              locale: dateLocale,
+            })
           ) : (
-            <span>Pick a date</span>
+            <span>{t('pickDate')}</span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-auto p-0' align='start'>
         <Calendar
           mode='single'
+          locale={dateLocale}
           selected={selectedDate}
           defaultMonth={defaultMonth}
           onSelect={onDateChange}
