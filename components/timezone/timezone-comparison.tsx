@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
 import { ShareDialog } from '../social-share/share-dialog';
+import useGetDateLocale from '../hooks/useGetDateLocale';
 
 export interface TimezoneData {
   city: string;
@@ -31,6 +32,7 @@ export function TimezoneComparison({
   startDate = new Date(),
 }: TimezoneComparisonProps) {
   const t = useTranslations('timezoneComparison');
+  const dateLocale = useGetDateLocale();
   const containerRef = useRef(null);
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
 
@@ -48,7 +50,10 @@ export function TimezoneComparison({
 
   // Get month and day (April 5)
   const getMonthDay = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return format(date, 'MMM d', {
+      locale: dateLocale,
+    });
   };
 
   // Format offset from milliseconds to human-readable format (+8)
@@ -110,19 +115,29 @@ export function TimezoneComparison({
           <div className='flex gap-2'>
             <ShareDialog
               elementRef={containerRef}
-              filename={`timezone-comparison-${format(currentDate, 'yyyy-MM-dd')}`}
+              filename={`timezone-comparison-${format(
+                currentDate,
+                'yyyy-MM-dd',
+                {
+                  locale: dateLocale,
+                }
+              )}`}
             />
           </div>
         </div>
       </CardHeader>
 
       <CardContent className='bg-card p-3' ref={containerRef}>
-         <div className='mb-4 flex items-center justify-between'>
+        <div className='mb-4 flex items-center justify-between'>
           <Button variant='ghost' size='icon' onClick={goToPreviousDay}>
             <ChevronLeft className='h-4 w-4' />
             <span className='sr-only'>Previous day</span>
           </Button>
-          <h3 className='font-medium'>{format(currentDate, 'PPP')}</h3>
+          <h3 className='font-medium'>
+            {format(currentDate, 'PPP', {
+              locale: dateLocale,
+            })}
+          </h3>
           <Button variant='ghost' size='icon' onClick={goToNextDay}>
             <ChevronRight className='h-4 w-4' />
             <span className='sr-only'>Next day</span>
