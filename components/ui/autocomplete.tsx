@@ -42,6 +42,7 @@ interface AutocompleteProps {
   triggerClassName?: string;
   contentClassName?: string;
   clearable?: boolean;
+  renderOption?: (option: Option) => React.ReactNode;
 }
 
 export function Autocomplete({
@@ -56,6 +57,7 @@ export function Autocomplete({
   triggerClassName,
   contentClassName,
   clearable = true,
+  renderOption,
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || '');
@@ -108,14 +110,6 @@ export function Autocomplete({
         align="start"
       >
         <Command>
-          <CommandInput
-            value={inputValue}
-            onValueChange={(newValue: string) => {
-              setInputValue(newValue);
-              onInputChange?.(newValue);
-            }}
-            placeholder={placeholder}
-          />
           <CommandEmpty>{emptyMessage}</CommandEmpty>
           <CommandGroup className="max-h-[300px] overflow-auto">
             {options.map((option) => (
@@ -124,7 +118,7 @@ export function Autocomplete({
                 value={option.value}
                 onSelect={handleSelect}
               >
-                {option.label}
+                {renderOption ? renderOption(option) : option.label}
               </CommandItem>
             ))}
           </CommandGroup>
