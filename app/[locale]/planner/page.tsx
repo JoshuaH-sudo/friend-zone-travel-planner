@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AddFriendForm } from '@/components/friend-form/add-friend-form';
 import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
 import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
@@ -21,6 +21,7 @@ export default function PlannerPage() {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [groupName, setGroupName] = useState('');
   const [showAddFriend, setShowAddFriend] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const addFriend = (friend: Friend) => {
     setFriends([...friends, friend]);
@@ -69,27 +70,33 @@ export default function PlannerPage() {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('plannerState')) {
-      const state = JSON.parse(localStorage.getItem('plannerState') as string);
+    const storedState = localStorage.getItem('plannerState');
+    if (storedState) {
+      const state = JSON.parse(storedState as string);
       setGroupName(state.groupName);
       setFriends(state.friends);
     }
   }, []);
 
-  const updateLocalStorage = useCallback(() => {
-    localStorage.setItem('plannerState', JSON.stringify({
-      groupName,
-      friends,
-    }));
-  }, [groupName, friends]);
-
   useEffect(() => {
-    updateLocalStorage();
-  }, [groupName, friends, updateLocalStorage]);
+    // To prevent the initial render from setting the state in localStorage to empty,
+    // When the user switches language / component unmounts.
+    if (!isMounted) {
+      return setIsMounted(true);
+    }
+
+    localStorage.setItem(
+      'plannerState',
+      JSON.stringify({
+        groupName,
+        friends,
+      })
+    );
+  }, [groupName, friends, isMounted]);
 
   return (
     <div className='flex flex-col gap-6'>
-      <div className='flex flex-row items-end justify-between'>
+      <div className='flex flex-row items-end justify-between gap-2'>
         <div className='flex-grow space-y-2'>
           <Label htmlFor='group-name'>{t('app.groupName')}</Label>
           <Input

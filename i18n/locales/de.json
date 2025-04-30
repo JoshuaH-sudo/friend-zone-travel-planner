@@ -29,7 +29,7 @@
     "addFriend": "Freund hinzufügen",
     "importCalendar": "Kalender importieren",
     "exportCalendars": "Kalender exportieren",
-    "saveState": "Status speichern",
+    "saveState": "Status speichern/laden",
     "restoreState": "Status wiederherstellen"
   },
   "friend": {
