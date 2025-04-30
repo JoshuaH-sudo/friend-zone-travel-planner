@@ -30,10 +30,10 @@ function AddressField({ className }: AddressFieldProps) {
   const t = useTranslations('friend.form.address');
 
   const address = form.watch('address');
-  const debouncedSearchTerm = useDebounce<string>(address, 300);
-  const { suggestions, isLoading, error } = useAddressAutocomplete(debouncedSearchTerm || '');
+  // const debouncedSearchTerm = useDebounce<string>(address, 300);
+  const { suggestions, isLoading, error } = useAddressAutocomplete(address);
 
-  const { data: addressDetails, isSuccess: isAddressSuccess } = useFetchAddress(address);
+  // const { data: addressDetails, isSuccess: isAddressSuccess } = useFetchAddress(address);
 
   useEffect(() => {
     if (error) {
@@ -46,21 +46,21 @@ function AddressField({ className }: AddressFieldProps) {
     }
   }, [error]);
 
-  useEffect(() => {
-    if (addressDetails && isAddressSuccess) {
-      form.clearErrors('address');
-      // If the address is successfully fetched, update the coordinates
-      const { lat, lng } = addressDetails.geometry.location;
-      form.setValue(
-        'coordinates',
-        { lat, lng },
-        {
-          shouldValidate: true,
-          shouldDirty: true,
-        }
-      );
-    }
-  }, [addressDetails, isAddressSuccess]);
+  // useEffect(() => {
+  //   if (addressDetails && isAddressSuccess) {
+  //     form.clearErrors('address');
+  //     // If the address is successfully fetched, update the coordinates
+  //     const { lat, lng } = addressDetails.geometry.location;
+  //     form.setValue(
+  //       'coordinates',
+  //       { lat, lng },
+  //       {
+  //         shouldValidate: true,
+  //         shouldDirty: true,
+  //       }
+  //     );
+  //   }
+  // }, [addressDetails, isAddressSuccess]);
 
   return (
     <div id='address-form-field' className={cn('space-y-2', className)}>

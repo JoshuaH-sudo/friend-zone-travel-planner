@@ -8,7 +8,6 @@ const useFetchAddress = (address: string) => {
     queryKey: ['address', address], // Cache results based on the address
     queryFn: async () => { 
       const response = await getAddressCoordinates(address);
-      console.log(response);
 
       if (response.status === "ERROR") throw new Error(response.message);
 

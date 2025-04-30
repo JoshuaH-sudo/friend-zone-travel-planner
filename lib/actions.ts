@@ -1,7 +1,7 @@
 'use server';
 
 import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
-import { googleMapsClient } from './google-maps';
+import { googleMapsClient, placesClient } from './google-maps';
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
@@ -100,26 +100,16 @@ export const getPlaceAutocomplete = async (input: string) => {
     };
   }
 
-  try {
-    const result = await googleMapsClient.placeAutocomplete({
-      params: {
-        input,
-        key: process.env.GOOGLE_MAPS_API_KEY!,
-        // components: ['country:US'],
-      },
-    });
+  const result = await placesClient.autocompletePlaces({
+    input
+  });
+  console.log(result);
+  console.log(result[0].suggestions);
 
-    return {
-      status: 'OK',
-      predictions: result.data.predictions,
-    };
-  } catch (error) {
-    console.error('Error fetching place autocomplete:', error);
-    return {
-      status: 'ERROR',
-      message: 'An error occurred while fetching place autocomplete.',
-    };
-  }
+  return {
+    status: 'OK',
+    suggestions: result[0].suggestions,
+  };
 };
 
 const decisionHandler = async () => {
