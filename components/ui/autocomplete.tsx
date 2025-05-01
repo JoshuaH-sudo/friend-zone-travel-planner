@@ -49,7 +49,6 @@ export function Autocomplete({
     const selected = options.find((option) => option.value === currentValue);
     if (selected) {
       onSelect?.(selected.value);
-      setOpen(false);
     }
   };
 
