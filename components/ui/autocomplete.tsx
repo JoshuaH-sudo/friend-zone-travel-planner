@@ -9,7 +9,7 @@ import {
   CommandItem,
 } from '@/components/ui/command';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export type Option = {
   label: string;
@@ -38,6 +38,7 @@ export function Autocomplete({
   disabled = false,
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = (search: string) => {
     onInputChange(search);
@@ -62,44 +63,59 @@ export function Autocomplete({
     }
   }, [options]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
-      <div className='relative flex w-full items-center px-2'>
-        <CommandInput
-          value={value}
-          onValueChange={handleInputChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          onClick={() => !disabled && setOpen(true)}
-        />
-        <X
-          className='absolute right-2 size-5 rounded-full text-muted-foreground hover:cursor-pointer hover:text-white'
-          onClick={handleClear}
-        />
-      </div>
-      <CommandEmpty
-        style={{
-          display: open ? 'block' : 'none',
-        }}
-      >
-        {emptyMessage}
-      </CommandEmpty>
-      <CommandGroup
-        className='max-h-[300px] overflow-auto'
-        style={{
-          display: open ? 'block' : 'none',
-        }}
-      >
-        {options.map((option) => (
-          <CommandItem
-            key={option.value}
-            value={option.value}
-            onSelect={handleSelect}
-          >
-            {option.label}
-          </CommandItem>
-        ))}
-      </CommandGroup>
-    </Command>
+    <div ref={wrapperRef}>
+      <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
+        <div className='relative flex w-full items-center px-2'>
+          <CommandInput
+            value={value}
+            onValueChange={handleInputChange}
+            placeholder={placeholder}
+            disabled={disabled}
+            onClick={() => !disabled && setOpen(true)}
+          />
+          <X
+            className='absolute right-2 size-5 rounded-full text-muted-foreground hover:cursor-pointer hover:text-white'
+            onClick={handleClear}
+          />
+        </div>
+        <CommandEmpty
+          style={{
+            display: open ? 'block' : 'none',
+          }}
+        >
+          {emptyMessage}
+        </CommandEmpty>
+        <CommandGroup
+          className='max-h-[300px] overflow-auto'
+          style={{
+            display: open ? 'block' : 'none',
+          }}
+        >
+          {options.map((option) => (
+            <CommandItem
+              key={option.value}
+              value={option.value}
+              onSelect={handleSelect}
+            >
+              {option.label}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </Command>
+    </div>
   );
 }

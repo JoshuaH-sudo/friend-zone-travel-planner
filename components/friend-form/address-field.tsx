@@ -98,10 +98,6 @@ function AddressField({ className }: AddressFieldProps) {
                 />
               </div>
             </FormControl>
-
-            <FormDescription>
-              {!address && !error && t('searching')}
-            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
