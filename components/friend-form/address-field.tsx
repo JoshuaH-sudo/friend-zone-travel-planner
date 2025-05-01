@@ -81,7 +81,7 @@ function AddressField({ className }: AddressFieldProps) {
                   value={searchInput}
                   options={suggestions}
                   placeholder={t('placeholder')}
-                  emptyMessage={t('no_results')}
+                  emptyMessage={t('noResults')}
                   onInputChange={(value) => {
                     setSearchInput(value);
                   }}

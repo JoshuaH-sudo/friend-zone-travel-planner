@@ -55,6 +55,7 @@
         "label": "Adresse",
         "searching": "Suchen...",
         "placeholder": "Adresse eingeben",
+        "noResults": "Keine Ergebnisse gefunden",
         "example": "z. B. San Francisco",
         "error": {
           "required": "Adresse ist erforderlich"
