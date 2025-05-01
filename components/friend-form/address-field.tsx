@@ -75,21 +75,19 @@ function AddressField({ className }: AddressFieldProps) {
             </FormLabel>
 
             <FormControl>
-              <div className='flex w-[70%]'>
+              <div className='flex w-[50%]'>
                 <Autocomplete
                   {...field}
                   placeholder={t('placeholder')}
-                  loading={isLoading}
                   options={suggestions}
                   emptyMessage={t('no_results')}
                   value={searchInput}
                   onInputChange={(value) => {
                     setSearchInput(value);
                   }}
-                  // onSelect={(value) => {
-                  //   console.log('selected', value);
-                  //   field.onChange(value);
-                  // }}
+                  onSelect={(value) => {
+                    field.onChange(value);
+                  }}
                 />
               </div>
             </FormControl>

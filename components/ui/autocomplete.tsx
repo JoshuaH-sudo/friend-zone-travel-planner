@@ -8,6 +8,8 @@ import {
   CommandInput,
   CommandItem,
 } from '@/components/ui/command';
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export type Option = {
   label: string;
@@ -19,13 +21,10 @@ interface AutocompleteProps {
   value?: string;
   onChange?: (value: string) => void;
   onInputChange?: (value: string) => void;
+  onSelect?: (value: string) => void;
   placeholder?: string;
   emptyMessage?: string;
-  loading?: boolean;
   disabled?: boolean;
-  triggerClassName?: string;
-  contentClassName?: string;
-  clearable?: boolean;
   renderOption?: (option: Option) => React.ReactNode;
 }
 
@@ -34,20 +33,17 @@ export function Autocomplete({
   value,
   onChange,
   onInputChange,
+  onSelect,
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
-  loading = false,
   disabled = false,
-  triggerClassName,
-  contentClassName,
-  clearable = true,
   renderOption,
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || '');
 
   // Update internal input value when prop value changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (value !== undefined) {
       setInputValue(value);
     }
@@ -70,19 +66,38 @@ export function Autocomplete({
   const handleClear = () => {
     setInputValue('');
     onChange?.('');
+    setOpen(false);
   };
 
   return (
     <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
-      <CommandInput
-        value={inputValue}
-        onValueChange={handleInputChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        onClick={() => !disabled && setOpen(true)}
-      />
-      {/* <CommandEmpty>{emptyMessage}</CommandEmpty> */}
-      <CommandGroup className='max-h-[300px] overflow-auto' hidden={!open}>
+      <div className='relative flex w-full items-center px-2'>
+        <CommandInput
+          value={inputValue}
+          onValueChange={handleInputChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          onClick={() => !disabled && setOpen(true)}
+          onBlur={() => setOpen(false)}
+        />
+        <X
+          className='absolute right-2 size-5 rounded-full text-muted-foreground hover:cursor-pointer hover:text-white'
+          onClick={handleClear}
+        />
+      </div>
+      <CommandEmpty
+        style={{
+          display: open ? 'block' : 'none',
+        }}
+      >
+        {emptyMessage}
+      </CommandEmpty>
+      <CommandGroup
+        className='max-h-[300px] overflow-auto'
+        style={{
+          display: open ? 'block' : 'none',
+        }}
+      >
         {options.map((option) => (
           <CommandItem
             key={option.value}
