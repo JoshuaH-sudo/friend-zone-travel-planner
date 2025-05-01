@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/command';
 import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { ScrollArea } from './scroll-area';
 
 export type Option = {
   label: string;
@@ -65,7 +66,10 @@ export function Autocomplete({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -92,29 +96,31 @@ export function Autocomplete({
             onClick={handleClear}
           />
         </div>
-        <CommandEmpty
+        <ScrollArea
+          className='h-32'
           style={{
             display: open ? 'block' : 'none',
           }}
         >
-          {emptyMessage}
-        </CommandEmpty>
-        <CommandGroup
-          className='max-h-[300px] overflow-auto'
-          style={{
-            display: open ? 'block' : 'none',
-          }}
-        >
-          {options.map((option) => (
-            <CommandItem
-              key={option.value}
-              value={option.value}
-              onSelect={handleSelect}
-            >
-              {option.label}
-            </CommandItem>
-          ))}
-        </CommandGroup>
+          <CommandEmpty
+            style={{
+              display: open ? 'block' : 'none',
+            }}
+          >
+            {emptyMessage}
+          </CommandEmpty>
+          <CommandGroup>
+            {options.map((option) => (
+              <CommandItem
+                key={option.value}
+                value={option.value}
+                onSelect={handleSelect}
+              >
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </ScrollArea>
       </Command>
     </div>
   );
