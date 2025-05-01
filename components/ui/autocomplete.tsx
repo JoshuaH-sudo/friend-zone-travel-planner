@@ -25,7 +25,6 @@ interface AutocompleteProps {
   placeholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
-  renderOption?: (option: Option) => React.ReactNode;
 }
 
 export function Autocomplete({
@@ -37,7 +36,6 @@ export function Autocomplete({
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
   disabled = false,
-  renderOption,
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || '');
