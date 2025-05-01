@@ -59,6 +59,7 @@ export function Autocomplete({
     if (selected) {
       setInputValue(selected.label);
       onChange?.(selected.value);
+      onSelect?.(selected.value);
       setOpen(false);
     }
   };
@@ -78,7 +79,7 @@ export function Autocomplete({
           placeholder={placeholder}
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
-          onBlur={() => setOpen(false)}
+          // onBlur={() => setOpen(false)}
         />
         <X
           className='absolute right-2 size-5 rounded-full text-muted-foreground hover:cursor-pointer hover:text-white'
