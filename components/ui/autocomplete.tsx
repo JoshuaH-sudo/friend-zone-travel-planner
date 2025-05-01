@@ -18,9 +18,9 @@ export type Option = {
 
 interface AutocompleteProps {
   options: Option[];
-  value?: string;
-  onChange?: (value: string) => void;
-  onInputChange?: (value: string) => void;
+  value: string;
+  onInputChange: (value: string) => void;
+  onClear?: () => void;
   onSelect?: (value: string) => void;
   placeholder?: string;
   emptyMessage?: string;
@@ -30,49 +30,43 @@ interface AutocompleteProps {
 export function Autocomplete({
   options,
   value,
-  onChange,
   onInputChange,
+  onClear,
   onSelect,
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
   disabled = false,
 }: AutocompleteProps) {
   const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState(value || '');
-
-  // Update internal input value when prop value changes
-  useEffect(() => {
-    if (value !== undefined) {
-      setInputValue(value);
-    }
-  }, [value]);
 
   const handleInputChange = (search: string) => {
-    setInputValue(search);
     onInputChange?.(search);
   };
 
   const handleSelect = (currentValue: string) => {
     const selected = options.find((option) => option.value === currentValue);
     if (selected) {
-      setInputValue(selected.label);
-      onChange?.(selected.value);
       onSelect?.(selected.value);
       setOpen(false);
     }
   };
 
   const handleClear = () => {
-    setInputValue('');
-    onChange?.('');
+    onClear?.();
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (options.length > 0) {
+      setOpen(true);
+    }
+  }, [options]);
 
   return (
     <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
       <div className='relative flex w-full items-center px-2'>
         <CommandInput
-          value={inputValue}
+          value={value}
           onValueChange={handleInputChange}
           placeholder={placeholder}
           disabled={disabled}
