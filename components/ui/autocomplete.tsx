@@ -40,7 +40,7 @@ export function Autocomplete({
   const [open, setOpen] = React.useState(false);
 
   const handleInputChange = (search: string) => {
-    onInputChange?.(search);
+    onInputChange(search);
   };
 
   const handleSelect = (currentValue: string) => {
