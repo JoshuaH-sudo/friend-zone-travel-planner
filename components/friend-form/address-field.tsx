@@ -27,10 +27,10 @@ interface AddressFieldProps {
 function AddressField({ className }: AddressFieldProps) {
   const form = useFormContext();
   const t = useTranslations('friend.form.address');
-  const [searchInput, setSearchInput] = useState<string>('');
 
   const address = form.watch('address');
-  const { suggestions, isLoading, error } = useAddressAutocomplete(searchInput);
+  const [searchInput, setSearchInput] = useState<string>(address);
+  const { suggestions, error } = useAddressAutocomplete(searchInput);
 
   const { data: addressDetails, isSuccess: isAddressSuccess } =
     useFetchAddress(address);

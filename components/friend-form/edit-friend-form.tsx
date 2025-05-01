@@ -45,7 +45,7 @@ export function EditFriendForm({
   onSave,
   onCancel,
 }: EditFriendFormProps) {
-  const t = useTranslations();
+  const t = useTranslations('friend');
 
   const form = useForm<z.infer<typeof addFriendSchema>>({
     resolver: zodResolver(addFriendSchema),
@@ -83,10 +83,10 @@ export function EditFriendForm({
 
         <div className='flex justify-end gap-2'>
           <Button type='button' variant='outline' onClick={onCancel}>
-            {t('actions.cancel')}
+            {t('cancel')}
           </Button>
           <Button type='submit' disabled={!isValid}>
-            {t('actions.save')}
+            {t('save')}
           </Button>
         </div>
       </form>

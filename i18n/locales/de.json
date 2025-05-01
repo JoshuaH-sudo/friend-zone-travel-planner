@@ -65,6 +65,7 @@
     "remove": "{{name}} entfernen?",
     "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
     "addFriend": "Freund hinzufügen",
+    "save": "Speichern",
     "cancel": "Abbrechen"
   },
   "colourPicker": {

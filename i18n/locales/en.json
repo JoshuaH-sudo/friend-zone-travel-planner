@@ -66,6 +66,7 @@
     "remove": "Remove {{name}}?",
     "removeConfirm": "This will remove {{name}} and their availability data. This action cannot be undone.",
     "addFriend": "Add Friend",
+    "save": "Save",
     "cancel": "Cancel"
   },
   "colourPicker": {
