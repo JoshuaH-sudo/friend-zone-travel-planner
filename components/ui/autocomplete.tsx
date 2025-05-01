@@ -71,7 +71,6 @@ export function Autocomplete({
           placeholder={placeholder}
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
-          // onBlur={() => setOpen(false)}
         />
         <X
           className='absolute right-2 size-5 rounded-full text-muted-foreground hover:cursor-pointer hover:text-white'

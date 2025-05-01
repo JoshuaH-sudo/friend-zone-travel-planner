@@ -103,6 +103,7 @@ export const getPlaceAutocomplete = async (input: string) => {
   const result = await placesClient.autocompletePlaces({
     input
   });
+  console.log(input);
   console.log(result);
   console.log(result[0].suggestions);
 

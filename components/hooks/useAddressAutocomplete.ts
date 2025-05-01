@@ -33,8 +33,8 @@ type PlaceResponse = {
 };
 
 export type AddressSuggestion = {
-  label: string;  // Will use text.text from the API response
-  value: string;  // Will use text.text from the API response
+  label: string; // Will use text.text from the API response
+  value: string; // Will use text.text from the API response
   placeId: string;
   mainText: string;
   secondaryText: string;
@@ -50,22 +50,32 @@ export function useAddressAutocomplete(input: string) {
     queryKey: ['addressAutocomplete', debouncedInput],
     queryFn: async () => {
       const response = await getPlaceAutocomplete(debouncedInput);
-      
+
       if (response.status === 'ERROR') {
         throw new Error(response.message);
       }
 
-      const newSuggestions: AddressSuggestion[] = response.suggestions.map((item: PlaceResponse) => ({
-        label: item.placePrediction.text.text,
-        value: item.placePrediction.text.text,
-        placeId: item.placePrediction.placeId,
-        mainText: item.placePrediction.structuredFormat.mainText.text,
-        secondaryText: item.placePrediction.structuredFormat.secondaryText.text,
-        types: item.placePrediction.types
-      }));
+      try {
+        const newSuggestions: AddressSuggestion[] = response.suggestions.map(
+          (item: PlaceResponse) => {
+            console.log(item);
+            return {
+              label: item.placePrediction.text.text,
+              value: item.placePrediction.text.text,
+              // placeId: item.placePrediction.placeId,
+              // mainText: item.placePrediction.structuredFormat.mainText.text,
+              // secondaryText: item.placePrediction.structuredFormat.secondaryText.text,
+              // types: item.placePrediction.types,
+            };
+          }
+        );
 
-      setSuggestions(newSuggestions);
-      return newSuggestions;
+        setSuggestions(newSuggestions);
+        return newSuggestions;
+      } catch (error) {
+        console.error('Error processing response:', error);
+        throw new Error('Failed to process address suggestions');
+      }
     },
   });
 

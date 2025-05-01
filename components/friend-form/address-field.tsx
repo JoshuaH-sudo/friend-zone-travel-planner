@@ -88,6 +88,7 @@ function AddressField({ className }: AddressFieldProps) {
                   onSelect={(value) => {
                     // Only want to set the address and get the timezone
                     // when the user selects an address from the suggestions
+                    setSearchInput(value);
                     field.onChange(value);
                   }}
                   onClear={() => {
