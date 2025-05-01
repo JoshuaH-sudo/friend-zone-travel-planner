@@ -55,6 +55,7 @@
         "label": "Adresse",
         "searching": "Suchen...",
         "placeholder": "Adresse eingeben",
+        "noResults": "Keine Ergebnisse gefunden",
         "example": "z. B. San Francisco",
         "error": {
           "required": "Adresse ist erforderlich"
@@ -65,6 +66,7 @@
     "remove": "{{name}} entfernen?",
     "removeConfirm": "Dies wird {{name}} und deren Verfügbarkeitsdaten entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
     "addFriend": "Freund hinzufügen",
+    "save": "Speichern",
     "cancel": "Abbrechen"
   },
   "colourPicker": {
