@@ -86,10 +86,10 @@ function AddressField({ className }: AddressFieldProps) {
                   onInputChange={(value) => {
                     setSearchInput(value);
                   }}
-                  onSelect={(value) => {
-                    console.log('selected', value);
-                    field.onChange(value);
-                  }}
+                  // onSelect={(value) => {
+                  //   console.log('selected', value);
+                  //   field.onChange(value);
+                  // }}
                 />
               </div>
             </FormControl>
