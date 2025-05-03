@@ -4,118 +4,100 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import background from '@/public/images/landing-bg.png';
+import productExampleFront from '@/public/images/product-example-front.png';
+import productExampleLeft from '@/public/images/product-example-left.png';
+import productExampleRight from '@/public/images/product-example-right.png';
+import Image from 'next/image';
 
 export default function LandingPage() {
   const t = useTranslations();
 
   return (
     <div className='flex min-h-screen flex-col'>
+      <Image
+        alt='background'
+        src={background}
+        placeholder='blur'
+        quality={100}
+        fill
+        sizes='200vh'
+        className='brightness-90'
+        style={{
+          objectFit: 'cover',
+          zIndex: -100,
+          minHeight: '200vh',
+        }}
+      />
       <main>
-        <section className='px-4 py-20'>
-          <div className='container mx-auto max-w-5xl text-center'>
-            <h1 className='mb-6 text-4xl font-bold md:text-6xl'>
-              {t('landing.title')}{' '}
-              <span className='text-primary'>
-                {t('landing.titleHighlight')}
-              </span>
-            </h1>
-            <p className='mx-auto mb-10 max-w-3xl text-xl text-muted-foreground'>
-              {t('landing.subtitle')}
-            </p>
-            <Link href='/planner'>
-              <Button size='lg' className='gap-2'>
-                <Calendar className='h-5 w-5' />
-                {t('landing.startPlanning')}
-              </Button>
-            </Link>
-          </div>
-        </section>
-
-        <section className='bg-muted/30 py-16'>
-          <div className='container mx-auto px-4'>
-            <h2 className='mb-12 text-center text-3xl font-bold'>
-              {t('landing.features')}
-            </h2>
-
-            <div className='grid gap-8 md:grid-cols-3'>
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Users className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureManagement.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureManagement.description')}
-                </p>
-              </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Globe className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureTimezone.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureTimezone.description')}
-                </p>
-              </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Clock className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureOverview.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureOverview.description')}
-                </p>
-              </div>
+        <section id='intro' className='h-full'>
+          <section className='px-4 py-12'>
+            <div className='container mx-auto max-w-5xl text-center'>
+              <h1 className='mb-6 text-4xl font-bold md:text-6xl'>
+                {t('landing.title')}
+                <br />
+                <span className='text-primary underline'>
+                  {t('landing.titleHighlight')}
+                </span>
+              </h1>
+              {/* <p className='mx-auto mb-10 max-w-3xl rounded-lg bg-violet-500/80 p-4 text-xl text-foreground'>
+                {t('landing.subtitle')}
+              </p> */}
+              <Link href='/planner'>
+                <Button id='call-to-action' size='lg' className='gap-2'>
+                  <Calendar className='h-5 w-5' />
+                  {t('landing.startPlanning')}
+                </Button>
+              </Link>
             </div>
+          </section>
 
-            <div className='mt-8 grid gap-8 md:grid-cols-2'>
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Download className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureImport.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureImport.description')}
-                </p>
+          <section
+            id='product-example'
+            className='border-12 flex items-center justify-center'
+          >
+            <div className='relative'>
+              <div className='relative'>
+                <Image
+                  alt='product example front'
+                  src={productExampleFront}
+                  placeholder='blur'
+                  className='z-10 rounded-2xl border-[12px] border-transparent'
+                  quality={100}
+                  height={430}
+                  width={717}
+                />
+                <div
+                  id='boarder-gradient'
+                  className='absolute bottom-0 left-0 right-0 top-0 z-[-1] rounded-2xl border-primary shadow-xl'
+                  style={{
+                    background: 'linear-gradient(#FFFFFF, #25C9F2)',
+                  }}
+                />
               </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Upload className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureExport.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureExport.description')}
-                </p>
-              </div>
+              <Image
+                alt='product example left'
+                src={productExampleLeft}
+                placeholder='blur'
+                className='absolute bottom-5 left-[-400px] z-[-2] -rotate-6 shadow-lg'
+                quality={100}
+                height={297}
+                width={717}
+              />
+              <Image
+                alt='product example right'
+                src={productExampleRight}
+                placeholder='blur'
+                className='absolute bottom-3 right-[-400px] z-[-2] rotate-6 shadow-lg'
+                quality={100}
+                height={357}
+                width={596}
+              />
             </div>
-          </div>
+          </section>
         </section>
 
-        <section className='px-4 py-20 text-center'>
-          <div className='container mx-auto max-w-3xl'>
-            <h2 className='mb-6 text-3xl font-bold'>
-              {t('landing.readyToStart')}
-            </h2>
-            <p className='mb-8 text-xl text-muted-foreground'>
-              {t('landing.readyDescription')}
-            </p>
-            <Link href='/planner'>
-              <Button size='lg'>{t('landing.goToPlanner')}</Button>
-            </Link>
-          </div>
-        </section>
+        <section id='features' className='h-screen'></section>
       </main>
 
       <footer className='border-t bg-muted/30 py-8'>

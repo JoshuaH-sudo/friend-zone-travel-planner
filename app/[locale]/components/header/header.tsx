@@ -11,11 +11,11 @@ export function Header() {
   const t = useTranslations('app');
 
   return (
-    <header className='border-b'>
+    <header>
       <div className='container mx-auto flex items-center justify-between px-4 py-4'>
         <Link
           href='/'
-          className='flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground'
+          className='flex items-center gap-2 text-foreground transition-colors hover:text-muted-foreground'
         >
           <div className='flex items-center gap-2'>
             <Image
