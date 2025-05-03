@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { MultiPointSlider } from '@/components/ui/multi-point-slider';
-import { adjustOpacity, lightenColor } from '@/lib/utils';
+import { adjustOpacity, lightenColor } from '@/lib/colour-utils';
 
 interface TimeRangeSliderProps {
   label: string;

@@ -5,7 +5,7 @@ import {
   cn,
   darkenColor,
   lightenColor,
-} from '@/lib/utils';
+} from '@/lib/colour-utils';
 
 export interface HourData {
   hour: number;

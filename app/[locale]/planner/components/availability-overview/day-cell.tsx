@@ -1,7 +1,7 @@
 'use client';
 
 import { format, isSameMonth } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/colour-utils';
 import { Badge } from '@/components/ui/badge';
 import { FriendAvatars } from './friend-avatars';
 import type { Friend } from '@/lib/types';
