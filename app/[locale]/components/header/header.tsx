@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { LanguageSwitcher } from '@/components/header/language-switcher';
-import { ThemeToggle } from '@/components/header/theme-toggle';
+import { LanguageSwitcher } from '@/app/[locale]/components/header/language-switcher';
+import { ThemeToggle } from '@/app/[locale]/components/header/theme-toggle';
 import travelIcon from '@/public/travel.png';
 import Link from 'next/link';
 import Image from 'next/image';
