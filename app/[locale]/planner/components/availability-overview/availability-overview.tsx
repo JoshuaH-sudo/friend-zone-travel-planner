@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { CalendarGrid } from './calendar-grid';
 import { ShareDialog } from '../social-share/share-dialog';
-import useGetDateLocale from '@/components/hooks/useGetDateLocale';
+import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
 
 interface AvailabilityOverviewProps {
   friends: Friend[];

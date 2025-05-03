@@ -6,12 +6,12 @@ import { Friend } from '@/lib/types';
 import { format, secondsToHours } from 'date-fns';
 import { TZDate } from '@date-fns/tz';
 import { HourData, TimezoneHour } from './timezone-hour';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { useTranslations } from 'next-intl';
 import { ShareDialog } from '../social-share/share-dialog';
-import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
+import useGetDateLocale from '../../app/[locale]/planner/hooks/useGetDateLocale';
 
 export interface TimezoneData {
   city: string;

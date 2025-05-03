@@ -2,7 +2,7 @@ import { Globe } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
 import { useFormContext } from 'react-hook-form';
-import useFetchTimezoneInformation from '@/components/hooks/useFetchTimeZoneInformation';
+import useFetchTimezoneInformation from '@/app/[locale]/planner/hooks/useFetchTimeZoneInformation';
 import { useEffect } from 'react';
 import { addFriendFormContext } from './add-friend-form';
 import { displayTimezoneOffset } from '../timezone/timezone-display';

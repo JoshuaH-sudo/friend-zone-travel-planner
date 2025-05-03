@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calander';
-import useGetDateLocale from '@/components/hooks/useGetDateLocale';
+import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
 import { useTranslations } from 'next-intl';
 
 interface DatePickerProps {

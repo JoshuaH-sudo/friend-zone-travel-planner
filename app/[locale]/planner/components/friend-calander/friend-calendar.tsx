@@ -33,7 +33,7 @@ import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import useGetDateLocale from '@/components/hooks/useGetDateLocale';
+import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
 
 interface FriendCalendarProps {
   friend: Friend;
