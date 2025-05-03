@@ -57,7 +57,7 @@ export default function LandingPage() {
             className='border-12 flex items-center justify-center'
           >
             <div className='relative'>
-              <div className='relative'>
+              <div className='relative hover:scale-105 transition-transform duration-300'>
                 <Image
                   alt='product example front'
                   src={productExampleFront}
