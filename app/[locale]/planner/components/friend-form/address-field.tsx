@@ -7,16 +7,15 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormDescription,
   FormMessage,
-} from '../ui/form';
+} from '@/components/ui/form';
 import { useFormContext } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-import { Label } from '../ui/label';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Autocomplete } from '../ui/autocomplete';
-import { useAddressAutocomplete } from '../hooks/useAddressAutocomplete';
-import useFetchAddress from '../hooks/useFetchAddressCoordinates';
+import { Autocomplete } from '@/components/ui/autocomplete';
+import { useAddressAutocomplete } from '@/components/hooks/useAddressAutocomplete';
+import useFetchAddress from '@/components/hooks/useFetchAddressCoordinates';
 import { useEffect, useState } from 'react';
 
 interface AddressFieldProps {

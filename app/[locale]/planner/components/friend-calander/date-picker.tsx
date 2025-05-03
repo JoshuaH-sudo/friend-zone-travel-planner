@@ -9,8 +9,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Calendar } from '../ui/calander';
-import useGetDateLocale from '../hooks/useGetDateLocale';
+import { Calendar } from '@/components/ui/calander';
+import useGetDateLocale from '@/components/hooks/useGetDateLocale';
 import { useTranslations } from 'next-intl';
 
 interface DatePickerProps {

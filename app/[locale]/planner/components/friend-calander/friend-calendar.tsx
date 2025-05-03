@@ -23,18 +23,17 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { generateFriendIcal, downloadFile } from '@/lib/ical';
 import { EditFriendForm } from '../friend-form/edit-friend-form';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
-import { Calendar } from '../ui/calander';
+import { Calendar } from '@/components/ui/calander';
 import { cn } from '@/lib/utils';
 import { displayTimezoneOffset } from '../timezone/timezone-display';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TimeRangeSlider } from './timerange-slider';
 import { DatePicker } from './date-picker';
 import { format } from 'date-fns';
-import { ScrollArea } from '../ui/scroll-area';
-import { dateLocaleMaps, SupportedLocales } from '@/i18n/utils';
-import useGetDateLocale from '../hooks/useGetDateLocale';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import useGetDateLocale from '@/components/hooks/useGetDateLocale';
 
 interface FriendCalendarProps {
   friend: Friend;

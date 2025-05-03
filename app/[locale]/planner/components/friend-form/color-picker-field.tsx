@@ -6,7 +6,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
+} from '@/components/ui/form';
 import { Friend } from '@/lib/types';
 import { ColorPicker, PRESET_COLORS } from '../color-picker';
 

@@ -1,71 +1,97 @@
 'use client';
 
 import type React from 'react';
-
 import type { Friend } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import { PRESET_COLORS } from '../color-picker';
 import { useTranslations } from 'next-intl';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from '../ui/form';
+import { Form } from '@/components/ui/form';
 import AddressField from './address-field';
 import ColorPickerField from './color-picker-field';
-import NameFormField from './name-form-field';
 import TimezoneFormField from './timezone-form-field';
+import NameFormField from './name-form-field';
 
-interface EditFriendFormProps {
-  friend: Friend;
+interface AddFriendFormProps {
   friends: Friend[];
-  onSave: (updatedFriend: Friend) => void;
+  onAddFriend: (friend: Friend) => void;
   onCancel: () => void;
 }
 
 export const addFriendSchema = z.object({
+  id: z.string(),
   name: z.string().nonempty({
-    message: 'Name is required',
+    message: 'required',
   }),
   color: z.string({
-    message: 'Must select a color',
+    message: 'required',
   }),
   coordinates: z.object({
     lat: z.number(),
     lng: z.number(),
   }),
   address: z.string({
-    message: 'Address is required',
+    message: 'required',
   }),
   timezone: z.string(),
+  timeZoneId: z.string(),
   timezoneOffset: z.number(),
 });
 
-export function EditFriendForm({
-  friend,
+export type addFriendFormContext = z.infer<typeof addFriendSchema>;
+
+export function AddFriendForm({
   friends,
-  onSave,
+  onAddFriend,
   onCancel,
-}: EditFriendFormProps) {
+}: AddFriendFormProps) {
   const t = useTranslations('friend');
+
+  const takenColors = friends.map((f) => f.color);
+  const availableColors = PRESET_COLORS.filter(
+    (color) => !takenColors.includes(color)
+  );
+  const randomPreselectColor =
+    availableColors[Math.floor(Math.random() * availableColors.length)];
 
   const form = useForm<z.infer<typeof addFriendSchema>>({
     resolver: zodResolver(addFriendSchema),
     defaultValues: {
-      ...friend,
-      coordinates: undefined,
+      id: crypto.randomUUID(),
+      name: '',
+      color: randomPreselectColor,
+      address: '',
     },
   });
 
   function onSubmit(values: z.infer<typeof addFriendSchema>) {
-    const { name, color, coordinates, address, timezone, timezoneOffset } =
-      values;
-    onSave({
-      ...friend,
+    const {
+      id,
+      name,
+      color,
+      coordinates,
+      address,
+      timezone,
+      timeZoneId,
+      timezoneOffset,
+    } = values;
+    onAddFriend({
+      id,
       name: name.trim(),
       color,
       coordinates,
       address,
       timezone,
       timezoneOffset,
+      timeZoneId,
+      availableDates: [],
+      availableHours: {
+        weekdays: [1, 24],
+        weekends: [1, 24],
+        dates: {},
+      },
     });
   }
 
@@ -75,9 +101,9 @@ export function EditFriendForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <NameFormField />
 
-        <ColorPickerField selectedFriendId={friend.id} friends={friends} />
+        <ColorPickerField friends={friends} />
 
-        <AddressField friends={friends} />
+        <AddressField friends={friends} className='w-[50%]' />
 
         <TimezoneFormField />
 
@@ -86,7 +112,7 @@ export function EditFriendForm({
             {t('cancel')}
           </Button>
           <Button type='submit' disabled={!isValid}>
-            {t('save')}
+            {t('addFriend')}
           </Button>
         </div>
       </form>

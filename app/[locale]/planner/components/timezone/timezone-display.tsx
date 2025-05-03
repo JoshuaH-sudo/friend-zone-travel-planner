@@ -1,5 +1,5 @@
 import { Globe } from 'lucide-react';
-import { Label } from '../ui/label';
+import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
 import { secondsToHours } from 'date-fns';
 

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AddFriendForm } from '@/components/friend-form/add-friend-form';
-import { AvailabilityOverview } from '@/components/availability-overview/availability-overview';
-import { FriendCalendar } from '@/components/friend-calander/friend-calendar';
-import { WorkspaceActions } from '@/components/workspace-actions/workspace-actions';
-import { EmptyState } from '@/components/empty-state';
+import { AddFriendForm } from './components/friend-form/add-friend-form';
+import { AvailabilityOverview } from './components/availability-overview/availability-overview';
+import { FriendCalendar } from './components/friend-calander/friend-calendar';
+import { WorkspaceActions } from '@/app/[locale]/planner/components/workspace-actions/workspace-actions';
+import { EmptyState } from '@/app/[locale]/planner/components/empty-state';
 import type { AvailableHours, Friend } from '@/lib/types';
 import type { AppState } from '@/lib/json-export';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,7 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
-import { TimezoneComparison } from '@/components/timezone/timezone-comparison';
+import { TimezoneComparison } from './components/timezone/timezone-comparison';
 
 export default function PlannerPage() {
   const t = useTranslations();

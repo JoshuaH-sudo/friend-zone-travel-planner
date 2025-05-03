@@ -11,16 +11,16 @@ import type { Friend } from '@/lib/types';
 import { Download, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslations } from 'next-intl';
-import AddressField from '@/components/friend-form/address-field';
-import ColorPickerField from '@/components/friend-form/color-picker-field';
-import NameFormField from '@/components/friend-form/name-form-field';
-import TimezoneFormField from '@/components/friend-form/timezone-form-field';
-import { addFriendSchema } from '@/components/friend-form/add-friend-form';
+import AddressField from '../friend-form/address-field';
+import ColorPickerField from '../friend-form/color-picker-field';
+import NameFormField from '../friend-form/name-form-field';
+import TimezoneFormField from '../friend-form/timezone-form-field';
+import { addFriendSchema } from '../friend-form/add-friend-form';
 import { z } from 'zod';
 import { Form } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PRESET_COLORS } from '@/components/color-picker';
+import { PRESET_COLORS } from '@/app/[locale]/planner/components/color-picker';
 
 interface ImportCalendarProps {
   friends: Friend[];
