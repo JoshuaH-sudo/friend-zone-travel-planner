@@ -11,7 +11,7 @@ export function Header() {
   const t = useTranslations('app');
 
   return (
-    <header className='my-2 flex justify-center'>
+    <header className='fixed top-2 left-0 right-0 z-50 flex items-center justify-center'>
       <div className='inline-flex h-16 w-[766px] items-center justify-between overflow-hidden rounded-3xl bg-green-300/80 px-6 py-3 outline outline-2 outline-offset-[-2px] outline-black backdrop-blur-[2px]'>
         <div className='flex items-center justify-start gap-2'>
           <Link
