@@ -15,11 +15,17 @@ export default function LandingPage() {
   const t = useTranslations();
 
   return (
-    <main className='pt-20'>
+    <main
+      className='pt-20'
+      style={{
+        background:
+          'linear-gradient(180deg, #0084FF 0%, #C5F1FF 50%, #D5C5FF 100%), white',
+      }}
+    >
       <section id='intro' className='flex h-screen flex-row'>
         <div className='px-4 py-12'>
-          <div className='container mx-auto max-w-5xl text-center'>
-            <h1 className='mb-6 text-4xl font-bold md:text-6xl'>
+          <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
+            <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
               <div className='flex items-center justify-center gap-3'>
                 <WordFrame>Separated</WordFrame>
                 <WordFrame>By</WordFrame>
@@ -34,20 +40,30 @@ export default function LandingPage() {
                   fontWeight: '800',
                 }}
               >
-                <span className="font-['Roboto'] text-6xl font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]">
+                <span className='font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
                   connected-by-
                 </span>
-                <span className="font-['Roboto'] text-6xl font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]">
+                <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
                   Friend-zone
                 </span>
               </div>
-              <br />
-              <span className='text-primary underline'>
-                {t('landing.titleHighlight')}
-              </span>
             </h1>
+            <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
+              Plan, organise and meet with friends effortlessly - no matter
+              where they are.
+            </p>
             <Link href='/planner'>
-              <Button id='call-to-action' size='lg' className='gap-2'>
+              <Button
+                id='call-to-action'
+                size='lg'
+                className='gap-2'
+                style={{
+                  borderRadius: '6px',
+                  border: '2px solid var(--Border---Dark, #262626)',
+                  background: '#FAFAFA',
+                  boxShadow: '4px 4px 0px 0px #A2FF9E',
+                }}
+              >
                 <Calendar className='h-5 w-5' />
                 {t('landing.startPlanning')}
               </Button>
