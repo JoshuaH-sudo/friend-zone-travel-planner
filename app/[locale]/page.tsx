@@ -23,7 +23,7 @@ export default function LandingPage() {
       }}
     >
       <section id='intro' className='flex h-screen flex-row'>
-        <div className='px-4 py-12'>
+        <div id="text" className='px-4 py-12'>
           <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
             <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
               <div className='flex items-center justify-center gap-3'>
@@ -69,6 +69,10 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
+        </div>
+
+        <div id="example-photos">
+          <Image src="./images/landing-bg.png" alt="first-example" width={717} height={428}/>
         </div>
       </section>
 
