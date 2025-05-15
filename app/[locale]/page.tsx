@@ -22,8 +22,11 @@ export default function LandingPage() {
           'linear-gradient(180deg, #0084FF 0%, #C5F1FF 50%, #D5C5FF 100%), white',
       }}
     >
-      <section id='intro' className='flex h-screen flex-row'>
-        <div id="text" className='px-4 py-12'>
+      <section
+        id='intro'
+        className='flex h-screen flex-row justify-between px-10'
+      >
+        <div id='text' className='px-4 py-12'>
           <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
             <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
               <div className='flex items-center justify-center gap-3'>
@@ -71,8 +74,38 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div id="example-photos">
-          <Image src="./images/landing-bg.png" alt="first-example" width={717} height={428}/>
+        <div id='example-photos' className='self-end'>
+          <div className='relative' style={{ width: '717px', height: '428px' }}>
+            <Image
+              src={productExampleFront}
+              alt='first-example'
+              width={717}
+              height={428}
+              className='absolute bottom-0 z-10 rounded-md outline outline-4 outline-white'
+            />
+
+            <Image
+              src={productExampleRight}
+              alt='first-example'
+              width={596}
+              height={367}
+              className='absolute bottom-5 left-[-100] z-[1]'
+              style={{
+                transform: 'rotate(-4.317deg)',
+              }}
+            />
+
+            <Image
+              src={productExampleLeft}
+              alt='first-example'
+              width={782}
+              height={551}
+              className='absolute bottom-10 left-[-180] z-[0]'
+              style={{
+                transform: 'rotate(-6.962deg)',
+              }}
+            />
+          </div>
         </div>
       </section>
 
