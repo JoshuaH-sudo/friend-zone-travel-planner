@@ -74,7 +74,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div id='example-photos' className='self-end'>
+        <div id='example-photos' className='self-end pb-20'>
           <div className='relative' style={{ width: '717px', height: '428px' }}>
             <Image
               src={productExampleFront}
@@ -89,7 +89,7 @@ export default function LandingPage() {
               alt='first-example'
               width={596}
               height={367}
-              className='absolute bottom-5 left-[-100] z-[1]'
+              className='absolute bottom-0 left-[-100] z-[1]'
               style={{
                 transform: 'rotate(-4.317deg)',
               }}
@@ -100,7 +100,7 @@ export default function LandingPage() {
               alt='first-example'
               width={782}
               height={551}
-              className='absolute bottom-10 left-[-180] z-[0]'
+              className='absolute bottom-0 left-[-180] z-[0]'
               style={{
                 transform: 'rotate(-6.962deg)',
               }}
