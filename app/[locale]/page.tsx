@@ -53,7 +53,7 @@ export default function LandingPage() {
                 <WordFrame>Borders</WordFrame>
               </div>
               <div
-                className='h-20 justify-start self-stretch text-center'
+                className='h-20 justify-start self-stretch whitespace-nowrap text-center'
                 style={{
                   WebkitTextStrokeWidth: '3px',
                   WebkitTextStrokeColor: '#30002B',
