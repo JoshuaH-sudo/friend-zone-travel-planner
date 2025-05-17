@@ -22,6 +22,10 @@ import {
   RefAttributes,
 } from 'react';
 import { cn } from '@/lib/colour-utils';
+import Path1 from '@/public/images/paths/path-1.svg';
+import Path2 from '@/public/images/paths/path-2.svg';
+import Path3 from '@/public/images/paths/path-3.svg';
+import Path4 from '@/public/images/paths/path-4.svg';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -38,7 +42,7 @@ export default function LandingPage() {
         id='intro'
         className='flex h-screen flex-row justify-between px-10 pt-10'
       >
-        <div id='text' className='px-4 py-12'>
+        <div id='text' className='relative px-4 py-12'>
           <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
             <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
               <div className='flex items-center justify-center gap-3'>
@@ -84,9 +88,15 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
+          <div
+            id='start-path-1'
+            className='absolute bottom-[-30px] right-[50%] z-0'
+          >
+            <Image src={Path1} alt='path-1' width={62} height={168} />
+          </div>
         </div>
 
-        <div id='example-photos' className='self-end pb-20'>
+        <div id='example-photos' className='self-end'>
           <div className='relative' style={{ width: '717px', height: '428px' }}>
             <Image
               src={productExampleFront}
@@ -123,15 +133,23 @@ export default function LandingPage() {
 
       <section
         id='features-1'
-        className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
+        className='flex h-screen flex-col justify-center gap-6 px-32'
       >
         <div className='flex flex-row justify-center gap-16'>
-          <FeatureFrame
-            title='Availability Overview'
-            Icon={Clock10}
-            imageSrc={productExampleRight}
-            imageAlt='availability overview example'
-          />
+          <div className='relative'>
+            <FeatureFrame
+              title='Availability Overview'
+              Icon={Clock10}
+              imageSrc={productExampleRight}
+              imageAlt='availability overview example'
+            />
+            <div
+              id='path-2'
+              className='absolute bottom-[-15px] right-[-450px] z-0'
+            >
+              <Image src={Path2} alt='path-2' width={443.5} height={200} />
+            </div>
+          </div>
           <FeatureText shadowDirection='right'>
             Compare all your friends availabilities in an easy to see and
             exportable calendar.
@@ -144,13 +162,21 @@ export default function LandingPage() {
             <span className='text-sky-600'>Friend-zone</span> sort out all the
             hassle with thinking about what timezone they are in.
           </FeatureText>
-          <FeatureFrame
-            title='Friend Management'
-            Icon={Users}
-            imageSrc={productExampleRight}
-            imageAlt='Friend Management example'
-            shadowDirection='right'
-          />
+          <div className='relative'>
+            <FeatureFrame
+              title='Friend Management'
+              Icon={Users}
+              imageSrc={productExampleRight}
+              imageAlt='Friend Management example'
+              shadowDirection='right'
+            />
+            <div
+              id='path-3'
+              className='absolute bottom-[-150px] left-[-580px] z-0'
+            >
+              <Image src={Path3} alt='path-3' width={573.5} height={278.08} />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -159,12 +185,20 @@ export default function LandingPage() {
         className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
       >
         <div className='flex flex-row justify-center gap-16'>
-          <FeatureFrame
-            title='Timezone Support'
-            Icon={Globe2}
-            imageSrc={productExampleRight}
-            imageAlt='Timezone Support example'
-          />
+          <div className='relative'>
+            <FeatureFrame
+              title='Timezone Support'
+              Icon={Globe2}
+              imageSrc={productExampleRight}
+              imageAlt='Timezone Support example'
+            />
+            <div
+              id='path-4'
+              className='absolute bottom-[-10px] right-[-450px] z-0'
+            >
+              <Image src={Path4} alt='path-4' width={443.5} height={165.37} />
+            </div>
+          </div>
           <FeatureText shadowDirection='right'>
             No more asking, “what time is it over there?” Let{' '}
             <span className='text-sky-600'>Friend-zone</span> answer it for you.
