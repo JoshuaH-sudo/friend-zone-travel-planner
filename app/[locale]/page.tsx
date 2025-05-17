@@ -2,14 +2,28 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
+import {
+  Calendar,
+  Users,
+  Clock,
+  Upload,
+  Download,
+  Globe,
+  Clock10,
+  LucideProps,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import background from '@/public/images/landing-bg.png';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
 import productExampleRight from '@/public/images/product-example-right.png';
-import Image from 'next/image';
-import { FC, PropsWithChildren } from 'react';
+import Image, { StaticImageData } from 'next/image';
+import {
+  FC,
+  ForwardRefExoticComponent,
+  PropsWithChildren,
+  RefAttributes,
+} from 'react';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -24,7 +38,7 @@ export default function LandingPage() {
     >
       <section
         id='intro'
-        className='flex h-screen flex-row justify-between px-10'
+        className='flex h-screen flex-row justify-between px-10 pt-10'
       >
         <div id='text' className='px-4 py-12'>
           <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
@@ -109,9 +123,77 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id='features-1' className='h-screen'></section>
+      <section
+        id='features-1'
+        className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
+      >
+        <div
+          style={{
+            gridTemplateAreas: '"image text"',
+            height: 'fit-content',
+          }}
+          className='grid grid-cols-2 gap-6'
+        >
+          <FeatureFrame
+            title='Availability Overview'
+            Icon={Clock10}
+            imageSrc={productExampleRight}
+            imageAlt='availability overview example'
+          />
+          <FeatureText>
+            Compare all your friends availabilities in an easy to see and
+            exportable calendar.
+          </FeatureText>
+        </div>
+        <div
+          style={{
+            gridTemplateAreas: '"text image"',
+            height: 'fit-content',
+          }}
+          className='grid grid-cols-2 gap-6'
+        >
+          <FeatureText>
+            Add your friends and let Friend-zone sort out all the hassle with
+            thinking about what timezone they are in.
+          </FeatureText>
+          <FeatureFrame
+            title='Friend Management'
+            Icon={Clock10}
+            imageSrc={productExampleRight}
+            imageAlt='Friend Management example'
+          />
+        </div>
+      </section>
 
-      <section id='features-2' className='h-screen'></section>
+      <section
+        id='features-2'
+        className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
+      >
+        <div className='grid grid-cols-2'>
+          <FeatureFrame
+            title='Timezone Support'
+            Icon={Clock10}
+            imageSrc={productExampleRight}
+            imageAlt='Timezone Support example'
+          />
+          <FeatureText>
+            No more asking, “what time is it over there?” Let Friend-zone answer
+            it for you.
+          </FeatureText>
+        </div>
+        <div className='grid grid-cols-2'>
+          <FeatureText>
+            Once your all done, export and share it to all your friends with
+            screenshots or iCal files.
+          </FeatureText>
+          <FeatureFrame
+            title='Export to iCal'
+            Icon={Clock10}
+            imageSrc={productExampleRight}
+            imageAlt='Export to iCal example'
+          />
+        </div>
+      </section>
 
       <footer className='border-t bg-muted/30 py-8'>
         <div className='container mx-auto px-4 text-center text-muted-foreground'>
@@ -140,5 +222,53 @@ const WordFrame: FC<PropsWithChildren> = ({ children }) => (
     >
       {children}
     </div>
+  </div>
+);
+
+export interface FeatureFrameProps {
+  title: string;
+  Icon: ForwardRefExoticComponent<
+    Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
+  >;
+  imageSrc: StaticImageData;
+  imageAlt: string;
+}
+
+const FeatureFrame: FC<FeatureFrameProps> = ({
+  title,
+  Icon,
+  imageSrc,
+  imageAlt,
+}) => (
+  <div
+    style={{
+      gridArea: 'image',
+    }}
+    className='inline-flex w-[472px] flex-col items-start justify-center gap-3 overflow-hidden rounded-xl bg-white px-6 py-6 shadow-[-12px_12px_4px_0px_rgba(0,0,0,0.25)]'
+  >
+    <div className='flex h-72 flex-col items-start justify-start gap-4 self-stretch'>
+      <div className='inline-flex items-center justify-start gap-2.5'>
+        <div className='relative inline-flex flex-col items-start justify-between overflow-hidden rounded-full bg-black p-1 shadow-[-2px_2px_0px_0px_rgba(0,203,51,1.00)]'>
+          <Icon />
+        </div>
+        <div className="justify-start font-['Roboto'] text-3xl font-semibold leading-9 text-black">
+          {title}
+        </div>
+      </div>
+      <Image src={imageSrc} alt={imageAlt} width={717} height={428} />
+    </div>
+  </div>
+);
+
+const FeatureText: FC<PropsWithChildren> = ({ children }) => (
+  <div
+    style={{
+      gridArea: 'text',
+    }}
+    className='inline-flex flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl bg-white/90 px-4 py-6 shadow-[12px_12px_4px_0px_rgba(0,0,0,0.25)] outline outline-2 outline-offset-[-2px] outline-black'
+  >
+    <p className="justify-start font-['Roboto'] text-2xl font-semibold text-neutral-900">
+      {children}
+    </p>
   </div>
 );
