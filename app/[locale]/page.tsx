@@ -5,15 +5,12 @@ import { Button } from '@/components/ui/button';
 import {
   Calendar,
   Users,
-  Clock,
-  Upload,
-  Download,
-  Globe,
   Clock10,
   LucideProps,
+  FileClock,
+  Globe2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import background from '@/public/images/landing-bg.png';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
 import productExampleRight from '@/public/images/product-example-right.png';
@@ -24,6 +21,7 @@ import {
   PropsWithChildren,
   RefAttributes,
 } from 'react';
+import { cn } from '@/lib/colour-utils';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -127,38 +125,28 @@ export default function LandingPage() {
         id='features-1'
         className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
       >
-        <div
-          style={{
-            gridTemplateAreas: '"image text"',
-            height: 'fit-content',
-          }}
-          className='grid grid-cols-2 gap-6'
-        >
+        <div className='flex flex-row justify-center gap-16'>
           <FeatureFrame
             title='Availability Overview'
             Icon={Clock10}
             imageSrc={productExampleRight}
             imageAlt='availability overview example'
           />
-          <FeatureText>
+          <FeatureText shadowDirection='right'>
             Compare all your friends availabilities in an easy to see and
             exportable calendar.
           </FeatureText>
         </div>
-        <div
-          style={{
-            gridTemplateAreas: '"text image"',
-            height: 'fit-content',
-          }}
-          className='grid grid-cols-2 gap-6'
-        >
+
+        <div className='flex flex-row justify-center gap-16'>
           <FeatureText>
-            Add your friends and let Friend-zone sort out all the hassle with
-            thinking about what timezone they are in.
+            Add your friends and let{' '}
+            <span className='text-sky-600'>Friend-zone</span> sort out all the
+            hassle with thinking about what timezone they are in.
           </FeatureText>
           <FeatureFrame
             title='Friend Management'
-            Icon={Clock10}
+            Icon={Users}
             imageSrc={productExampleRight}
             imageAlt='Friend Management example'
           />
@@ -169,26 +157,27 @@ export default function LandingPage() {
         id='features-2'
         className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
       >
-        <div className='grid grid-cols-2'>
+        <div className='flex flex-row justify-center gap-16'>
           <FeatureFrame
             title='Timezone Support'
-            Icon={Clock10}
+            Icon={Globe2}
             imageSrc={productExampleRight}
             imageAlt='Timezone Support example'
           />
-          <FeatureText>
-            No more asking, “what time is it over there?” Let Friend-zone answer
-            it for you.
+          <FeatureText shadowDirection='right'>
+            No more asking, “what time is it over there?” Let{' '}
+            <span className='text-sky-600'>Friend-zone</span> answer it for you.
           </FeatureText>
         </div>
-        <div className='grid grid-cols-2'>
+
+        <div className='flex flex-row justify-center gap-16'>
           <FeatureText>
             Once your all done, export and share it to all your friends with
             screenshots or iCal files.
           </FeatureText>
           <FeatureFrame
             title='Export to iCal'
-            Icon={Clock10}
+            Icon={FileClock}
             imageSrc={productExampleRight}
             imageAlt='Export to iCal example'
           />
@@ -232,6 +221,7 @@ export interface FeatureFrameProps {
   >;
   imageSrc: StaticImageData;
   imageAlt: string;
+  className?: string;
 }
 
 const FeatureFrame: FC<FeatureFrameProps> = ({
@@ -239,12 +229,13 @@ const FeatureFrame: FC<FeatureFrameProps> = ({
   Icon,
   imageSrc,
   imageAlt,
+  className,
 }) => (
   <div
-    style={{
-      gridArea: 'image',
-    }}
-    className='inline-flex w-[472px] flex-col items-start justify-center gap-3 overflow-hidden rounded-xl bg-white px-6 py-6 shadow-[-12px_12px_4px_0px_rgba(0,0,0,0.25)]'
+    className={cn(
+      'inline-flex w-[472px] flex-col items-start justify-center gap-3 overflow-hidden rounded-xl bg-white px-6 py-6 shadow-[-12px_12px_4px_0px_rgba(0,0,0,0.25)]',
+      className
+    )}
   >
     <div className='flex h-72 flex-col items-start justify-start gap-4 self-stretch'>
       <div className='inline-flex items-center justify-start gap-2.5'>
@@ -260,15 +251,31 @@ const FeatureFrame: FC<FeatureFrameProps> = ({
   </div>
 );
 
-const FeatureText: FC<PropsWithChildren> = ({ children }) => (
-  <div
-    style={{
-      gridArea: 'text',
-    }}
-    className='inline-flex flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl bg-white/90 px-4 py-6 shadow-[12px_12px_4px_0px_rgba(0,0,0,0.25)] outline outline-2 outline-offset-[-2px] outline-black'
-  >
-    <p className="justify-start font-['Roboto'] text-2xl font-semibold text-neutral-900">
-      {children}
-    </p>
-  </div>
-);
+export interface FeatureTextProps extends PropsWithChildren {
+  shadowDirection?: 'left' | 'right';
+  className?: string;
+}
+const FeatureText: FC<FeatureTextProps> = ({
+  shadowDirection = 'left',
+  className,
+  children,
+}) => {
+  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
+  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
+  const shadowClassName =
+    shadowDirection === 'left' ? leftShadowClassName : rightShadowClassName;
+
+  return (
+    <div
+      className={cn(
+        'inline-flex h-fit w-[639px] flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 bg-white/90 px-4 py-6',
+        shadowClassName,
+        className
+      )}
+    >
+      <p className="justify-start font-['Roboto'] text-2xl font-semibold text-neutral-900">
+        {children}
+      </p>
+    </div>
+  );
+};
