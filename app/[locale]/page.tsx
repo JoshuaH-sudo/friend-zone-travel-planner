@@ -75,12 +75,12 @@ export default function LandingPage() {
               <Button
                 id='call-to-action'
                 size='lg'
-                className='gap-2'
+                className='gap-2 bg-white shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
                 style={{
                   borderRadius: '6px',
                   border: '2px solid var(--Border---Dark, #262626)',
-                  background: '#FAFAFA',
-                  boxShadow: '4px 4px 0px 0px #A2FF9E',
+                  // background: '#FAFAFA',
+                  // boxShadow: '4px 4px 0px 0px #A2FF9E',
                 }}
               >
                 <Calendar className='h-5 w-5' />
@@ -220,7 +220,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className='h-24 border-t bg-green-300 py-2'>
+      <footer className='h-24 border-t bg-green-300 py-1'>
         <div className='container mx-auto flex justify-end px-4 text-end align-bottom text-black'>
           <a
             href='https://www.flaticon.com/free-icons/travel'
