@@ -26,6 +26,8 @@ import Path1 from '@/public/images/paths/path-1.svg';
 import Path2 from '@/public/images/paths/path-2.svg';
 import Path3 from '@/public/images/paths/path-3.svg';
 import Path4 from '@/public/images/paths/path-4.svg';
+import MouseIndicator from '@/public/images/mouse-indicator.svg';
+import XIndicator from '@/public/images/x-indicator.svg';
 
 export default function LandingPage() {
   const t = useTranslations();
@@ -79,8 +81,6 @@ export default function LandingPage() {
                 style={{
                   borderRadius: '6px',
                   border: '2px solid var(--Border---Dark, #262626)',
-                  // background: '#FAFAFA',
-                  // boxShadow: '4px 4px 0px 0px #A2FF9E',
                 }}
               >
                 <Calendar className='h-5 w-5' />
@@ -90,8 +90,22 @@ export default function LandingPage() {
           </div>
           <div
             id='start-path-1'
-            className='absolute bottom-[-30px] right-[50%] z-0'
+            className='absolute bottom-[-30px] right-[50%] z-0 flex flex-col justify-center'
           >
+            <div className='absolute right-[-18px] top-[-120px] z-10 flex flex-col items-center justify-center gap-1'>
+              <Image
+                src={MouseIndicator}
+                alt='Mouse Indicator'
+                width={40}
+                height={80}
+              />
+              <Image
+                src={XIndicator}
+                alt='X Indicator'
+                width={40}
+                height={40}
+              />
+            </div>
             <Image src={Path1} alt='path-1' width={62} height={168} />
           </div>
         </div>
