@@ -6,9 +6,9 @@ import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { motion, useScroll } from 'motion/react';
-import productExampleFront from '@/public/images/product-example-front.png';
-import productExampleLeft from '@/public/images/product-example-left.png';
-import productExampleRight from '@/public/images/product-example-right.png';
+import productExampleFirst from '@/public/images/product-example-front.png';
+import productExampleThird from '@/public/images/product-example-left.png';
+import productExampleSecond from '@/public/images/product-example-right.png';
 import availabilityOverviewFeature from '@/public/images/features/availability-overview-feature.png';
 import friendManagementFeature from '@/public/images/features/friend-management-feature.png';
 import timezoneFeature from '@/public/images/features/timezone-feature.png';
@@ -121,35 +121,48 @@ export default function LandingPage() {
 
         <div id='example-photos' className='self-end'>
           <div className='relative' style={{ width: '717px', height: '428px' }}>
-            <Image
-              src={productExampleFront}
-              alt='first-example'
-              width={717}
-              height={428}
-              className='absolute bottom-0 z-10 rounded-md outline outline-4 outline-white'
-            />
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className='absolute bottom-0 z-10'
+            >
+              <Image
+                src={productExampleFirst}
+                alt='first-example'
+                width={717}
+                height={428}
+                className='rounded-md outline outline-4 outline-white'
+              />
+            </motion.div>
 
-            <Image
-              src={productExampleRight}
-              alt='second-example'
-              width={596}
-              height={367}
-              className='absolute bottom-0 left-[-100] z-[1]'
-              style={{
-                transform: 'rotate(-4.317deg)',
-              }}
-            />
+            <motion.div
+              initial={{ rotate: 0, x: -50, opacity: 0 }}
+              animate={{ rotate: -4.317, x: -100, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
+              className='absolute bottom-0 z-[1]'
+            >
+              <Image
+                src={productExampleSecond}
+                alt='second-example'
+                width={596}
+                height={367}
+              />
+            </motion.div>
 
-            <Image
-              src={productExampleLeft}
-              alt='third-example'
-              width={782}
-              height={551}
-              className='absolute bottom-0 left-[-180] z-[0]'
-              style={{
-                transform: 'rotate(-6.962deg)',
-              }}
-            />
+            <motion.div
+              initial={{ rotate: 0, x: -50, opacity: 0 }}
+              animate={{ rotate: -6.962, x: -180, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.7 }}
+              className='absolute bottom-0 z-[0]'
+            >
+              <Image
+                src={productExampleThird}
+                alt='third-example'
+                width={782}
+                height={551}
+              />
+            </motion.div>
           </div>
         </div>
       </section>
