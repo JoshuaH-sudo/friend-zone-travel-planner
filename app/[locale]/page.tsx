@@ -2,132 +2,249 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Calendar, Users, Clock, Upload, Download, Globe } from 'lucide-react';
+import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import productExampleFront from '@/public/images/product-example-front.png';
+import productExampleLeft from '@/public/images/product-example-left.png';
+import productExampleRight from '@/public/images/product-example-right.png';
+import availabilityOverviewFeature from '@/public/images/features/availability-overview-feature.png';
+import friendManagementFeature from '@/public/images/features/friend-management-feature.png';
+import timezoneFeature from '@/public/images/features/timezone-feature.png';
+import exportCalendarFeature from '@/public/images/features/export-calendar-feature.png';
+import path1 from '@/public/images/paths/path-1.svg';
+import path2 from '@/public/images/paths/path-2.svg';
+import path3 from '@/public/images/paths/path-3.svg';
+import path4 from '@/public/images/paths/path-4.svg';
+import mouseIndicator from '@/public/images/mouse-indicator.svg';
+import xIndicator from '@/public/images/x-indicator.svg';
+import WordFrame from './components/WordFrame';
+import FeatureFrame from './components/FeatureFrame';
+import FeatureText from './components/FeatureText';
+import Footer from './components/Footer';
 
 export default function LandingPage() {
-  const t = useTranslations();
+  const t = useTranslations('landing');
 
   return (
-    <div className='flex min-h-screen flex-col'>
-      <main>
-        <section className='px-4 py-20'>
-          <div className='container mx-auto max-w-5xl text-center'>
-            <h1 className='mb-6 text-4xl font-bold md:text-6xl'>
-              {t('landing.title')}{' '}
-              <span className='text-primary'>
-                {t('landing.titleHighlight')}
-              </span>
+    <main
+      className='pt-20'
+      style={{
+        background:
+          'linear-gradient(180deg, #0084FF 0%, #C5F1FF 50%, #D5C5FF 100%), white',
+      }}
+    >
+      <section
+        id='intro'
+        className='flex h-screen flex-row justify-between px-10 pt-10'
+      >
+        <div id='text' className='relative px-4 py-12'>
+          <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
+            <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
+              <div className='flex items-center justify-center gap-3'>
+                <WordFrame>Separated</WordFrame>
+                <WordFrame>By</WordFrame>
+                <WordFrame>Borders</WordFrame>
+              </div>
+              <div
+                className='h-20 justify-start self-stretch whitespace-nowrap text-center'
+                style={{
+                  WebkitTextStrokeWidth: '3px',
+                  WebkitTextStrokeColor: '#30002B',
+                  paintOrder: 'stroke fill',
+                  fontWeight: '800',
+                }}
+              >
+                <span className='font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
+                  {t('connectedBy')}
+                </span>
+                <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
+                  {t('friendZone')}
+                </span>
+              </div>
             </h1>
-            <p className='mx-auto mb-10 max-w-3xl text-xl text-muted-foreground'>
-              {t('landing.subtitle')}
+            <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
+              {t('description')}
             </p>
             <Link href='/planner'>
-              <Button size='lg' className='gap-2'>
+              <Button
+                id='call-to-action'
+                size='lg'
+                className='gap-2 bg-white text-black shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
+                style={{
+                  borderRadius: '6px',
+                  border: '2px solid var(--Border---Dark, #262626)',
+                }}
+              >
                 <Calendar className='h-5 w-5' />
-                {t('landing.startPlanning')}
+                {t('startPlanning')}
               </Button>
             </Link>
           </div>
-        </section>
-
-        <section className='bg-muted/30 py-16'>
-          <div className='container mx-auto px-4'>
-            <h2 className='mb-12 text-center text-3xl font-bold'>
-              {t('landing.features')}
-            </h2>
-
-            <div className='grid gap-8 md:grid-cols-3'>
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Users className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureManagement.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureManagement.description')}
-                </p>
-              </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Globe className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureTimezone.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureTimezone.description')}
-                </p>
-              </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Clock className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureOverview.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureOverview.description')}
-                </p>
-              </div>
-            </div>
-
-            <div className='mt-8 grid gap-8 md:grid-cols-2'>
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Download className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureImport.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureImport.description')}
-                </p>
-              </div>
-
-              <div className='flex flex-col items-center rounded-lg bg-card p-6 text-center shadow-sm'>
-                <div className='mb-4 rounded-full bg-primary/10 p-3'>
-                  <Upload className='h-8 w-8 text-primary' />
-                </div>
-                <h3 className='mb-2 text-xl font-medium'>
-                  {t('landing.featureExport.title')}
-                </h3>
-                <p className='text-muted-foreground'>
-                  {t('landing.featureExport.description')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className='px-4 py-20 text-center'>
-          <div className='container mx-auto max-w-3xl'>
-            <h2 className='mb-6 text-3xl font-bold'>
-              {t('landing.readyToStart')}
-            </h2>
-            <p className='mb-8 text-xl text-muted-foreground'>
-              {t('landing.readyDescription')}
-            </p>
-            <Link href='/planner'>
-              <Button size='lg'>{t('landing.goToPlanner')}</Button>
-            </Link>
-          </div>
-        </section>
-      </main>
-
-      <footer className='border-t bg-muted/30 py-8'>
-        <div className='container mx-auto px-4 text-center text-muted-foreground'>
-          <a
-            href='https://www.flaticon.com/free-icons/travel'
-            title='travel icons'
+          <div
+            id='start-path-1'
+            className='absolute bottom-[-30px] right-[50%] z-0 flex flex-col justify-center'
           >
-            Travel icons created by Freepik - Flaticon
-          </a>
+            <div className='absolute right-[-18px] top-[-120px] z-10 flex flex-col items-center justify-center gap-1'>
+              <Image
+                src={mouseIndicator}
+                alt='Mouse Indicator'
+                width={40}
+                height={80}
+              />
+              <Image
+                src={xIndicator}
+                alt='X Indicator'
+                width={40}
+                height={40}
+              />
+            </div>
+            <Image src={path1} alt='path-1' width={62} height={168} />
+          </div>
         </div>
-      </footer>
-    </div>
+
+        <div id='example-photos' className='self-end'>
+          <div className='relative' style={{ width: '717px', height: '428px' }}>
+            <Image
+              src={productExampleFront}
+              alt='first-example'
+              width={717}
+              height={428}
+              className='absolute bottom-0 z-10 rounded-md outline outline-4 outline-white'
+            />
+
+            <Image
+              src={productExampleRight}
+              alt='second-example'
+              width={596}
+              height={367}
+              className='absolute bottom-0 left-[-100] z-[1]'
+              style={{
+                transform: 'rotate(-4.317deg)',
+              }}
+            />
+
+            <Image
+              src={productExampleLeft}
+              alt='third-example'
+              width={782}
+              height={551}
+              className='absolute bottom-0 left-[-180] z-[0]'
+              style={{
+                transform: 'rotate(-6.962deg)',
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        id='features-1'
+        className='flex h-screen flex-col justify-center gap-6 px-32'
+      >
+        <div className='flex flex-row justify-center gap-16'>
+          <div className='relative'>
+            <FeatureFrame
+              title={t('feature.availabilityOverview.title')}
+              Icon={Clock10}
+              imageSrc={availabilityOverviewFeature}
+              imageAlt='availability overview example'
+            />
+            <div
+              id='path-2'
+              className='absolute bottom-[-15px] right-[-450px] z-0'
+            >
+              <Image src={path2} alt='path-2' width={443.5} height={200} />
+            </div>
+          </div>
+          <FeatureText shadowDirection='right'>
+            {t('feature.availabilityOverview.description')}
+          </FeatureText>
+        </div>
+
+        <div className='flex flex-row justify-center gap-16'>
+          <FeatureText>{t('feature.friendManagement.description')}</FeatureText>
+          <div className='relative'>
+            <FeatureFrame
+              title={t('feature.friendManagement.title')}
+              Icon={Users}
+              imageSrc={friendManagementFeature}
+              imageAlt='Friend Management example'
+              shadowDirection='right'
+            />
+            <div
+              id='path-3'
+              className='absolute bottom-[-150px] left-[-580px] z-0'
+            >
+              <Image src={path3} alt='path-3' width={573.5} height={278.08} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id='features-2'
+        className='flex h-screen flex-col justify-center gap-6 px-32 pt-20'
+      >
+        <div className='flex flex-row justify-center gap-16'>
+          <div className='relative'>
+            <FeatureFrame
+              title={t('feature.timezoneSupport.title')}
+              Icon={Globe2}
+              imageSrc={timezoneFeature}
+              imageAlt='Timezone Support example'
+            />
+            <div
+              id='path-4'
+              className='absolute bottom-[-10px] right-[-450px] z-0'
+            >
+              <Image src={path4} alt='path-4' width={443.5} height={165.37} />
+            </div>
+          </div>
+          <FeatureText shadowDirection='right'>
+            {t('feature.timezoneSupport.description')}
+          </FeatureText>
+        </div>
+
+        <div className='flex flex-row justify-center gap-16'>
+          <FeatureText>{t('feature.calendarExport.description')}</FeatureText>
+          <FeatureFrame
+            title={t('feature.calendarExport.title')}
+            Icon={FileClock}
+            imageSrc={exportCalendarFeature}
+            imageAlt='Export Calendar example'
+            shadowDirection='right'
+          />
+        </div>
+      </section>
+
+      <section
+        id='last-call-to-action'
+        className='flex h-96 flex-col items-center justify-center gap-6 px-32'
+      >
+        <h2 className=" font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+          So, what you waiting for?
+        </h2>
+        <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+          Lets plan that trip!
+        </h2>
+        <Link href='/planner'>
+          <Button
+            id='call-to-action'
+            size='lg'
+            className='gap-2 bg-white text-black shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
+            style={{
+              borderRadius: '6px',
+              border: '2px solid var(--Border---Dark, #262626)',
+            }}
+          >
+            <Calendar className='h-5 w-5' />
+            {t('startPlanning')}
+          </Button>
+        </Link>
+      </section>
+
+      <Footer />
+    </main>
   );
 }

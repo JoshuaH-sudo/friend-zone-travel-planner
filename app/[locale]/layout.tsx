@@ -6,7 +6,8 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
-import { Header } from '@/components/header/header';
+import { Header } from '@/app/[locale]/components/header/header';
+import { Geist, Roboto } from 'next/font/google';
 
 export const metadata = {
   title: 'Friend Zoned Travel Planner',
@@ -16,6 +17,11 @@ export const metadata = {
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+const roboto = Roboto({
+  weight: '600',
+  subsets: ['latin'],
+});
 
 export default async function RootLayout({
   children,
@@ -29,7 +35,7 @@ export default async function RootLayout({
     notFound();
   }
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning className={roboto.className}>
       <body>
         <ThemeProvider
           attribute='class'
