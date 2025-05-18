@@ -121,7 +121,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className='self-end'>
+        <div className='self-end flex justify-center flex-col items-center gap-4'>
           <FeatureShortcuts />
           <div
             id='example-photos'
@@ -308,7 +308,7 @@ const FeatureShortcuts = () => {
   const [activeTab, setActiveTab] = useState('availabilityOverview');
 
   return (
-    <div className='flex flex-row gap-4 mb-4'>
+    <div className='flex flex-row gap-4'>
       {features.map((feature) => (
         <div
           key={feature.name}
@@ -318,7 +318,7 @@ const FeatureShortcuts = () => {
           <div
             data-hover='false'
             className={cn(
-              'relative z-10 inline-flex h-20 w-20 flex-col items-center justify-center gap-2.5 rounded-xl p-1 transition-opacity',
+              'relative z-10 inline-flex h-20 w-20 flex-col items-center justify-center gap-2.5 rounded-xl p-1 transition-all hover:opacity-100',
               activeTab !== feature.name && 'opacity-50'
             )}
           >
@@ -334,7 +334,7 @@ const FeatureShortcuts = () => {
             <motion.div
               layoutId='selectedFeature'
               transition={{ type: 'spring', bounce: 0.3, duration: 0.6 }}
-              className='absolute left-0 top-0 z-[1] h-20 w-20 rounded-xl bg-gray-200'
+              className='absolute left-0 top-0 z-[1] h-20 w-20 rounded-xl bg-white'
             />
           )}
         </div>
