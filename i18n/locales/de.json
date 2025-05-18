@@ -15,6 +15,15 @@
       "addFriend": "Freund hinzufügen"
     }
   },
+  "landing": {
+    "separated": "Getrennt",
+    "by": "durch",
+    "borders": "Grenzen",
+    "connectedBy": "Verbunden-durch",
+    "friendZone": "FriendZone",
+    "description": "Planen, organisieren und treffen Sie sich mühelos mit Freunden - egal wo sie sind.",
+    "startPlanning": "Planung starten"
+  },
   "navigation": {
     "home": "Startseite",
     "calendars": "Freund-Kalender",
@@ -176,36 +185,6 @@
     "actions": {
       "saveState": "Status speichern",
       "restoreState": "Status wiederherstellen"
-    }
-  },
-  "landing": {
-    "title": "Planen Sie Veranstaltungen mit Freunden",
-    "titleHighlight": "Mühelos",
-    "subtitle": "Koordinieren Sie Zeitpläne über verschiedene Zeitzonen hinweg und finden Sie den perfekten Tag für Ihr nächstes Treffen, Meeting oder Event.",
-    "startPlanning": "Jetzt planen",
-    "features": "Hauptmerkmale",
-    "readyToStart": "Bereit, loszulegen?",
-    "readyDescription": "Planen Sie Ihr nächstes Event mit Freunden in Minuten, nicht Stunden.",
-    "goToPlanner": "Zum Planer gehen",
-    "featureManagement": {
-      "title": "Freundeverwaltung",
-      "description": "Fügen Sie Freunde hinzu, weisen Sie Farben zu und verfolgen Sie die Verfügbarkeit aller an einem Ort."
-    },
-    "featureTimezone": {
-      "title": "Zeitzonenunterstützung",
-      "description": "Koordinieren Sie über verschiedene Zeitzonen hinweg mit integrierter Zeitzonenauswahl für jeden Freund."
-    },
-    "featureOverview": {
-      "title": "Verfügbarkeitsübersicht",
-      "description": "Sehen Sie auf einen Blick, welche Tage für alle am besten passen, mit unserer visuellen Verfügbarkeitsübersicht."
-    },
-    "featureImport": {
-      "title": "Kalender importieren",
-      "description": "Importieren Sie bestehende Kalender aus iCal-Dateien, um die Verfügbarkeit schnell einzurichten."
-    },
-    "featureExport": {
-      "title": "Export nach iCal",
-      "description": "Exportieren Sie einzelne oder kombinierte Kalender, um sie in Ihrer bevorzugten Kalender-App zu verwenden."
     }
   }
 }

@@ -30,7 +30,7 @@ import MouseIndicator from '@/public/images/mouse-indicator.svg';
 import XIndicator from '@/public/images/x-indicator.svg';
 
 export default function LandingPage() {
-  const t = useTranslations();
+  const t = useTranslations('landing');
 
   return (
     <main
@@ -62,16 +62,15 @@ export default function LandingPage() {
                 }}
               >
                 <span className='font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
-                  connected-by-
+                {t('connectedBy')}
                 </span>
                 <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
-                  Friend-zone
+                {t('friendZone')}
                 </span>
               </div>
             </h1>
             <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
-              Plan, organize and meet with friends effortlessly - no matter
-              where they are.
+              {t('description')}
             </p>
             <Link href='/planner'>
               <Button
@@ -84,7 +83,7 @@ export default function LandingPage() {
                 }}
               >
                 <Calendar className='h-5 w-5' />
-                {t('landing.startPlanning')}
+                {t('startPlanning')}
               </Button>
             </Link>
           </div>
