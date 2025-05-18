@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import productExampleFront from '@/public/images/product-example-front.png';
-import productExampleLeft from '@/public/images/product-example-left.png';
-import productExampleRight from '@/public/images/product-example-right.png';
+import { motion, useScroll } from 'motion/react';
+import productExampleFirst from '@/public/images/product-example-front.png';
+import productExampleThird from '@/public/images/product-example-left.png';
+import productExampleSecond from '@/public/images/product-example-right.png';
 import availabilityOverviewFeature from '@/public/images/features/availability-overview-feature.png';
 import friendManagementFeature from '@/public/images/features/friend-management-feature.png';
 import timezoneFeature from '@/public/images/features/timezone-feature.png';
@@ -25,6 +26,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
+  const { scrollYProgress } = useScroll();
 
   return (
     <main
@@ -34,6 +36,20 @@ export default function LandingPage() {
           'linear-gradient(180deg, #0084FF 0%, #C5F1FF 50%, #D5C5FF 100%), white',
       }}
     >
+      <motion.div
+        id='scroll-indicator'
+        style={{
+          scaleX: scrollYProgress,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 5,
+          originX: 0,
+          zIndex: 100,
+          backgroundColor: '#a2ff9e',
+        }}
+      />
       <section
         id='intro'
         className='flex h-screen flex-row justify-between px-10 pt-10'
@@ -105,35 +121,48 @@ export default function LandingPage() {
 
         <div id='example-photos' className='self-end'>
           <div className='relative' style={{ width: '717px', height: '428px' }}>
-            <Image
-              src={productExampleFront}
-              alt='first-example'
-              width={717}
-              height={428}
-              className='absolute bottom-0 z-10 rounded-md outline outline-4 outline-white'
-            />
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className='absolute bottom-0 z-10'
+            >
+              <Image
+                src={productExampleFirst}
+                alt='first-example'
+                width={717}
+                height={428}
+                className='rounded-md outline outline-4 outline-white'
+              />
+            </motion.div>
 
-            <Image
-              src={productExampleRight}
-              alt='second-example'
-              width={596}
-              height={367}
-              className='absolute bottom-0 left-[-100] z-[1]'
-              style={{
-                transform: 'rotate(-4.317deg)',
-              }}
-            />
+            <motion.div
+              initial={{ rotate: 0, x: -50, opacity: 0 }}
+              animate={{ rotate: -4.317, x: -100, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
+              className='absolute bottom-0 z-[1]'
+            >
+              <Image
+                src={productExampleSecond}
+                alt='second-example'
+                width={596}
+                height={367}
+              />
+            </motion.div>
 
-            <Image
-              src={productExampleLeft}
-              alt='third-example'
-              width={782}
-              height={551}
-              className='absolute bottom-0 left-[-180] z-[0]'
-              style={{
-                transform: 'rotate(-6.962deg)',
-              }}
-            />
+            <motion.div
+              initial={{ rotate: 0, x: -50, opacity: 0 }}
+              animate={{ rotate: -6.962, x: -180, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.7 }}
+              className='absolute bottom-0 z-[0]'
+            >
+              <Image
+                src={productExampleThird}
+                alt='third-example'
+                width={782}
+                height={551}
+              />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -222,7 +251,7 @@ export default function LandingPage() {
         id='last-call-to-action'
         className='flex h-96 flex-col items-center justify-center gap-6 px-32'
       >
-        <h2 className=" font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+        <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
           So, what you waiting for?
         </h2>
         <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
