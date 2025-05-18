@@ -4,16 +4,20 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
 import productExampleRight from '@/public/images/product-example-right.png';
-import Image from 'next/image';
-import Path1 from '@/public/images/paths/path-1.svg';
-import Path2 from '@/public/images/paths/path-2.svg';
-import Path3 from '@/public/images/paths/path-3.svg';
-import Path4 from '@/public/images/paths/path-4.svg';
-import MouseIndicator from '@/public/images/mouse-indicator.svg';
-import XIndicator from '@/public/images/x-indicator.svg';
+import availabilityOverviewFeature from '@/public/images/features/availability-overview-feature.png';
+import friendManagementFeature from '@/public/images/features/friend-management-feature.png';
+import timezoneFeature from '@/public/images/features/timezone-feature.png';
+import exportCalendarFeature from '@/public/images/features/export-calendar-feature.png';
+import path1 from '@/public/images/paths/path-1.svg';
+import path2 from '@/public/images/paths/path-2.svg';
+import path3 from '@/public/images/paths/path-3.svg';
+import path4 from '@/public/images/paths/path-4.svg';
+import mouseIndicator from '@/public/images/mouse-indicator.svg';
+import xIndicator from '@/public/images/x-indicator.svg';
 import WordFrame from './components/WordFrame';
 import FeatureFrame from './components/FeatureFrame';
 import FeatureText from './components/FeatureText';
@@ -83,19 +87,19 @@ export default function LandingPage() {
           >
             <div className='absolute right-[-18px] top-[-120px] z-10 flex flex-col items-center justify-center gap-1'>
               <Image
-                src={MouseIndicator}
+                src={mouseIndicator}
                 alt='Mouse Indicator'
                 width={40}
                 height={80}
               />
               <Image
-                src={XIndicator}
+                src={xIndicator}
                 alt='X Indicator'
                 width={40}
                 height={40}
               />
             </div>
-            <Image src={Path1} alt='path-1' width={62} height={168} />
+            <Image src={path1} alt='path-1' width={62} height={168} />
           </div>
         </div>
 
@@ -111,7 +115,7 @@ export default function LandingPage() {
 
             <Image
               src={productExampleRight}
-              alt='first-example'
+              alt='second-example'
               width={596}
               height={367}
               className='absolute bottom-0 left-[-100] z-[1]'
@@ -122,7 +126,7 @@ export default function LandingPage() {
 
             <Image
               src={productExampleLeft}
-              alt='first-example'
+              alt='third-example'
               width={782}
               height={551}
               className='absolute bottom-0 left-[-180] z-[0]'
@@ -143,14 +147,14 @@ export default function LandingPage() {
             <FeatureFrame
               title={t('feature.availabilityOverview.title')}
               Icon={Clock10}
-              imageSrc={productExampleRight}
+              imageSrc={availabilityOverviewFeature}
               imageAlt='availability overview example'
             />
             <div
               id='path-2'
               className='absolute bottom-[-15px] right-[-450px] z-0'
             >
-              <Image src={Path2} alt='path-2' width={443.5} height={200} />
+              <Image src={path2} alt='path-2' width={443.5} height={200} />
             </div>
           </div>
           <FeatureText shadowDirection='right'>
@@ -164,7 +168,7 @@ export default function LandingPage() {
             <FeatureFrame
               title={t('feature.friendManagement.title')}
               Icon={Users}
-              imageSrc={productExampleRight}
+              imageSrc={friendManagementFeature}
               imageAlt='Friend Management example'
               shadowDirection='right'
             />
@@ -172,7 +176,7 @@ export default function LandingPage() {
               id='path-3'
               className='absolute bottom-[-150px] left-[-580px] z-0'
             >
-              <Image src={Path3} alt='path-3' width={573.5} height={278.08} />
+              <Image src={path3} alt='path-3' width={573.5} height={278.08} />
             </div>
           </div>
         </div>
@@ -187,14 +191,14 @@ export default function LandingPage() {
             <FeatureFrame
               title={t('feature.timezoneSupport.title')}
               Icon={Globe2}
-              imageSrc={productExampleRight}
+              imageSrc={timezoneFeature}
               imageAlt='Timezone Support example'
             />
             <div
               id='path-4'
               className='absolute bottom-[-10px] right-[-450px] z-0'
             >
-              <Image src={Path4} alt='path-4' width={443.5} height={165.37} />
+              <Image src={path4} alt='path-4' width={443.5} height={165.37} />
             </div>
           </div>
           <FeatureText shadowDirection='right'>
@@ -207,7 +211,7 @@ export default function LandingPage() {
           <FeatureFrame
             title={t('feature.calendarExport.title')}
             Icon={FileClock}
-            imageSrc={productExampleRight}
+            imageSrc={exportCalendarFeature}
             imageAlt='Export Calendar example'
             shadowDirection='right'
           />
