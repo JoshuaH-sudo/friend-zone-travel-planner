@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { motion, useScroll } from 'motion/react';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
 import productExampleRight from '@/public/images/product-example-right.png';
@@ -25,6 +26,7 @@ import Footer from './components/Footer';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
+  const { scrollYProgress } = useScroll();
 
   return (
     <main
@@ -34,6 +36,20 @@ export default function LandingPage() {
           'linear-gradient(180deg, #0084FF 0%, #C5F1FF 50%, #D5C5FF 100%), white',
       }}
     >
+      <motion.div
+        id='scroll-indicator'
+        style={{
+          scaleX: scrollYProgress,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 5,
+          originX: 0,
+          zIndex: 100,
+          backgroundColor: '#a2ff9e',
+        }}
+      />
       <section
         id='intro'
         className='flex h-screen flex-row justify-between px-10 pt-10'
@@ -222,7 +238,7 @@ export default function LandingPage() {
         id='last-call-to-action'
         className='flex h-96 flex-col items-center justify-center gap-6 px-32'
       >
-        <h2 className=" font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+        <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
           So, what you waiting for?
         </h2>
         <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
