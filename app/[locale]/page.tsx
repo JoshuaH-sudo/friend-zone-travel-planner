@@ -70,7 +70,7 @@ export default function LandingPage() {
               </div>
             </h1>
             <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
-              Plan, organise and meet with friends effortlessly - no matter
+              Plan, organize and meet with friends effortlessly - no matter
               where they are.
             </p>
             <Link href='/planner'>
