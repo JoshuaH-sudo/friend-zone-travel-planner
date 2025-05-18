@@ -218,6 +218,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section
+        id='last-call-to-action'
+        className='flex h-96 flex-col items-center justify-center gap-6 px-32'
+      >
+        <h2 className=" font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+          So, what you waiting for?
+        </h2>
+        <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
+          Lets plan that trip!
+        </h2>
+        <Link href='/planner'>
+          <Button
+            id='call-to-action'
+            size='lg'
+            className='gap-2 bg-white text-black shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
+            style={{
+              borderRadius: '6px',
+              border: '2px solid var(--Border---Dark, #262626)',
+            }}
+          >
+            <Calendar className='h-5 w-5' />
+            {t('startPlanning')}
+          </Button>
+        </Link>
+      </section>
+
       <Footer />
     </main>
   );
