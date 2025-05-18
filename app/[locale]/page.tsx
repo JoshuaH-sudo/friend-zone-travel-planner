@@ -6,7 +6,6 @@ import {
   Calendar,
   Users,
   Clock10,
-  LucideProps,
   FileClock,
   Globe2,
 } from 'lucide-react';
@@ -14,20 +13,16 @@ import { useTranslations } from 'next-intl';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
 import productExampleRight from '@/public/images/product-example-right.png';
-import Image, { StaticImageData } from 'next/image';
-import {
-  FC,
-  ForwardRefExoticComponent,
-  PropsWithChildren,
-  RefAttributes,
-} from 'react';
-import { cn } from '@/lib/colour-utils';
+import Image from 'next/image';
 import Path1 from '@/public/images/paths/path-1.svg';
 import Path2 from '@/public/images/paths/path-2.svg';
 import Path3 from '@/public/images/paths/path-3.svg';
 import Path4 from '@/public/images/paths/path-4.svg';
 import MouseIndicator from '@/public/images/mouse-indicator.svg';
 import XIndicator from '@/public/images/x-indicator.svg';
+import { WordFrame } from './components/WordFrame';
+import { FeatureFrame } from './components/FeatureFrame';
+import { FeatureText } from './components/FeatureText';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
@@ -246,94 +241,3 @@ export default function LandingPage() {
     </main>
   );
 }
-
-const WordFrame: FC<PropsWithChildren> = ({ children }) => (
-  <div className='inline-flex items-center justify-center gap-2.5 rounded-xl p-3 outline-dashed outline-[3px] outline-offset-[-3px] outline-pink-950'>
-    <div
-      className="justify-start text-center font-['Roboto'] text-6xl font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]"
-      style={{
-        WebkitTextStrokeWidth: '3px',
-        WebkitTextStrokeColor: '#30002B',
-        paintOrder: 'stroke fill',
-        fontWeight: '800',
-      }}
-    >
-      {children}
-    </div>
-  </div>
-);
-
-export interface FeatureFrameProps {
-  title: string;
-  Icon: ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & RefAttributes<SVGSVGElement>
-  >;
-  imageSrc: StaticImageData;
-  imageAlt: string;
-  shadowDirection?: 'left' | 'right';
-  className?: string;
-}
-
-export const FeatureFrame: FC<FeatureFrameProps> = ({
-  title,
-  Icon,
-  imageSrc,
-  imageAlt,
-  shadowDirection = 'left',
-  className,
-}) => {
-  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const shadowClassName =
-    shadowDirection === 'left' ? leftShadowClassName : rightShadowClassName;
-  return (
-    <div
-      className={cn(
-        'inline-flex w-[472px] flex-col items-start justify-center gap-3 overflow-hidden rounded-xl bg-white px-6 py-8',
-        shadowClassName,
-        className
-      )}
-    >
-      <div className='flex h-72 flex-col items-start justify-start gap-4 self-stretch'>
-        <div className='inline-flex items-center justify-start gap-2.5'>
-          <div className='relative inline-flex flex-col items-start justify-between overflow-hidden rounded-full bg-black p-1 shadow-[-2px_2px_0px_0px_rgba(0,203,51,1.00)]'>
-            <Icon />
-          </div>
-          <div className="justify-start font-['Roboto'] text-3xl font-semibold leading-9 text-black">
-            {title}
-          </div>
-        </div>
-        <Image src={imageSrc} alt={imageAlt} width={717} height={428} />
-      </div>
-    </div>
-  );
-};
-
-export interface FeatureTextProps extends PropsWithChildren {
-  shadowDirection?: 'left' | 'right';
-  className?: string;
-}
-export const FeatureText: FC<FeatureTextProps> = ({
-  shadowDirection = 'left',
-  className,
-  children,
-}) => {
-  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const shadowClassName =
-    shadowDirection === 'left' ? leftShadowClassName : rightShadowClassName;
-
-  return (
-    <div
-      className={cn(
-        'inline-flex h-fit w-[639px] flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 bg-white/90 px-4 py-6',
-        shadowClassName,
-        className
-      )}
-    >
-      <p className="justify-start font-['Roboto'] text-2xl font-semibold text-neutral-900">
-        {children}
-      </p>
-    </div>
-  );
-};
