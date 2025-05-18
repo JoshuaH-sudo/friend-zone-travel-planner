@@ -6,7 +6,7 @@ export interface FeatureTextProps extends PropsWithChildren {
   className?: string;
 }
 
-export const FeatureText: FC<FeatureTextProps> = ({
+const FeatureText: FC<FeatureTextProps> = ({
   shadowDirection = 'left',
   className,
   children,
@@ -19,7 +19,7 @@ export const FeatureText: FC<FeatureTextProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex h-fit w-[639px] flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 bg-white/90 px-4 py-6',
+        'inline-flex h-fit w-[639px] flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 border-black bg-white/90 px-4 py-6',
         shadowClassName,
         className
       )}
@@ -30,3 +30,5 @@ export const FeatureText: FC<FeatureTextProps> = ({
     </div>
   );
 };
+
+export default FeatureText;

@@ -14,9 +14,10 @@ import Path3 from '@/public/images/paths/path-3.svg';
 import Path4 from '@/public/images/paths/path-4.svg';
 import MouseIndicator from '@/public/images/mouse-indicator.svg';
 import XIndicator from '@/public/images/x-indicator.svg';
-import { WordFrame } from './components/WordFrame';
-import { FeatureFrame } from './components/FeatureFrame';
-import { FeatureText } from './components/FeatureText';
+import WordFrame from './components/WordFrame';
+import FeatureFrame from './components/FeatureFrame';
+import FeatureText from './components/FeatureText';
+import Footer from './components/Footer';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
@@ -65,7 +66,7 @@ export default function LandingPage() {
               <Button
                 id='call-to-action'
                 size='lg'
-                className='gap-2 bg-white shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
+                className='gap-2 bg-white text-black shadow-[4px_4px_0px_0px_rgba(162,255,158,1.00)] transition-all hover:bg-slate-100 hover:shadow-[8px_8px_0px_0px_rgba(162,255,158,1.00)] focus:translate-x-1 focus:translate-y-1 focus:shadow-none'
                 style={{
                   borderRadius: '6px',
                   border: '2px solid var(--Border---Dark, #262626)',
@@ -213,16 +214,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className='h-24 border-t bg-green-300 py-1'>
-        <div className='container mx-auto flex justify-end px-4 text-end align-bottom text-black'>
-          <a
-            href='https://www.flaticon.com/free-icons/travel'
-            title='travel icons'
-          >
-            Travel icons created by Freepik - Flaticon
-          </a>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
