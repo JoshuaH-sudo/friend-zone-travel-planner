@@ -48,6 +48,7 @@ const FeatureFrame: FC<FeatureFrameProps> = ({
           alt={imageAlt}
           width={717}
           height={428}
+          objectFit='fit'
           className='rounded-xl'
         />
       </div>
