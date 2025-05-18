@@ -2,13 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import {
-  Calendar,
-  Users,
-  Clock10,
-  FileClock,
-  Globe2,
-} from 'lucide-react';
+import { Calendar, Users, Clock10, FileClock, Globe2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import productExampleFront from '@/public/images/product-example-front.png';
 import productExampleLeft from '@/public/images/product-example-left.png';
@@ -57,10 +51,10 @@ export default function LandingPage() {
                 }}
               >
                 <span className='font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
-                {t('connectedBy')}
+                  {t('connectedBy')}
                 </span>
                 <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
-                {t('friendZone')}
+                  {t('friendZone')}
                 </span>
               </div>
             </h1>
@@ -146,7 +140,7 @@ export default function LandingPage() {
         <div className='flex flex-row justify-center gap-16'>
           <div className='relative'>
             <FeatureFrame
-              title='Availability Overview'
+              title={t('feature.availabilityOverview.title')}
               Icon={Clock10}
               imageSrc={productExampleRight}
               imageAlt='availability overview example'
@@ -159,20 +153,15 @@ export default function LandingPage() {
             </div>
           </div>
           <FeatureText shadowDirection='right'>
-            Compare all your friends availabilities in an easy to see and
-            exportable calendar.
+            {t('feature.availabilityOverview.description')}
           </FeatureText>
         </div>
 
         <div className='flex flex-row justify-center gap-16'>
-          <FeatureText>
-            Add your friends and let{' '}
-            <span className='text-sky-600'>Friend-zone</span> sort out all the
-            hassle with thinking about what timezone they are in.
-          </FeatureText>
+          <FeatureText>{t('feature.friendManagement.description')}</FeatureText>
           <div className='relative'>
             <FeatureFrame
-              title='Friend Management'
+              title={t('feature.friendManagement.title')}
               Icon={Users}
               imageSrc={productExampleRight}
               imageAlt='Friend Management example'
@@ -195,7 +184,7 @@ export default function LandingPage() {
         <div className='flex flex-row justify-center gap-16'>
           <div className='relative'>
             <FeatureFrame
-              title='Timezone Support'
+              title={t('feature.timezoneSupport.title')}
               Icon={Globe2}
               imageSrc={productExampleRight}
               imageAlt='Timezone Support example'
@@ -208,21 +197,17 @@ export default function LandingPage() {
             </div>
           </div>
           <FeatureText shadowDirection='right'>
-            No more asking, “what time is it over there?” Let{' '}
-            <span className='text-sky-600'>Friend-zone</span> answer it for you.
+            {t('feature.timezoneSupport.description')}
           </FeatureText>
         </div>
 
         <div className='flex flex-row justify-center gap-16'>
-          <FeatureText>
-            Once your all done, export and share it to all your friends with
-            screenshots or iCal files.
-          </FeatureText>
+          <FeatureText>{t('feature.calendarExport.description')}</FeatureText>
           <FeatureFrame
-            title='Export to iCal'
+            title={t('feature.calendarExport.title')}
             Icon={FileClock}
             imageSrc={productExampleRight}
-            imageAlt='Export to iCal example'
+            imageAlt='Export Calendar example'
             shadowDirection='right'
           />
         </div>

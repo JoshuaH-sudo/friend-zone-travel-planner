@@ -22,7 +22,25 @@
     "connectedBy": "Verbunden-durch",
     "friendZone": "FriendZone",
     "description": "Planen, organisieren und treffen Sie sich mühelos mit Freunden - egal wo sie sind.",
-    "startPlanning": "Planung starten"
+    "startPlanning": "Planung starten",
+    "feature": {
+      "availabilityOverview": {
+        "title": "Verfügbarkeitsübersicht",
+        "description": "Vergleichen Sie die Verfügbarkeiten aller Ihrer Freunde in einem übersichtlichen und exportierbaren Kalender."
+      },
+      "friendManagement": {
+        "title": "Freundeverwaltung",
+        "description": "Fügen Sie Ihre Freunde hinzu und lassen Sie Friend-zone sich um alle Zeitzonenfragen kümmern."
+      },
+      "timezoneSupport": {
+        "title": "Zeitzonen-Unterstützung",
+        "description": "Nie mehr fragen müssen: \"Wie spät ist es dort?\" Friend-zone beantwortet das für Sie."
+      },
+      "calendarExport": {
+        "title": "Kalenderexport",
+        "description": "Exportieren Sie die Verfügbarkeiten Ihrer Freunde im iCal-Format (.ics) zur Nutzung in anderen Kalenderanwendungen."
+      }
+    }
   },
   "navigation": {
     "home": "Startseite",
