@@ -23,7 +23,7 @@ import WordFrame from './components/WordFrame';
 import FeatureFrame from './components/FeatureFrame';
 import FeatureText from './components/FeatureText';
 import Footer from './components/Footer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/colour-utils';
 
 export default function LandingPage() {
@@ -121,7 +121,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className='self-end flex justify-center flex-col items-center gap-4'>
+        <div className='flex flex-col items-center justify-center gap-4 self-end'>
           <FeatureShortcuts />
           <div
             id='example-photos'
@@ -285,36 +285,43 @@ export default function LandingPage() {
   );
 }
 
+const features = [
+  {
+    name: 'availabilityOverview',
+    icon: <Clock10 className='h-5 w-5 text-white' />,
+  },
+  {
+    name: 'friendManagement',
+    icon: <Users className='h-5 w-5 text-white' />,
+  },
+  {
+    name: 'timezoneSupport',
+    icon: <Globe2 className='h-5 w-5 text-white' />,
+  },
+  {
+    name: 'calendarExport',
+    icon: <FileClock className='h-5 w-5 text-white' />,
+  },
+];
+
 const FeatureShortcuts = () => {
   const t = useTranslations('landing');
-  const features = [
-    {
-      name: 'availabilityOverview',
-      icon: <Clock10 className='h-5 w-5 text-white' />,
-    },
-    {
-      name: 'friendManagement',
-      icon: <Users className='h-5 w-5 text-white' />,
-    },
-    {
-      name: 'timezoneSupport',
-      icon: <Globe2 className='h-5 w-5 text-white' />,
-    },
-    {
-      name: 'calendarExport',
-      icon: <FileClock className='h-5 w-5 text-white' />,
-    },
-  ];
   const [activeTab, setActiveTab] = useState('availabilityOverview');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentIndex = features.findIndex((f) => f.name === activeTab);
+      const nextIndex = (currentIndex + 1) % features.length;
+      setActiveTab(features[nextIndex].name);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [activeTab, features]);
 
   return (
     <div className='flex flex-row gap-4'>
       {features.map((feature) => (
-        <div
-          key={feature.name}
-          className='relative'
-          onClick={() => setActiveTab(feature.name)}
-        >
+        <div key={feature.name} className='relative'>
           <div
             data-hover='false'
             className={cn(
