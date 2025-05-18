@@ -23,6 +23,8 @@ import WordFrame from './components/WordFrame';
 import FeatureFrame from './components/FeatureFrame';
 import FeatureText from './components/FeatureText';
 import Footer from './components/Footer';
+import { useState } from 'react';
+import { cn } from '@/lib/colour-utils';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
@@ -119,12 +121,17 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div id='example-photos' className='self-end'>
-          <div className='relative' style={{ width: '717px', height: '428px' }}>
+        <div className='self-end'>
+          <FeatureShortcuts />
+          <div
+            id='example-photos'
+            className='relative'
+            style={{ width: '717px', height: '428px' }}
+          >
             <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
               className='absolute bottom-0 z-10'
             >
               <Image
@@ -139,7 +146,7 @@ export default function LandingPage() {
             <motion.div
               initial={{ rotate: 0, x: -50, opacity: 0 }}
               animate={{ rotate: -4.317, x: -100, opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.4 }}
               className='absolute bottom-0 z-[1]'
             >
               <Image
@@ -153,7 +160,7 @@ export default function LandingPage() {
             <motion.div
               initial={{ rotate: 0, x: -50, opacity: 0 }}
               animate={{ rotate: -6.962, x: -180, opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.7 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.7 }}
               className='absolute bottom-0 z-[0]'
             >
               <Image
@@ -277,3 +284,61 @@ export default function LandingPage() {
     </main>
   );
 }
+
+const FeatureShortcuts = () => {
+  const t = useTranslations('landing');
+  const features = [
+    {
+      name: 'availabilityOverview',
+      icon: <Clock10 className='h-5 w-5 text-white' />,
+    },
+    {
+      name: 'friendManagement',
+      icon: <Users className='h-5 w-5 text-white' />,
+    },
+    {
+      name: 'timezoneSupport',
+      icon: <Globe2 className='h-5 w-5 text-white' />,
+    },
+    {
+      name: 'calendarExport',
+      icon: <FileClock className='h-5 w-5 text-white' />,
+    },
+  ];
+  const [activeTab, setActiveTab] = useState('availabilityOverview');
+
+  return (
+    <div className='flex flex-row gap-4 mb-4'>
+      {features.map((feature) => (
+        <div
+          key={feature.name}
+          className='relative'
+          onClick={() => setActiveTab(feature.name)}
+        >
+          <div
+            data-hover='false'
+            className={cn(
+              'relative z-10 inline-flex h-20 w-20 flex-col items-center justify-center gap-2.5 rounded-xl p-1 transition-opacity',
+              activeTab !== feature.name && 'opacity-50'
+            )}
+          >
+            <div className='relative flex flex-col items-start justify-start gap-2.5 overflow-hidden rounded-full bg-black p-1'>
+              {feature.icon}
+            </div>
+            <div className="justify-start self-stretch text-center font-['Roboto'] text-xs font-medium leading-none tracking-wide text-black">
+              {t(`feature.${feature.name}.title`)}
+            </div>
+          </div>
+
+          {activeTab === feature.name && (
+            <motion.div
+              layoutId='selectedFeature'
+              transition={{ type: 'spring', bounce: 0.3, duration: 0.6 }}
+              className='absolute left-0 top-0 z-[1] h-20 w-20 rounded-xl bg-gray-200'
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
