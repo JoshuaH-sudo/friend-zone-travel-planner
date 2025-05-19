@@ -58,9 +58,9 @@ export default function LandingPage() {
           <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
             <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
               <div className='flex items-center justify-center gap-3'>
-                <WordFrame>Separated</WordFrame>
-                <WordFrame>By</WordFrame>
-                <WordFrame>Borders</WordFrame>
+                <WordFrame>{t("separated")}</WordFrame>
+                <WordFrame>{t("by")}</WordFrame>
+                <WordFrame>{t("borders")}</WordFrame>
               </div>
               <div
                 className='h-20 justify-start self-stretch whitespace-nowrap text-center'
@@ -256,10 +256,10 @@ export default function LandingPage() {
         className='flex h-96 flex-col items-center justify-center gap-6 px-32'
       >
         <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
-          So, what you waiting for?
+          {t('whatYouWaitingFor')}
         </h2>
         <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
-          Lets plan that trip!
+          {t('letsPlanThatTrip')}
         </h2>
         <Link href='/planner'>
           <Button

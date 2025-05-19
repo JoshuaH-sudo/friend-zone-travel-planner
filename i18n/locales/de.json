@@ -4,7 +4,7 @@
     "groupName": "Gruppenname",
     "groupNamePlaceholder": "Gruppennamen eingeben",
     "noFriendsTitle": "Noch keine Freunde hinzugefügt",
-    "noFriendsDescription": "Fügen Sie Freunde und deren Verfügbarkeit hinzu, um zu sehen, wann alle für Ihr nächstes Treffen frei sind.",
+    "noFriendsDescription": "Füge Freunde und deren Verfügbarkeit hinzu, um zu sehen, wann alle für dein nächstes Treffen frei sind.",
     "theme": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -19,9 +19,9 @@
     "separated": "Getrennt",
     "by": "durch",
     "borders": "Grenzen",
-    "connectedBy": "Verbunden-durch",
+    "connectedBy": "Verbunden-durch-",
     "friendZone": "Friend-Zone",
-    "description": "Planen, organisieren und treffen Sie sich mühelos mit Freunden - egal wo sie sind.",
+    "description": "Plane, organisiere und triff dich mühelos mit Freunden - egal wo du bist.",
     "startPlanning": "Planung starten",
     "feature": {
       "availabilityOverview": {
@@ -40,7 +40,9 @@
         "title": "Kalenderexport",
         "description": "Exportieren Sie die Verfügbarkeiten Ihrer Freunde im iCal-Format (.ics) zur Nutzung in anderen Kalenderanwendungen."
       }
-    }
+    },
+    "whatYouWaitingFor": "Also, worauf wartest du noch?",
+    "letsPlanThatTrip": "Lass uns diese Reise planen!"
   },
   "navigation": {
     "home": "Startseite",

@@ -40,7 +40,9 @@
         "title": "Calendar Export",
         "description": "Export your friends' availabilities to iCal format (.ics) to use in other calendar applications."
       }
-    }
+    },
+    "whatYouWaitingFor": "So, What are you waiting for?",
+    "letsPlanThatTrip": "Lets plan that trip!"
   },
   "navigation": {
     "home": "Home",
