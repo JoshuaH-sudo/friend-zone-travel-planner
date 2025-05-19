@@ -48,13 +48,13 @@ export const FeatureShortcuts = () => {
             className={cn(
               'relative z-10 inline-flex h-24 w-24 flex-col items-center justify-center gap-2.5 rounded-xl p-1 transition-all hover:opacity-100',
               activeTab !== feature.name && 'opacity-50',
-              activeTab === feature.name && 'opacity-100 scale-110'
+              activeTab === feature.name && 'scale-110 opacity-100'
             )}
           >
             <div className='relative flex flex-col items-start justify-start gap-2.5 overflow-hidden rounded-full bg-black p-1'>
               {feature.icon}
             </div>
-            <div className="justify-start self-stretch text-center font-['Roboto'] text-xs font-medium leading-none tracking-wide text-black">
+            <div className="justify-start self-stretch hyphens-auto text-center font-['Roboto'] text-xs font-medium leading-none tracking-wide text-black">
               {t(`feature.${feature.name}.title`)}
             </div>
           </div>

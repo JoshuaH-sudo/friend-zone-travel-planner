@@ -23,6 +23,7 @@ import WordFrame from './components/WordFrame';
 import FeatureFrame from './components/FeatureFrame';
 import FeatureText from './components/FeatureText';
 import Footer from './components/Footer';
+import { FeatureShortcuts } from './components/FeatureShortcuts';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
@@ -120,6 +121,7 @@ export default function LandingPage() {
         </div>
 
         <div className='flex flex-col items-center justify-center gap-4 self-end'>
+          <FeatureShortcuts />
           <div
             id='example-photos'
             className='relative'
