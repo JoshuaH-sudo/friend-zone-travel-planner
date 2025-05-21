@@ -46,7 +46,7 @@ export const FeatureShortcuts = () => {
           <div
             data-hover='false'
             className={cn(
-              'relative z-10 inline-flex h-24 w-24 flex-col items-center justify-center gap-2.5 rounded-xl p-1 transition-all hover:opacity-100',
+              'relative z-10 inline-flex h-28 w-28 flex-col items-center justify-center gap-2.5 rounded-xl p-2 transition-all hover:opacity-100',
               activeTab !== feature.name && 'opacity-50',
               activeTab === feature.name && 'scale-110 opacity-100'
             )}
@@ -63,7 +63,7 @@ export const FeatureShortcuts = () => {
             <motion.div
               layoutId='selectedFeature'
               transition={{ type: 'spring', bounce: 0.3, duration: 0.6 }}
-              className='absolute left-0 top-0 z-[1] h-24 w-24 rounded-xl bg-white'
+              className='absolute top-0 right-0 z-[1] h-28 w-28 rounded-xl bg-white'
             />
           )}
         </div>
