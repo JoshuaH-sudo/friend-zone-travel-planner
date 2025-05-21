@@ -33,6 +33,7 @@ export function WorkspaceActions({
 
   const getCurrentState = (): AppState => {
     return {
+      version: '1.0',
       groupName,
       friends,
     };

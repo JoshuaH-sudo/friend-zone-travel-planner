@@ -1,7 +1,9 @@
 import type { Friend } from './types';
 
+
 // Type for the entire application state
 export interface AppState {
+  version: string;
   groupName: string;
   friends: Friend[];
 }

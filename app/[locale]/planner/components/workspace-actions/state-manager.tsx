@@ -15,6 +15,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Save, Upload, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+const CURRENT_VERSION = '1.0';
+
 interface StateManagerProps {
   currentState: AppState;
   onRestoreState: (state: AppState) => void;
@@ -53,6 +55,12 @@ export function StateManager({
 
     try {
       const state = await readStateFile(file);
+
+      if (state.version !== CURRENT_VERSION) {
+        // TODO: implement a database to migrate the state files.
+        throw new Error('Version mismatch');
+      }
+      
       onRestoreState(state);
     } catch (error) {
       console.error('Error importing state:', error);
