@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
-import { Header } from '@/app/[locale]/components/header/header';
 import { Roboto } from 'next/font/google';
 import { PostHogProvider } from '../providers';
 
@@ -46,7 +45,6 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             <NextIntlClientProvider>
-              <Header />
               {children}
               <SpeedInsights />
               <Analytics />

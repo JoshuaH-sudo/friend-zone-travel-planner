@@ -12,10 +12,10 @@ export default function PlannerPage() {
   const destinations = ['Paris', 'Tokyo', 'New York', 'Berlin', 'Sydney'];
   const friends = ['josh', 'maria', 'john', 'lisa', 'david'];
   return (
-    <div className='flex h-full flex-col gap-6'>
+    <div className='h-96'>
       <div
         id='trip-name'
-        className='flex flex-row items-end justify-between gap-2'
+        className='mb-4 flex flex-row items-end justify-between gap-2'
       >
         <div className='flex-grow space-y-2'>
           <Label htmlFor='group-name'>{t('app.groupName')}</Label>
@@ -31,11 +31,11 @@ export default function PlannerPage() {
       </div>
       <div
         id='trip-details'
-        className='flex flex-row items-center justify-between gap-4'
+        className='flex h-full flex-row items-start justify-between gap-4'
       >
         <div
           id='destinations-list'
-          className='flex h-96 w-[30%] flex-col gap-2 bg-gray-500 p-2'
+          className='flex h-full w-[30%] flex-col gap-2 bg-gray-500 p-2'
         >
           {destinations.map((destination) => (
             <div
@@ -52,7 +52,10 @@ export default function PlannerPage() {
             Add
           </button>
         </div>
-        <div id='destination-details' className='h-96 w-[30%] bg-gray-500 p-2'>
+        <div
+          id='destination-details'
+          className='h-full w-[30%] bg-gray-500 p-2'
+        >
           <div>
             <p>Destination</p>
             <Input
