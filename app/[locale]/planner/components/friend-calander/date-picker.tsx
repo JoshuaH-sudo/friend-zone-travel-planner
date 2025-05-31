@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calander';
+import { Calendar } from '@/components/ui/calendar';
 import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
 import { useTranslations } from 'next-intl';
 

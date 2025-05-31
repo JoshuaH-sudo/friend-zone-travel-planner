@@ -1,175 +1,88 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AddFriendForm } from './components/friend-form/add-friend-form';
-import { AvailabilityOverview } from './components/availability-overview/availability-overview';
-import { FriendCalendar } from './components/friend-calander/friend-calendar';
-import { WorkspaceActions } from '@/app/[locale]/planner/components/workspace-actions/workspace-actions';
-import { EmptyState } from '@/app/[locale]/planner/components/empty-state';
-import type { AvailableHours, Friend } from '@/lib/types';
-import type { AppState } from '@/lib/json-export';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Users, Clock } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslations } from 'next-intl';
-import { TimezoneComparison } from './components/timezone/timezone-comparison';
+import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 export default function PlannerPage() {
   const t = useTranslations();
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [groupName, setGroupName] = useState('');
-  const [showAddFriend, setShowAddFriend] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
 
-  const addFriend = (friend: Friend) => {
-    setFriends([...friends, friend]);
-    setShowAddFriend(false);
-  };
-
-  const onUpdateAvailableDates = (friendId: string, dates: Date[]) => {
-    setFriends(
-      friends.map((friend) =>
-        friend.id === friendId ? { ...friend, availableDates: dates } : friend
-      )
-    );
-  };
-
-  const onUpdateAvailableHours = (
-    friendId: string,
-    availableHours: Partial<AvailableHours>
-  ) => {
-    setFriends(
-      friends.map((friend) =>
-        friend.id === friendId
-          ? {
-              ...friend,
-              availableHours: { ...friend.availableHours, ...availableHours },
-            }
-          : friend
-      )
-    );
-  };
-
-  const updateFriend = (updatedFriend: Friend) => {
-    setFriends(
-      friends.map((friend) =>
-        friend.id === updatedFriend.id ? updatedFriend : friend
-      )
-    );
-  };
-
-  const removeFriend = (friendId: string) => {
-    setFriends(friends.filter((friend) => friend.id !== friendId));
-  };
-
-  const restoreState = (state: AppState) => {
-    setGroupName(state.groupName);
-    setFriends(state.friends);
-  };
-
-  useEffect(() => {
-    const storedState = localStorage.getItem('plannerState');
-    if (storedState) {
-      const state = JSON.parse(storedState as string);
-      setGroupName(state.groupName);
-      setFriends(state.friends);
-    }
-  }, []);
-
-  useEffect(() => {
-    // To prevent the initial render from setting the state in localStorage to empty,
-    // When the user switches language / component unmounts.
-    if (!isMounted) {
-      return setIsMounted(true);
-    }
-
-    localStorage.setItem(
-      'plannerState',
-      JSON.stringify({
-        groupName,
-        friends,
-      })
-    );
-  }, [groupName, friends, isMounted]);
-
+  const destinations = ['Paris', 'Tokyo', 'New York', 'Berlin', 'Sydney'];
+  const friends = ['josh', 'maria', 'john', 'lisa', 'david'];
   return (
-    <div className='flex flex-col gap-6'>
-      <div className='flex flex-row items-end justify-between gap-2'>
+    <div className='flex h-full flex-col gap-6'>
+      <div
+        id='trip-name'
+        className='flex flex-row items-end justify-between gap-2'
+      >
         <div className='flex-grow space-y-2'>
           <Label htmlFor='group-name'>{t('app.groupName')}</Label>
           <Input
+            // TODO: rename this to trip name
             id='group-name'
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
+            value={'Berlin Trip'}
+            onChange={(e) => console.log(e.target.value)}
             placeholder={t('app.groupNamePlaceholder')}
             className='max-w-md'
           />
         </div>
-
-        <WorkspaceActions
-          friends={friends}
-          groupName={groupName}
-          onAddFriend={addFriend}
-          onShowAddFriendForm={() => setShowAddFriend(true)}
-          onRestoreState={restoreState}
-        />
       </div>
-
-      {showAddFriend && (
-        <div className='rounded-lg border bg-card p-4'>
-          <AddFriendForm
-            friends={friends}
-            onAddFriend={addFriend}
-            onCancel={() => setShowAddFriend(false)}
-          />
+      <div
+        id='trip-details'
+        className='flex flex-row items-center justify-between gap-4'
+      >
+        <div
+          id='destinations-list'
+          className='flex h-96 w-[30%] flex-col gap-2 bg-gray-500 p-2'
+        >
+          {destinations.map((destination) => (
+            <div
+              key={destination}
+              className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
+            >
+              {destination}
+            </div>
+          ))}
+          <button
+            id='add-destination'
+            className='w-full rounded-lg bg-green-500 p-2 text-white transition-colors duration-200 hover:bg-green-600'
+          >
+            Add
+          </button>
         </div>
-      )}
+        <div id='destination-details' className='h-96 w-[30%] bg-gray-500 p-2'>
+          <div>
+            <p>Destination</p>
+            <Input
+              placeholder={'Berlin'}
+              className='mb-4 w-full'
+              onChange={(e) => console.log('Search:', e.target.value)}
+            />
+          </div>
 
-      {friends.length > 0 ? (
-        <Tabs defaultValue='calendars'>
-          <TabsList className='grid w-full grid-cols-3'>
-            <TabsTrigger value='calendars' className='flex items-center gap-2'>
-              <Calendar className='h-4 w-4' />
-              {t('navigation.calendars')}
-            </TabsTrigger>
-            <TabsTrigger value='timezone' className='flex items-center gap-2'>
-              <Clock className='h-4 w-4' />
-              {t('navigation.timezone')}
-            </TabsTrigger>
-            <TabsTrigger value='overview' className='flex items-center gap-2'>
-              <Users className='h-4 w-4' />
-              {t('navigation.overview')}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value='calendars' className='mt-4'>
-            <ScrollArea className='h-[calc(100vh-300px)]'>
-              <div className='grid gap-6 md:grid-cols-2'>
-                {friends.map((friend) => (
-                  <FriendCalendar
-                    key={friend.id}
-                    friend={friend}
-                    friends={friends}
-                    onUpdateAvailableDates={onUpdateAvailableDates}
-                    onUpdateAvailableHours={onUpdateAvailableHours}
-                    onRemoveFriend={removeFriend}
-                    onUpdateFriend={updateFriend}
-                  />
-                ))}
-              </div>
+          <div>
+            <p>Dates</p>
+            <DatePickerWithRange />
+          </div>
+
+          <div>
+            <p>Friends To See</p>
+            <ScrollArea className='h-32 overflow-x-auto'>
+              {friends.map((friend) => (
+                <div
+                  key={friend}
+                  className='my-2 cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
+                >
+                  {friend}
+                </div>
+              ))}
             </ScrollArea>
-          </TabsContent>
-          <TabsContent value='timezone' className='mt-4'>
-            <TimezoneComparison friends={friends} />
-          </TabsContent>
-          <TabsContent value='overview' className='mt-4'>
-            <AvailabilityOverview friends={friends} />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <EmptyState onShowAddFriend={() => setShowAddFriend(true)} />
-      )}
+          </div>
+        </div>
+        <div id='map-overview' className='h-96 flex-1 bg-blue-500' />
+      </div>
     </div>
   );
 }
