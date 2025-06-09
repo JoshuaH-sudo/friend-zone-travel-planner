@@ -5,10 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "friend-zone-travel-planner",
+    "scheme": "com.joshua.friendzonetravelplanner",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.joshua.friendzonetravelplanner",
       "supportsTablet": true
     },
     "android": {
