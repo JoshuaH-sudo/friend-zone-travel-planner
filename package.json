@@ -1,5 +1,5 @@
 {
-  "name": "turbo-repo-test",
+  "name": "friend-zone-travel-planner",
   "private": true,
   "scripts": {
     "build": "turbo run build",
