@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "friend-zone-travel-planner",
-    "slug": "friend-zone-travel-planner",
+    "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
