@@ -12,7 +12,7 @@ export default function PlannerPage() {
   const destinations = ['Paris', 'Tokyo', 'New York', 'Berlin', 'Sydney'];
   const friends = ['josh', 'maria', 'john', 'lisa', 'david'];
   return (
-    <div className='h-96'>
+    <div className='h-[600px]'>
       <div
         id='trip-name'
         className='mb-4 flex flex-row items-end justify-between gap-2'
@@ -52,6 +52,7 @@ export default function PlannerPage() {
             Add
           </button>
         </div>
+        
         <div
           id='destination-details'
           className='h-full w-[30%] bg-gray-500 p-2'
@@ -84,7 +85,8 @@ export default function PlannerPage() {
             </ScrollArea>
           </div>
         </div>
-        <div id='map-overview' className='h-96 flex-1 bg-blue-500' />
+
+        <div id='map-overview' className='size-[593px] flex-1 bg-blue-500' />
       </div>
     </div>
   );
