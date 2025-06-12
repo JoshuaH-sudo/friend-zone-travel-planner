@@ -12,7 +12,7 @@ export default function PlannerPage() {
   const destinations = ['Paris', 'Tokyo', 'New York', 'Berlin', 'Sydney'];
   const friends = ['josh', 'maria', 'john', 'lisa', 'david'];
   return (
-    <div className='h-[600px]'>
+    <div className='h-screen sm:h-[600px]'>
       <div
         id='trip-name'
         className='mb-4 flex flex-row items-end justify-between gap-2'
@@ -31,11 +31,11 @@ export default function PlannerPage() {
       </div>
       <div
         id='trip-details'
-        className='flex h-full flex-row items-start justify-between gap-4'
+        className='flex h-full flex-col items-center justify-between gap-4 sm:flex-row sm:items-start'
       >
         <div
           id='destinations-list'
-          className='flex h-full w-[30%] flex-col gap-2 bg-gray-500 p-2'
+          className='flex h-full w-full flex-col gap-2 bg-gray-500 p-2 sm:w-[30%]'
         >
           {destinations.map((destination) => (
             <div
@@ -52,10 +52,10 @@ export default function PlannerPage() {
             Add
           </button>
         </div>
-        
+
         <div
           id='destination-details'
-          className='h-full w-[30%] bg-gray-500 p-2'
+          className='h-full w-full bg-gray-500 p-2 sm:w-[30%]'
         >
           <div>
             <p>Destination</p>
@@ -73,7 +73,7 @@ export default function PlannerPage() {
 
           <div>
             <p>Friends To See</p>
-            <ScrollArea className='h-32 overflow-x-auto'>
+            <ScrollArea className='overflow-x-auto'>
               {friends.map((friend) => (
                 <div
                   key={friend}
@@ -86,7 +86,7 @@ export default function PlannerPage() {
           </div>
         </div>
 
-        <div id='map-overview' className='size-[593px] flex-1 bg-blue-500' />
+        <div id='map-overview' className=' h-dvh w-full max-w-xl bg-blue-500 sm:h-full' />
       </div>
     </div>
   );

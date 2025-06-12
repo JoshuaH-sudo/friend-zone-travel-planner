@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <QueryClientProvider client={queryClient}>
       <LoadingArea />
-      <main className='container mx-auto max-w-8xl p-4 h-screen'>{children}</main>
+      <main className='container mx-auto max-w-8xl p-4 sm:h-screen'>{children}</main>
     </QueryClientProvider>
   );
 }
