@@ -10,7 +10,11 @@ export default function Index() {
     <WebView
       style={styles.container}
       showsHorizontalScrollIndicator={false}
-      source={{ uri: isDevelopment ? "http://localhost:3000" : "https://www.friend-zone.app/" }}
+      source={{
+        uri: isDevelopment
+          ? "http://localhost:3000"
+          : "https://www.friend-zone.app/",
+      }}
     />
   );
 }
