@@ -6,59 +6,38 @@ import { useTranslations } from 'next-intl';
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { useState } from 'react';
-import { ChevronDown, Dot } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import { Destinations } from '@/type';
 
-type Friend = {
-  id: number;
-  name: string;
-  location: string;
-  lat: number;
-  lng: number;
-  available: {
-    weekday: [number, number]; // [start, end] in hours
-    weekend: [number, number]; // [start, end] in hours
-    [day: string]: [number, number]; // [start, end] in hours for specific dates
-  };
-};
 
-type Destinations = {
-  location: string;
-  timezone: string;
-  utc: string;
-  lat: number;
-  lng: number;
-  startDate: Date;
-  endDate: Date;
-  friends: Friend[];
+const DUMMMY_BERLIN_DESTINATION: Destinations = {
+  location: 'Berlin',
+  timezone: 'Europe/Berlin',
+  utc: '+01:00',
+  lat: 52.52,
+  lng: 13.405,
+  startDate: new Date('2024-05-01'),
+  endDate: new Date('2024-05-10'),
+  friends: [
+    {
+      id: 1,
+      name: 'Josh',
+      location: 'Berlin',
+      lat: 52.52,
+      lng: 13.405,
+      available: {
+        weekday: [9, 17],
+        weekend: [10, 16],
+      },
+    },
+    // Add more friends as needed
+  ],
 };
 
 export default function PlannerPage() {
   const t = useTranslations();
 
   const [destinations, setDestinations] = useState<Destinations[]>([
-    {
-      location: 'Berlin',
-      timezone: 'Europe/Berlin',
-      utc: '+01:00',
-      lat: 52.52,
-      lng: 13.405,
-      startDate: new Date('2024-05-01'),
-      endDate: new Date('2024-05-10'),
-      friends: [
-        {
-          id: 1,
-          name: 'Josh',
-          location: 'Berlin',
-          lat: 52.52,
-          lng: 13.405,
-          available: {
-            weekday: [9, 17],
-            weekend: [10, 16],
-          },
-        },
-        // Add more friends as needed
-      ],
-    },
     {
       location: 'Paris',
       timezone: 'Europe/Paris',
@@ -105,26 +84,23 @@ export default function PlannerPage() {
         id='trip-details'
         className='flex h-full flex-col justify-between gap-4 sm:flex-row sm:items-start sm:justify-center'
       >
-        <div
-          id='route-list'
-          className='h-1/3 bg-gray-500 p-2 sm:w-[30%]'
-        >
+        <div id='route-list' className='h-1/3 bg-gray-500 p-2 sm:w-[30%]'>
           <p>Route</p>
-          <ScrollArea className='gap-2 flex flex-col'>
+          <ScrollArea className='flex flex-col gap-2'>
             {destinations.map((destination, index) => (
               <>
-              <div
-                key={destination.location}
-                className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
-              >
-                {destination.location}
-              </div>
-              {index < destinations.length - 1 && (
-                <ChevronDown
-                  key={`dot-${index}`}
-                  className='mx-auto size-6 text-black'
-                />
-              )}
+                <div
+                  key={destination.location}
+                  className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
+                >
+                  {destination.location}
+                </div>
+                {index < destinations.length - 1 && (
+                  <ChevronDown
+                    key={`dot-${index}`}
+                    className='mx-auto size-6 text-black'
+                  />
+                )}
               </>
             ))}
           </ScrollArea>
@@ -150,7 +126,7 @@ export default function PlannerPage() {
 
           <div className='h-1/3'>
             <p>Friends To See</p>
-            <ScrollArea className='gap-2 flex flex-col'>
+            <ScrollArea className='flex h-24 flex-col gap-2 overflow-auto'>
               {friends.map((friend) => (
                 <div
                   key={friend}
