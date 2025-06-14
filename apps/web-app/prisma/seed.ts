@@ -3,12 +3,14 @@ import { PrismaClient } from '../lib/generated/prisma';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clean up existing data in reverse order of dependencies
-  await prisma.destination.deleteMany();
-  await prisma.route.deleteMany();
-  await prisma.trip.deleteMany();
-  await prisma.friend.deleteMany();
-  await prisma.user.deleteMany();
+  // Clean up existing data
+  await prisma.$transaction([
+    prisma.destination.deleteMany(),
+    prisma.route.deleteMany(),
+    prisma.trip.deleteMany(),
+    prisma.friend.deleteMany(),
+    prisma.user.deleteMany(),
+  ]);
 
   // Create Users
   const john = await prisma.user.create({
