@@ -11,7 +11,8 @@
     "prebuild": "expo prebuild",
     "android:upload-preview": "npx eas-cli preview --platform android --non-interactive --profile preview",
     "ios:upload-preview": "npx eas-cli preview --platform ios --non-interactive --profile preview",
-    "upload-preview": "npx eas-cli preview --platform all --non-interactive --profile preview"
+    "upload-preview": "npx eas-cli preview --platform all --non-interactive --profile preview",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

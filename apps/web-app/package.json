@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore ."
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.5",
