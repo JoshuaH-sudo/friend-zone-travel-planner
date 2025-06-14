@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String
+  location String
+  friends  Friend[]
+  trips    Trip[]
+}
+
+model Friend {
+  id       Int    @id @default(autoincrement())
+  name     String
+  location String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   Int
+}
+
+// A trip can have multiple routes
+model Trip {
+  id     Int     @id @default(autoincrement())
+  name   String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+  routes Route[]
+}
+
+// A route can have multiple destinations
+model Route {
+  id           Int           @id @default(autoincrement())
+  name         String
+  Trip         Trip          @relation(fields: [tripId], references: [id])
+  tripId       Int
+  Destinations Destination[]
+}
+
+// A destination is a specific location within a route
+model Destination {
+  id       Int    @id @default(autoincrement())
+  order    Int    @default(autoincrement())
+  location String
+  routes   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  routeId  Int
+}
