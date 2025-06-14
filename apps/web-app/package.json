@@ -9,6 +9,7 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "check-types": "tsc --noEmit",
+    "postinstall": "prisma generate",
     "seed-db": "prisma db seed"
   },
   "prisma": {
