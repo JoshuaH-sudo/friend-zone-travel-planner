@@ -17,11 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-
   return (
     <QueryClientProvider client={queryClient}>
       <LoadingArea />
-      <main className='container mx-auto max-w-8xl p-4 sm:h-screen'>{children}</main>
+      <main className='max-w-8xl container mx-auto p-4 sm:h-screen'>
+        {children}
+      </main>
     </QueryClientProvider>
   );
 }
@@ -31,7 +32,5 @@ function LoadingArea() {
   if (!isFetching) {
     return <div className='h-1' />;
   }
-  return (
-    <Progress indeterminate />
-  )
+  return <Progress indeterminate />;
 }

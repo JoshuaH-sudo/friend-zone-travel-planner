@@ -1,68 +1,21 @@
-'use client';
-
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useTranslations } from 'next-intl';
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { Destinations } from '@/type';
+import { Destination } from '@/lib/generated/prisma';
+import prisma from '@/lib/db';
+import { TripPageProps } from '../types';
+import { DUMMY_LOGIN_USER_ID } from '../../page';
 
-
-const DUMMMY_BERLIN_DESTINATION: Destinations = {
-  location: 'Berlin',
-  timezone: 'Europe/Berlin',
-  utc: '+01:00',
-  lat: 52.52,
-  lng: 13.405,
-  startDate: new Date('2024-05-01'),
-  endDate: new Date('2024-05-10'),
-  friends: [
-    {
-      id: 1,
-      name: 'Josh',
-      location: 'Berlin',
-      lat: 52.52,
-      lng: 13.405,
-      available: {
-        weekday: [9, 17],
-        weekend: [10, 16],
-      },
+export default async function NewRoutePage({ params }: TripPageProps) {
+  const destinations: Destination[] = [];
+  const friends = await prisma.friend.findMany({
+    where: {
+      userId: DUMMY_LOGIN_USER_ID,
     },
-    // Add more friends as needed
-  ],
-};
+  });
 
-export default function PlannerPage() {
-  const t = useTranslations();
-
-  const [destinations, setDestinations] = useState<Destinations[]>([
-    {
-      location: 'Paris',
-      timezone: 'Europe/Paris',
-      utc: '+01:00',
-      lat: 48.8566,
-      lng: 2.3522,
-      startDate: new Date('2024-06-01'),
-      endDate: new Date('2024-06-10'),
-      friends: [
-        {
-          id: 2,
-          name: 'Maria',
-          location: 'Paris',
-          lat: 48.8566,
-          lng: 2.3522,
-          available: {
-            weekday: [10, 18],
-            weekend: [11, 17],
-          },
-        },
-        // Add more friends as needed
-      ],
-    },
-  ]);
-  const friends = ['josh', 'maria', 'john', 'lisa', 'david'];
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
@@ -74,7 +27,6 @@ export default function PlannerPage() {
           <Input
             id='route-name'
             value={'Berlin Trip'}
-            onChange={(e) => console.log(e.target.value)}
             placeholder={'Enter route` name'}
             className='max-w-md'
           />
@@ -112,11 +64,7 @@ export default function PlannerPage() {
         >
           <div>
             <p>Destination</p>
-            <Input
-              placeholder={'Berlin'}
-              className='w-full'
-              onChange={(e) => console.log('Search:', e.target.value)}
-            />
+            <Input placeholder={'Berlin'} className='w-full' />
           </div>
 
           <div>
@@ -129,10 +77,10 @@ export default function PlannerPage() {
             <ScrollArea className='flex h-24 flex-col gap-2 overflow-auto'>
               {friends.map((friend) => (
                 <div
-                  key={friend}
+                  key={friend.id}
                   className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
                 >
-                  {friend}
+                  {friend.name}
                 </div>
               ))}
             </ScrollArea>
