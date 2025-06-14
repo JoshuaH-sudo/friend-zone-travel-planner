@@ -51,7 +51,7 @@ model Route {
 // A destination is a specific location within a route
 model Destination {
   id       Int    @id @default(autoincrement())
-  order    Int    @unique @default(autoincrement())
+  order    Int    @default(autoincrement())
   location String
   routes   Route  @relation(fields: [routeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   routeId  Int

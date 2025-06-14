@@ -1,14 +1,3 @@
-/*
-  Warnings:
-
-  - Added the required column `location` to the `Friend` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `userId` to the `Friend` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "Friend" ADD COLUMN     "location" TEXT NOT NULL,
-ADD COLUMN     "userId" INTEGER NOT NULL;
-
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
@@ -17,6 +6,16 @@ CREATE TABLE "User" (
     "location" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Friend" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "location" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Friend_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -49,9 +48,6 @@ CREATE TABLE "Destination" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Destination_order_key" ON "Destination"("order");
 
 -- AddForeignKey
 ALTER TABLE "Friend" ADD CONSTRAINT "Friend_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
