@@ -1,9 +1,10 @@
 'use server';
 
 import prisma from '@/lib/db';
+import { redirect } from 'next/dist/server/api-utils';
 
 const createRoute = async (tripId: number) => {
-  await prisma.route.create({
+  return await prisma.route.create({
     data: {
       name: 'New Route',
       tripId: tripId,
