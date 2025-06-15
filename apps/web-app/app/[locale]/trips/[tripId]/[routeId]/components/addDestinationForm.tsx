@@ -39,7 +39,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className='flex h-full flex-col gap-1'>
       <div>
         <p>Destination</p>
         <Input
@@ -48,6 +48,9 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
           {...register('location')}
         />
       </div>
+      <p>
+        {JSON.stringify(errors)}
+      </p>
 
       <div>
         <p>Dates</p>
@@ -56,11 +59,11 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
       <div className='h-1/3'>
         <p>Friends To See</p>
-        <ScrollArea className='flex h-24 flex-col gap-2 overflow-auto'>
+        <ScrollArea>
           {friends.map((friend) => (
             <div
               key={friend.id}
-              className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
+              className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400 my-2'
             >
               {friend.name}
             </div>
@@ -70,9 +73,9 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
       <button
         id='add-destination'
-        className='w-full rounded-lg bg-green-500 p-2 text-white transition-colors duration-200 hover:bg-green-600'
+        className='w-full rounded-lg bg-green-500 p-2 text-white transition-colors duration-200 hover:bg-green-600 disabled:opacity-50'
         type='submit'
-        disabled={!!errors}
+        disabled={!errors}
       >
         Add
       </button>
