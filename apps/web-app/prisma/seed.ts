@@ -75,9 +75,9 @@ async function main() {
             name: 'Western Europe Tour',
             Destinations: {
               create: [
-                { location: 'Paris, France' },
-                { location: 'Amsterdam, Netherlands' },
-                { location: 'Brussels, Belgium' },
+                { location: 'Paris, France', order: 0 },
+                { location: 'Amsterdam, Netherlands', order: 1 },
+                { location: 'Brussels, Belgium', order: 2 },
               ],
             },
           },
@@ -85,9 +85,9 @@ async function main() {
             name: 'Mediterranean Tour',
             Destinations: {
               create: [
-                { location: 'Rome, Italy' },
-                { location: 'Barcelona, Spain' },
-                { location: 'Athens, Greece' },
+                { location: 'Rome, Italy', order: 0 },
+                { location: 'Barcelona, Spain', order: 1 },
+                { location: 'Athens, Greece', order: 2 },
               ],
             },
           },
@@ -106,9 +106,9 @@ async function main() {
             name: 'East Asia Tour',
             Destinations: {
               create: [
-                { location: 'Tokyo, Japan' },
-                { location: 'Seoul, South Korea' },
-                { location: 'Beijing, China' },
+                { location: 'Tokyo, Japan', order: 0 },
+                { location: 'Seoul, South Korea', order: 1 },
+                { location: 'Beijing, China', order: 2 },
               ],
             },
           },
@@ -116,9 +116,9 @@ async function main() {
             name: 'Southeast Asia Tour',
             Destinations: {
               create: [
-                { location: 'Bangkok, Thailand' },
-                { location: 'Singapore' },
-                { location: 'Bali, Indonesia' },
+                { location: 'Bangkok, Thailand', order: 0 },
+                { location: 'Singapore', order: 1 },
+                { location: 'Bali, Indonesia', order: 2 },
               ],
             },
           },

@@ -86,7 +86,7 @@ export default function LandingPage() {
               <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
                 {t('description')}
               </p>
-              <Link href='/planner'>
+              <Link href='/trips'>
                 <Button
                   id='call-to-action'
                   size='lg'

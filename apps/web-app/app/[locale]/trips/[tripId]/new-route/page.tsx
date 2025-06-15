@@ -7,14 +7,23 @@ import { Destination } from '@/lib/generated/prisma';
 import prisma from '@/lib/db';
 import { TripPageProps } from '../types';
 import { DUMMY_LOGIN_USER_ID } from '../../page';
+import { useForm } from 'react-hook-form';
 
 export default async function NewRoutePage({ params }: TripPageProps) {
   const destinations: Destination[] = [];
   const friends = await prisma.friend.findMany({
     where: {
       userId: DUMMY_LOGIN_USER_ID,
+      //TODO: Filter friends by location area to destination
     },
   });
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Destination>();
 
   return (
     <div className='min-h-screen sm:h-[600px]'>
