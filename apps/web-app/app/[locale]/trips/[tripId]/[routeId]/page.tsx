@@ -5,11 +5,20 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { ChevronDown } from 'lucide-react';
 import { Destination } from '@/lib/generated/prisma';
 import prisma from '@/lib/db';
-import { TripPageProps } from '../types';
 import { DUMMY_LOGIN_USER_ID } from '../../page';
 import { useForm } from 'react-hook-form';
+import { TripRouteParams } from '../page';
 
-export default async function NewRoutePage({ params }: TripPageProps) {
+type NewDestination = Omit<Destination, 'id'>;
+
+export type RouteParams = TripRouteParams & {
+  routeId: string;
+};
+export type RoutePageProps = {
+  params: Promise<RouteParams>;
+};
+export default async function NewRoutePage({ params }: RoutePageProps) {
+  const { routeId } = await params;
   const destinations: Destination[] = [];
   const friends = await prisma.friend.findMany({
     where: {
@@ -23,7 +32,13 @@ export default async function NewRoutePage({ params }: TripPageProps) {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Destination>();
+  } = useForm<NewDestination>({
+    defaultValues: {
+      location: '',
+      order: 0, // Default order, can be adjusted later
+      routeId: parseInt(routeId, 10),
+    },
+  });
 
   return (
     <div className='min-h-screen sm:h-[600px]'>

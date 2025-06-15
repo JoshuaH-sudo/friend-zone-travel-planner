@@ -1,8 +1,17 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '../page';
-import { TripRouteParams } from './types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import CreateRouteButton from './components.tsx/createRouteButton';
+
+export type TripRouteParams = {
+  locale: string;
+  tripId: string;
+};
+export type TripPageProps = {
+  params: Promise<TripRouteParams>;
+};
 
 export default async function TripDetails({
   params,
@@ -40,9 +49,7 @@ export default async function TripDetails({
               </p>
             </div>
           ))}
-          <Link href={`/trips/${tripId}/new-route`}>
-            <Button>Add Route</Button>
-          </Link>
+          <CreateRouteButton tripId={tripId} />
         </div>
       </div>
     </main>
