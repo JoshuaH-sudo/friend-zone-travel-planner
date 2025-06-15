@@ -1,8 +1,5 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '../page';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import CreateRouteButton from './components.tsx/createRouteButton';
 
 export type TripRouteParams = {
