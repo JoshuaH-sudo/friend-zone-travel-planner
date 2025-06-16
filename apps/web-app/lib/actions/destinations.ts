@@ -1,13 +1,26 @@
-'use server'
+'use server';
 
-import prisma from '../db'
+import prisma from '../db';
 
-export async function addDestinationToRoute(routeId: number, location: string) {
+export async function getDestinationsByRouteId(routeId: number) {
+  return prisma.destination.findMany({
+    where: { routeId },
+    orderBy: { order: 'asc' },
+  });
+}
+
+export async function addDestinationToRoute({
+  routeId,
+  location,
+}: {
+  routeId: number;
+  location: string;
+}) {
   // Get the current highest order in the route
   const highestOrder = await prisma.destination.findFirst({
     where: { routeId },
     orderBy: { order: 'desc' },
-    select: { order: true }
+    select: { order: true },
   });
 
   // Create new destination with incremented order
@@ -17,17 +30,20 @@ export async function addDestinationToRoute(routeId: number, location: string) {
     data: {
       location,
       routeId,
-      order: newOrder
-    }
+      order: newOrder,
+    },
   });
 }
 
-export async function reorderDestinations(routeId: number, destinationIds: number[]) {
+export async function reorderDestinations(
+  routeId: number,
+  destinationIds: number[]
+) {
   // Update the order of all destinations in the route
-  const updates = destinationIds.map((id, index) => 
+  const updates = destinationIds.map((id, index) =>
     prisma.destination.update({
       where: { id },
-      data: { order: index }
+      data: { order: index },
     })
   );
 

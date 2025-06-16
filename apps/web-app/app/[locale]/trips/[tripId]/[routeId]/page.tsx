@@ -1,11 +1,10 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { ChevronDown } from 'lucide-react';
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '../../page';
 import { TripRouteParams } from '../page';
 import AddDestinationForm from './components/addDestinationForm';
+import DestinationList from './components/destinationsList';
 
 export type RouteParams = TripRouteParams & {
   routeId: string;
@@ -19,14 +18,6 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
     where: {
       userId: DUMMY_LOGIN_USER_ID,
       //TODO: Filter friends by location area to destination
-    },
-  });
-  const destinations = await prisma.destination.findMany({
-    where: {
-      routeId: parseInt(routeId, 10),
-    },
-    orderBy: {
-      order: 'asc',
     },
   });
 
@@ -51,25 +42,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         className='flex h-full flex-col justify-between gap-4 sm:flex-row sm:items-start sm:justify-center'
       >
         <div id='route-list' className='h-1/3 bg-gray-500 p-2 sm:w-[30%]'>
-          <p>Route</p>
-          <ScrollArea className='flex flex-col gap-2'>
-            {destinations.map((destination, index) => (
-              <>
-                <div
-                  key={destination.location}
-                  className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
-                >
-                  {destination.location}
-                </div>
-                {index < destinations.length - 1 && (
-                  <ChevronDown
-                    key={`dot-${index}`}
-                    className='mx-auto size-6 text-black'
-                  />
-                )}
-              </>
-            ))}
-          </ScrollArea>
+          <DestinationList routeId={parseInt(routeId, 10)} />
         </div>
 
         <div
@@ -79,7 +52,6 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           <AddDestinationForm
             routeId={parseInt(routeId, 10)}
             friends={friends}
-            currentOrder={destinations.length}
           />
         </div>
 

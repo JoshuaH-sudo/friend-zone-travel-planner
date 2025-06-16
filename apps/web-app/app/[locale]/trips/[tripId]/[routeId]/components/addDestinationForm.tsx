@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Destination, Friend } from '@/lib/generated/prisma';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import addDestination from '../actions/addDestination';
+import useAddDestinationToRoute from '@/lib/hooks/useAddDestnationToRoute';
 
 export type NewDestination = Omit<Destination, 'id'>;
 
@@ -32,14 +32,18 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       routeId,
     },
   });
+  const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute();
 
   const onSubmit = async (data: NewDestination) => {
     console.log('Form submitted with data:', data);
-    await addDestination(data);
+    addDestinationToRoute(data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='flex h-full flex-col gap-1'>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className='flex h-full flex-col gap-1'
+    >
       <div>
         <p>Destination</p>
         <Input
@@ -48,9 +52,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
           {...register('location')}
         />
       </div>
-      <p>
-        {JSON.stringify(errors)}
-      </p>
+      <p>{JSON.stringify(errors)}</p>
 
       <div>
         <p>Dates</p>
@@ -63,7 +65,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
           {friends.map((friend) => (
             <div
               key={friend.id}
-              className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400 my-2'
+              className='my-2 cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
             >
               {friend.name}
             </div>

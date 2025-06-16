@@ -1,6 +1,6 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '../page';
-import CreateRouteButton from './components.tsx/createRouteButton';
+import CreateRouteButton from './components/createRouteButton';
 
 export type TripRouteParams = {
   locale: string;
