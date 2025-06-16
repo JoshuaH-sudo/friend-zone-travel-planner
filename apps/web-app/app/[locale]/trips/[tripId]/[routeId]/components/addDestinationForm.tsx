@@ -7,6 +7,7 @@ import { Destination, Friend } from '@/lib/generated/prisma';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '@/lib/hooks/useAddDestnationToRoute';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type NewDestination = Omit<Destination, 'id'>;
 
@@ -21,9 +22,11 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   friends,
   currentOrder = 0,
 }) => {
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<NewDestination>({
     defaultValues: {
@@ -32,11 +35,22 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       routeId,
     },
   });
-  const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute();
+  const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
+    onSuccess: () => {
+      reset();
+      queryClient.invalidateQueries({
+        queryKey: ['destinations', routeId],
+      });
+      console.log('Destination added successfully');
+    },
+    onError: (error) => {
+      console.error('Error adding destination:', error);
+    },
+  });
 
   const onSubmit = async (data: NewDestination) => {
     console.log('Form submitted with data:', data);
-    addDestinationToRoute(data);
+    await addDestinationToRoute(data);
   };
 
   return (

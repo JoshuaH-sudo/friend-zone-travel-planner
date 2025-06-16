@@ -1,18 +1,22 @@
 'use client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addDestinationToRoute } from '../actions/destinations';
+import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import {
+  addDestinationToRoute,
+  addDestinationToRouteProps,
+} from '../actions/destinations';
 
-const useAddDestinationToRoute = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+export type UseAddDestinationToRoute = Omit<
+  UseMutationOptions<
+    addDestinationToRouteProps,
+    Error,
+    addDestinationToRouteProps
+  >,
+  'mutationFn'
+>;
+const useAddDestinationToRoute = (props?: UseAddDestinationToRoute) =>
+  useMutation({
     mutationFn: addDestinationToRoute,
-    onSuccess: async (data, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: ['destinations', variables.routeId],
-      });
-    },
+    ...props,
   });
-};
 
 export default useAddDestinationToRoute;

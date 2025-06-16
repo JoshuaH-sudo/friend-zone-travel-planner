@@ -9,13 +9,14 @@ export async function getDestinationsByRouteId(routeId: number) {
   });
 }
 
+export interface addDestinationToRouteProps {
+  routeId: number;
+  location: string;
+}
 export async function addDestinationToRoute({
   routeId,
   location,
-}: {
-  routeId: number;
-  location: string;
-}) {
+}: addDestinationToRouteProps) {
   // Get the current highest order in the route
   const highestOrder = await prisma.destination.findFirst({
     where: { routeId },
