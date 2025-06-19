@@ -1,6 +1,7 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '../page';
 import CreateRouteButton from './components/createRouteButton';
+import Link from 'next/link';
 
 export type TripRouteParams = {
   locale: string;
@@ -41,9 +42,11 @@ export default async function TripDetails({
           {routes.map((route) => (
             <div key={route.id}>
               <h3>{route.name}</h3>
-              <p className='text-sm font-light text-blue-500 hover:cursor-pointer hover:text-blue-300'>
-                Details for route {route.id}
-              </p>
+              <Link href={`${tripId}/${route.id}`}>
+                <p className='text-sm font-light text-blue-500 hover:cursor-pointer hover:text-blue-300'>
+                  Details for route {route.id}
+                </p>
+              </Link>
             </div>
           ))}
           <CreateRouteButton tripId={tripId} />
