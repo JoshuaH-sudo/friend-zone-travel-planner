@@ -1,7 +1,7 @@
 import { FC, ForwardRefExoticComponent, RefAttributes } from 'react';
 import { LucideProps } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
-import { cn } from '@/lib/colour-utils';
+import { cn } from '@/lib/utils';
 
 export interface FeatureFrameProps {
   title: string;

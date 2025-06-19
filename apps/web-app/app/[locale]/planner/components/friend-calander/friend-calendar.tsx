@@ -26,7 +26,7 @@ import { EditFriendForm } from '../friend-form/edit-friend-form';
 import { useTranslations } from 'next-intl';
 import { OnSelectHandler } from 'react-day-picker';
 import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/colour-utils';
+import { cn } from '@/lib/utils';
 import { displayTimezoneOffset } from '../timezone/timezone-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TimeRangeSlider } from './timerange-slider';

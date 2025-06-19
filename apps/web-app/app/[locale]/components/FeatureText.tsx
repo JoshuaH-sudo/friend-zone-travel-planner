@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from 'react';
-import { cn } from '@/lib/colour-utils';
+import { cn } from '@/lib/utils';
 
 export interface FeatureTextProps extends PropsWithChildren {
   shadowDirection?: 'left' | 'right';

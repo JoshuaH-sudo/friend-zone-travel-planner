@@ -11,9 +11,9 @@ export interface DestinationListProps {
 const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
   const { data: destinations } = useGetDestinationsByRouteId(routeId);
   return (
-    <div>
+    <>
       <p>Route</p>
-      <ScrollArea className='flex flex-col gap-2'>
+      <ScrollArea className='h-full'>
         {destinations?.map((destination, index) => (
           <>
             <div
@@ -31,7 +31,7 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
           </>
         ))}
       </ScrollArea>
-    </div>
+    </>
   );
 };
 

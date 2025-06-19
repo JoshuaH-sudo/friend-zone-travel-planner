@@ -8,6 +8,16 @@ import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '@/lib/hooks/useAddDestnationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from '@/components/ui/form';
 
 export type NewDestination = Omit<Destination, 'id'>;
 
@@ -17,6 +27,12 @@ export interface AddDestinationFormProps {
   currentOrder?: number;
 }
 
+const schema = z.object({
+  location: z.string().min(1, 'Location is required'),
+  order: z.number().int().positive('Order must be a positive integer'),
+  routeId: z.number().int().positive('Route ID must be a positive integer'),
+});
+
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
   routeId,
   friends,
@@ -24,7 +40,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -34,7 +50,9 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       order: currentOrder + 1,
       routeId,
     },
+    resolver: zodResolver(schema),
   });
+  console.log('errors:', errors);
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
@@ -60,10 +78,19 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     >
       <div>
         <p>Destination</p>
-        <Input
-          placeholder={'Berlin'}
-          className='w-full'
-          {...register('location')}
+        <FormField
+          control={control}
+          name='location'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel />
+              <FormControl>
+                <Input placeholder={'Berlin'} {...field}/>
+              </FormControl>
+              <FormDescription />
+              <FormMessage />
+            </FormItem>
+          )}
         />
       </div>
       <p>{JSON.stringify(errors)}</p>
@@ -91,7 +118,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         id='add-destination'
         className='w-full rounded-lg bg-green-500 p-2 text-white transition-colors duration-200 hover:bg-green-600 disabled:opacity-50'
         type='submit'
-        disabled={!errors}
+        disabled={!!errors}
       >
         Add
       </button>
