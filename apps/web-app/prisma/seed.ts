@@ -75,9 +75,24 @@ async function main() {
             name: 'Western Europe Tour',
             Destinations: {
               create: [
-                { location: 'Paris, France', order: 0 },
-                { location: 'Amsterdam, Netherlands', order: 1 },
-                { location: 'Brussels, Belgium', order: 2 },
+                { 
+                  location: 'Paris, France',
+                  latitude: 48.8566,
+                  longitude: 2.3522,
+                  order: 0 
+                },
+                { 
+                  location: 'Amsterdam, Netherlands',
+                  latitude: 52.3676,
+                  longitude: 4.9041,
+                  order: 1 
+                },
+                { 
+                  location: 'Brussels, Belgium',
+                  latitude: 50.8503,
+                  longitude: 4.3517,
+                  order: 2 
+                },
               ],
             },
           },
@@ -85,9 +100,24 @@ async function main() {
             name: 'Mediterranean Tour',
             Destinations: {
               create: [
-                { location: 'Rome, Italy', order: 0 },
-                { location: 'Barcelona, Spain', order: 1 },
-                { location: 'Athens, Greece', order: 2 },
+                { 
+                  location: 'Rome, Italy',
+                  latitude: 41.9028,
+                  longitude: 12.4964,
+                  order: 0 
+                },
+                { 
+                  location: 'Barcelona, Spain',
+                  latitude: 41.3851,
+                  longitude: 2.1734,
+                  order: 1 
+                },
+                { 
+                  location: 'Athens, Greece',
+                  latitude: 37.9838,
+                  longitude: 23.7275,
+                  order: 2 
+                },
               ],
             },
           },
@@ -106,9 +136,24 @@ async function main() {
             name: 'East Asia Tour',
             Destinations: {
               create: [
-                { location: 'Tokyo, Japan', order: 0 },
-                { location: 'Seoul, South Korea', order: 1 },
-                { location: 'Beijing, China', order: 2 },
+                { 
+                  location: 'Tokyo, Japan',
+                  latitude: 35.6895,
+                  longitude: 139.6917,
+                  order: 0 
+                },
+                { 
+                  location: 'Seoul, South Korea',
+                  latitude: 37.5665,
+                  longitude: 126.978,
+                  order: 1 
+                },
+                { 
+                  location: 'Beijing, China',
+                  latitude: 39.9042,
+                  longitude: 116.4074,
+                  order: 2 
+                },
               ],
             },
           },
@@ -116,9 +161,24 @@ async function main() {
             name: 'Southeast Asia Tour',
             Destinations: {
               create: [
-                { location: 'Bangkok, Thailand', order: 0 },
-                { location: 'Singapore', order: 1 },
-                { location: 'Bali, Indonesia', order: 2 },
+                { 
+                  location: 'Bangkok, Thailand',
+                  latitude: 13.7563,
+                  longitude: 100.5018,
+                  order: 0 
+                },
+                { 
+                  location: 'Singapore',
+                  latitude: 1.3521,
+                  longitude: 103.8198,
+                  order: 1 
+                },
+                { 
+                  location: 'Bali, Indonesia',
+                  latitude: -8.4095,
+                  longitude: 115.1889,
+                  order: 2 
+                },
               ],
             },
           },

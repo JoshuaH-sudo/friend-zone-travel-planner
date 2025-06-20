@@ -6,7 +6,6 @@ import {
   Map,
   Pin,
 } from '@vis.gl/react-google-maps';
-import { set } from 'date-fns';
 import { FC, useEffect, useState } from 'react';
 
 export type Poi = { key: string; location: google.maps.LatLngLiteral };

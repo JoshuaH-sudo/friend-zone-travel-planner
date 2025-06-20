@@ -63,7 +63,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           id='map-overview'
           className='h-1/3 w-full max-w-xl bg-blue-500 sm:h-full'
         >
-          <LocationMap />
+          <LocationMap routeId={parseInt(routeId, 10)} />
         </div>
       </div>
     </div>
