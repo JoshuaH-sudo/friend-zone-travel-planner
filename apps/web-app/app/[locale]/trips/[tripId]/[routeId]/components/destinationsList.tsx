@@ -17,7 +17,7 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
         {destinations?.map((destination, index) => (
           <>
             <div
-              key={destination.location}
+              key={destination.id}
               className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
             >
               {destination.location}
