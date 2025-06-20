@@ -5,6 +5,7 @@ import { DUMMY_LOGIN_USER_ID } from '../../page';
 import { TripRouteParams } from '../page';
 import AddDestinationForm from './components/addDestinationForm';
 import DestinationList from './components/destinationsList';
+import LocationMap from './components/locationMap';
 
 export type RouteParams = TripRouteParams & {
   routeId: string;
@@ -61,7 +62,9 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         <div
           id='map-overview'
           className='h-1/3 w-full max-w-xl bg-blue-500 sm:h-full'
-        />
+        >
+          <LocationMap />
+        </div>
       </div>
     </div>
   );
