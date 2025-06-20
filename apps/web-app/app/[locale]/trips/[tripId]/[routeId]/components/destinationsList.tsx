@@ -11,15 +11,12 @@ export interface DestinationListProps {
 const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
   const { data: destinations } = useGetDestinationsByRouteId(routeId);
   return (
-    <>
+    <div>
       <p>Route</p>
       <ScrollArea className='h-full'>
         {destinations?.map((destination, index) => (
-          <>
-            <div
-              key={destination.id}
-              className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
-            >
+          <div key={destination.id} className='flex flex-col items-center'>
+            <div className='cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'>
               {destination.location}
             </div>
             {index < destinations.length - 1 && (
@@ -28,10 +25,10 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
                 className='mx-auto size-6 text-black'
               />
             )}
-          </>
+          </div>
         ))}
       </ScrollArea>
-    </>
+    </div>
   );
 };
 

@@ -14,15 +14,15 @@ interface LocationMapProps {
   routeId: number;
 }
 const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
-  const { data: destinations } = useGetDestinationsByRouteId(routeId);
-  const locations: Poi[] =
-    destinations?.map((destination) => ({
-      key: destination.location,
-      location: {
-        lat: destination?.latitude || 0,
-        lng: destination?.longitude || 0,
-      },
-    })) || [];
+  const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
+
+  const locations: Poi[] = destinations.map((destination) => ({
+    key: destination.location,
+    location: {
+      lat: destination.latitude,
+      lng: destination.longitude,
+    },
+  }));
 
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral>({
     lat: 0,
@@ -40,14 +40,21 @@ const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
     );
   }, []);
 
+  const lastDestination = destinations[destinations.length - 1];
+  console.log('Last destination:', lastDestination);
+  const lastPosition: google.maps.LatLngLiteral = {
+    lat: lastDestination?.latitude || userLocation.lat,
+    lng: lastDestination?.longitude || userLocation.lng,
+  };
+
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
       <Map
         // Force re-render when user location changes
-        key={userLocation.lat + userLocation.lng}
+        key={lastPosition.lat + lastPosition.lng}
         mapId='e8e51ecff87a146cf2857bda'
         style={{ width: '100%', height: '100%' }}
-        defaultCenter={userLocation}
+        defaultCenter={lastPosition}
         defaultZoom={13}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
