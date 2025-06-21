@@ -68,8 +68,9 @@ const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
 const PoiMarkers = (props: { pois: Poi[] }) => {
   return (
     <>
-      {props.pois.map((poi: Poi) => (
+      {props.pois.map((poi, index) => (
         <AdvancedMarker key={poi.key} position={poi.location}>
+          <h1>{index}</h1>
           <Pin
             background={'#FBBC04'}
             glyphColor={'#000'}

@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Destination, Friend } from '@/lib/generated/prisma';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import useAddDestinationToRoute from '@/lib/hooks/useAddDestnationToRoute';
+import useAddDestinationToRoute from '@/lib/hooks/useAddDestinationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
