@@ -40,7 +40,8 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   currentOrder = 0,
 }) => {
   const queryClient = useQueryClient();
-  const form = useForm<NewDestination>({
+
+  const form = useForm<NewDestination, any, NewDestination>({
     defaultValues: {
       location: '',
       order: currentOrder + 1,
@@ -69,7 +70,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   });
 
   const onSubmit = async (data: NewDestination) => {
-    console.log('Form submitted with data:', data);
     await addDestinationToRoute(data);
   };
 

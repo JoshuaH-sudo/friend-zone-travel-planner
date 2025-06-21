@@ -1,5 +1,6 @@
 'use server';
 
+import { getAddressCoordinates } from '../actions';
 import prisma from '../db';
 
 export async function getDestinationsByRouteId(routeId: number) {
@@ -17,6 +18,14 @@ export async function addDestinationToRoute({
   routeId,
   location,
 }: addDestinationToRouteProps) {
+  const geoData = await getAddressCoordinates(location);
+  if (geoData.status !== 'OK') {
+    throw new Error(`Failed to get coordinates for location: ${location}`);
+  }
+  if (!geoData.results) {
+    throw new Error(`No results found for location: ${location}`);
+  }
+  const { lat, lng } = geoData.results.geometry.location;
   // Get the current highest order in the route
   const highestOrder = await prisma.destination.findFirst({
     where: { routeId },
@@ -30,6 +39,8 @@ export async function addDestinationToRoute({
   return prisma.destination.create({
     data: {
       location,
+      latitude: lat,
+      longitude: lng,
       routeId,
       order: newOrder,
     },
