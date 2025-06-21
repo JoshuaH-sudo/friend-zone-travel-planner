@@ -35,7 +35,7 @@ export async function addDestinationToRoute({
 
   // Create new destination with incremented order
   const newOrder = (highestOrder?.order ?? -1) + 1;
-
+ 
   return prisma.destination.create({
     data: {
       location,
