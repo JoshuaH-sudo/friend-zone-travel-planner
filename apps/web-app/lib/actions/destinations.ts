@@ -13,10 +13,12 @@ export async function getDestinationsByRouteId(routeId: number) {
 export interface addDestinationToRouteProps {
   routeId: number;
   location: string;
+  friendIds: number[];
 }
 export async function addDestinationToRoute({
   routeId,
   location,
+  friendIds = [],
 }: addDestinationToRouteProps) {
   const geoData = await getAddressCoordinates(location);
   if (geoData.status !== 'OK') {
@@ -43,6 +45,9 @@ export async function addDestinationToRoute({
       longitude: lng,
       routeId,
       order: newOrder,
+      friends: {
+        connect: friendIds.map((id) => ({ id })),
+      },
     },
   });
 }

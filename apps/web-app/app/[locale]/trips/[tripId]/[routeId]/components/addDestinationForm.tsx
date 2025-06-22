@@ -2,7 +2,6 @@
 
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Destination, Friend } from '@/lib/generated/prisma';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,8 +18,11 @@ import {
   FormDescription,
   FormMessage,
 } from '@/components/ui/form';
+import { Combobox } from '@/components/ui/combo-box';
 
-export type NewDestination = Omit<Destination, 'id'>;
+export interface NewDestination extends Omit<Destination, 'id'> {
+  friendIds: number[];
+}
 
 export interface AddDestinationFormProps {
   routeId: number;
@@ -30,6 +32,7 @@ export interface AddDestinationFormProps {
 const schema = z.object({
   location: z.string().min(1, 'Location is required'),
   routeId: z.number().int().positive('Route ID must be a positive integer'),
+  friends: z.array(z.string()),
 });
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
@@ -42,6 +45,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     defaultValues: {
       location: '',
       routeId,
+      friendIds: [],
     },
     resolver: zodResolver(schema),
   });
@@ -101,16 +105,17 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
         <div className='h-1/3'>
           <p>Friends To See</p>
-          <ScrollArea>
-            {friends.map((friend) => (
-              <div
-                key={friend.id}
-                className='my-2 cursor-pointer rounded-lg bg-gray-200 p-2 text-black transition-colors duration-200 hover:bg-red-400'
-              >
-                {friend.name}
-              </div>
-            ))}
-          </ScrollArea>
+          <Combobox
+            multiple
+            options={friends.map((friend) => ({
+              value: friend.id,
+              label: friend.name,
+            }))}
+            onChange={(value) => {
+              form.setValue('friendIds', value);
+            }}
+            value={form.watch('friendIds')}
+          />
         </div>
 
         <button

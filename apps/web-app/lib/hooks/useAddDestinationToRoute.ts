@@ -5,13 +5,10 @@ import {
   addDestinationToRouteProps,
 } from '../actions/destinations';
 
-export type UseAddDestinationToRoute = Omit<
-  UseMutationOptions<
-    addDestinationToRouteProps,
-    Error,
-    addDestinationToRouteProps
-  >,
-  'mutationFn'
+export type UseAddDestinationToRoute = UseMutationOptions<
+  addDestinationToRouteProps,
+  Error,
+  addDestinationToRouteProps
 >;
 const useAddDestinationToRoute = (props?: UseAddDestinationToRoute) =>
   useMutation({
