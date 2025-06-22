@@ -21,7 +21,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
       //TODO: Filter friends by location area to destination
     },
   });
-
+  
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div

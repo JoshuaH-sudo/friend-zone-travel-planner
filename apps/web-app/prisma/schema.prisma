@@ -23,11 +23,13 @@ model User {
 }
 
 model Friend {
-  id       Int    @id @default(autoincrement())
-  name     String
-  location String
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId   Int
+  id            Int          @id @default(autoincrement())
+  name          String
+  location      String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId        Int
+  Destination   Destination? @relation(fields: [destinationId], references: [id])
+  destinationId Int?
 }
 
 // A trip can have multiple routes
@@ -55,6 +57,7 @@ model Destination {
   latitude  Float
   longitude Float
   order     Int
+  friends   Friend[]
   routeId   Int
   Route     Route    @relation(fields: [routeId], references: [id])
 }

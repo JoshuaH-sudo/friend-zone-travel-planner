@@ -25,26 +25,22 @@ export type NewDestination = Omit<Destination, 'id'>;
 export interface AddDestinationFormProps {
   routeId: number;
   friends: Friend[];
-  currentOrder?: number;
 }
 
 const schema = z.object({
   location: z.string().min(1, 'Location is required'),
-  order: z.number().int().positive('Order must be a positive integer'),
   routeId: z.number().int().positive('Route ID must be a positive integer'),
 });
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
   routeId,
   friends,
-  currentOrder = 0,
 }) => {
   const queryClient = useQueryClient();
 
   const form = useForm<NewDestination, any, NewDestination>({
     defaultValues: {
       location: '',
-      order: currentOrder + 1,
       routeId,
     },
     resolver: zodResolver(schema),
@@ -56,6 +52,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     reset,
     formState: { isValid },
   } = form;
+
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
