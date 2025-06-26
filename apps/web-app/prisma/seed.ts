@@ -80,6 +80,8 @@ async function main() {
                   latitude: 48.8566,
                   longitude: 2.3522,
                   order: 0,
+                  startDate: new Date('2025-07-01'),
+                  endDate: new Date('2025-07-05'),
                   friends: {
                     connect: [{ id: mikeFriend.id }]
                   }
@@ -89,6 +91,8 @@ async function main() {
                   latitude: 52.3676,
                   longitude: 4.9041,
                   order: 1,
+                  startDate: new Date('2025-07-06'),
+                  endDate: new Date('2025-07-10'),
                   friends: {
                     connect: [{ id: sarahFriend.id }]
                   }
@@ -98,6 +102,8 @@ async function main() {
                   latitude: 50.8503,
                   longitude: 4.3517,
                   order: 2,
+                  startDate: new Date('2025-07-11'),
+                  endDate: new Date('2025-07-15'),
                   friends: {
                     connect: [{ id: mikeFriend.id }, { id: sarahFriend.id }]
                   }
@@ -114,6 +120,8 @@ async function main() {
                   latitude: 41.9028,
                   longitude: 12.4964,
                   order: 0,
+                  startDate: new Date('2025-08-01'),
+                  endDate: new Date('2025-08-05'),
                   friends: {
                     connect: [{ id: sarahFriend.id }]
                   }
@@ -123,6 +131,8 @@ async function main() {
                   latitude: 41.3851,
                   longitude: 2.1734,
                   order: 1,
+                  startDate: new Date('2025-08-06'),
+                  endDate: new Date('2025-08-10'),
                   friends: {
                     connect: [{ id: mikeFriend.id }]
                   }
@@ -132,6 +142,8 @@ async function main() {
                   latitude: 37.9838,
                   longitude: 23.7275,
                   order: 2,
+                  startDate: new Date('2025-08-11'),
+                  endDate: new Date('2025-08-15'),
                   friends: {
                     connect: [{ id: mikeFriend.id }, { id: sarahFriend.id }]
                   }
@@ -159,6 +171,8 @@ async function main() {
                   latitude: 35.6895,
                   longitude: 139.6917,
                   order: 0,
+                  startDate: new Date('2025-09-01'),
+                  endDate: new Date('2025-09-05'),
                   friends: {
                     connect: [{ id: tomFriend.id }]
                   }
@@ -168,6 +182,8 @@ async function main() {
                   latitude: 37.5665,
                   longitude: 126.978,
                   order: 1,
+                  startDate: new Date('2025-09-06'),
+                  endDate: new Date('2025-09-10'),
                   friends: {
                     connect: [{ id: emmaFriend.id }]
                   }
@@ -177,6 +193,8 @@ async function main() {
                   latitude: 39.9042,
                   longitude: 116.4074,
                   order: 2,
+                  startDate: new Date('2025-09-11'),
+                  endDate: new Date('2025-09-15'),
                   friends: {
                     connect: [{ id: tomFriend.id }, { id: emmaFriend.id }]
                   }
@@ -193,6 +211,8 @@ async function main() {
                   latitude: 13.7563,
                   longitude: 100.5018,
                   order: 0,
+                  startDate: new Date('2025-10-01'),
+                  endDate: new Date('2025-10-05'),
                   friends: {
                     connect: [{ id: emmaFriend.id }]
                   }
@@ -202,6 +222,8 @@ async function main() {
                   latitude: 1.3521,
                   longitude: 103.8198,
                   order: 1,
+                  startDate: new Date('2025-10-06'),
+                  endDate: new Date('2025-10-10'),
                   friends: {
                     connect: [{ id: tomFriend.id }]
                   }
@@ -211,6 +233,8 @@ async function main() {
                   latitude: -8.4095,
                   longitude: 115.1889,
                   order: 2,
+                  startDate: new Date('2025-10-11'),
+                  endDate: new Date('2025-10-15'),
                   friends: {
                     connect: [{ id: tomFriend.id }, { id: emmaFriend.id }]
                   }
