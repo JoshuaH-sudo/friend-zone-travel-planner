@@ -55,12 +55,14 @@ export function DatePickerWithRange({
         </PopoverTrigger>
         <PopoverContent
           id='date-picker-content'
-          className='w-auto bg-slate-500 p-1'
+          className='w-auto p-0 bg-popover'
           align='start'
+          data-slot='popover-content'
         >
           <Calendar
             initialFocus
             mode='range'
+            captionLayout="dropdown"
             locale={dateLocale}
             defaultMonth={dates?.from}
             selected={dates}
