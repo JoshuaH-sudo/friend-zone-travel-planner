@@ -19,11 +19,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
+import { DateRange } from 'react-day-picker';
 
 export interface NewDestination {
   routeId: number;
   location: string;
   friendIds: number[];
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface AddDestinationFormProps {
@@ -35,6 +38,16 @@ const schema = z.object({
   routeId: z.number().int().positive('Route ID must be a positive integer'),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.number()),
+  startDate: z
+    .date()
+    .refine((date) => date === undefined || date instanceof Date, {
+      message: 'Start date must be a valid date',
+    }),
+  endDate: z
+    .date()
+    .refine((date) => date === undefined || date instanceof Date, {
+      message: 'End date must be a valid date',
+    }),
 });
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
@@ -76,6 +89,20 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     await addDestinationToRoute(data);
   };
 
+  const dates: DateRange = {
+    to: form.watch('endDate') || undefined,
+    from: form.watch('startDate') || undefined,
+  };
+  const onDateSelect = (selectedDates: DateRange | undefined) => {
+    if (!selectedDates?.from || !selectedDates?.to) {
+      form.resetField('startDate');
+      form.resetField('endDate');
+      return;
+    }
+    form.setValue('startDate', selectedDates.from);
+    form.setValue('endDate', selectedDates.to);
+  };
+
   return (
     <Form {...form}>
       <form
@@ -102,7 +129,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
         <div>
           <p>Dates</p>
-          <DatePickerWithRange />
+          <DatePickerWithRange dates={dates} onSelect={onDateSelect} />
         </div>
 
         <div className='h-1/3'>

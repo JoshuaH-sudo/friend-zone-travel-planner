@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { addDays, addYears, format } from 'date-fns';
+import { addYears, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
@@ -14,17 +14,19 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
-import { useState } from 'react';
+
+interface DatePickerWithRangeProps {
+  className?: string;
+  dates: DateRange;
+  onSelect: (dates: DateRange | undefined) => void;
+}
 
 export function DatePickerWithRange({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  dates,
+  onSelect: setDates,
+}: DatePickerWithRangeProps) {
   const dateLocale = useGetDateLocale();
-  const [dates, setDates] = useState<DateRange | undefined>({
-    from: new Date(),
-    // Default to a week range
-    to: addDays(new Date(), 7),
-  });
 
   return (
     <div className={cn('grid gap-2', className)}>
@@ -55,21 +57,21 @@ export function DatePickerWithRange({
         </PopoverTrigger>
         <PopoverContent
           id='date-picker-content'
-          className='w-auto p-0 bg-popover'
+          className='bg-popover w-auto p-0'
           align='start'
           data-slot='popover-content'
         >
           <Calendar
             initialFocus
             mode='range'
-            captionLayout="dropdown"
-            startMonth={new Date()} 
+            captionLayout='dropdown'
+            startMonth={new Date()}
             endMonth={addYears(new Date(), 5)}
             locale={dateLocale}
             defaultMonth={dates?.from}
             selected={dates}
             onSelect={setDates}
-            numberOfMonths={2}
+            numberOfMonths={1}
           />
         </PopoverContent>
       </Popover>
