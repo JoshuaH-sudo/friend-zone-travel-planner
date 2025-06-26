@@ -10,6 +10,14 @@ export async function getDestinationsByRouteId(routeId: number) {
   });
 }
 
+export type DestinationResponse = {
+  id: number;
+  location: string;
+  latitude: number;
+  longitude: number;
+  order: number;
+  routeId: number;
+};
 export interface addDestinationToRouteProps {
   routeId: number;
   location: string;
