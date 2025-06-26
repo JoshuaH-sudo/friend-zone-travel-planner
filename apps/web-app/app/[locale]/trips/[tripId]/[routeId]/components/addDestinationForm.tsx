@@ -39,16 +39,8 @@ const schema = z.object({
   routeId: z.number().int().positive('Route ID must be a positive integer'),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.number()),
-  startDate: z
-    .date()
-    .refine((date) => date === undefined || date instanceof Date, {
-      message: 'Start date must be a valid date',
-    }),
-  endDate: z
-    .date()
-    .refine((date) => date === undefined || date instanceof Date, {
-      message: 'End date must be a valid date',
-    }),
+  startDate: z.date(),
+  endDate: z.date(),
 });
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
@@ -79,7 +71,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       queryClient.invalidateQueries({
         queryKey: ['destinations', routeId],
       });
-      console.log('Destination added successfully');
     },
     onError: (error) => {
       console.error('Error adding destination:', error);
@@ -105,7 +96,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   };
 
   const selectedFriends = form.watch('friendIds');
-  console.log('Selected Friends:', selectedFriends);
 
   return (
     <Form {...form}>
