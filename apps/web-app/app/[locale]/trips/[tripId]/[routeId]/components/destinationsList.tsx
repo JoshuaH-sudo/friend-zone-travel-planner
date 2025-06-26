@@ -22,7 +22,7 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
                 {index + 1}
               </div>
 
-              <div className='flex flex-1 cursor-pointer gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
+              <div className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
                 <p className='flex-1'>{destination.location}</p>
                 <p>{destination.startDate.toLocaleDateString()}</p>
                 <p>{destination.endDate.toLocaleDateString()}</p>
