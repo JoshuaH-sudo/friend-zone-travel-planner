@@ -12,6 +12,7 @@ export type UseAddDestinationToRoute = UseMutationOptions<
 >;
 const useAddDestinationToRoute = (props?: UseAddDestinationToRoute) =>
   useMutation({
+    //@ts-expect-error
     mutationFn: addDestinationToRoute,
     ...props,
   });

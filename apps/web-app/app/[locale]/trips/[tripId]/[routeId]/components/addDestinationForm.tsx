@@ -2,7 +2,7 @@
 
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { Input } from '@/components/ui/input';
-import { Destination, Friend } from '@/lib/generated/prisma';
+import { Friend } from '@/lib/generated/prisma';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '@/lib/hooks/useAddDestinationToRoute';
@@ -20,7 +20,9 @@ import {
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
 
-export interface NewDestination extends Omit<Destination, 'id'> {
+export interface NewDestination {
+  routeId: number;
+  location: string;
   friendIds: number[];
 }
 
@@ -30,9 +32,9 @@ export interface AddDestinationFormProps {
 }
 
 const schema = z.object({
-  location: z.string().min(1, 'Location is required'),
   routeId: z.number().int().positive('Route ID must be a positive integer'),
-  friends: z.array(z.string()),
+  location: z.string().min(1, 'Location is required'),
+  friendIds: z.array(z.number()),
 });
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({

@@ -66,10 +66,10 @@ export function Combobox<T extends string | number>({
         const newValues = currentValues.includes(optionValue)
           ? currentValues.filter((v) => v !== optionValue)
           : [...currentValues, optionValue];
-        onChange(newValues);
+        (onChange as (value: T[]) => void)(newValues);
       } else {
-        const newValue = optionValue === value ? '' : optionValue;
-        onChange(newValue);
+        const newValue = optionValue === value ? ('' as T) : optionValue;
+        (onChange as (value: T) => void)(newValue);
         setOpen(false);
       }
     },
@@ -131,7 +131,10 @@ export function Combobox<T extends string | number>({
                 <CommandItem
                   key={option.value.toString()}
                   value={option.value.toString()}
-                  onSelect={handleSelect}
+                  onSelect={(value) => {
+                    const option = options.find((opt) => opt.value.toString() === value);
+                    if (option) handleSelect(option.value);
+                  }}
                 >
                   {option.label}
                   <Check
