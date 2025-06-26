@@ -98,7 +98,7 @@ export function Combobox<T extends string | number>({
                     <Badge key={`t${val}`} variant='secondary' className='mr-1'>
                       {options.find((option) => option.value === val)?.label}
                       <button
-                        className='ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
+                        className='ml-1 rounded-full outline-hidden ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
                         onMouseDown={(e) => {
                           e.preventDefault();
                           clearSelection(e, val);

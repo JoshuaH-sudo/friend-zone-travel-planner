@@ -75,10 +75,10 @@ export default function LandingPage() {
                     fontWeight: '800',
                   }}
                 >
-                  <span className='font-extrabold leading-[64px] text-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
+                  <span className='font-extrabold leading-[64px] text-white [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]'>
                     {t('connectedBy')}
                   </span>
-                  <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.25)]'>
+                  <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]'>
                     {t('friendZone')}
                   </span>
                 </div>
@@ -141,7 +141,7 @@ export default function LandingPage() {
                   alt='first-example'
                   width={717}
                   height={428}
-                  className='rounded-md outline outline-4 outline-white'
+                  className='rounded-md outline-solid outline-4 outline-white'
                 />
               </motion.div>
 
@@ -149,7 +149,7 @@ export default function LandingPage() {
                 initial={{ rotate: 0, x: -50, opacity: 0 }}
                 animate={{ rotate: -4.317, x: -100, opacity: 1 }}
                 transition={{ duration: 0.5, ease: 'easeOut', delay: 0.4 }}
-                className='absolute bottom-0 z-[1]'
+                className='absolute bottom-0 z-1'
               >
                 <Image
                   src={productExampleSecond}
@@ -163,7 +163,7 @@ export default function LandingPage() {
                 initial={{ rotate: 0, x: -50, opacity: 0 }}
                 animate={{ rotate: -6.962, x: -180, opacity: 1 }}
                 transition={{ duration: 0.5, ease: 'easeOut', delay: 0.7 }}
-                className='absolute bottom-0 z-[0]'
+                className='absolute bottom-0 z-0'
               >
                 <Image
                   src={productExampleThird}

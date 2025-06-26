@@ -63,7 +63,7 @@ export const FeatureShortcuts = () => {
             <motion.div
               layoutId='selectedFeature'
               transition={{ type: 'spring', bounce: 0.3, duration: 0.6 }}
-              className='absolute top-0 right-0 z-[1] h-28 w-28 rounded-xl bg-white'
+              className='absolute top-0 right-0 z-1 h-28 w-28 rounded-xl bg-white'
             />
           )}
         </div>

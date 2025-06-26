@@ -28,7 +28,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         id='route-name-section'
         className='mb-4 flex flex-row items-end justify-between gap-2'
       >
-        <div className='flex-grow space-y-2'>
+        <div className='grow space-y-2'>
           <Label htmlFor='route-name'>Route Name</Label>
           <Input
             id='route-name'

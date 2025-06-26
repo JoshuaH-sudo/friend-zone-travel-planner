@@ -22,8 +22,8 @@ const FeatureFrame: FC<FeatureFrameProps> = ({
   shadowDirection = 'left',
   className,
 }) => {
-  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
+  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0/0.25)]';
+  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0/0.25)]';
   const shadowClassName =
     shadowDirection === 'left' ? leftShadowClassName : rightShadowClassName;
   return (

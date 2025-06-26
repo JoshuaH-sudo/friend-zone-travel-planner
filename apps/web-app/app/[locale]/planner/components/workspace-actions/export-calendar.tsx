@@ -64,11 +64,11 @@ export function ExportCalendar({ friends, groupName }: ExportCalendarProps) {
                 className='justify-start gap-2 overflow-hidden'
               >
                 <span
-                  className='inline-block h-3 w-3 flex-shrink-0 rounded-full'
+                  className='inline-block h-3 w-3 shrink-0 rounded-full'
                   style={{ backgroundColor: friend.color }}
                 />
                 <span className='truncate'>{friend.name}</span>
-                <Upload className='ml-auto h-4 w-4 flex-shrink-0' />
+                <Upload className='ml-auto h-4 w-4 shrink-0' />
               </Button>
             ))}
           </div>

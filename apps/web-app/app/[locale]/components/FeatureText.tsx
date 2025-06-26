@@ -11,15 +11,15 @@ const FeatureText: FC<FeatureTextProps> = ({
   className,
   children,
 }) => {
-  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
-  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0_/_0.25)]';
+  const leftShadowClassName = 'shadow-[-12px_12px_4px_0px_rgb(0_0_0/0.25)]';
+  const rightShadowClassName = 'shadow-[12px_12px_4px_0px_rgb(0_0_0/0.25)]';
   const shadowClassName =
     shadowDirection === 'left' ? leftShadowClassName : rightShadowClassName;
 
   return (
     <div
       className={cn(
-        'inline-flex h-fit w-[639px] flex-grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 border-black bg-white/90 px-4 py-6',
+        'inline-flex h-fit w-[639px] grow-0 flex-col items-center justify-center gap-2.5 rounded-3xl border-2 border-black bg-white/90 px-4 py-6',
         shadowClassName,
         className
       )}

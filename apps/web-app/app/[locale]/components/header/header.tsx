@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <header className='fixed left-0 right-0 top-2 z-50 flex items-center justify-center'>
-      <div className='inline-flex h-16 w-[766px] items-center justify-between overflow-hidden rounded-3xl bg-green-300/80 px-6 py-3 outline outline-2 outline-offset-[-2px] outline-black backdrop-blur-[2px]'>
+      <div className='inline-flex h-16 w-[766px] items-center justify-between overflow-hidden rounded-3xl bg-green-300/80 px-6 py-3 outline-solid outline-2 -outline-offset-2 outline-black backdrop-blur-[2px]'>
         <div className='flex items-center justify-start gap-2'>
           <Link
             href='/'

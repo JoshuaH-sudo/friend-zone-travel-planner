@@ -72,7 +72,7 @@ const MultiPointSlider = React.forwardRef<
           <SliderPrimitive.Thumb
             className={cn(
               'block h-5 w-5 rounded-full border-2 border-white',
-              'ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+              'ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
             )}
             style={{
               backgroundColor: thumbColor,
@@ -83,7 +83,7 @@ const MultiPointSlider = React.forwardRef<
           <SliderPrimitive.Thumb
             className={cn(
               'block h-5 w-5 rounded-full border-2 border-white',
-              'ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+              'ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
             )}
             style={{
               backgroundColor: thumbColor,
