@@ -30,11 +30,6 @@ export interface NewDestination {
   endDate: Date;
 }
 
-export interface AddDestinationFormProps {
-  routeId: number;
-  friends: Friend[];
-}
-
 const schema = z.object({
   routeId: z.number().int().positive('Route ID must be a positive integer'),
   location: z.string().min(1, 'Location is required'),
@@ -42,6 +37,11 @@ const schema = z.object({
   startDate: z.date(),
   endDate: z.date(),
 });
+
+export interface AddDestinationFormProps {
+  routeId: number;
+  friends: Friend[];
+}
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
   routeId,
