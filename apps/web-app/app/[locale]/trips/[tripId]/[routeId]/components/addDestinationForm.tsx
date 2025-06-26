@@ -104,6 +104,9 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     form.setValue('endDate', selectedDates.to);
   };
 
+  const selectedFriends = form.watch('friendIds');
+  console.log('Selected Friends:', selectedFriends);
+
   return (
     <Form {...form}>
       <form
@@ -144,7 +147,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
             onChange={(value) => {
               form.setValue('friendIds', value);
             }}
-            value={form.watch('friendIds')}
+            value={selectedFriends}
           />
         </div>
 

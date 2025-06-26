@@ -31,28 +31,20 @@ export interface ComboboxPropsBase<T extends string | number> {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
-  multiple?: boolean;
   className?: string;
 }
 
-type ComboboxProps<T extends string | number> =
-  | (ComboboxPropsBase<T> & {
-      multiple: false;
-      value: T;
-      onChange: (value: T) => void;
-    })
-  | (ComboboxPropsBase<T> & {
-      multiple: true;
-      value: T[];
-      onChange: (value: T[]) => void;
-    });
+type ComboboxProps<T extends string | number> = ComboboxPropsBase<T> & {
+  multiple: true;
+  value: T[];
+  onChange: (value: T[]) => void;
+};
 
 export function Combobox<T extends string | number>({
   options,
   placeholder = 'Select an option...',
   searchPlaceholder = 'Search...',
   emptyMessage = 'No options found.',
-  multiple = false,
   value,
   onChange,
   className,
@@ -61,19 +53,13 @@ export function Combobox<T extends string | number>({
 
   const handleSelect = useCallback(
     (optionValue: T) => {
-      if (multiple === true) {
-        const currentValues = Array.isArray(value) ? value : [];
-        const newValues = currentValues.includes(optionValue)
-          ? currentValues.filter((v) => v !== optionValue)
-          : [...currentValues, optionValue];
-        (onChange as (value: T[]) => void)(newValues);
-      } else {
-        const newValue = optionValue === value ? ('' as T) : optionValue;
-        (onChange as (value: T) => void)(newValue);
-        setOpen(false);
-      }
+      const currentValues = Array.isArray(value) ? value : [];
+      const newValues = currentValues.includes(optionValue)
+        ? currentValues.filter((v) => v !== optionValue)
+        : [...currentValues, optionValue];
+      onChange(newValues);
     },
-    [multiple, onChange, value]
+    [onChange, value]
   );
 
   const clearSelection = (e: React.MouseEvent, valueToRemove: T) => {
@@ -91,29 +77,23 @@ export function Combobox<T extends string | number>({
           className={cn('w-full justify-between', className)}
         >
           <div className='flex flex-wrap items-center gap-1'>
-            {multiple ? (
-              Array.isArray(value) && value.length > 0 ? (
-                <div className='flex flex-wrap gap-1'>
-                  {value.map((val) => (
-                    <Badge key={`t${val}`} variant='secondary' className='mr-1'>
-                      {options.find((option) => option.value === val)?.label}
-                      <button
-                        className='ml-1 rounded-full outline-hidden ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2'
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          clearSelection(e, val);
-                        }}
-                      >
-                        <X className='h-3 w-3' />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <span className='text-muted-foreground'>{placeholder}</span>
-              )
-            ) : value ? (
-              options.find((option) => option.value === value)?.label
+            {value.length > 0 ? (
+              <div className='flex flex-wrap gap-1'>
+                {value.map((val) => (
+                  <Badge key={`t${val}`} variant='secondary' className='mr-1'>
+                    {options.find((option) => option.value === val)?.label}
+                    <button
+                      className='ring-offset-background focus:ring-ring ml-1 rounded-full outline-hidden focus:ring-2 focus:ring-offset-2'
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        clearSelection(e, val);
+                      }}
+                    >
+                      <X className='h-3 w-3' />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
             ) : (
               <span className='text-muted-foreground'>{placeholder}</span>
             )}
@@ -132,21 +112,23 @@ export function Combobox<T extends string | number>({
                   key={option.value.toString()}
                   value={option.value.toString()}
                   onSelect={(value) => {
-                    const option = options.find((opt) => opt.value.toString() === value);
+                    const option = options.find(
+                      (opt) => opt.value.toString() == value
+                    );
                     if (option) handleSelect(option.value);
                   }}
                 >
                   {option.label}
-                  <Check
+                  <div
                     className={cn(
                       'ml-auto h-4 w-4',
-                      multiple
-                        ? Array.isArray(value) && value.includes(option.value)
-                        : value === option.value
-                          ? 'opacity-100'
-                          : 'opacity-0'
+                      (value as T[]).includes(option.value)
+                        ? 'opacity-100'
+                        : 'opacity-0'
                     )}
-                  />
+                  >
+                    <Check />
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
