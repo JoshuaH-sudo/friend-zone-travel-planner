@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
 import { DateRange } from 'react-day-picker';
+import { addDestinationToRouteProps } from '@/lib/actions/destinations';
 
 export interface NewDestination {
   routeId: number;
@@ -56,7 +57,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<NewDestination, any, NewDestination>({
+  const form = useForm<NewDestination, any, addDestinationToRouteProps>({
     defaultValues: {
       location: '',
       routeId,

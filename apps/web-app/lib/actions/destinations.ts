@@ -7,9 +7,33 @@ export async function getDestinationsByRouteId(routeId: number) {
   return prisma.destination.findMany({
     where: { routeId },
     orderBy: { order: 'asc' },
+    select: {
+      id: true,
+      location: true,
+      latitude: true,
+      longitude: true,
+      order: true,
+      routeId: true,
+      startDate: true,
+      endDate: true,
+      friends: {
+        select: {
+          id: true,
+          name: true,
+          location: true,
+        },
+      },
+    },
   });
 }
 
+export interface addDestinationToRouteProps {
+  routeId: number;
+  location: string;
+  friendIds: number[];
+  startDate: Date;
+  endDate: Date;
+}
 export type DestinationResponse = {
   id: number;
   location: string;
@@ -17,16 +41,20 @@ export type DestinationResponse = {
   longitude: number;
   order: number;
   routeId: number;
+  startDate: Date;
+  endDate: Date;
+  friends: {
+    id: number;
+    name: string;
+    location: string;
+  }[];
 };
-export interface addDestinationToRouteProps {
-  routeId: number;
-  location: string;
-  friendIds: number[];
-}
 export async function addDestinationToRoute({
   routeId,
   location,
   friendIds = [],
+  startDate,
+  endDate,
 }: addDestinationToRouteProps) {
   const geoData = await getAddressCoordinates(location);
   if (geoData.status !== 'OK') {
@@ -48,29 +76,16 @@ export async function addDestinationToRoute({
 
   return prisma.destination.create({
     data: {
+      routeId,
+      order: newOrder,
       location,
       latitude: lat,
       longitude: lng,
-      routeId,
-      order: newOrder,
+      startDate,
+      endDate,
       friends: {
         connect: friendIds.map((id) => ({ id })),
       },
     },
   });
-}
-
-export async function reorderDestinations(
-  routeId: number,
-  destinationIds: number[]
-) {
-  // Update the order of all destinations in the route
-  const updates = destinationIds.map((id, index) =>
-    prisma.destination.update({
-      where: { id },
-      data: { order: index },
-    })
-  );
-
-  return prisma.$transaction(updates);
 }
