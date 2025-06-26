@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { addDays, format } from 'date-fns';
+import { addDays, addYears, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
@@ -63,6 +63,8 @@ export function DatePickerWithRange({
             initialFocus
             mode='range'
             captionLayout="dropdown"
+            startMonth={new Date()} 
+            endMonth={addYears(new Date(), 5)}
             locale={dateLocale}
             defaultMonth={dates?.from}
             selected={dates}
