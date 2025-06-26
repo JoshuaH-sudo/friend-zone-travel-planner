@@ -41,7 +41,6 @@ const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
   }, []);
 
   const lastDestination = destinations[destinations.length - 1];
-  console.log('Last destination:', lastDestination);
   const lastPosition: google.maps.LatLngLiteral = {
     lat: lastDestination?.latitude || userLocation.lat,
     lng: lastDestination?.longitude || userLocation.lng,

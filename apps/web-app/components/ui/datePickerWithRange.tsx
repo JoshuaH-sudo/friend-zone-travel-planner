@@ -13,13 +13,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
+import { useState } from 'react';
 
 export function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
+  const dateLocale = useGetDateLocale();
+  const [dates, setDates] = useState<DateRange | undefined>({
+    from: new Date(),
+    // Default to a week range
+    to: addDays(new Date(), 7),
   });
 
   return (
@@ -31,31 +35,36 @@ export function DatePickerWithRange({
             variant={'outline'}
             className={cn(
               'w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
+              !dates && 'text-muted-foreground'
             )}
           >
             <CalendarIcon />
-            {date?.from ? (
-              date.to ? (
+            {dates?.from ? (
+              dates.to ? (
                 <>
-                  {format(date.from, 'LLL dd, y')} -{' '}
-                  {format(date.to, 'LLL dd, y')}
+                  {format(dates.from, 'LLL dd, y')} -{' '}
+                  {format(dates.to, 'LLL dd, y')}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(dates.from, 'LLL dd, y')
               )
             ) : (
               <span>Pick a date</span>
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='w-auto p-0' align='start'>
+        <PopoverContent
+          id='date-picker-content'
+          className='w-auto bg-slate-500 p-1'
+          align='start'
+        >
           <Calendar
             initialFocus
             mode='range'
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
+            locale={dateLocale}
+            defaultMonth={dates?.from}
+            selected={dates}
+            onSelect={setDates}
             numberOfMonths={2}
           />
         </PopoverContent>
