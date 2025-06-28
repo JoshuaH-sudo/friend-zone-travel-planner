@@ -74,7 +74,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
-  console.log('coordinates: ', coordinates);
 
   useEffect(() => {
     console.log('Refetching coordinates for:', debouncedValue);
