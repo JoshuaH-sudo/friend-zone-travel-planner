@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { getAddressCoordinates } from '@/lib/actions/google';
 import { GeocodeResult } from '@googlemaps/google-maps-services-js';
@@ -15,7 +15,7 @@ const useGetAddressCoordinates = (
   options?: Partial<UseGetAddressCoordinatesOptions>
 ) => {
   return useQuery({
-    enabled: !!address, // Only fetch if address is provided
+    enabled: !!address || address?.length !== 0, // Only fetch if address is provided
     // Only want to fetch the address once the user has entered it completely
     queryKey: ['address', address], // Cache results based on the address
     queryFn: async () => {

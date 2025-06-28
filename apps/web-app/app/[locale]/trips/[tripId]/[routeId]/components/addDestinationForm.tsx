@@ -52,6 +52,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
 
   const form = useForm<NewDestination>({
     defaultValues: {
+      location: '',
       routeId,
       friendIds: [],
     },
