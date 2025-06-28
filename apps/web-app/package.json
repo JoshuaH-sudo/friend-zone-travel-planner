@@ -12,6 +12,7 @@
     "postinstall": "prisma generate --no-engine",
     "seed-db": "prisma db seed"
   },
+  "postinstall": "npm run generate  --no-engine",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
