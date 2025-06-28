@@ -93,9 +93,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     await addDestinationToRoute(transformedData);
   };
 
-  console.log('form values:', form.getValues());
-  console.log('form errors:', form.formState.errors);
-
   return (
     <Form {...form}>
       <form
@@ -135,6 +132,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                         : { from: undefined, to: undefined }
                     }
                     onSelect={field.onChange}
+                    {...field}
                   />
                 </FormControl>
                 <FormDescription>
@@ -160,8 +158,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                       value: friend.id,
                       label: friend.name,
                     }))}
-                    onChange={field.onChange}
-                    value={field.value}
+                    {...field}
                   />
                 </FormControl>
                 <FormDescription>
