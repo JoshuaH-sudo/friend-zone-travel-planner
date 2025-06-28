@@ -19,23 +19,26 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
-import { DateRange } from 'react-day-picker';
 import { addDestinationToRouteProps } from '@/lib/actions/destinations';
 
 export interface NewDestination {
   routeId: number;
   location: string;
   friendIds: number[];
-  startDate: Date;
-  endDate: Date;
+  dateRange: {
+    from: Date;
+    to: Date;
+  };
 }
 
 const schema = z.object({
   routeId: z.number().int().positive('Route ID must be a positive integer'),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.number()),
-  startDate: z.date(),
-  endDate: z.date(),
+  dateRange: z.object({
+    from: z.date(),
+    to: z.date(),
+  }),
 });
 
 export interface AddDestinationFormProps {
@@ -49,7 +52,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<NewDestination, any, addDestinationToRouteProps>({
+  const form = useForm<NewDestination>({
     defaultValues: {
       location: '',
       routeId,
@@ -78,24 +81,20 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   });
 
   const onSubmit = async (data: NewDestination) => {
-    await addDestinationToRoute(data);
+    // Transform the form data to match the API expected format
+    const transformedData: addDestinationToRouteProps = {
+      routeId: data.routeId,
+      location: data.location,
+      friendIds: data.friendIds,
+      startDate: data.dateRange.from,
+      endDate: data.dateRange.to,
+    };
+
+    await addDestinationToRoute(transformedData);
   };
 
-  const dates: DateRange = {
-    to: form.watch('endDate') || undefined,
-    from: form.watch('startDate') || undefined,
-  };
-  const onDateSelect = (selectedDates: DateRange | undefined) => {
-    if (!selectedDates?.from || !selectedDates?.to) {
-      form.resetField('startDate');
-      form.resetField('endDate');
-      return;
-    }
-    form.setValue('startDate', selectedDates.from);
-    form.setValue('endDate', selectedDates.to);
-  };
-
-  const selectedFriends = form.watch('friendIds');
+  console.log('form values:', form.getValues());
+  console.log('form errors:', form.formState.errors);
 
   return (
     <Form {...form}>
@@ -122,22 +121,55 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         </div>
 
         <div>
-          <p>Dates</p>
-          <DatePickerWithRange dates={dates} onSelect={onDateSelect} />
+          <FormField
+            control={control}
+            name='dateRange'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dates</FormLabel>
+                <FormControl>
+                  <DatePickerWithRange
+                    dates={
+                      field.value
+                        ? { from: field.value.from, to: field.value.to }
+                        : { from: undefined, to: undefined }
+                    }
+                    onSelect={field.onChange}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Select the start and end dates for your trip
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <div className='h-1/3'>
-          <p>Friends To See</p>
-          <Combobox
-            multiple
-            options={friends.map((friend) => ({
-              value: friend.id,
-              label: friend.name,
-            }))}
-            onChange={(value) => {
-              form.setValue('friendIds', value);
-            }}
-            value={selectedFriends}
+          <FormField
+            control={control}
+            name='friendIds'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Friends To See</FormLabel>
+                <FormControl>
+                  <Combobox
+                    multiple
+                    options={friends.map((friend) => ({
+                      value: friend.id,
+                      label: friend.name,
+                    }))}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Which friends are you going see
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
 
