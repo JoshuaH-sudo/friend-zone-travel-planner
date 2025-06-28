@@ -2,14 +2,14 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 import {
   addDestinationToRoute,
-  addDestinationToRouteProps,
+  AddDestinationToRouteProps,
   DestinationResponse,
 } from '../actions/destinations';
 
 export type UseAddDestinationToRoute = UseMutationOptions<
   DestinationResponse,
   Error,
-  addDestinationToRouteProps
+  AddDestinationToRouteProps
 >;
 const useAddDestinationToRoute = (props?: UseAddDestinationToRoute) =>
   useMutation({

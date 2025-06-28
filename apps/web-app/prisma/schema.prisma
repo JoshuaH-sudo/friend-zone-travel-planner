@@ -26,6 +26,8 @@ model Friend {
   id            Int          @id @default(autoincrement())
   name          String
   location      String
+  latitude      Float
+  longitude     Float
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId        Int
   Destination   Destination? @relation(fields: [destinationId], references: [id])

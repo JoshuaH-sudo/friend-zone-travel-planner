@@ -1,4 +1,4 @@
-import { Coordinates, getTimezoneInformation } from '@/lib/actions';
+import { Coordinates, getTimezoneInformation } from '@/lib/actions/google';
 import { useQuery } from '@tanstack/react-query';
 
 const useFetchTimezoneInformation = (coordinates?: Coordinates) => {

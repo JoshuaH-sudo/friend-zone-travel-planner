@@ -35,6 +35,8 @@ async function main() {
       data: {
         name: 'Mike Johnson',
         location: 'Los Angeles, USA',
+        latitude: 34.0522,
+        longitude: -118.2437,
         userId: john.id,
       },
     }),
@@ -42,6 +44,8 @@ async function main() {
       data: {
         name: 'Sarah Wilson',
         location: 'Sydney, Australia',
+        latitude: -33.8688,
+        longitude: 151.2093,
         userId: john.id,
       },
     }),
@@ -52,6 +56,8 @@ async function main() {
       data: {
         name: 'Tom Brown',
         location: 'Toronto, Canada',
+        latitude: 43.6532,
+        longitude: -79.3832,
         userId: jane.id,
       },
     }),
@@ -59,6 +65,8 @@ async function main() {
       data: {
         name: 'Emma Davis',
         location: 'Berlin, Germany',
+        latitude: 52.5200,
+        longitude: 13.4050,
         userId: jane.id,
       },
     }),

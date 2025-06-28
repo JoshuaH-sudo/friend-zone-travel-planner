@@ -1,7 +1,7 @@
 'use server';
 
 import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
-import { googleMapsClient, placesClient } from './google-maps';
+import { googleMapsClient, placesClient } from '../google-maps';
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
@@ -110,7 +110,7 @@ export const getPlaceAutocomplete = async (input: string) => {
   };
 };
 
-const decisionHandler = async () => {
+export const decisionHandler = async () => {
   const req = await request();
   const decision = await aj.protect(req);
   if (decision.isDenied()) {

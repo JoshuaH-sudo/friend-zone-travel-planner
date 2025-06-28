@@ -1,4 +1,4 @@
-import { getPlaceAutocomplete } from '@/lib/actions';
+import { getPlaceAutocomplete } from '@/lib/actions/google';
 import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
 import { useState } from 'react';

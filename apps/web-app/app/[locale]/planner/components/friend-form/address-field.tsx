@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { useAddressAutocomplete } from '@/app/[locale]/planner/hooks/useAddressAutocomplete';
-import useFetchAddress from '@/app/[locale]/planner/hooks/useFetchAddressCoordinates';
+import useGetAddressCoordinates from '@/lib/hooks/useGetAddressCoordinates';
 import { useEffect, useState } from 'react';
 
 interface AddressFieldProps {
@@ -32,7 +32,7 @@ function AddressField({ className }: AddressFieldProps) {
   const { suggestions, error } = useAddressAutocomplete(searchInput);
 
   const { data: addressDetails, isSuccess: isAddressSuccess } =
-    useFetchAddress(address);
+    useGetAddressCoordinates(address);
 
   useEffect(() => {
     if (error) {

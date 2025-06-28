@@ -1,6 +1,6 @@
 'use server';
 
-import { getAddressCoordinates } from '../actions';
+import { getAddressCoordinates } from './google';
 import prisma from '../db';
 
 export async function getDestinationsByRouteId(routeId: number) {
@@ -27,7 +27,7 @@ export async function getDestinationsByRouteId(routeId: number) {
   });
 }
 
-export interface addDestinationToRouteProps {
+export interface AddDestinationToRouteProps {
   routeId: number;
   location: string;
   friendIds: number[];
@@ -55,7 +55,7 @@ export async function addDestinationToRoute({
   friendIds = [],
   startDate,
   endDate,
-}: addDestinationToRouteProps) {
+}: AddDestinationToRouteProps) {
   const geoData = await getAddressCoordinates(location);
   if (geoData.status !== 'OK') {
     throw new Error(`Failed to get coordinates for location: ${location}`);

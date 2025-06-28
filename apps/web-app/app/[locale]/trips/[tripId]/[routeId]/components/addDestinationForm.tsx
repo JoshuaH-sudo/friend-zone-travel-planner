@@ -2,8 +2,7 @@
 
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { Input } from '@/components/ui/input';
-import { Friend } from '@/lib/generated/prisma';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '@/lib/hooks/useAddDestinationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
@@ -19,7 +18,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
-import { addDestinationToRouteProps } from '@/lib/actions/destinations';
+import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
+import useGetFriendsByGeoLocation from '@/lib/hooks/useGetFriendsByGeoLocation';
+import useGetAddressCoordinates from '@/lib/hooks/useGetAddressCoordinates';
+import { useDebouncedValue } from '@tanstack/react-pacer';
 
 export interface NewDestination {
   routeId: number;
@@ -43,18 +45,13 @@ const schema = z.object({
 
 export interface AddDestinationFormProps {
   routeId: number;
-  friends: Friend[];
 }
 
-const AddDestinationForm: FC<AddDestinationFormProps> = ({
-  routeId,
-  friends,
-}) => {
+const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   const queryClient = useQueryClient();
 
   const form = useForm<NewDestination>({
     defaultValues: {
-      location: '',
       routeId,
       friendIds: [],
     },
@@ -67,6 +64,21 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     reset,
     formState: { isValid },
   } = form;
+
+  const location = form.watch('location');
+  const [debouncedValue] = useDebouncedValue(location, {
+    wait: 1000,
+  });
+  const { data: coordinates, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const { data: friends } = useGetFriendsByGeoLocation(
+    coordinates?.geometry?.location
+  );
+  console.log('coordinates: ', coordinates);
+
+  useEffect(() => {
+    console.log('Refetching coordinates for:', debouncedValue);
+    refetch();
+  }, [debouncedValue]);
 
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
@@ -82,7 +94,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
   const onSubmit = async (data: NewDestination) => {
     // Transform the form data to match the API expected format
-    const transformedData: addDestinationToRouteProps = {
+    const transformedData: AddDestinationToRouteProps = {
       routeId: data.routeId,
       location: data.location,
       friendIds: data.friendIds,
@@ -154,10 +166,12 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                 <FormControl>
                   <Combobox
                     multiple
-                    options={friends.map((friend) => ({
-                      value: friend.id,
-                      label: friend.name,
-                    }))}
+                    options={
+                      friends?.map((friend) => ({
+                        value: friend.id,
+                        label: friend.name,
+                      })) || []
+                    }
                     {...field}
                   />
                 </FormControl>
