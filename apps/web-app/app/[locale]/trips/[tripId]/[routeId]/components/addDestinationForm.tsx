@@ -69,7 +69,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   const [debouncedValue] = useDebouncedValue(location, {
     wait: 1000,
   });
-  const { data: coordinates, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
@@ -124,6 +124,13 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
                 </FormControl>
                 <FormDescription>Enter your destination</FormDescription>
                 <FormMessage />
+                <FormMessage>
+                  {isError && (
+                    <span className='text-red-500'>
+                      {error?.message || 'Failed to fetch coordinates'}
+                    </span>
+                  )}
+                </FormMessage>
               </FormItem>
             )}
           />
