@@ -1,7 +1,5 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import prisma from '@/lib/db';
-import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import { TripRouteParams } from '../page';
 import AddDestinationForm from './components/addDestinationForm';
 import DestinationList from './components/destinationsList';
@@ -15,13 +13,7 @@ export type RoutePageProps = {
 };
 export default async function NewRoutePage({ params }: RoutePageProps) {
   const { routeId } = await params;
-  const friends = await prisma.friend.findMany({
-    where: {
-      userId: DUMMY_LOGIN_USER_ID,
-      //TODO: Filter friends by location area to destination
-    },
-  });
-  
+
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
@@ -53,9 +45,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           id='destination-details'
           className='flex h-2/3 w-full flex-col gap-4 bg-gray-500 p-2 sm:h-full sm:w-[30%]'
         >
-          <AddDestinationForm
-            routeId={parseInt(routeId, 10)}
-          />
+          <AddDestinationForm routeId={parseInt(routeId, 10)} />
         </div>
 
         <div

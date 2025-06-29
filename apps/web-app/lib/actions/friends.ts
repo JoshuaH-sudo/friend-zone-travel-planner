@@ -12,6 +12,7 @@ export const getFriendsByGeoLocation = async ({
 }: GetFriendsByGeoLocationProps) => {
   return await prisma.friend.findMany({
     where: {
+      userId: 1, // TODO: Replace with actual user ID or context
       latitude: {
         gte: lat - 0.1,
         lte: lat + 0.1,
