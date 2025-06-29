@@ -9,10 +9,9 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "check-types": "tsc --noEmit",
-    "postinstall": "prisma generate --no-engine",
+    "postinstall": "prisma generate",
     "seed-db": "prisma db seed"
   },
-  "postinstall": "npm run generate  --no-engine",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
