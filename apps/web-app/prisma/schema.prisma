@@ -35,11 +35,13 @@ model Friend {
 
 // A trip can have multiple routes
 model Trip {
-  id     Int     @id @default(autoincrement())
-  name   String
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId Int
-  routes Route[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int
+  routes    Route[]
 }
 
 // A route can have multiple destinations

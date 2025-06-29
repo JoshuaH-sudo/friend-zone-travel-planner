@@ -1,7 +1,9 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import CreateRouteButton from './components/createRouteButton';
-import Link from 'next/link';
+import RouteCard from './components/routeCard';
+import TripHeader from './components/tripHeader';
+import MapPlaceholder from './components/mapPlaceholder';
 
 export type TripRouteParams = {
   locale: string;
@@ -34,22 +36,42 @@ export default async function TripDetails({
   }
 
   return (
-    <main className='mx-auto max-w-7xl px-4 py-8'>
-      <h1 className='mb-2'>Trip details</h1>
-
-      <div className='flex flex-col gap-4 bg-slate-800 p-4 text-white'>
-        <div key={trip.id}>
-          {routes.map((route) => (
-            <div key={route.id}>
-              <h3>{route.name}</h3>
-              <Link href={`${tripId}/${route.id}`}>
-                <p className='text-sm font-light text-blue-500 hover:cursor-pointer hover:text-blue-300'>
-                  Details for route {route.id}
-                </p>
-              </Link>
+    <main className='min-h-screen bg-gray-50'>
+      {/* Header */}
+      <TripHeader trip={trip} />
+      
+      {/* Main Content */}
+      <div className='mx-auto max-w-7xl px-4 py-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+          {/* Left Column - Routes */}
+          <div className='lg:col-span-2 space-y-4'>
+            <div className='flex items-center justify-between'>
+              <h2 className='text-xl font-semibold text-gray-900'>Routes</h2>
+              <CreateRouteButton tripId={tripId} />
             </div>
-          ))}
-          <CreateRouteButton tripId={tripId} />
+            
+            {routes.length > 0 ? (
+              <div className='grid gap-4'>
+                {routes.map((route) => (
+                  <RouteCard 
+                    key={route.id} 
+                    route={route} 
+                    tripId={tripId} 
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className='text-center py-12 bg-white rounded-lg border border-gray-200'>
+                <p className='text-gray-500 mb-4'>No routes added yet</p>
+                <CreateRouteButton tripId={tripId} />
+              </div>
+            )}
+          </div>
+          
+          {/* Right Column - Map */}
+          <div className='lg:col-span-1'>
+            <MapPlaceholder />
+          </div>
         </div>
       </div>
     </main>
