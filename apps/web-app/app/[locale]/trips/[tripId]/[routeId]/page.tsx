@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import prisma from '@/lib/db';
-import { DUMMY_LOGIN_USER_ID } from '../../page';
+import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import { TripRouteParams } from '../page';
 import AddDestinationForm from './components/addDestinationForm';
 import DestinationList from './components/destinationsList';
@@ -55,7 +55,6 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         >
           <AddDestinationForm
             routeId={parseInt(routeId, 10)}
-            friends={friends}
           />
         </div>
 

@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import { DUMMY_LOGIN_USER_ID } from '../page';
+import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import CreateRouteButton from './components/createRouteButton';
 import Link from 'next/link';
 

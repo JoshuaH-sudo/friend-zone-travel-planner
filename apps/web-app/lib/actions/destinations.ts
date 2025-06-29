@@ -34,7 +34,7 @@ export interface AddDestinationToRouteProps {
   startDate: Date;
   endDate: Date;
 }
-export type DestinationResponse = {
+export type AddDestinationToRouteResponse = {
   id: number;
   location: string;
   latitude: number;
@@ -46,7 +46,7 @@ export type DestinationResponse = {
   friends: {
     id: number;
     name: string;
-    location: string;
+    location: string | null;
   }[];
 };
 export async function addDestinationToRoute({
@@ -85,6 +85,15 @@ export async function addDestinationToRoute({
       endDate,
       friends: {
         connect: friendIds.map((id) => ({ id })),
+      },
+    },
+    include: {
+      friends: {
+        select: {
+          id: true,
+          name: true,
+          location: true,
+        },
       },
     },
   });

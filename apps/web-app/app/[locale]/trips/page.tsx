@@ -1,7 +1,7 @@
 import prisma from '@/lib/db';
+import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import Link from 'next/link';
 
-export const DUMMY_LOGIN_USER_ID = 1;
 export default async function TripsPage() {
   const trips = await prisma.trip.findMany({
     where: {

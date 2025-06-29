@@ -3,11 +3,11 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 import {
   addDestinationToRoute,
   AddDestinationToRouteProps,
-  DestinationResponse,
+  AddDestinationToRouteResponse,
 } from '../actions/destinations';
 
 export type UseAddDestinationToRoute = UseMutationOptions<
-  DestinationResponse,
+  AddDestinationToRouteResponse,
   Error,
   AddDestinationToRouteProps
 >;
