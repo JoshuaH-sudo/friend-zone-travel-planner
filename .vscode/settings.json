@@ -1,10 +1,5 @@
 {
-  "postman.settings.dotenv-detection-notification-visibility": false,
   "cSpell.words": [
-    "calname",
-    "dtstart",
-    "ICAL",
-    "Subcomponents",
-    "vevent"
+    "fztp"
   ]
 }
