@@ -13,12 +13,12 @@ const MapPlaceholder = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className='flex-1 flex items-center justify-center'>
-          <div className='text-center text-gray-500'>
-            <div className='w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center'>
-              <Navigation className='h-12 w-12 text-gray-400' />
+          <div className='text-center text-muted-foreground'>
+            <div className='w-24 h-24 mx-auto mb-4 bg-muted rounded-lg flex items-center justify-center'>
+              <Navigation className='h-12 w-12 text-muted-foreground' />
             </div>
             <p className='text-sm'>Interactive map will be displayed here</p>
-            <p className='text-xs text-gray-400 mt-1'>
+            <p className='text-xs text-muted-foreground mt-1'>
               Showing all routes and destinations
             </p>
           </div>
@@ -42,14 +42,14 @@ const MapPlaceholder = () => {
             </div>
           </div>
           
-          <div className='pt-2 border-t border-gray-200'>
-            <div className='text-xs text-gray-500 mb-2'>Quick Actions</div>
+          <div className='pt-2 border-t border-border'>
+            <div className='text-xs text-muted-foreground mb-2'>Quick Actions</div>
             <div className='space-y-2 text-sm'>
-              <div className='flex items-center gap-2 text-gray-600'>
+              <div className='flex items-center gap-2 text-muted-foreground'>
                 <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
                 <span>View all destinations</span>
               </div>
-              <div className='flex items-center gap-2 text-gray-600'>
+              <div className='flex items-center gap-2 text-muted-foreground'>
                 <div className='w-2 h-2 bg-green-500 rounded-full'></div>
                 <span>Export itinerary</span>
               </div>

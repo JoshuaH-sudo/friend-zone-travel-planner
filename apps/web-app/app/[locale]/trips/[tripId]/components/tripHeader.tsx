@@ -25,22 +25,24 @@ const TripHeader = ({ trip }: TripHeaderProps) => {
 
   const getDuration = () => {
     if (!trip.startDate || !trip.endDate) return null;
-    const diffTime = Math.abs(trip.endDate.getTime() - trip.startDate.getTime());
+    const diffTime = Math.abs(
+      trip.endDate.getTime() - trip.startDate.getTime()
+    );
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
   };
 
   return (
-    <div className='bg-white border-b border-gray-200'>
+    <div className='border-b'>
       <div className='mx-auto max-w-7xl px-4 py-6'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex-1'>
-            <div className='flex items-center gap-3 mb-2'>
+            <div className='mb-2 flex items-center gap-3'>
               <MapPin className='h-6 w-6 text-blue-600' />
-              <h1 className='text-3xl font-bold text-gray-900'>{trip.name}</h1>
+              <h1 className='text-3xl font-bold'>{trip.name}</h1>
             </div>
-            
-            <div className='flex flex-wrap items-center gap-4 text-sm text-gray-600'>
+
+            <div className='flex flex-wrap items-center gap-4 text-sm'>
               <div className='flex items-center gap-2'>
                 <CalendarDays className='h-4 w-4' />
                 <span>

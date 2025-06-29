@@ -36,38 +36,34 @@ export default async function TripDetails({
   }
 
   return (
-    <main className='min-h-screen bg-gray-50'>
+    <main className='min-h-screen'>
       {/* Header */}
       <TripHeader trip={trip} />
-      
+
       {/* Main Content */}
       <div className='mx-auto max-w-7xl px-4 py-6'>
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
           {/* Left Column - Routes */}
-          <div className='lg:col-span-2 space-y-4'>
+          <div className='space-y-4 lg:col-span-2'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-xl font-semibold text-gray-900'>Routes</h2>
+              <h2 className='text-foreground text-xl font-semibold'>Routes</h2>
               <CreateRouteButton tripId={tripId} />
             </div>
-            
+
             {routes.length > 0 ? (
               <div className='grid gap-4'>
                 {routes.map((route) => (
-                  <RouteCard 
-                    key={route.id} 
-                    route={route} 
-                    tripId={tripId} 
-                  />
+                  <RouteCard key={route.id} route={route} tripId={tripId} />
                 ))}
               </div>
             ) : (
-              <div className='text-center py-12 bg-white rounded-lg border border-gray-200'>
-                <p className='text-gray-500 mb-4'>No routes added yet</p>
+              <div className='rounded-lg border border-gray-200 bg-white py-12 text-center'>
+                <p className='mb-4 text-gray-500'>No routes added yet</p>
                 <CreateRouteButton tripId={tripId} />
               </div>
             )}
           </div>
-          
+
           {/* Right Column - Map */}
           <div className='lg:col-span-1'>
             <MapPlaceholder />

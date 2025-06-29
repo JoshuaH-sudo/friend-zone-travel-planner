@@ -76,11 +76,14 @@ async function main() {
   await prisma.trip.create({
     data: {
       name: 'European Adventure',
+      startDate: new Date('2025-07-01'),
+      endDate: new Date('2025-08-15'),
       userId: john.id,
       routes: {
         create: [
           {
             name: 'Western Europe Tour',
+            
             Destinations: {
               create: [
                 {
@@ -167,6 +170,8 @@ async function main() {
   await prisma.trip.create({
     data: {
       name: 'Asian Explorer',
+      startDate: new Date('2025-09-01'),
+      endDate: new Date('2025-10-15'),
       userId: jane.id,
       routes: {
         create: [
