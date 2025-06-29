@@ -25,7 +25,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           <Input
             id='route-name'
             value={'Berlin Trip'}
-            placeholder={'Enter route` name'}
+            placeholder={'Enter route name'}
             className='max-w-md'
           />
         </div>
