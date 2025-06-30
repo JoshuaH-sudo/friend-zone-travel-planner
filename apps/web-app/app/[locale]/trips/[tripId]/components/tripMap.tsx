@@ -6,10 +6,8 @@ import {
   AdvancedMarker,
   APIProvider,
   Map as GoogleMap,
-  Pin,
 } from '@vis.gl/react-google-maps';
 import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId';
-import { useEffect, useState } from 'react';
 
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 

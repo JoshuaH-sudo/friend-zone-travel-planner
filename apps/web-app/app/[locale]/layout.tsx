@@ -1,9 +1,6 @@
-import type React from 'react';
 import '@/app/globals.css';
 import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { useIsFetching } from '@tanstack/react-query';
-import { Progress } from '@/components/ui/progress';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SpeedInsights } from '@vercel/speed-insights/next';
