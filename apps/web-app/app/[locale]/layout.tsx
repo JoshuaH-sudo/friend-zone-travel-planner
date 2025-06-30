@@ -1,7 +1,14 @@
+"use client";
 import type React from 'react';
 import '@/app/globals.css';
 import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useIsFetching,
+} from '@tanstack/react-query';
+import { Progress } from '@/components/ui/progress';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -23,6 +30,16 @@ const roboto = Roboto({
   subsets: ['latin'],
 });
 
+const queryClient = new QueryClient();
+
+function LoadingArea() {
+  const isFetching = useIsFetching();
+  if (!isFetching) {
+    return <div className='h-1' />;
+  }
+  return <Progress indeterminate />;
+}
+
 export default async function RootLayout({
   children,
   params,
@@ -38,18 +55,21 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning className={roboto.className}>
       <body>
         <PostHogProvider>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NextIntlClientProvider>
-              {children}
-              <SpeedInsights />
-              <Analytics />
-            </NextIntlClientProvider>
-          </ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <LoadingArea />
+            <ThemeProvider
+              attribute='class'
+              defaultTheme='system'
+              enableSystem
+              disableTransitionOnChange
+            >
+              <NextIntlClientProvider>
+                {children}
+                <SpeedInsights />
+                <Analytics />
+              </NextIntlClientProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
         </PostHogProvider>
       </body>
     </html>
