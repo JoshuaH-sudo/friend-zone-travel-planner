@@ -1,4 +1,3 @@
-'use client';
 import type React from 'react';
 import '@/app/globals.css';
 import { ThemeProvider } from 'next-themes';
@@ -26,14 +25,6 @@ const roboto = Roboto({
   subsets: ['latin'],
 });
 
-function LoadingArea() {
-  const isFetching = useIsFetching();
-  if (!isFetching) {
-    return <div className='h-1' />;
-  }
-  return <Progress indeterminate />;
-}
-
 export default async function RootLayout({
   children,
   params,
@@ -50,7 +41,6 @@ export default async function RootLayout({
       <body>
         <PostHogProvider>
           <TanStackQueryProvider>
-            <LoadingArea />
             <ThemeProvider
               attribute='class'
               defaultTheme='system'
