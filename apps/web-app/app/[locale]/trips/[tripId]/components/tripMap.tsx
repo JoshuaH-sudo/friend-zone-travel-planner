@@ -27,25 +27,6 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(
     selectedRouteId || 0
   );
-  const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral>({
-    lat: -37.8136, // Default to Melbourne
-    lng: 144.9631,
-  });
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) =>
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          }),
-        () => {
-          // Keep default location if geolocation fails
-        }
-      );
-    }
-  }, []);
 
   const locations: Poi[] = destinations.map((destination) => ({
     key: destination.location,
@@ -57,10 +38,6 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
 
   // Calculate map center based on destinations or use user location
   const getDefaultMapCenter = (): google.maps.LatLngLiteral => {
-    if (destinations.length === 0) {
-      return userLocation;
-    }
-
     if (destinations.length === 1) {
       return {
         lat: destinations[0].latitude,
