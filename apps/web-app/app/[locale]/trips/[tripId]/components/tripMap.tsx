@@ -56,7 +56,7 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
   }));
 
   // Calculate map center based on destinations or use user location
-  const getMapCenter = (): google.maps.LatLngLiteral => {
+  const getDefaultMapCenter = (): google.maps.LatLngLiteral => {
     if (destinations.length === 0) {
       return userLocation;
     }
@@ -79,7 +79,7 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
     return { lat: avgLat, lng: avgLng };
   };
 
-  const getMapZoom = (): number => {
+  const getDefaultMapZoom = (): number => {
     if (destinations.length === 0) return 10;
     if (destinations.length === 1) return 13;
 
@@ -119,8 +119,8 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
                   height: '100%',
                   borderRadius: '0 0 8px 8px',
                 }}
-                center={getMapCenter()}
-                zoom={getMapZoom()}
+                defaultCenter={getDefaultMapCenter()}
+                defaultZoom={getDefaultMapZoom()}
                 gestureHandling={'greedy'}
                 disableDefaultUI={true}
               >
