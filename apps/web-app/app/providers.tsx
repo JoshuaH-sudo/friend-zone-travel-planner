@@ -7,6 +7,7 @@ import { usePostHog } from 'posthog-js/react';
 
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -64,5 +65,17 @@ function SuspendedPostHogPageView() {
     <Suspense fallback={null}>
       <PostHogPageView />
     </Suspense>
+  );
+}
+
+const queryClient = new QueryClient();
+
+export function TanStackQueryProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

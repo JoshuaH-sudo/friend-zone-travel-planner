@@ -1,20 +1,16 @@
-"use client";
+'use client';
 import type React from 'react';
 import '@/app/globals.css';
 import { ThemeProvider } from 'next-themes';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useIsFetching,
-} from '@tanstack/react-query';
+import { useIsFetching } from '@tanstack/react-query';
 import { Progress } from '@/components/ui/progress';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
 import { Roboto } from 'next/font/google';
-import { PostHogProvider } from '../providers';
+import { PostHogProvider, TanStackQueryProvider } from '../providers';
 
 export const metadata = {
   title: 'Friend Zoned Travel Planner',
@@ -29,8 +25,6 @@ const roboto = Roboto({
   weight: '600',
   subsets: ['latin'],
 });
-
-const queryClient = new QueryClient();
 
 function LoadingArea() {
   const isFetching = useIsFetching();
@@ -55,7 +49,7 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning className={roboto.className}>
       <body>
         <PostHogProvider>
-          <QueryClientProvider client={queryClient}>
+          <TanStackQueryProvider>
             <LoadingArea />
             <ThemeProvider
               attribute='class'
@@ -69,7 +63,7 @@ export default async function RootLayout({
                 <Analytics />
               </NextIntlClientProvider>
             </ThemeProvider>
-          </QueryClientProvider>
+          </TanStackQueryProvider>
         </PostHogProvider>
       </body>
     </html>
