@@ -15,7 +15,7 @@ const useGetAddressCoordinates = (
   options?: Partial<UseGetAddressCoordinatesOptions>
 ) => {
   return useQuery({
-    enabled: !!address && address.length > 0, 
+    enabled: !!address && address.trim().length > 0, 
     queryKey: ['address', address], // Cache results based on the address
     queryFn: async () => {
       const response = await getAddressCoordinates(address!);

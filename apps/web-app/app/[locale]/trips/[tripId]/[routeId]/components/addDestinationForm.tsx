@@ -52,7 +52,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
 
   const form = useForm<NewDestination>({
     defaultValues: {
-      location: '',
       routeId,
       friendIds: [],
     },
@@ -76,9 +75,11 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   );
 
   useEffect(() => {
-    console.log('Refetching coordinates for:', debouncedValue);
-    refetch();
-  }, [debouncedValue]);
+    if (debouncedValue && debouncedValue.trim().length > 0) {
+      console.log('Refetching coordinates for:', debouncedValue);
+      refetch();
+    }
+  }, [debouncedValue, refetch]);
 
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
