@@ -42,7 +42,7 @@ const TripOverviewClient = ({ trip, routes, tripId }: TripOverviewClientProps) =
           {/* Left Column - Routes */}
           <div className='lg:col-span-2 space-y-4'>
             <div className='flex items-center justify-between'>
-              <h2 className='text-xl font-semibold text-gray-900'>Routes</h2>
+              <h2 className='text-xl font-semibold text-foreground'>Routes</h2>
               <CreateRouteButton tripId={tripId} />
             </div>
             
