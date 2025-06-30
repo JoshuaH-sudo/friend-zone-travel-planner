@@ -7,6 +7,12 @@ import { usePostHog } from 'posthog-js/react';
 
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useIsFetching,
+} from '@tanstack/react-query';
+import { Progress } from '@/components/ui/progress';
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -65,4 +71,27 @@ function SuspendedPostHogPageView() {
       <PostHogPageView />
     </Suspense>
   );
+}
+
+const queryClient = new QueryClient();
+
+export function TanStackQueryProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LoadingArea />
+      {children}
+    </QueryClientProvider>
+  );
+}
+
+function LoadingArea() {
+  const isFetching = useIsFetching();
+  if (!isFetching) {
+    return <div className='h-1' />;
+  }
+  return <Progress indeterminate />;
 }

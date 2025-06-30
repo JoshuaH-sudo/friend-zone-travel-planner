@@ -10,7 +10,6 @@ export interface DestinationListProps {
 
 const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
   const { data: destinations } = useGetDestinationsByRouteId(routeId);
-  console.log('Destinations:', destinations);
   return (
     <div>
       <p>Route</p>

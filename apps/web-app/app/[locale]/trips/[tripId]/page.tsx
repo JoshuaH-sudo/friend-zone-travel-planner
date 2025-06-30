@@ -1,7 +1,6 @@
 import prisma from '@/lib/db';
 import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
-import CreateRouteButton from './components/createRouteButton';
-import Link from 'next/link';
+import TripOverviewClient from './components/tripOverviewClient';
 
 export type TripRouteParams = {
   locale: string;
@@ -33,25 +32,5 @@ export default async function TripDetails({
     return <div className='text-red-500'>Trip not found</div>;
   }
 
-  return (
-    <main className='mx-auto max-w-7xl px-4 py-8'>
-      <h1 className='mb-2'>Trip details</h1>
-
-      <div className='flex flex-col gap-4 bg-slate-800 p-4 text-white'>
-        <div key={trip.id}>
-          {routes.map((route) => (
-            <div key={route.id}>
-              <h3>{route.name}</h3>
-              <Link href={`${tripId}/${route.id}`}>
-                <p className='text-sm font-light text-blue-500 hover:cursor-pointer hover:text-blue-300'>
-                  Details for route {route.id}
-                </p>
-              </Link>
-            </div>
-          ))}
-          <CreateRouteButton tripId={tripId} />
-        </div>
-      </div>
-    </main>
-  );
+  return <TripOverviewClient trip={trip} routes={routes} tripId={tripId} />;
 }
