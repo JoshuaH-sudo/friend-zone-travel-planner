@@ -2,14 +2,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import useGetTripsWithRoutes, { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
 import TripCard from './TripCard';
 import TripMapView from './TripMapView';
+import createTrip from '../actions/createTrip';
 
 const TripsPageClient = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const router = useRouter();
   const { data: trips = [], isLoading, error } = useGetTripsWithRoutes(DUMMY_LOGIN_USER_ID);
 
   const handleViewMap = (trip: TripWithRoutes) => {
@@ -30,9 +33,9 @@ const TripsPageClient = () => {
     setSelectedRouteId(routeId);
   };
 
-  const handleCreateNewTrip = () => {
-    // TODO: Implement create new trip functionality
-    console.log('Create new trip clicked');
+  const handleCreateNewTrip = async () => {
+    const newTrip = await createTrip();
+    router.push(`/trips/${newTrip.id}`);
   };
 
   if (isLoading) {
@@ -138,7 +141,7 @@ const TripsPageClient = () => {
                     </Button>
                   </div>
                   <div className="h-[500px] relative">
-                    <TripMapView trip={selectedTrip} selectedRouteId={selectedRouteId} />
+                    <TripMapView trip={selectedTrip} selectedRouteId={selectedRouteId || undefined} />
                   </div>
                 </div>
               ) : (

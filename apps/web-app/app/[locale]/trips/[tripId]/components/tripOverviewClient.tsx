@@ -59,8 +59,8 @@ const TripOverviewClient = ({ trip, routes, tripId }: TripOverviewClientProps) =
                 ))}
               </div>
             ) : (
-              <div className='text-center py-12 bg-white rounded-lg border border-gray-200'>
-                <p className='text-gray-500 mb-4'>No routes added yet</p>
+              <div className='text-center py-12 bg-card rounded-lg border'>
+                <p className='text-foreground mb-4'>No routes added yet</p>
                 <CreateRouteButton tripId={tripId} />
               </div>
             )}
