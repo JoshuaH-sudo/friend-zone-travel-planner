@@ -12,12 +12,15 @@ export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
 interface TripMapViewProps {
   trip: TripWithRoutes;
+  selectedRouteId?: number;
 }
 
-const TripMapView: FC<TripMapViewProps> = ({ trip }) => {
-  const firstRoute = trip.routes[0];
+const TripMapView: FC<TripMapViewProps> = ({ trip, selectedRouteId }) => {
+  const selectedRoute = selectedRouteId 
+    ? trip.routes.find(route => route.id === selectedRouteId) 
+    : trip.routes[0];
   
-  const locations: Poi[] = firstRoute?.destinations.map((destination) => ({
+  const locations: Poi[] = selectedRoute?.destinations.map((destination) => ({
     key: `${destination.id}-${destination.location}`,
     location: {
       lat: destination.latitude,
@@ -76,9 +79,9 @@ const TripMapView: FC<TripMapViewProps> = ({ trip }) => {
       {/* Trip info overlay */}
       <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg p-3 shadow-lg border">
         <h3 className="text-foreground font-semibold text-sm">{trip.name}</h3>
-        {firstRoute && (
+        {selectedRoute && (
           <p className="text-muted-foreground text-xs mt-1">
-            {firstRoute.name} • {firstRoute.destinationCount} destinations
+            {selectedRoute.name} • {selectedRoute.destinationCount} destinations
           </p>
         )}
       </div>

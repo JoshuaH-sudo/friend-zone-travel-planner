@@ -9,14 +9,25 @@ import TripMapView from './TripMapView';
 
 const TripsPageClient = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
   const { data: trips = [], isLoading, error } = useGetTripsWithRoutes(DUMMY_LOGIN_USER_ID);
 
   const handleViewMap = (trip: TripWithRoutes) => {
     if (selectedTrip?.id === trip.id) {
       setSelectedTrip(null);
+      setSelectedRouteId(null);
     } else {
       setSelectedTrip(trip);
+      // Default to first route if no route is selected
+      if (!selectedRouteId && trip.routes.length > 0) {
+        setSelectedRouteId(trip.routes[0].id);
+      }
     }
+  };
+
+  const handleRouteSelect = (trip: TripWithRoutes, routeId: number) => {
+    setSelectedTrip(trip);
+    setSelectedRouteId(routeId);
   };
 
   const handleCreateNewTrip = () => {
@@ -101,28 +112,33 @@ const TripsPageClient = () => {
                     key={trip.id}
                     trip={trip}
                     onViewMap={handleViewMap}
+                    onRouteSelect={handleRouteSelect}
+                    selectedRouteId={selectedTrip?.id === trip.id ? selectedRouteId : null}
                     isMapVisible={selectedTrip?.id === trip.id}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Right Column - Map */}
+            {/* Right Column - Preview */}
             <div className="lg:sticky lg:top-8 lg:h-fit">
               {selectedTrip ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground">Map View</h2>
+                    <h2 className="text-xl font-semibold text-foreground">Preview</h2>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setSelectedTrip(null)}
+                      onClick={() => {
+                        setSelectedTrip(null);
+                        setSelectedRouteId(null);
+                      }}
                     >
-                      Close Map
+                      Close Preview
                     </Button>
                   </div>
                   <div className="h-[500px] relative">
-                    <TripMapView trip={selectedTrip} />
+                    <TripMapView trip={selectedTrip} selectedRouteId={selectedRouteId} />
                   </div>
                 </div>
               ) : (
@@ -150,10 +166,10 @@ const TripsPageClient = () => {
                       </svg>
                     </div>
                     <h3 className="text-lg font-medium text-foreground mb-2">
-                      Select a trip to view map
+                      Select a route to preview
                     </h3>
                     <p className="text-muted-foreground text-sm">
-                      Click on any trip card to see its destinations on the map
+                      Click on any route in a trip card to see its destinations on the map
                     </p>
                   </div>
                 </div>
