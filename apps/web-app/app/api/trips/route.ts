@@ -41,12 +41,12 @@ export async function GET(request: NextRequest) {
       routes: trip.routes.map((route) => ({
         id: route.id,
         name: route.name,
-        destinationCount: route.Destinations.length,
-        friendCount: route.Destinations.reduce(
+        destinationCount: route.destinations.length,
+        friendCount: route.destinations.reduce(
           (total, dest) => total + dest.friends.length,
           0
         ),
-        destinations: route.Destinations.map((dest) => ({
+        destinations: route.destinations.map((dest) => ({
           id: dest.id,
           location: dest.location,
           latitude: dest.latitude,
