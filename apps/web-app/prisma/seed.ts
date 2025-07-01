@@ -72,7 +72,7 @@ async function main() {
     }),
   ]);
 
-  // Create Trips with Routes and Destinations
+  // Create Trips with Routes and destinations
   await prisma.trip.create({
     data: {
       name: 'European Adventure',
@@ -84,7 +84,7 @@ async function main() {
           {
             name: 'Western Europe Tour',
             
-            Destinations: {
+            destinations: {
               create: [
                 {
                   location: 'Paris, France',
@@ -124,7 +124,7 @@ async function main() {
           },
           {
             name: 'Mediterranean Tour',
-            Destinations: {
+            destinations: {
               create: [
                 {
                   location: 'Rome, Italy',
@@ -177,7 +177,7 @@ async function main() {
         create: [
           {
             name: 'East Asia Tour',
-            Destinations: {
+            destinations: {
               create: [
                 {
                   location: 'Tokyo, Japan',
@@ -217,7 +217,7 @@ async function main() {
           },
           {
             name: 'Southeast Asia Tour',
-            Destinations: {
+            destinations: {
               create: [
                 {
                   location: 'Bangkok, Thailand',
