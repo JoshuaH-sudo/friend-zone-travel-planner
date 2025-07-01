@@ -52,7 +52,12 @@ const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
         // Force re-render when user location changes
         key={lastPosition.lat + lastPosition.lng}
         mapId='e8e51ecff87a146cf2857bda'
-        style={{ width: '100%', height: '100%' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '0.65rem',
+          overflow: 'hidden',
+        }}
         defaultCenter={lastPosition}
         defaultZoom={13}
         gestureHandling={'greedy'}

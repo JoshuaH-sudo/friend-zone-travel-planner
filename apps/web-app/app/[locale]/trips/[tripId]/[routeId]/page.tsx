@@ -36,21 +36,21 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
       >
         <div
           id='route-list'
-          className='h-1/3 bg-gray-500 p-2 sm:h-full sm:w-[30%]'
+          className='bg-card h-1/3 rounded-lg border p-2 sm:h-full sm:w-[30%]'
         >
           <DestinationList routeId={parseInt(routeId, 10)} />
         </div>
 
         <div
           id='destination-details'
-          className='flex h-2/3 w-full flex-col gap-4 bg-gray-500 p-2 sm:h-full sm:w-[30%]'
+          className='bg-card flex h-2/3 w-full flex-col gap-4 rounded-lg border p-2 sm:h-full sm:w-[30%]'
         >
           <AddDestinationForm routeId={parseInt(routeId, 10)} />
         </div>
 
         <div
           id='map-overview'
-          className='h-1/3 w-full max-w-xl bg-blue-500 sm:h-full'
+          className='bg-card h-1/3 w-full max-w-xl rounded-lg border sm:h-full'
         >
           <LocationMap routeId={parseInt(routeId, 10)} />
         </div>
