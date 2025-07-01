@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       include: {
         routes: {
           include: {
-            Destinations: {
+            destinations: {
               include: {
                 friends: true,
               },
