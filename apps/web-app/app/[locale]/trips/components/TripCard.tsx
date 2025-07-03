@@ -1,21 +1,19 @@
 'use client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MapPin, Users, Calendar, Map, Star } from 'lucide-react';
 import { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
-import { useState } from 'react';
-import LocationMap from '../[tripId]/[routeId]/components/locationMap';
 
 interface TripCardProps {
   trip: TripWithRoutes;
   onViewMap: (trip: TripWithRoutes) => void;
   onRouteSelect: (trip: TripWithRoutes, routeId: number) => void;
+  onTripClick: (tripId: number) => void;
   selectedRouteId: number | null;
   isMapVisible: boolean;
 }
 
-const TripCard = ({ trip, onViewMap, onRouteSelect, selectedRouteId, isMapVisible }: TripCardProps) => {
+const TripCard = ({ trip, onViewMap, onRouteSelect, onTripClick, selectedRouteId, isMapVisible }: TripCardProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -31,6 +29,10 @@ const TripCard = ({ trip, onViewMap, onRouteSelect, selectedRouteId, isMapVisibl
     }
   };
 
+  const handleTripNameClick = () => {
+    onTripClick(trip.id);
+  };
+
   return (
     <Card className="transition-all duration-200 hover:shadow-md bg-background border">
       <CardHeader className="pb-3">
@@ -40,7 +42,12 @@ const TripCard = ({ trip, onViewMap, onRouteSelect, selectedRouteId, isMapVisibl
               <Map className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-foreground font-semibold text-lg">{trip.name}</h3>
+              <h3 
+                className="text-foreground font-semibold text-lg cursor-pointer hover:text-primary transition-colors"
+                onClick={handleTripNameClick}
+              >
+                {trip.name}
+              </h3>
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Calendar className="h-4 w-4" />
                 <span>

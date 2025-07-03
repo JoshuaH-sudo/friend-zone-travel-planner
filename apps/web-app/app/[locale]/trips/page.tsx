@@ -33,6 +33,10 @@ const TripsPage = () => {
     setSelectedRouteId(routeId);
   };
 
+  const handleTripClick = (tripId: number) => {
+    router.push(`/trips/${tripId}`);
+  };
+
   const handleCreateNewTrip = async () => {
     const newTrip = await createTrip();
     router.push(`/trips/${newTrip.id}`);
@@ -116,6 +120,7 @@ const TripsPage = () => {
                     trip={trip}
                     onViewMap={handleViewMap}
                     onRouteSelect={handleRouteSelect}
+                    onTripClick={handleTripClick}
                     selectedRouteId={selectedTrip?.id === trip.id ? selectedRouteId : null}
                     isMapVisible={selectedTrip?.id === trip.id}
                   />
