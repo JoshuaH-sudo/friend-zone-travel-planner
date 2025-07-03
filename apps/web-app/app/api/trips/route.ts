@@ -1,5 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
+
+// Type for the trips data with all nested relations
+type TripWithRoutes = Prisma.TripGetPayload<{
+  include: {
+    routes: {
+      include: {
+        destinations: {
+          include: {
+            friends: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+// Type for the formatted response data
+type TripResponse = {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  routes: {
+    id: number;
+    name: string;
+    destinationCount: number;
+    friendCount: number;
+    destinations: {
+      id: number;
+      location: string;
+      latitude: number;
+      longitude: number;
+      order: number;
+    }[];
+  }[];
+};
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -31,9 +68,9 @@ export async function GET(request: NextRequest) {
       orderBy: {
         startDate: 'desc',
       },
-    });
+    }) as TripWithRoutes[];
 
-    const tripsWithRoutes = trips.map((trip) => ({
+    const tripsWithRoutes: TripResponse[] = trips.map((trip) => ({
       id: trip.id,
       name: trip.name,
       startDate: trip.startDate.toISOString(),
