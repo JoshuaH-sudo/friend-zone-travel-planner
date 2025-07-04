@@ -17,5 +17,4 @@ jobs:
     needs: [build_android]
     type: submit
     params:
-      platform: android
       build_id: ${{ needs.build_android.outputs.build_id }}
