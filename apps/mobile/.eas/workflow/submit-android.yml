@@ -1,6 +1,8 @@
 on:
   push:
     branches: ['main']
+    paths:
+      - 'app/mobile/**'
 
 jobs:
   build_android:
