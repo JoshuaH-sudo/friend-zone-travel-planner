@@ -1,7 +1,8 @@
 "use server";
+
 import prisma from "../db";
 
-export const getUserFromDb = async (email: string, passwordHash: string) => {
+export async function getUserFromDb(email: string, passwordHash: string) { 
   return prisma.user.findUnique({
     where: {
       email,
