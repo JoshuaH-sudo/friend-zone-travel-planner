@@ -22,11 +22,11 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   // Authenticator Authenticator[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  location  String
-  friends   Friend[]
-  trips     Trip[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  location      String
+  friends       Friend[]
+  trips         Trip[]
 }
 
 model Account {
@@ -85,19 +85,18 @@ model VerificationToken {
 // }
 
 model Friend {
-  id            Int          @id @default(autoincrement())
+  id            String       @id @default(cuid())
   name          String
   location      String
   latitude      Float
   longitude     Float
   userId        String
-  destinationId Int?
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  destination   Destination? @relation(fields: [destinationId], references: [id])
+  destinations  Destination[]
 }
 
 model Trip {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
   startDate DateTime
   endDate   DateTime
@@ -108,23 +107,23 @@ model Trip {
 
 // A route can have multiple destinations
 model Route {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   name         String
-  tripId       Int
+  tripId       String
   trip         Trip          @relation(fields: [tripId], references: [id])
   destinations Destination[]
 }
 
 // A destination is a specific location within a route
 model Destination {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   location  String
   latitude  Float
   longitude Float
   order     Int
   friends   Friend[]
-  routeId   Int
   startDate DateTime
   endDate   DateTime
+  routeId   String
   route     Route    @relation(fields: [routeId], references: [id])
 }
