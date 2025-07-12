@@ -72,7 +72,7 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isEditing, updateRouteMutation.isPending, handleCancel]);
+  }, [isEditing, updateRouteMutation.isPending]);
 
   return (
     <div className='grow space-y-2'>
