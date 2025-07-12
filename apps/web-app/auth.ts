@@ -1,20 +1,11 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import prisma from './lib/db';
+import { getUserFromDb } from './lib/actions/auth';
 
 const saltAndHashPassword = (password: string) => {
   // Implement your password salting and hashing logic here
   // This is a placeholder function
   return password; // Replace with actual hashed password
-};
-
-const getUserFromDb = async (email: string, passwordHash: string) => {
-  return prisma.user.findUnique({
-    where: {
-      email,
-      passwordHash,
-    },
-  });
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

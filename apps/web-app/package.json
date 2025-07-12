@@ -10,7 +10,8 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "check-types": "tsc --noEmit",
     "postinstall": "prisma generate --no-engine",
-    "seed-db": "prisma db seed"
+    "seed-db": "prisma db seed",
+    "clean-db": "prisma migrate reset"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
