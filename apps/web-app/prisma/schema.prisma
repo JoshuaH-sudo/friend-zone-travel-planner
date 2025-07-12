@@ -14,7 +14,9 @@ datasource db {
 
 model User {
   id       Int      @id @default(autoincrement())
+  guid      String   @unique @default(uuid())
   email    String   @unique
+  passwordHash String
   name     String
   location String
   friends  Friend[]
