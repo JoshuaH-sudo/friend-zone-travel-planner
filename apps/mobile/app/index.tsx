@@ -12,8 +12,8 @@ export default function Index() {
       showsHorizontalScrollIndicator={false}
       source={{
         uri: isDevelopment
-          ? "http://localhost:3000/planner"
-          : "https://www.friend-zone.app/planner",
+          ? "http://localhost:3000/en/trips"
+          : "https://www.friend-zone.app/en/trips",
       }}
     />
   );
