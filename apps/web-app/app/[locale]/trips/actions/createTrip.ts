@@ -9,7 +9,7 @@ const createTrip = async () => {
   const endDate = new Date();
   endDate.setDate(startDate.getDate() + 7);
 
-  return await prisma.trip.create({
+  return prisma.trip.create({
     data: {
       name: 'New Trip',
       startDate: startDate,
