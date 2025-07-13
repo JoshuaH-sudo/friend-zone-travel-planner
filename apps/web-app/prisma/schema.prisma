@@ -24,19 +24,19 @@ model User {
 }
 
 model Friend {
-  id            Int          @id @default(autoincrement())
+  id            String       @id @default(cuid())
   name          String
   location      String
   latitude      Float
   longitude     Float
   userId        String
-  destinationId Int?
-  Destination   Destination? @relation(fields: [destinationId], references: [id])
+  destinationId String?
+  destination   Destination? @relation(fields: [destinationId], references: [id])
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Trip {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
   startDate DateTime
   endDate   DateTime
@@ -46,24 +46,24 @@ model Trip {
 }
 
 model Route {
-  id           Int           @id @default(autoincrement())
+  id           String        @id @default(cuid())
   name         String
-  tripId       Int
+  tripId       String
   destinations Destination[]
   trip         Trip          @relation(fields: [tripId], references: [id])
 }
 
 model Destination {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   location  String
   latitude  Float
   longitude Float
   order     Int
-  routeId   Int
+  routeId   String
   startDate DateTime
   endDate   DateTime
   route     Route    @relation(fields: [routeId], references: [id])
-  Friend    Friend[]
+  friends   Friend[]
 }
 
 model Account {
