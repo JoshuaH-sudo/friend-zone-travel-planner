@@ -1,6 +1,6 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
-import { getTrips } from '@/app/[locale]/(main-product)/trips/actions/getTrips';
+import { getTrips } from '@/app/[locale]/(main-product)/home/trips/actions/getTrips';
 
 export type TripWithRoutes = Awaited<ReturnType<typeof getTrips>>[0];
 
