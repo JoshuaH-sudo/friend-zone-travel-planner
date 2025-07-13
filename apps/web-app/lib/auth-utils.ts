@@ -1,21 +1,21 @@
-import bcrypt from "bcrypt"
+import bcryptjs from "bcryptjs"
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/db"
 
 const SALT_ROUNDS = 12
 
 /**
- * Hash a password using bcrypt
+ * Hash a password using bcryptjs
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS)
+  return bcryptjs.hash(password, SALT_ROUNDS)
 }
 
 /**
  * Verify a password against a hash
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash)
+  return bcryptjs.compare(password, hash)
 }
 
 /**
