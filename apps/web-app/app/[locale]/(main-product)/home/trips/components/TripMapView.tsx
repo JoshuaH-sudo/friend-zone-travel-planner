@@ -12,7 +12,7 @@ export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
 interface TripMapViewProps {
   trip: TripWithRoutes;
-  selectedRouteId?: number;
+  selectedRouteId?: string;
 }
 
 const TripMapView: FC<TripMapViewProps> = ({ trip, selectedRouteId }) => {
@@ -81,7 +81,7 @@ const TripMapView: FC<TripMapViewProps> = ({ trip, selectedRouteId }) => {
         <h3 className="text-foreground font-semibold text-sm">{trip.name}</h3>
         {selectedRoute && (
           <p className="text-muted-foreground text-xs mt-1">
-            {selectedRoute.name} • {selectedRoute.destinationCount} destinations
+            {selectedRoute.name} • {selectedRoute.destinations.length} destinations
           </p>
         )}
       </div>
