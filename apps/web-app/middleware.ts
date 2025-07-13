@@ -5,49 +5,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const intlMiddleware = createMiddleware(routing);
 
-// Define public routes that don't require authentication
-const publicRoutes = [
-  '/api/auth',
-  '/login',
-  '/signup', 
-  '/landing',
-  '/_next',
-  '/_vercel',
-  '/favicon.ico'
-];
-
-function isPublicRoute(pathname: string): boolean {
-  // Remove locale prefix if present (e.g., /en/login -> /login)
-  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
-  
-  return publicRoutes.some(route => 
-    pathWithoutLocale.startsWith(route) || pathname.includes(route)
-  );
-}
-
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Skip auth check for public routes
-  if (isPublicRoute(pathname)) {
+  // Skip auth check for auth-related routes and API routes
+  if (
+    pathname.includes('/api/auth') ||
+    pathname.includes('/login') ||
+    pathname.includes('/signup') ||
+    pathname.includes('/_next') ||
+    pathname.includes('/_vercel') ||
+    pathname.includes('/favicon.ico')
+  ) {
     return intlMiddleware(request);
-  }
-
-  // Handle root path redirects based on authentication
-  if (pathname === '/' || pathname.match(/^\/[a-z]{2}\/?$/)) {
-    const session = await auth();
-    const localeMatch = pathname.match(/^\/([a-z]{2})/);
-    const locale = localeMatch ? localeMatch[1] : 'en';
-    
-    if (session) {
-      // Redirect authenticated users to trips
-      const tripsUrl = new URL(`/${locale}/trips`, request.url);
-      return NextResponse.redirect(tripsUrl);
-    } else {
-      // Redirect unauthenticated users to login
-      const loginUrl = new URL(`/${locale}/login`, request.url);
-      return NextResponse.redirect(loginUrl);
-    }
   }
 
   // Check if the route is under /trips (including nested routes)
