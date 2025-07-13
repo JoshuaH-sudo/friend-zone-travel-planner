@@ -268,7 +268,7 @@ export default function LandingPage() {
           <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
             {t('letsPlanThatTrip')}
           </h2>
-          <Link href='/planner'>
+          <Link href='/trips'>
             <Button
               id='call-to-action'
               size='lg'
