@@ -2,13 +2,18 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/db"
-import bcrypt from "bcrypt"
 import { z } from "zod"
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 })
+
+// Import bcrypt dynamically to avoid Edge Runtime issues
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  const bcrypt = await import("bcrypt")
+  return bcrypt.compare(password, hash)
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -31,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null
           }
           
-          const isValidPassword = await bcrypt.compare(password, user.password)
+          const isValidPassword = await verifyPassword(password, user.password)
           
           if (!isValidPassword) {
             return null
@@ -72,4 +77,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 })
-
