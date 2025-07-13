@@ -18,14 +18,10 @@ export default async function TripDetails({
 }) {
   const { tripId } = await params;
   const userId = await getCurrentUserId();
-  
-  if (!userId) {
-    redirect('/login');
-  }
 
   const trip = await prisma.trip.findFirst({
     where: {
-      userId: userId,
+      userId: userId!,
       id: tripId,
     },
   });

@@ -7,7 +7,7 @@ export default async function RootPage() {
   console.log('Session:', session);
 
   if (!session) {
-    return redirect('/login');
+    return redirect('/signin');
   }
 
   return redirect('/home');

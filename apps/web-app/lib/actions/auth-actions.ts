@@ -1,7 +1,6 @@
 "use server"
 
 import { z } from "zod"
-import { redirect } from "next/navigation"
 import { signIn } from "@/lib/auth"
 import { createUser, userExists } from "@/lib/auth-utils"
 import { AuthError } from "next-auth"

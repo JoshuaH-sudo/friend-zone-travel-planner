@@ -40,7 +40,7 @@ export default auth((req) => {
     const locale = pathname.match(/^\/([a-z]{2})\//)?.[1] || routing.defaultLocale;
     
     // Create the sign-in URL with the current locale
-    const signInUrl = new URL(`/${locale}/login`, req.url);
+    const signInUrl = new URL(`/${locale}/signin`, req.url);
     
     // Add the current URL as a callback parameter so user can be redirected back after login
     signInUrl.searchParams.set('callbackUrl', req.url);
