@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { prisma } from "@/lib/db"
+import prisma from "@/lib/db"
 import bcrypt from "bcrypt"
 import { z } from "zod"
 
@@ -55,7 +55,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: "/login",
-    signUp: "/signup",
   },
   callbacks: {
     async jwt({ token, user }) {
