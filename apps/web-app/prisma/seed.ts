@@ -20,6 +20,7 @@ async function main() {
     data: {
       name: 'John Doe',
       email: 'john@example.com',
+      password: '$2a$12$eImiTMZG8rj1z5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3', // hashed password for 'password123'
       location: 'New York, USA',
     },
   });
@@ -28,6 +29,7 @@ async function main() {
     data: {
       name: 'Jane Smith',
       email: 'jane@example.com',
+      password: '$2a$12$eImiTMZG8rj1z5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3', // hashed password for 'password123'
       location: 'London, UK',
     },
   });
