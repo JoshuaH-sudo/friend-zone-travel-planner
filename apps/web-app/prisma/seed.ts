@@ -16,8 +16,6 @@ async function main() {
   const john = await prisma.user.create({
     data: {
       name: 'John Doe',
-      guid: 'john-doe-guid',
-      passwordHash: '$2b$10$eImiTMZG8rj1zQ9a5h6eOeO5k1Z3f4d7g8h9j0k1l2m3n4o5p6q7r8s9t0',
       email: 'john@example.com',
       location: 'New York, USA',
     },
@@ -26,8 +24,6 @@ async function main() {
   const jane = await prisma.user.create({
     data: {
       name: 'Jane Smith',
-      guid: 'jane-smith-guid',
-      passwordHash: '$2b$10$eImiTMZG8rj1zQ9a5h6eOeO5k1Z3f4d7g8h9j0k1l2m3n4o5p6q7r8s9t0',
       email: 'jane@example.com',
       location: 'London, UK',
     },

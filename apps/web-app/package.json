@@ -11,7 +11,8 @@
     "check-types": "tsc --noEmit",
     "postinstall": "prisma generate --no-engine",
     "seed-db": "prisma db seed",
-    "clean-db": "prisma migrate reset"
+    "clean-db": "prisma migrate reset",
+    "new-migration": "prisma migrate dev"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
