@@ -19,12 +19,12 @@ import path3 from '@/public/images/paths/path-3.svg';
 import path4 from '@/public/images/paths/path-4.svg';
 import mouseIndicator from '@/public/images/mouse-indicator.svg';
 import xIndicator from '@/public/images/x-indicator.svg';
-import WordFrame from '../components/WordFrame';
-import FeatureFrame from '../components/FeatureFrame';
-import FeatureText from '../components/FeatureText';
-import Footer from '../components/Footer';
-import { FeatureShortcuts } from '../components/FeatureShortcuts';
-import { Header } from '../components/header/header';
+import WordFrame from './components/WordFrame';
+import FeatureFrame from './components/FeatureFrame';
+import FeatureText from './components/FeatureText';
+import Footer from './components/Footer';
+import { FeatureShortcuts } from './components/FeatureShortcuts';
+import { Header } from './components/header/header';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
