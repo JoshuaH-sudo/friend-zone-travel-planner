@@ -51,7 +51,7 @@ const TripCard = ({ trip, onViewMap, onRouteSelect, onTripClick, selectedRouteId
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                  {formatDate(trip.startDate.toISOString())} - {formatDate(trip.endDate.toISOString())}
                 </span>
               </div>
             </div>
@@ -97,11 +97,11 @@ const TripCard = ({ trip, onViewMap, onRouteSelect, onTripClick, selectedRouteId
                 <div className="flex items-center gap-4 text-muted-foreground text-xs">
                   <div className="flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
-                    <span>{route.destinationCount} destinations</span>
+                    <span>{route.destinations.length} destinations</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
-                    <span>{route.friendCount} friends</span>
+                    {/* <span>{route} friends</span> */}
                   </div>
                 </div>
               </div>
