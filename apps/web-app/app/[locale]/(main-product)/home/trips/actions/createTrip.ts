@@ -1,9 +1,15 @@
 'use server';
 
 import prisma from '@/lib/db';
-import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
+import { getCurrentUserId } from '@/lib/auth-utils';
 
 const createTrip = async () => {
+  const userId = await getCurrentUserId();
+  
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
   // Set default dates (start: today, end: one week from today)
   const startDate = new Date();
   const endDate = new Date();
@@ -14,7 +20,7 @@ const createTrip = async () => {
       name: 'New Trip',
       startDate: startDate,
       endDate: endDate,
-      userId: DUMMY_LOGIN_USER_ID,
+      userId: userId,
     },
   });
 };

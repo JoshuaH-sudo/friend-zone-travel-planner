@@ -1,6 +1,7 @@
 import prisma from '@/lib/db';
-import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
+import { getCurrentUserId } from '@/lib/auth-utils';
 import TripOverviewClient from './components/tripOverviewClient';
+import { redirect } from 'next/navigation';
 
 export type TripRouteParams = {
   locale: string;
@@ -16,9 +17,15 @@ export default async function TripDetails({
   params: Promise<TripRouteParams>;
 }) {
   const { tripId } = await params;
+  const userId = await getCurrentUserId();
+  
+  if (!userId) {
+    redirect('/login');
+  }
+
   const trip = await prisma.trip.findFirst({
     where: {
-      userId: DUMMY_LOGIN_USER_ID,
+      userId: userId,
       id: parseInt(tripId, 10),
     },
   });

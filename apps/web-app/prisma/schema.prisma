@@ -17,10 +17,11 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  Account       Account[]
-  friends       Friend[]
-  Session       Session[]
-  trips         Trip[]
+  
+  accounts Account[]
+  sessions Session[]
+  friends  Friend[]
+  trips    Trip[]
 }
 
 model Friend {
