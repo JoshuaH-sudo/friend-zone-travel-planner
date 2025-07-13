@@ -33,12 +33,12 @@ const TripsPage = () => {
   };
 
   const handleTripClick = (tripId: string) => {
-    router.push(`/trips/${tripId}`);
+    router.push(`/home/trips/${tripId}`);
   };
 
   const handleCreateNewTrip = async () => {
     const newTrip = await createTrip();
-    router.push(`/trips/${newTrip.id}`);
+    router.push(`/home/trips/${newTrip.id}`);
   };
 
   if (isLoading) {

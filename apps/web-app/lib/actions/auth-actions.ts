@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { signIn } from '@/lib/auth';
 import { createUser, userExists } from '@/lib/auth-utils';
 import { AuthError } from 'next-auth';
+import { redirect } from 'next/navigation';
 
 const signupSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -43,9 +44,26 @@ export async function signup(formData: FormData) {
     // Create the user
     await createUser(email, password, name);
 
-    // Return success - let the component handle the sign-in
-    return { success: true };
+    await signIn('credentials', {
+      email,
+      password,
+      redirectTo: '/',
+    });
+
+    // Redirect to login page after successful signup
+    await login(formData);
   } catch (error) {
+    // Handle Next.js redirect errors - these are expected and should be re-thrown
+    if (
+      error &&
+      typeof error === 'object' &&
+      'digest' in error &&
+      typeof error.digest === 'string' &&
+      error.digest.includes('NEXT_REDIRECT')
+    ) {
+      throw error;
+    }
+
     console.error('Signup error:', error);
     return {
       error: 'Something went wrong. Please try again.',
