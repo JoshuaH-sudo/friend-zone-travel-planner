@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/db';
+import { getCurrentUserId } from '@/lib/auth-utils';
 
 export interface GetFriendsByGeoLocationProps {
   lat: number;
@@ -10,9 +11,15 @@ export const getFriendsByGeoLocation = async ({
   lat,
   lng,
 }: GetFriendsByGeoLocationProps) => {
+  const userId = await getCurrentUserId();
+  
+  if (!userId) {
+    throw new Error('User not authenticated');
+  }
+
   return await prisma.friend.findMany({
     where: {
-      userId: 1, // TODO: Replace with actual user ID or context
+      userId: userId,
       latitude: {
         gte: lat - 0.1,
         lte: lat + 0.1,
