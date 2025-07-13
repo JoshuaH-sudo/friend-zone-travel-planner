@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { signup } from "@/lib/actions/auth-actions"
 import Link from "next/link"
+import { signIn } from "@/lib/auth"
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -50,7 +51,7 @@ export function SignupForm() {
       formData.append("password", data.password)
 
       const result = await signup(formData)
-      
+
       if (result?.error) {
         setError(result.error)
       }
