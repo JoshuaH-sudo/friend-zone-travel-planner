@@ -34,15 +34,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         try {
           // Validate credentials using Zod schema
-          await signInSchema.parseAsync(credentials);
-
-          let user = null;
+          const { email, password } = await signInSchema.parseAsync(credentials);
 
           // logic to salt and hash password
-          const pwHash = saltAndHashPassword(credentials.password as string);
+          const pwHash = saltAndHashPassword(password);
 
           // logic to verify if the user exists
-          user = await getUserFromDb(credentials.email as string, pwHash);
+          const user = await prisma.user.findUnique({
+            where: {
+              email,
+            },
+          }); 
 
           if (!user) {
             // No user found, so this is their first attempt to login
@@ -52,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // return user object with their profile data
           return {
-            uuid: user.id, // Ensure this is included if you need it
+            id: user.id,
             name: user.name,
             email: user.email,
             location: user.location,
@@ -69,5 +71,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  secret: process.env.AUTH_SECRET,
+  session: {
+    strategy: 'jwt',
+  },
+  pages: {
+    signIn: '/auth/signin',
+  },
 });

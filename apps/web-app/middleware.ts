@@ -1,7 +1,13 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
+import { auth } from './auth';
 
-export default createMiddleware(routing);
+const intlMiddleware = createMiddleware(routing);
+
+export default auth((req) => {
+  // Run the internationalization middleware for authenticated requests
+  return intlMiddleware(req);
+});
 
 export const config = {
   // Match all pathnames except for
@@ -9,5 +15,3 @@ export const config = {
   // - … the ones containing a dot (e.g. `favicon.ico`)
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
 };
-
-export { auth as middleware } from "@/auth"
