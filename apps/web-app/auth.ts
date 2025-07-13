@@ -3,7 +3,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import Credentials from 'next-auth/providers/credentials';
 import { getUserFromDb } from './lib/actions/auth';
 import { z } from 'zod';
-import { prisma } from './prisma';
+import prisma from './lib/db';
 
 const saltAndHashPassword = (password: string) => {
   // Implement your password salting and hashing logic here
@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // return user object with their profile data
           return {
-            uuid: user.guid, // Ensure this is included if you need it
+            uuid: user.id, // Ensure this is included if you need it
             name: user.name,
             email: user.email,
             location: user.location,
