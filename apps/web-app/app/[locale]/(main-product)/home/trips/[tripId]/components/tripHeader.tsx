@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin } from 'lucide-react';
 
 interface Trip {
-  id: number;
+  id: string;
   name: string;
   startDate?: Date;
   endDate?: Date;

@@ -8,7 +8,7 @@ import { Check, X, Edit, Loader2 } from 'lucide-react';
 import useUpdateRouteName from '@/lib/hooks/useUpdateRouteName';
 
 interface RouteNameInputProps {
-  routeId: number;
+  routeId: string;
   initialName: string;
 }
 

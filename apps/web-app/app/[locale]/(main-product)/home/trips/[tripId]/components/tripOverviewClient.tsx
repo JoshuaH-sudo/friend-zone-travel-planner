@@ -7,14 +7,14 @@ import TripHeader from './tripHeader';
 import TripMap from './tripMap';
 
 interface Trip {
-  id: number;
+  id: string;
   name: string;
   startDate?: Date;
   endDate?: Date;
 }
 
 interface Route {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -27,7 +27,7 @@ interface TripOverviewClientProps {
 const TripOverviewClient = ({ trip, routes, tripId }: TripOverviewClientProps) => {
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
 
-  const handleRouteSelect = (routeId: number) => {
+  const handleRouteSelect = (routeId: string) => {
     setSelectedRouteId(selectedRouteId === routeId ? null : routeId);
   };
 

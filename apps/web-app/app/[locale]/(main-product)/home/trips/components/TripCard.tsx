@@ -7,8 +7,8 @@ import { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
 interface TripCardProps {
   trip: TripWithRoutes;
   onViewMap: (trip: TripWithRoutes) => void;
-  onRouteSelect: (trip: TripWithRoutes, routeId: number) => void;
-  onTripClick: (tripId: number) => void;
+  onRouteSelect: (trip: TripWithRoutes, routeId: string) => void;
+  onTripClick: (tripId: string) => void;
   selectedRouteId: number | null;
   isMapVisible: boolean;
 }
@@ -22,7 +22,7 @@ const TripCard = ({ trip, onViewMap, onRouteSelect, onTripClick, selectedRouteId
     });
   };
 
-  const handleRouteClick = (routeId: number) => {
+  const handleRouteClick = (routeId: string) => {
     onRouteSelect(trip, routeId);
     if (!isMapVisible) {
       onViewMap(trip);

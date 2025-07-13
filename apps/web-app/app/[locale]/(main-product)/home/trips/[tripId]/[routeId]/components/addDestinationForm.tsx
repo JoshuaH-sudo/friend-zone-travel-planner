@@ -24,9 +24,9 @@ import useGetAddressCoordinates from '@/lib/hooks/useGetAddressCoordinates';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 
 export interface NewDestination {
-  routeId: number;
+  routeId: string;
   location: string;
-  friendIds: number[];
+  friendIds: string[];
   dateRange: {
     from: Date;
     to: Date;
@@ -34,9 +34,9 @@ export interface NewDestination {
 }
 
 const schema = z.object({
-  routeId: z.number().int().positive('Route ID must be a positive integer'),
+  routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
-  friendIds: z.array(z.number()),
+  friendIds: z.array(z.string()),
   dateRange: z.object({
     from: z.date(),
     to: z.date(),
@@ -44,7 +44,7 @@ const schema = z.object({
 });
 
 export interface AddDestinationFormProps {
-  routeId: number;
+  routeId: string;
 }
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {

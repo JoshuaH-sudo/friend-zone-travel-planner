@@ -13,7 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import useGetDateLocale from '@/app/[locale]/planner/hooks/useGetDateLocale';
+import useGetDateLocale from '@/lib/hooks/useGetDateLocale';
 
 interface DatePickerWithRangeProps {
   className?: string;

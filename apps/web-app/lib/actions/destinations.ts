@@ -3,7 +3,7 @@
 import { getAddressCoordinates } from './google';
 import prisma from '../db';
 
-export async function getDestinationsByRouteId(routeId: number) {
+export async function getDestinationsByRouteId(routeId: string) {
   return prisma.destination.findMany({
     where: { routeId },
     orderBy: { order: 'asc' },
@@ -28,23 +28,23 @@ export async function getDestinationsByRouteId(routeId: number) {
 }
 
 export interface AddDestinationToRouteProps {
-  routeId: number;
+  routeId: string;
   location: string;
-  friendIds: number[];
+  friendIds: string[];
   startDate: Date;
   endDate: Date;
 }
 export type AddDestinationToRouteResponse = {
-  id: number;
+  id: string;
   location: string;
   latitude: number;
   longitude: number;
   order: number;
-  routeId: number;
+  routeId: string;
   startDate: Date;
   endDate: Date;
   friends: {
-    id: number;
+    id: string;
     name: string;
     location: string | null;
   }[];

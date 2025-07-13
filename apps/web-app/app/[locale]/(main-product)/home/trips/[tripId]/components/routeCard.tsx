@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface Route {
-  id: number;
+  id: string;
   name: string;
 }
 

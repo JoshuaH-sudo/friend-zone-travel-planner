@@ -27,12 +27,12 @@ const TripsPage = () => {
     }
   };
 
-  const handleRouteSelect = (trip: TripWithRoutes, routeId: number) => {
+  const handleRouteSelect = (trip: TripWithRoutes, routeId: string) => {
     setSelectedTrip(trip);
     setSelectedRouteId(routeId);
   };
 
-  const handleTripClick = (tripId: number) => {
+  const handleTripClick = (tripId: string) => {
     router.push(`/trips/${tripId}`);
   };
 

@@ -12,7 +12,7 @@ import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
 interface Route {
-  id: number;
+  id: string;
   name: string;
 }
 

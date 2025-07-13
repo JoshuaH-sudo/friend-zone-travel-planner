@@ -5,7 +5,7 @@ import { ChevronDown } from 'lucide-react';
 import { FC } from 'react';
 
 export interface DestinationListProps {
-  routeId: number;
+  routeId: string;
 }
 
 const DestinationList: FC<DestinationListProps> = ({ routeId }) => {

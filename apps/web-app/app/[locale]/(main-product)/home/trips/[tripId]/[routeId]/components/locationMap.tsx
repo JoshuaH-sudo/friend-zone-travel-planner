@@ -11,7 +11,7 @@ import { FC, useEffect, useState } from 'react';
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
 interface LocationMapProps {
-  routeId: number;
+  routeId: string;
 }
 const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);

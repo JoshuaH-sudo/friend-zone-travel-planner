@@ -3,14 +3,14 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 import updateRoute from '../../app/[locale]/(main-product)/home/trips/[tripId]/actions/updateRoute';
 
 export interface UpdateRouteNameProps {
-  routeId: number;
+  routeId: string;
   name: string;
 }
 
 export type UpdateRouteNameResponse = {
-  id: number;
+  id: string;
   name: string;
-  tripId: number;
+  tripId: string;
 };
 
 export type UseUpdateRouteNameOptions = UseMutationOptions<

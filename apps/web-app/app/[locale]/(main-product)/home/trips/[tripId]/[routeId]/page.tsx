@@ -13,10 +13,10 @@ export type RoutePageProps = {
 };
 export default async function NewRoutePage({ params }: RoutePageProps) {
   const { routeId } = await params;
-  
+
   const route = await prisma.route.findUnique({
     where: {
-      id: parseInt(routeId, 10),
+      id: routeId,
     },
   });
 
@@ -31,7 +31,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         className='mb-4 flex flex-row items-end justify-between gap-2'
       >
         <div className='grow space-y-2'>
-          <RouteNameInput routeId={parseInt(routeId, 10)} initialName={route.name} />
+          <RouteNameInput routeId={routeId} initialName={route.name} />
         </div>
       </div>
       <div
@@ -42,21 +42,21 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           id='route-list'
           className='bg-card h-1/3 rounded-lg border p-2 sm:h-full sm:w-[30%]'
         >
-          <DestinationList routeId={parseInt(routeId, 10)} />
+          <DestinationList routeId={routeId} />
         </div>
 
         <div
           id='destination-details'
           className='bg-card flex h-2/3 w-full flex-col gap-4 rounded-lg border p-2 sm:h-full sm:w-[30%]'
         >
-          <AddDestinationForm routeId={parseInt(routeId, 10)} />
+          <AddDestinationForm routeId={routeId} />
         </div>
 
         <div
           id='map-overview'
           className='bg-card h-1/3 w-full max-w-xl rounded-lg border sm:h-full'
         >
-          <LocationMap routeId={parseInt(routeId, 10)} />
+          <LocationMap routeId={routeId} />
         </div>
       </div>
     </div>
