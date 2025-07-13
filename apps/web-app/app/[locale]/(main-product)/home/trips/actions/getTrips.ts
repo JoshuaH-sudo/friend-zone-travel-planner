@@ -22,6 +22,13 @@ export async function getTrips(userId?: string) {
               latitude: true,
               longitude: true,
               order: true,
+              friends: {
+                select: {
+                  id: true,
+                  name: true,
+                  location: true,
+                },
+              },
             },
           },
         },

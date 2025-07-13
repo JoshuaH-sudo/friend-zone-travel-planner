@@ -25,7 +25,7 @@ interface TripOverviewClientProps {
 }
 
 const TripOverviewClient = ({ trip, routes, tripId }: TripOverviewClientProps) => {
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
 
   const handleRouteSelect = (routeId: string) => {
     setSelectedRouteId(selectedRouteId === routeId ? null : routeId);
