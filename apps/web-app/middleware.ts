@@ -18,12 +18,14 @@ const publicRoutes = [
 
 // Helper function to check if a route is public
 function isPublicRoute(pathname: string): boolean {
-  // Remove locale prefix to check the actual route
-  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
+  // Check direct matches first
+  if (publicRoutes.some(route => pathname.startsWith(route))) {
+    return true;
+  }
   
-  return publicRoutes.some(route => 
-    pathWithoutLocale.startsWith(route) || pathname.startsWith(route)
-  );
+  // Check with locale removed (e.g., /en/login -> /login)
+  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}\//, '/');
+  return publicRoutes.some(route => pathWithoutLocale.startsWith(route));
 }
 
 // Helper function to extract locale from pathname
@@ -40,11 +42,11 @@ export default async function middleware(request: NextRequest) {
     return intlMiddleware(request);
   }
 
-  // Handle root redirect
+  // Handle root redirect (only for exact root paths)
   if (pathname === '/' || pathname.match(/^\/[a-z]{2}$/)) {
     try {
       const token = await getToken({ req: request });
-      const locale = getLocaleFromPathname(pathname) || 'en';
+      const locale = pathname.match(/^\/([a-z]{2})$/) ? pathname.slice(1) : 'en';
       
       if (token) {
         // Redirect authenticated users to trips
@@ -57,7 +59,7 @@ export default async function middleware(request: NextRequest) {
       }
     } catch (error) {
       // If token check fails, redirect to login
-      const locale = getLocaleFromPathname(pathname) || 'en';
+      const locale = pathname.match(/^\/([a-z]{2})$/) ? pathname.slice(1) : 'en';
       const loginUrl = new URL(`/${locale}/login`, request.url);
       return NextResponse.redirect(loginUrl);
     }
