@@ -163,7 +163,7 @@ export function SignupForm() {
         
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/signin" className="text-primary hover:underline">
             Sign in
           </Link>
         </div>

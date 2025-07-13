@@ -7,8 +7,8 @@ const intlMiddleware = createMiddleware(routing);
 
 // Define public routes that don't require authentication
 const publicRoutes = [
-  '/login',
-  '/register',
+  '/signin',
+  '/signup',
   '/landing',
   '/api/auth',
 ] 
