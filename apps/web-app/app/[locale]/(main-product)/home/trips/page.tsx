@@ -10,7 +10,7 @@ import createTrip from './actions/createTrip';
 
 const TripsPage = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const router = useRouter();
   const { data: trips = [], isLoading, error } = useGetTripsWithRoutes();
 
