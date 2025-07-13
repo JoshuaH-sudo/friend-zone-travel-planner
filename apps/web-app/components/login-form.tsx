@@ -37,7 +37,7 @@ export function LoginForm({
                 await signIn('credentials', {
                   email: formData.get('email'),
                   password: formData.get('password'),
-                  redirectTo: '/app/trips',
+                  redirectTo: '/home/trips',
                 });
               } catch (error) {
                 if (error instanceof AuthError) {

@@ -10,5 +10,5 @@ export default async function RootPage() {
     return redirect('/login');
   }
 
-  return redirect('/trips');
+  return redirect('/home');
 }
