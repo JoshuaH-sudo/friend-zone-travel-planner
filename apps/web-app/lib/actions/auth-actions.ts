@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { signIn } from '@/lib/auth';
 import { createUser, userExists } from '@/lib/auth-utils';
 import { AuthError } from 'next-auth';
-import { redirect } from 'next/navigation';
 
 const signupSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
