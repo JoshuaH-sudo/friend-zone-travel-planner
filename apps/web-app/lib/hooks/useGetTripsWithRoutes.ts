@@ -4,10 +4,10 @@ import { getTrips } from '@/app/[locale]/(main-product)/app/trips/actions/getTri
 
 export type TripWithRoutes = Awaited<ReturnType<typeof getTrips>>[0];
 
-const useGetTripsWithRoutes = (userId: number) => {
+const useGetTripsWithRoutes = () => {
   return useQuery({
-    queryKey: ['trips', userId],
-    queryFn: async () => getTrips(userId),
+    queryKey: ['trips'],
+    queryFn: async () => getTrips(),
   });
 };
 

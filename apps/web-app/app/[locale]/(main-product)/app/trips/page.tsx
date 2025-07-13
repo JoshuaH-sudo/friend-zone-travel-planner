@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { DUMMY_LOGIN_USER_ID } from '@/lib/constants';
 import useGetTripsWithRoutes, { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
@@ -13,7 +12,7 @@ const TripsPage = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
   const router = useRouter();
-  const { data: trips = [], isLoading, error } = useGetTripsWithRoutes(DUMMY_LOGIN_USER_ID);
+  const { data: trips = [], isLoading, error } = useGetTripsWithRoutes();
 
   const handleViewMap = (trip: TripWithRoutes) => {
     if (selectedTrip?.id === trip.id) {
