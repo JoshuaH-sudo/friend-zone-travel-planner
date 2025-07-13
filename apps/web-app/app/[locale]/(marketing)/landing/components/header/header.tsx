@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { LanguageSwitcher } from '@/app/[locale]/components/header/language-switcher';
-import { ThemeToggle } from '@/app/[locale]/components/header/theme-toggle';
+import { LanguageSwitcher } from './language-switcher';
+import { ThemeToggle } from './theme-toggle';
 import travelIcon from '@/public/travel.png';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,19 +15,19 @@ export function Header() {
   console.log('Header pathname:', pathname);
 
   return (
-    <header className='fixed left-0 right-0 top-2 z-50 flex items-center justify-center'>
-      <div className='inline-flex h-16 w-[766px] items-center justify-between overflow-hidden rounded-3xl bg-green-300/80 px-6 py-3 outline-solid outline-2 -outline-offset-2 outline-black backdrop-blur-[2px]'>
+    <header className='fixed top-2 right-0 left-0 z-50 flex items-center justify-center'>
+      <div className='inline-flex h-16 w-[766px] items-center justify-between overflow-hidden rounded-3xl bg-green-300/80 px-6 py-3 outline-2 -outline-offset-2 outline-black backdrop-blur-[2px] outline-solid'>
         <div className='flex items-center justify-start gap-2'>
           <Link
             href='/'
-            className='flex items-center gap-2 text-foreground transition-colors hover:text-muted-foreground'
+            className='text-foreground hover:text-muted-foreground flex items-center gap-2 transition-colors'
           >
             <Image
               src={travelIcon.src}
               width={24}
               height={24}
               alt='Travel Icon'
-              className='h-6 w-6 text-primary'
+              className='text-primary h-6 w-6'
             />
             <span className='text-xl font-bold text-black'>{t('title')}</span>
           </Link>
