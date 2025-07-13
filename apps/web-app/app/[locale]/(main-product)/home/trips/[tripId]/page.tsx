@@ -26,12 +26,12 @@ export default async function TripDetails({
   const trip = await prisma.trip.findFirst({
     where: {
       userId: userId,
-      id: parseInt(tripId, 10),
+      id: tripId,
     },
   });
   const routes = await prisma.route.findMany({
     where: {
-      tripId: parseInt(tripId, 10),
+      tripId: tripId,
     },
   });
 

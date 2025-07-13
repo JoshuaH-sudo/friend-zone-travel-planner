@@ -17,14 +17,13 @@ interface Route {
 }
 
 interface TripMapProps {
-  selectedRouteId: number | null;
+  selectedRouteId: string | null;
   routes: Route[];
 }
 
 const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
-  const { data: destinations = [] } = useGetDestinationsByRouteId(
-    selectedRouteId || 0
-  );
+  const { data: destinations = [] } =
+    useGetDestinationsByRouteId(selectedRouteId);
 
   const locations: Poi[] = destinations.map((destination) => ({
     key: destination.location,

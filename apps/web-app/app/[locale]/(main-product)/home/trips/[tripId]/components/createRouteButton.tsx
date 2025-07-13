@@ -7,7 +7,7 @@ import createRoute from '../actions/createRoute';
 
 const CreateRouteButton = ({ tripId }: { tripId: string }) => {
   const createRouteHandler = async () => {
-    const newRoute = await createRoute(parseInt(tripId, 10));
+    const newRoute = await createRoute(tripId);
     redirect(`./${tripId}/${newRoute.id}`);
   };
 
