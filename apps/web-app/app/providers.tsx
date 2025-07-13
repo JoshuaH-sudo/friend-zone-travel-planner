@@ -91,7 +91,7 @@ export function TanStackQueryProvider({
 function LoadingArea() {
   const isFetching = useIsFetching();
   if (!isFetching) {
-    return <div className='h-1' />;
+    return null;
   }
   return <Progress indeterminate />;
 }
