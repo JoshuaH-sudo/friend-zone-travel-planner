@@ -6,8 +6,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { ChevronLeftIcon } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
+import { usePathname } from '@/i18n/navigation';
 
 export default function HomeLayout({
   children,
@@ -15,7 +15,6 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  console.log('Current Path:', pathname, pathname?.endsWith('/home'));
 
   return (
     <SidebarProvider>

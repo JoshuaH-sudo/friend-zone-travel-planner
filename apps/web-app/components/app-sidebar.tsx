@@ -2,8 +2,7 @@
 
 import { Plane, LogOut, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { handleLogout } from '@/app/[locale]/(main-product)/home/actions';
 
 import {
@@ -16,10 +15,13 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { usePathname } from '@/i18n/navigation';
 
 export function AppSidebar() {
   const t = useTranslations('navigation');
   const pathname = usePathname();
+
+  console.log('Current Path:', pathname);
 
   const menuItems = [
     {

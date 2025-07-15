@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Route as RouteIcon, ArrowRight, MapPin } from 'lucide-react';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
 
 interface Route {
   id: string;
