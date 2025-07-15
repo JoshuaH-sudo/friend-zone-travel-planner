@@ -3,20 +3,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clean up existing data
-  await prisma.$transaction([
-    prisma.destination.deleteMany(),
-    prisma.route.deleteMany(),
-    prisma.trip.deleteMany(),
-    prisma.friend.deleteMany(),
-    prisma.user.deleteMany(),
-  ]);
+  // // Clean up existing data
+  // await prisma.$transaction([
+  //   prisma.destination.deleteMany(),
+  //   prisma.route.deleteMany(),
+  //   prisma.trip.deleteMany(),
+  //   prisma.friend.deleteMany(),
+  //   prisma.authenticator.deleteMany(),
+  //   prisma.session.deleteMany(),
+  //   prisma.account.deleteMany(),
+  //   prisma.user.deleteMany(),
+  // ]);
 
   // Create Users
   const john = await prisma.user.create({
     data: {
       name: 'John Doe',
       email: 'john@example.com',
+      password: '$2a$12$eImiTMZG8rj1z5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3', // hashed password for 'password123'
       location: 'New York, USA',
     },
   });
@@ -25,6 +29,7 @@ async function main() {
     data: {
       name: 'Jane Smith',
       email: 'jane@example.com',
+      password: '$2a$12$eImiTMZG8rj1z5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3Uu7F6Y1b1y5Z5f9Q3', // hashed password for 'password123'
       location: 'London, UK',
     },
   });

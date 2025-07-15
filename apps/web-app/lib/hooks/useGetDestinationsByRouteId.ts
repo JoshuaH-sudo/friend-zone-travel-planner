@@ -2,10 +2,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDestinationsByRouteId } from '../actions/destinations';
 
-const useGetDestinationsByRouteId = (routeId: number) =>
+const useGetDestinationsByRouteId = (routeId: string | null) =>
   useQuery({
     queryKey: ['destinations', routeId],
-    queryFn: () => getDestinationsByRouteId(routeId),
+    queryFn: () => getDestinationsByRouteId(routeId!),
     enabled: !!routeId,
   });
 
