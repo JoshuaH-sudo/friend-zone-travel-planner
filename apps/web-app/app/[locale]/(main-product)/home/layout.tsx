@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   SidebarInset,
@@ -8,6 +8,8 @@ import {
 import { ChevronLeftIcon } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { usePathname } from '@/i18n/navigation';
+import { LanguageSwitcher } from '../../(marketing)/landing/components/header/language-switcher';
+import { ThemeToggle } from '../../(marketing)/landing/components/header/theme-toggle';
 
 export default function HomeLayout({
   children,
@@ -32,6 +34,10 @@ export default function HomeLayout({
                   Friend Zone Travel Planner
                 </h1>
               </Link>
+            </div>
+            <div id='app-actions'>
+              <LanguageSwitcher />
+              <ThemeToggle />
             </div>
           </div>
         </header>
