@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { Plane, LogOut, User } from "lucide-react"
-import { useTranslations } from "next-intl"
-import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { handleLogout } from "@/app/[locale]/(main-product)/home/actions"
+import { Plane, LogOut, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { handleLogout } from '@/app/[locale]/(main-product)/home/actions';
 
 import {
   Sidebar,
@@ -15,33 +15,32 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 
 export function AppSidebar() {
-  const t = useTranslations("navigation")
-  const pathname = usePathname()
+  const t = useTranslations('navigation');
+  const pathname = usePathname();
 
   const menuItems = [
     {
-      title: t("trips"),
-      url: "/home/trips",
+      title: t('trips'),
+      url: '/home/trips',
       icon: Plane,
     },
-  ]
+  ];
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible='icon'>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/home">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <User className="size-4" />
+            <SidebarMenuButton size='lg' asChild>
+              <Link href='/home'>
+                <div className='bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
+                  <User className='size-4' />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Joshua Hoban</span>
-                  <span className="truncate text-xs">Friend Zone Travel</span>
+                <div className='grid flex-1 text-left text-sm leading-tight'>
+                  <span className='truncate font-semibold'>Joshua Hoban</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -52,8 +51,8 @@ export function AppSidebar() {
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton 
-                asChild 
+              <SidebarMenuButton
+                asChild
                 isActive={pathname.startsWith(item.url)}
                 tooltip={item.title}
               >
@@ -70,9 +69,9 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <form action={handleLogout}>
-              <SidebarMenuButton type="submit" tooltip={t("logout")}>
+              <SidebarMenuButton type='submit' tooltip={t('logout')}>
                 <LogOut />
-                <span>{t("logout")}</span>
+                <span>{t('logout')}</span>
               </SidebarMenuButton>
             </form>
           </SidebarMenuItem>
@@ -80,5 +79,5 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

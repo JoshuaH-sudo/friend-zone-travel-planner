@@ -1,3 +1,4 @@
+"use client";
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   SidebarInset,
@@ -5,16 +6,16 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { ChevronLeftIcon } from 'lucide-react';
-import { headers } from 'next/headers';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-export default async function HomeLayout({
+export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headerList = await headers();
-  const pathname = headerList.get('x-current-path');
+  const pathname = usePathname();
+  console.log('Current Path:', pathname, pathname?.endsWith('/home'));
 
   return (
     <SidebarProvider>
@@ -42,10 +43,11 @@ export default async function HomeLayout({
             href='..'
             className='flex items-center space-x-2'
             style={{
-              visibility: pathname === '/home' ? 'hidden' : 'visible',
+              visibility: pathname?.endsWith('/home') ? 'hidden' : 'visible',
+              display: pathname?.endsWith('/home') ? 'none' : 'flex',
             }}
           >
-            <ChevronLeftIcon className='text-muted-foreground h-6 w-6' />
+            <ChevronLeftIcon className='text-muted-foreground h-6 w-6' /> Back
           </Link>
           {children}
         </main>
