@@ -49,7 +49,6 @@ const RouteCard = ({
             </div>
             <div>
               <h3 className='text-foreground font-semibold'>{route.name}</h3>
-              <p className='text-muted-foreground text-sm'>Route #{route.id}</p>
             </div>
           </div>
           <div className='flex items-center gap-2'>
