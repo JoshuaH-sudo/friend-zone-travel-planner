@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Route as RouteIcon, ArrowRight, MapPin } from 'lucide-react';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
 
 interface Route {
   id: string;
@@ -49,7 +49,6 @@ const RouteCard = ({
             </div>
             <div>
               <h3 className='text-foreground font-semibold'>{route.name}</h3>
-              <p className='text-muted-foreground text-sm'>Route #{route.id}</p>
             </div>
           </div>
           <div className='flex items-center gap-2'>

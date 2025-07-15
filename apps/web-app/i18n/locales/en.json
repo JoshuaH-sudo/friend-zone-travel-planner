@@ -46,9 +46,11 @@
   },
   "navigation": {
     "home": "Home",
+    "trips": "Trips",
     "calendars": "Friend Calendars",
     "overview": "Availability Overview",
-    "timezone": "Timezones"
+    "timezone": "Timezones",
+    "logout": "Logout"
   },
   "workspace-actions": {
     "cancel": "Cancel",

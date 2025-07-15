@@ -46,9 +46,11 @@
   },
   "navigation": {
     "home": "Startseite",
+    "trips": "Reisen",
     "calendars": "Freund-Kalender",
     "overview": "Verfügbarkeitsübersicht",
-    "timezone": "Zeitzonen"
+    "timezone": "Zeitzonen",
+    "logout": "Abmelden"
   },
   "workspace-actions": {
     "cancel": "Abbrechen",
