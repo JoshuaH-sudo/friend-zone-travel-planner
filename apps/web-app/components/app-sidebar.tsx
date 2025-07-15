@@ -49,10 +49,10 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className='p-2'>
         <SidebarMenu>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.title} className='justify-center'>
               <SidebarMenuButton
                 asChild
                 isActive={pathname.startsWith(item.url)}
