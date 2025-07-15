@@ -1,5 +1,9 @@
 import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { ChevronLeftIcon } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
@@ -22,15 +26,6 @@ export default async function HomeLayout({
             {/* Left side with sidebar trigger and navigation */}
             <div className='flex items-center space-x-4'>
               <SidebarTrigger />
-              <Link
-                href='..'
-                className='flex items-center space-x-2'
-                style={{
-                  visibility: pathname === '/home' ? 'hidden' : 'visible',
-                }}
-              >
-                <ChevronLeftIcon className='text-muted-foreground h-6 w-6' />
-              </Link>
 
               <Link href='/home' className='flex items-center space-x-2'>
                 <h1 className='text-foreground hover:text-primary text-xl font-semibold transition-colors'>
@@ -42,7 +37,18 @@ export default async function HomeLayout({
         </header>
 
         {/* Main Content */}
-        <main className='flex-1 px-4 py-6'>{children}</main>
+        <main className='flex-1 px-4 py-6'>
+          <Link
+            href='..'
+            className='flex items-center space-x-2'
+            style={{
+              visibility: pathname === '/home' ? 'hidden' : 'visible',
+            }}
+          >
+            <ChevronLeftIcon className='text-muted-foreground h-6 w-6' />
+          </Link>
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
