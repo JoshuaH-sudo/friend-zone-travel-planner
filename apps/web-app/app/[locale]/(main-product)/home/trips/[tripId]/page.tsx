@@ -1,7 +1,6 @@
 import prisma from '@/lib/db';
 import { getCurrentUserId } from '@/lib/auth-utils';
 import TripOverviewClient from './components/tripOverviewClient';
-import { redirect } from 'next/navigation';
 
 export type TripRouteParams = {
   locale: string;
