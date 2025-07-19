@@ -13,7 +13,7 @@ export default function Index() {
       source={{
         uri: isDevelopment
           ? "http://localhost:3000/en/trips"
-          : "https://www.friend-zone.app/en/trips",
+          : "https://www.friend-zone.app/en/home",
       }}
     />
   );
