@@ -86,7 +86,7 @@ export default function LandingPage() {
               <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
                 {t('description')}
               </p>
-              <Link href='/trips'>
+              <Link href='/signin'>
                 <Button
                   id='call-to-action'
                   size='lg'
@@ -268,7 +268,7 @@ export default function LandingPage() {
           <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
             {t('letsPlanThatTrip')}
           </h2>
-          <Link href='/trips'>
+          <Link href='/signin'>
             <Button
               id='call-to-action'
               size='lg'
