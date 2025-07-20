@@ -7,8 +7,8 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Link } from '@/i18n/navigation';
-import { LanguageSwitcher } from '../../(marketing)/landing/components/header/language-switcher';
-import { ThemeToggle } from '../../(marketing)/landing/components/header/theme-toggle';
+import { LanguageSwitcher } from '../../../../components/language-switcher';
+import { ThemeToggle } from '../../../../components/theme-toggle';
 import { HomeLayoutContent } from './home-layout-content';
 
 export default async function HomeLayout({

@@ -24,7 +24,7 @@ import FeatureFrame from './components/FeatureFrame';
 import FeatureText from './components/FeatureText';
 import Footer from './components/Footer';
 import { FeatureShortcuts } from './components/FeatureShortcuts';
-import { Header } from './components/header/header';
+import { Header } from './components/header';
 
 export default function LandingPage() {
   const t = useTranslations('landing');
