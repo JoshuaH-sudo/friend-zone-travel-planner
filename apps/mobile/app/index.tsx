@@ -1,27 +1,15 @@
-import { WebView } from "react-native-webview";
-import Constants from "expo-constants";
-import { StyleSheet } from "react-native";
-
-const isDevelopment = process.env.NODE_ENV === "development";
+import { Text, View } from "react-native";
 
 export default function Index() {
-  // https://github.com/react-native-webview/react-native-webview/blob/master/docs/Guide.md
   return (
-    <WebView
-      style={styles.container}
-      showsHorizontalScrollIndicator={false}
-      source={{
-        uri: isDevelopment
-          ? "http://localhost:3000/en/trips"
-          : "https://www.friend-zone.app/en/home",
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
       }}
-    />
+    >
+      <Text>Edit app/index.tsx to edit this screen.</Text>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight,
-  },
-});

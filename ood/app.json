@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "friendzonetravelplanner",
+    "scheme": "com.joshua.friendzonetravelplanner",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -38,7 +38,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -48,5 +49,6 @@
         "projectId": "87eba29a-1e51-4694-9d31-4e370444f924"
       }
     }
-  }
+  },
+  "owner": "joshua_h"
 }
