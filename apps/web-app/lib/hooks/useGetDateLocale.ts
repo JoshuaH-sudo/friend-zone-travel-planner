@@ -1,8 +1,9 @@
 import { dateLocaleMaps, SupportedLocales } from "@/i18n/utils";
-import { useLocale } from "next-intl";
+import { useTranslation } from "react-i18next";
 
 function useGetDateLocale() {
-  const locale = useLocale();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const dateLocale = dateLocaleMaps[locale as SupportedLocales]
 
   return dateLocale;

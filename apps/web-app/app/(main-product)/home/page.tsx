@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plane, Users, Calendar, MapPin } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
+import Link from 'next/link';
 
 export default function HomePage() {
   return (

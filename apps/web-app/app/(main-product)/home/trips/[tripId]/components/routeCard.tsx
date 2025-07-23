@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Route as RouteIcon, ArrowRight, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Link } from '@/i18n/navigation';
+import Link from 'next/link';
 
 interface Route {
   id: string;

@@ -1,9 +1,9 @@
 'use client';
 
-import { Link } from '@/i18n/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock10, Users, Globe2, FileClock } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import { motion, useScroll } from 'motion/react';
 import productExampleFirst from '@/public/images/product-example-front.png';
@@ -27,7 +27,7 @@ import { FeatureShortcuts } from './components/FeatureShortcuts';
 import { Header } from './components/header';
 
 export default function LandingPage() {
-  const t = useTranslations('landing');
+  const { t } = useTranslation('common');
   const { scrollYProgress } = useScroll();
 
   return (
@@ -62,9 +62,9 @@ export default function LandingPage() {
             <div className='container mx-auto flex max-w-5xl flex-col items-center gap-3 text-center'>
               <h1 className="flex flex-col items-center justify-center font-['Roboto'] text-4xl font-bold md:text-6xl">
                 <div className='flex items-center justify-center gap-3'>
-                  <WordFrame>{t('separated')}</WordFrame>
-                  <WordFrame>{t('by')}</WordFrame>
-                  <WordFrame>{t('borders')}</WordFrame>
+                  <WordFrame>{t('landing.separated')}</WordFrame>
+                  <WordFrame>{t('landing.by')}</WordFrame>
+                  <WordFrame>{t('landing.borders')}</WordFrame>
                 </div>
                 <div
                   className='h-20 justify-start self-stretch whitespace-nowrap text-center'
@@ -76,15 +76,15 @@ export default function LandingPage() {
                   }}
                 >
                   <span className='font-extrabold leading-[64px] text-white [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]'>
-                    {t('connectedBy')}
+                    {t('landing.connectedBy')}
                   </span>
                   <span className='font-extrabold leading-[64px] text-green-300 [text-shadow:0px_4px_4px_rgb(0_0_0/0.25)]'>
-                    {t('friendZone')}
+                    {t('landing.friendZone')}
                   </span>
                 </div>
               </h1>
               <p className='w-[506px] justify-start text-center text-3xl font-semibold text-neutral-900'>
-                {t('description')}
+                {t('landing.description')}
               </p>
               <Link href='/signin'>
                 <Button
@@ -97,7 +97,7 @@ export default function LandingPage() {
                   }}
                 >
                   <Calendar className='h-5 w-5' />
-                  {t('startPlanning')}
+                  {t('landing.startPlanning')}
                 </Button>
               </Link>
             </div>
@@ -183,7 +183,7 @@ export default function LandingPage() {
           <div className='flex flex-row justify-center gap-16'>
             <div className='relative'>
               <FeatureFrame
-                title={t('feature.availabilityOverview.title')}
+                title={t('landing.feature.availabilityOverview.title')}
                 Icon={Clock10}
                 imageSrc={availabilityOverviewFeature}
                 imageAlt='availability overview example'
@@ -196,17 +196,17 @@ export default function LandingPage() {
               </div>
             </div>
             <FeatureText shadowDirection='right'>
-              {t('feature.availabilityOverview.description')}
+              {t('landing.feature.availabilityOverview.description')}
             </FeatureText>
           </div>
 
           <div className='flex flex-row justify-center gap-16'>
             <FeatureText>
-              {t('feature.friendManagement.description')}
+              {t('landing.feature.friendManagement.description')}
             </FeatureText>
             <div className='relative'>
               <FeatureFrame
-                title={t('feature.friendManagement.title')}
+                title={t('landing.feature.friendManagement.title')}
                 Icon={Users}
                 imageSrc={friendManagementFeature}
                 imageAlt='Friend Management example'
@@ -229,7 +229,7 @@ export default function LandingPage() {
           <div className='flex flex-row justify-center gap-16'>
             <div className='relative'>
               <FeatureFrame
-                title={t('feature.timezoneSupport.title')}
+                title={t('landing.feature.timezoneSupport.title')}
                 Icon={Globe2}
                 imageSrc={timezoneFeature}
                 imageAlt='Timezone Support example'
@@ -242,14 +242,14 @@ export default function LandingPage() {
               </div>
             </div>
             <FeatureText shadowDirection='right'>
-              {t('feature.timezoneSupport.description')}
+              {t('landing.feature.timezoneSupport.description')}
             </FeatureText>
           </div>
 
           <div className='flex flex-row justify-center gap-16'>
-            <FeatureText>{t('feature.calendarExport.description')}</FeatureText>
+            <FeatureText>{t('landing.feature.calendarExport.description')}</FeatureText>
             <FeatureFrame
-              title={t('feature.calendarExport.title')}
+              title={t('landing.feature.calendarExport.title')}
               Icon={FileClock}
               imageSrc={exportCalendarFeature}
               imageAlt='Export Calendar example'
@@ -263,10 +263,10 @@ export default function LandingPage() {
           className='flex h-96 flex-col items-center justify-center gap-6 px-32'
         >
           <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
-            {t('whatYouWaitingFor')}
+            {t('landing.whatYouWaitingFor')}
           </h2>
           <h2 className="font-['Roboto'] text-4xl font-bold leading-[64px] text-black md:text-6xl">
-            {t('letsPlanThatTrip')}
+            {t('landing.letsPlanThatTrip')}
           </h2>
           <Link href='/signin'>
             <Button
@@ -279,7 +279,7 @@ export default function LandingPage() {
               }}
             >
               <Calendar className='h-5 w-5' />
-              {t('startPlanning')}
+              {t('landing.startPlanning')}
             </Button>
           </Link>
         </section>

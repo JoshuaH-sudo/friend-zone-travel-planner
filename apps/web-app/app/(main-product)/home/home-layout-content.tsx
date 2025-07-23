@@ -1,7 +1,7 @@
 'use client';
 import { ChevronLeftIcon } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
-import { usePathname } from '@/i18n/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function HomeLayoutContent({
   children,
