@@ -10,7 +10,7 @@ interface CreateTripData {
   endDate: Date
 }
 
-export async function createTrip(data: CreateTripData) {
+async function createTrip(data: CreateTripData) {
   const supabase = await createClient()
   const userId = await getCurrentUserId()
 
@@ -38,3 +38,4 @@ export async function createTrip(data: CreateTripData) {
   return trip
 }
 
+export default createTrip

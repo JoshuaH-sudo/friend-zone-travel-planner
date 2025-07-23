@@ -37,7 +37,11 @@ const TripsPage = () => {
   };
 
   const handleCreateNewTrip = async () => {
-    const newTrip = await createTrip();
+    const newTrip = await createTrip({
+      name: 'New Trip',
+      startDate: new Date(),
+      endDate: new Date(),
+    });
     router.push(`/home/trips/${newTrip.id}`);
   };
 
