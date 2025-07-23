@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
 import {
@@ -9,8 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePathname, useRouter } from '@/i18n/navigation';
-import { useParams } from 'next/navigation';
 
 // Define available languages
 const languages = [
@@ -20,27 +18,13 @@ const languages = [
 
 export function LanguageSwitcher() {
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
-  const [_isPending, startTransition] = useTransition();
-  const pathname = usePathname();
-  const params = useParams();
 
   // Avoid hydration mismatch by only rendering after mount
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const changeLanguage = async (locale: string) => {
-    startTransition(() => {
-      router.replace(
-        // @ts-expect-error -- TypeScript will validate that only known `params`
-        // are used in combination with a given `pathname`. Since the two will
-        // always match for the current route, we can skip runtime checks.
-        { pathname, params },
-        { locale }
-      );
-    });
-  };
+  const changeLanguage = async (locale: string) => {};
 
   if (!mounted) {
     return (
