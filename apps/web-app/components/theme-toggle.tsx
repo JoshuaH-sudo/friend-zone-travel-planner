@@ -10,10 +10,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 
 export function ThemeToggle() {
-  const t = useTranslations('app');
+  const { t } = useTranslation('common');
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -44,15 +44,15 @@ export function ThemeToggle() {
       <DropdownMenuContent align='end'>
         <DropdownMenuItem onClick={() => setTheme('light')} className={theme === 'light' ? 'font-bold bg-accent/50' : ''}>
           <Sun className='mr-2 h-4 w-4' />
-          <span>{t('theme.light')}</span>
+          <span>{t('app.theme.light')}</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('dark')} className={theme === 'dark' ? 'font-bold bg-accent/50' : ''}>
           <Moon className='mr-2 h-4 w-4' />
-          <span>{t('theme.dark')}</span>
+          <span>{t('app.theme.dark')}</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')} className={theme === 'system' ? 'font-bold bg-accent/50' : ''}>
           <Monitor className='mr-2 h-4 w-4' />
-          <span>{t('theme.system')}</span>
+          <span>{t('app.theme.system')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,9 +1,9 @@
 'use client';
 
 import { Plane, LogOut, User } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
-import { handleLogout } from '@/app/[locale]/(main-product)/home/actions';
+import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
+import { handleLogout } from '@/app/(main-product)/home/actions';
 
 import {
   Sidebar,
@@ -15,17 +15,17 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { usePathname } from '@/i18n/navigation';
+import { usePathname } from 'next/navigation';
 
 export function AppSidebar() {
-  const t = useTranslations('navigation');
+  const { t } = useTranslation('common');
   const pathname = usePathname();
 
   console.log('Current Path:', pathname);
 
   const menuItems = [
     {
-      title: t('trips'),
+      title: t('navigation.trips'),
       url: '/home/trips',
       icon: Plane,
     },
@@ -71,9 +71,9 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <form action={handleLogout}>
-              <SidebarMenuButton type='submit' tooltip={t('logout')}>
+              <SidebarMenuButton type='submit' tooltip={t('navigation.logout')}>
                 <LogOut />
-                <span>{t('logout')}</span>
+                <span>{t('navigation.logout')}</span>
               </SidebarMenuButton>
             </form>
           </SidebarMenuItem>

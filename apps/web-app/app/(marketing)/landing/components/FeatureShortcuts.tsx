@@ -1,7 +1,7 @@
 'use client';
 
 import { Clock10, Users, Globe2, FileClock } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'motion/react';
@@ -26,7 +26,7 @@ const features = [
 ];
 
 export const FeatureShortcuts = () => {
-  const t = useTranslations('landing');
+  const { t } = useTranslation('common');
   const [activeTab, setActiveTab] = useState('availabilityOverview');
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const FeatureShortcuts = () => {
               {feature.icon}
             </div>
             <div className="justify-start self-stretch hyphens-auto text-center font-['Roboto'] text-xs font-medium leading-none tracking-wide text-black">
-              {t(`feature.${feature.name}.title`)}
+              {t(`landing.feature.${feature.name}.title`)}
             </div>
           </div>
 

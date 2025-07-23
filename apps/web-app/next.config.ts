@@ -1,12 +1,14 @@
 import type { NextConfig } from 'next';
-import createNextIntlPlugin from 'next-intl/plugin';
 import path from 'node:path';
 
-const nextConfig: NextConfig = {};
+const { i18n } = require('./next-i18next.config');
+
+const nextConfig: NextConfig = {
+  i18n,
+};
 
 if (process.env.NODE_ENV === 'development') {
   nextConfig.outputFileTracingRoot = path.join(__dirname, '../../')
 }
 
-const withNextIntl = createNextIntlPlugin();
-export default withNextIntl(nextConfig);
+export default nextConfig;

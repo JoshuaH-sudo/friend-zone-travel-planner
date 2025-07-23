@@ -1,15 +1,15 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import { LanguageSwitcher } from '../../../../../components/language-switcher';
-import { ThemeToggle } from '../../../../../components/theme-toggle';
+import { useTranslation } from 'react-i18next';
+import { ThemeToggle } from '../../../../components/theme-toggle';
+import { LanguageSwitcher } from '../../../../components/language-switcher';
 import travelIcon from '@/public/travel.png';
 import Image from 'next/image';
-import { Link } from '@/i18n/navigation';
-import { usePathname } from '@/i18n/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Header() {
-  const t = useTranslations('app');
+  const { t } = useTranslation('common');
   const pathname = usePathname();
 
   console.log('Header pathname:', pathname);
@@ -29,7 +29,7 @@ export function Header() {
               alt='Travel Icon'
               className='text-primary h-6 w-6'
             />
-            <span className='text-xl font-bold text-black'>{t('title')}</span>
+            <span className='text-xl font-bold text-black'>{t('app.title')}</span>
           </Link>
         </div>
         <div className='flex items-center justify-start gap-4'>
