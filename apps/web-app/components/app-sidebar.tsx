@@ -3,7 +3,7 @@
 import { Plane, LogOut, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { handleLogout } from '@/app/(main-product)/home/actions';
+import { handleLogout } from '@/app/(main)/home/actions';
 
 import {
   Sidebar,
