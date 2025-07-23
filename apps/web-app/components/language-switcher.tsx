@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from 'react-i18next';
 
 // Define available languages
 const languages = [
@@ -17,6 +18,7 @@ const languages = [
 ];
 
 export function LanguageSwitcher() {
+  const { i18n } = useTranslation();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch by only rendering after mount
@@ -24,7 +26,9 @@ export function LanguageSwitcher() {
     setMounted(true);
   }, []);
 
-  const changeLanguage = async (locale: string) => {};
+  const changeLanguage = async (locale: string) => {
+    await i18n.changeLanguage(locale);
+  };
 
   if (!mounted) {
     return (
@@ -48,6 +52,7 @@ export function LanguageSwitcher() {
           <DropdownMenuItem
             key={language.code}
             onClick={() => changeLanguage(language.code)}
+            className={i18n.language === language.code ? 'font-bold bg-accent/50' : ''}
           >
             {language.name}
           </DropdownMenuItem>

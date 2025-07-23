@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from '../../../../components/theme-toggle';
+import { LanguageSwitcher } from '../../../../components/language-switcher';
 import travelIcon from '@/public/travel.png';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -33,6 +34,7 @@ export function Header() {
         </div>
         <div className='flex items-center justify-start gap-4'>
           <div className='flex text-black'>
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
         </div>
