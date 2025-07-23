@@ -1,100 +1,106 @@
-'use server';
+"use server"
 
-import { getAddressCoordinates } from './google';
-import prisma from '../db';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { revalidatePath } from 'next/cache'
 
-export async function getDestinationsByRouteId(routeId: string) {
-  return prisma.destination.findMany({
-    where: { routeId },
-    orderBy: { order: 'asc' },
-    select: {
-      id: true,
-      location: true,
-      latitude: true,
-      longitude: true,
-      order: true,
-      routeId: true,
-      startDate: true,
-      endDate: true,
-      friends: {
-        select: {
-          id: true,
-          name: true,
-          location: true,
-        },
-      },
-    },
-  });
-}
+export async function getDestinations() {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
 
-export interface AddDestinationToRouteProps {
-  routeId: string;
-  location: string;
-  friendIds: string[];
-  startDate: Date;
-  endDate: Date;
-}
-export type AddDestinationToRouteResponse = {
-  id: string;
-  location: string;
-  latitude: number;
-  longitude: number;
-  order: number;
-  routeId: string;
-  startDate: Date;
-  endDate: Date;
-  friends: {
-    id: string;
-    name: string;
-    location: string | null;
-  }[];
-};
-export async function addDestinationToRoute({
-  routeId,
-  location,
-  friendIds = [],
-  startDate,
-  endDate,
-}: AddDestinationToRouteProps) {
-  const geoData = await getAddressCoordinates(location);
-  if (geoData.status !== 'OK') {
-    throw new Error(`Failed to get coordinates for location: ${location}`);
+  if (!userId) {
+    throw new Error('User not authenticated')
   }
-  if (!geoData.results) {
-    throw new Error(`No results found for location: ${location}`);
+
+  const { data: destinations, error } = await supabase
+    .from('destinations')
+    .select(`
+      *,
+      routes!inner (
+        id,
+        trips!inner (
+          id,
+          user_id
+        )
+      )
+    `)
+    .eq('routes.trips.user_id', userId)
+    .order('order', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching destinations:', error)
+    throw new Error('Failed to fetch destinations')
   }
-  const { lat, lng } = geoData.results.geometry.location;
-  // Get the current highest order in the route
-  const highestOrder = await prisma.destination.findFirst({
-    where: { routeId },
-    orderBy: { order: 'desc' },
-    select: { order: true },
-  });
 
-  // Create new destination with incremented order
-  const newOrder = (highestOrder?.order ?? -1) + 1;
-
-  return prisma.destination.create({
-    data: {
-      routeId,
-      order: newOrder,
-      location,
-      latitude: lat,
-      longitude: lng,
-      startDate,
-      endDate,
-      friends: {
-        connect: friendIds.map((id) => ({ id })),
-      },
-    },
-    include: {
-      friends: {
-        select: {
-          id: true,
-          name: true,
-          location: true,
-        },
-      },
-    },
-  });
+  return destinations || []
 }
+
+interface CreateDestinationData {
+  location: string
+  latitude: number
+  longitude: number
+  routeId: string
+  startDate: Date
+  endDate: Date
+}
+
+export async function createDestination(data: CreateDestinationData) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  // Verify the route belongs to a trip owned by the user
+  const { data: route, error: routeError } = await supabase
+    .from('routes')
+    .select(`
+      id,
+      trips!inner (
+        id,
+        user_id
+      )
+    `)
+    .eq('id', data.routeId)
+    .eq('trips.user_id', userId)
+    .single()
+
+  if (routeError || !route) {
+    throw new Error('Route not found or access denied')
+  }
+
+  // Get the highest order number for this route
+  const { data: highestOrderDestination, error: orderError } = await supabase
+    .from('destinations')
+    .select('order')
+    .eq('route_id', data.routeId)
+    .order('order', { ascending: false })
+    .limit(1)
+    .single()
+
+  const nextOrder = highestOrderDestination ? highestOrderDestination.order + 1 : 1
+
+  const { data: destination, error } = await supabase
+    .from('destinations')
+    .insert({
+      location: data.location,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      route_id: data.routeId,
+      start_date: data.startDate.toISOString(),
+      end_date: data.endDate.toISOString(),
+      order: nextOrder,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating destination:', error)
+    throw new Error('Failed to create destination')
+  }
+
+  revalidatePath(`/home/trips/${route.trips.id}/${data.routeId}`)
+  return destination
+}
+

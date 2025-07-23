@@ -1,5 +1,4 @@
-import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+import { requireAuth } from '@/lib/auth';
 import { AppSidebar } from '@/components/app-sidebar';
 import {
   SidebarInset,
@@ -16,13 +15,8 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Check authentication on the server side
-  const session = await auth();
-
-  if (!session) {
-    // Redirect to signin if not authenticated
-    redirect('/signin');
-  }
+  // Check authentication on the server side - redirects if not authenticated
+  await requireAuth();
 
   return (
     <SidebarProvider>
@@ -54,3 +48,4 @@ export default async function HomeLayout({
     </SidebarProvider>
   );
 }
+

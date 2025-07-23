@@ -1,64 +1,75 @@
-import prisma from '@/lib/db';
-import { TripRouteParams } from '../page';
-import AddDestinationForm from './components/addDestinationForm';
-import DestinationList from './components/destinationsList';
-import LocationMap from './components/locationMap';
-import RouteNameInput from './components/routeNameInput';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { notFound } from 'next/navigation'
 
-export type RouteParams = TripRouteParams & {
-  routeId: string;
-};
-export type RoutePageProps = {
-  params: Promise<RouteParams>;
-};
-export default async function NewRoutePage({ params }: RoutePageProps) {
-  const { routeId } = await params;
+interface RoutePageProps {
+  params: {
+    tripId: string
+    routeId: string
+  }
+}
 
-  const route = await prisma.route.findUnique({
-    where: {
-      id: routeId,
-    },
-  });
+export default async function RoutePage({ params }: RoutePageProps) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
 
-  if (!route) {
-    return <div>Route not found</div>;
+  if (!userId) {
+    notFound()
+  }
+
+  // Fetch route with verification that it belongs to a trip owned by the user
+  const { data: route, error: routeError } = await supabase
+    .from('routes')
+    .select(`
+      *,
+      trips!inner (
+        id,
+        name,
+        user_id
+      ),
+      destinations (*)
+    `)
+    .eq('id', params.routeId)
+    .eq('trips.user_id', userId)
+    .single()
+
+  if (routeError || !route) {
+    notFound()
   }
 
   return (
-    <div className='min-h-screen sm:h-[600px]'>
-      <div
-        id='route-name-section'
-        className='mb-4 flex flex-row items-end justify-between gap-2'
-      >
-        <div className='grow space-y-2'>
-          <RouteNameInput routeId={routeId} initialName={route.name} />
-        </div>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">{route.name}</h1>
+        <p className="text-muted-foreground">
+          Part of trip: {route.trips.name}
+        </p>
       </div>
-      <div
-        id='trip-details'
-        className='flex h-2/3 flex-col justify-between gap-4 sm:flex-row sm:items-start sm:justify-center'
-      >
-        <div
-          id='route-list'
-          className='bg-card h-1/3 rounded-lg border p-2 sm:h-full sm:w-[30%]'
-        >
-          <DestinationList routeId={routeId} />
-        </div>
 
-        <div
-          id='destination-details'
-          className='bg-card flex h-2/3 w-full flex-col gap-4 rounded-lg border p-2 sm:h-full sm:w-[30%]'
-        >
-          <AddDestinationForm routeId={routeId} />
-        </div>
-
-        <div
-          id='map-overview'
-          className='bg-card h-1/3 w-full max-w-xl rounded-lg border sm:h-full'
-        >
-          <LocationMap routeId={routeId} />
-        </div>
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold">Destinations</h2>
+        
+        {route.destinations && route.destinations.length > 0 ? (
+          <div className="grid gap-4">
+            {route.destinations
+              .sort((a, b) => a.order - b.order)
+              .map((destination) => (
+                <div key={destination.id} className="border rounded-lg p-4">
+                  <h3 className="text-xl font-medium">{destination.location}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date(destination.start_date).toLocaleDateString()} - {new Date(destination.end_date).toLocaleDateString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Coordinates: {destination.latitude}, {destination.longitude}
+                  </p>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground">No destinations added yet.</p>
+        )}
       </div>
     </div>
-  );
+  )
 }
+

@@ -1,28 +1,40 @@
-'use server';
+"use server"
 
-import prisma from '@/lib/db';
-import { getCurrentUserId } from '@/lib/auth-utils';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { revalidatePath } from 'next/cache'
 
-const createTrip = async () => {
-  const userId = await getCurrentUserId();
-  
+interface CreateTripData {
+  name: string
+  startDate: Date
+  endDate: Date
+}
+
+export async function createTrip(data: CreateTripData) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
   if (!userId) {
-    throw new Error('User not authenticated');
+    throw new Error('User not authenticated')
   }
 
-  // Set default dates (start: today, end: one week from today)
-  const startDate = new Date();
-  const endDate = new Date();
-  endDate.setDate(startDate.getDate() + 7);
+  const { data: trip, error } = await supabase
+    .from('trips')
+    .insert({
+      name: data.name,
+      start_date: data.startDate.toISOString(),
+      end_date: data.endDate.toISOString(),
+      user_id: userId,
+    })
+    .select()
+    .single()
 
-  return prisma.trip.create({
-    data: {
-      name: 'New Trip',
-      startDate: startDate,
-      endDate: endDate,
-      userId: userId,
-    },
-  });
-};
+  if (error) {
+    console.error('Error creating trip:', error)
+    throw new Error('Failed to create trip')
+  }
 
-export default createTrip;
+  revalidatePath('/home/trips')
+  return trip
+}
+
