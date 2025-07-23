@@ -58,14 +58,14 @@ const TripCard = ({
               <div className='text-muted-foreground flex items-center gap-2 text-sm'>
                 <Calendar className='h-4 w-4' />
                 <span>
-                  {formatDate(trip.startDate.toDateString())} -{' '}
-                  {formatDate(trip.endDate.toDateString())}
+                  {/* {formatDate(trip.startDate.toDateString())} -{' '}
+                  {formatDate(trip.endDate.toDateString())} */}
                 </span>
               </div>
             </div>
           </div>
           <Badge variant='outline' className='text-xs'>
-            {trip.routes.length} {trip.routes.length === 1 ? 'Route' : 'Routes'}
+            {/* {trip.routes.length} {trip.routes.length === 1 ? 'Route' : 'Routes'} */}
           </Badge>
         </div>
       </CardHeader>
@@ -75,7 +75,8 @@ const TripCard = ({
         <div className='space-y-2'>
           <h4 className='text-foreground text-sm font-medium'>Routes</h4>
           <div className='max-h-48 space-y-2 overflow-y-auto pr-2'>
-            {trip.routes.map((route, index) => (
+            {/* {trip.routes.map((route, index) => ( */}
+            {[].map((route, index) => (
               <div
                 key={route.id}
                 className={`cursor-pointer rounded-lg border p-3 transition-all duration-200 ${
@@ -103,16 +104,16 @@ const TripCard = ({
                 <div className='text-muted-foreground flex items-center gap-4 text-xs'>
                   <div className='flex items-center gap-1'>
                     <MapPin className='h-3 w-3' />
-                    <span>{route.destinations.length} destinations</span>
+                    {/* <span>{route.destinations.length} destinations</span> */}
                   </div>
                   <div className='flex items-center gap-1'>
                     <Users className='h-3 w-3' />
-                    <span>
+                    {/* <span>
                       {route.destinations
                         .map((dest) => dest.friends.length)
                         .reduce((a, b) => a + b, 0)}{' '}
                       friends
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
