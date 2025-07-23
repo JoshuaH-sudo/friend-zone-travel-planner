@@ -6,6 +6,13 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from '../public/locales/en/common.json';
 import deCommon from '../public/locales/de/common.json';
 
+export enum SupportedLocales {
+  EN = 'en',
+  DE = 'de',
+}
+
+export type AvailableLocals = keyof typeof SupportedLocales;
+
 const resources = {
   en: {
     common: enCommon,
@@ -23,7 +30,7 @@ i18n
     fallbackLng: 'en',
     defaultNS: 'common',
     ns: ['common'],
-    
+
     // Language detection options
     detection: {
       order: ['navigator', 'htmlTag', 'path', 'subdomain'],
@@ -42,4 +49,3 @@ i18n
   });
 
 export default i18n;
-
