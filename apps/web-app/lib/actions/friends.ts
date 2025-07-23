@@ -93,3 +93,35 @@ export async function getFriends() {
   return friends || []
 }
 
+export interface GetFriendsByGeoLocationProps {
+  lat: number;
+  lng: number;
+}
+
+export async function getFriendsByGeoLocation({
+  lat,
+  lng,
+}: GetFriendsByGeoLocationProps) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+  
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data: friends, error } = await supabase
+    .from('friends')
+    .select('id, name, location, latitude, longitude')
+    .eq('user_id', userId)
+    .gte('latitude', lat - 0.1)
+    .lte('latitude', lat + 0.1)
+    .gte('longitude', lng - 0.1)
+    .lte('longitude', lng + 0.1)
+
+  if (error) {
+    console.error('Error fetching friends by geo location:', error)
+    throw new Error('Failed to fetch friends by location')
+  }
+
+  return friends || []
+}
