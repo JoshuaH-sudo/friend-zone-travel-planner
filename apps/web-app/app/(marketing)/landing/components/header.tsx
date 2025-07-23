@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { ThemeToggle } from '../../../../../components/theme-toggle';
+import { ThemeToggle } from '../../../../components/theme-toggle';
 import travelIcon from '@/public/travel.png';
 import Image from 'next/image';
 import Link from 'next/link';

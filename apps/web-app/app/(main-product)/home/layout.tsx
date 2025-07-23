@@ -7,7 +7,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { ThemeToggle } from '../../../../components/theme-toggle';
+import { ThemeToggle } from '../../../components/theme-toggle';
 import { HomeLayoutContent } from './home-layout-content';
 
 export default async function HomeLayout({
