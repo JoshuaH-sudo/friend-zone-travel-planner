@@ -3,100 +3,82 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  location      String?
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
-  accounts Account[]
-  sessions Session[]
-  friends  Friend[]
-  trips    Trip[]
-}
+// Note: User authentication is handled by Supabase Auth (auth.users table)
+// We don't manage users directly through Prisma, but reference them by UUID
+// The user_id fields reference auth.users(id) in Supabase
 
 model Friend {
-  id            String       @id @default(cuid())
-  name          String
-  location      String
-  latitude      Float
-  longitude     Float
-  userId        String
-  destinationId String?
-  destination   Destination? @relation(fields: [destinationId], references: [id])
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String
+  location       String
+  latitude       Float        @db.DoublePrecision
+  longitude      Float        @db.DoublePrecision
+  user_id        String       @db.Uuid
+  destination_id String?      @db.Uuid
+  created_at     DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime?    @default(now()) @updatedAt @db.Timestamptz(6)
+  
+  // Relationships
+  destination Destination? @relation(fields: [destination_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id], map: "idx_friends_user_id")
+  @@index([destination_id], map: "idx_friends_destination_id")
+  @@map("friends")
 }
 
 model Trip {
-  id        String   @id @default(cuid())
-  name      String
-  startDate DateTime
-  endDate   DateTime
-  userId    String
-  routes    Route[]
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String
+  start_date DateTime  @db.Timestamptz(6)
+  end_date   DateTime  @db.Timestamptz(6)
+  user_id    String    @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @updatedAt @db.Timestamptz(6)
+  
+  // Relationships
+  routes Route[]
+
+  @@index([user_id], map: "idx_trips_user_id")
+  @@map("trips")
 }
 
 model Route {
-  id           String        @id @default(cuid())
-  name         String
-  tripId       String
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String
+  trip_id    String    @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @updatedAt @db.Timestamptz(6)
+  
+  // Relationships
+  trip         Trip          @relation(fields: [trip_id], references: [id], onDelete: Cascade)
   destinations Destination[]
-  trip         Trip          @relation(fields: [tripId], references: [id])
+
+  @@index([trip_id], map: "idx_routes_trip_id")
+  @@map("routes")
 }
 
 model Destination {
-  id        String   @id @default(cuid())
-  location  String
-  latitude  Float
-  longitude Float
-  order     Int
-  routeId   String
-  startDate DateTime
-  endDate   DateTime
-  route     Route    @relation(fields: [routeId], references: [id])
-  friends   Friend[]
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  location   String
+  latitude   Float     @db.DoublePrecision
+  longitude  Float     @db.DoublePrecision
+  order      Int
+  route_id   String    @db.Uuid
+  start_date DateTime  @db.Timestamptz(6)
+  end_date   DateTime  @db.Timestamptz(6)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @updatedAt @db.Timestamptz(6)
+  
+  // Relationships
+  route   Route    @relation(fields: [route_id], references: [id], onDelete: Cascade)
+  friends Friend[]
+
+  @@index([route_id], map: "idx_destinations_route_id")
+  @@map("destinations")
 }
 
-model Account {
-  id                String  @id
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
