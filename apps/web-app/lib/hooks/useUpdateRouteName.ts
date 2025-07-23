@@ -1,16 +1,17 @@
 'use client';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import updateRoute from '../../app/(main)/home/trips/[tripId]/actions/updateRoute';
+import { updateRoute } from '../../app/(main)/home/trips/[tripId]/actions/updateRoute';
 
 export interface UpdateRouteNameProps {
   routeId: string;
   name: string;
+  tripId?: string;
 }
 
 export type UpdateRouteNameResponse = {
   id: string;
   name: string;
-  tripId: string;
+  trip_id: string;
 };
 
 export type UseUpdateRouteNameOptions = UseMutationOptions<
@@ -21,9 +22,19 @@ export type UseUpdateRouteNameOptions = UseMutationOptions<
 
 const useUpdateRouteName = (props?: UseUpdateRouteNameOptions) =>
   useMutation({
-    mutationFn: async ({ routeId, name }: UpdateRouteNameProps) => 
-      await updateRoute(routeId, name),
+    mutationFn: async ({ routeId, name, tripId }: UpdateRouteNameProps) => {
+      // We need tripId for the updateRoute function, but we can get it from the route if needed
+      if (!tripId) {
+        throw new Error('tripId is required for updating route');
+      }
+      return await updateRoute({
+        id: routeId,
+        name,
+        tripId
+      });
+    },
     ...props,
   });
 
 export default useUpdateRouteName;
+

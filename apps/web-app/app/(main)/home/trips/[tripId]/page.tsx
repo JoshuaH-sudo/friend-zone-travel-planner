@@ -1,14 +1,23 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUserId } from '@/lib/auth-utils'
 import { notFound } from 'next/navigation'
+import TripOverviewClient from './components/tripOverviewClient'
 
-interface TripPageProps {
-  params: {
-    tripId: string
-  }
-}
+export type TripRouteParams = {
+  locale: string;
+  tripId: string;
+};
 
-export default async function TripPage({ params }: TripPageProps) {
+export type TripPageProps = {
+  params: Promise<TripRouteParams>;
+};
+
+export default async function TripDetails({
+  params,
+}: {
+  params: Promise<TripRouteParams>;
+}) {
+  const { tripId } = await params;
   const supabase = await createClient()
   const userId = await getCurrentUserId()
 
@@ -20,7 +29,7 @@ export default async function TripPage({ params }: TripPageProps) {
   const { data: trip, error: tripError } = await supabase
     .from('trips')
     .select('*')
-    .eq('id', params.tripId)
+    .eq('id', tripId)
     .eq('user_id', userId)
     .single()
 
@@ -31,49 +40,27 @@ export default async function TripPage({ params }: TripPageProps) {
   // Fetch routes for this trip
   const { data: routes, error: routesError } = await supabase
     .from('routes')
-    .select(`
-      *,
-      destinations (*)
-    `)
-    .eq('trip_id', params.tripId)
+    .select('*')
+    .eq('trip_id', tripId)
     .order('created_at', { ascending: true })
 
   if (routesError) {
     console.error('Error fetching routes:', routesError)
   }
 
-  return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">{trip.name}</h1>
-        <p className="text-muted-foreground">
-          {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
-        </p>
-      </div>
+  // Transform the data to match the expected interface
+  const transformedTrip = {
+    id: trip.id,
+    name: trip.name,
+    startDate: trip.start_date ? new Date(trip.start_date) : undefined,
+    endDate: trip.end_date ? new Date(trip.end_date) : undefined,
+  }
 
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold">Routes</h2>
-        
-        {routes && routes.length > 0 ? (
-          <div className="grid gap-4">
-            {routes.map((route) => (
-              <div key={route.id} className="border rounded-lg p-4">
-                <h3 className="text-xl font-medium">{route.name}</h3>
-                {route.destinations && route.destinations.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-sm text-muted-foreground">
-                      {route.destinations.length} destination{route.destinations.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted-foreground">No routes created yet.</p>
-        )}
-      </div>
-    </div>
-  )
+  const transformedRoutes = (routes || []).map(route => ({
+    id: route.id,
+    name: route.name,
+  }))
+
+  return <TripOverviewClient trip={transformedTrip} routes={transformedRoutes} tripId={tripId} />
 }
 

@@ -35,6 +35,48 @@ export async function getDestinations() {
   return destinations || []
 }
 
+export async function getDestinationsByRouteId(routeId: string) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  // Verify the route belongs to a trip owned by the user and get destinations
+  const { data: destinations, error } = await supabase
+    .from('destinations')
+    .select(`
+      *,
+      routes!inner (
+        id,
+        trips!inner (
+          id,
+          user_id
+        )
+      )
+    `)
+    .eq('route_id', routeId)
+    .eq('routes.trips.user_id', userId)
+    .order('order', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching destinations:', error)
+    throw new Error('Failed to fetch destinations')
+  }
+
+  // Transform the data to match the expected interface
+  return (destinations || []).map(destination => ({
+    id: destination.id,
+    location: destination.location,
+    latitude: destination.latitude,
+    longitude: destination.longitude,
+    startDate: new Date(destination.start_date),
+    endDate: new Date(destination.end_date),
+    order: destination.order,
+  }))
+}
+
 interface CreateDestinationData {
   location: string
   latitude: number
@@ -102,5 +144,47 @@ export async function createDestination(data: CreateDestinationData) {
 
   revalidatePath(`/home/trips/${route.trips.id}/${data.routeId}`)
   return destination
+}
+
+// Types for the AddDestinationForm
+export interface AddDestinationToRouteProps {
+  routeId: string
+  location: string
+  friendIds: string[]
+  startDate: Date
+  endDate: Date
+}
+
+export interface AddDestinationToRouteResponse {
+  id: string
+  location: string
+  latitude: number
+  longitude: number
+  startDate: Date
+  endDate: Date
+  order: number
+}
+
+export async function addDestinationToRoute(data: AddDestinationToRouteProps): Promise<AddDestinationToRouteResponse> {
+  // For now, we'll use placeholder coordinates since we don't have the geocoding service
+  // In a real implementation, you'd geocode the location to get coordinates
+  const destination = await createDestination({
+    location: data.location,
+    latitude: 0, // Placeholder - would be geocoded
+    longitude: 0, // Placeholder - would be geocoded
+    routeId: data.routeId,
+    startDate: data.startDate,
+    endDate: data.endDate,
+  })
+
+  return {
+    id: destination.id,
+    location: destination.location,
+    latitude: destination.latitude,
+    longitude: destination.longitude,
+    startDate: new Date(destination.start_date),
+    endDate: new Date(destination.end_date),
+    order: destination.order,
+  }
 }
 
