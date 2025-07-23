@@ -1,6 +1,6 @@
 'use client';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import updateRoute from '../../app/(main-product)/home/trips/[tripId]/actions/updateRoute';
+import updateRoute from '../../app/(main)/home/trips/[tripId]/actions/updateRoute';
 
 export interface UpdateRouteNameProps {
   routeId: string;
