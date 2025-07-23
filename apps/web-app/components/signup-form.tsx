@@ -10,7 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { GoogleOAuthButton } from "@/components/ui/google-oauth-button"
 import { signup } from "@/lib/actions/auth-actions"
+import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { signIn } from "@/lib/auth"
 
@@ -29,6 +31,7 @@ type SignupFormData = z.infer<typeof signupSchema>
 export function SignupForm() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { t } = useTranslation()
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -66,14 +69,29 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t("auth.createAccount")}</CardTitle>
         <CardDescription className="text-center">
-          Enter your details to create your account
+          {t("auth.enterDetailsToCreate")}
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="space-y-4">
+          <GoogleOAuthButton variant="signup" />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t("auth.or")}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -157,19 +175,18 @@ export function SignupForm() {
             />
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
             </Button>
           </form>
         </Form>
         
         <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
+          {t("auth.alreadyHaveAccount")}{" "}
           <Link href="/signin" className="text-primary hover:underline">
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </div>
       </CardContent>
     </Card>
   )
 }
-

@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { GoogleOAuthButton } from "@/components/ui/google-oauth-button"
 import { login } from "@/lib/actions/auth-actions"
+import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
 const loginSchema = z.object({
@@ -22,6 +24,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { t } = useTranslation()
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -56,14 +59,29 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t("auth.signIn")}</CardTitle>
         <CardDescription className="text-center">
-          Enter your email and password to access your account
+          {t("auth.enterEmailPassword")}
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="space-y-4">
+          <GoogleOAuthButton variant="signin" />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t("auth.or")}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -109,19 +127,18 @@ export function LoginForm() {
             />
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? t("auth.signingIn") : t("auth.signIn")}
             </Button>
           </form>
         </Form>
         
         <div className="mt-4 text-center text-sm">
-          Don't have an account?{" "}
+          {t("auth.dontHaveAccount")}{" "}
           <Link href="/signup" className="text-primary hover:underline">
-            Sign up
+            {t("auth.signUp")}
           </Link>
         </div>
       </CardContent>
     </Card>
   )
 }
-

@@ -208,5 +208,20 @@
       "saveState": "Status speichern",
       "restoreState": "Status wiederherstellen"
     }
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "createAccount": "Konto erstellen",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "signInWithGoogle": "Mit Google anmelden",
+    "signUpWithGoogle": "Mit Google registrieren",
+    "or": "oder",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto?",
+    "dontHaveAccount": "Haben Sie noch kein Konto?",
+    "signingIn": "Anmelden...",
+    "creatingAccount": "Konto wird erstellt...",
+    "enterEmailPassword": "Geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein, um auf Ihr Konto zuzugreifen",
+    "enterDetailsToCreate": "Geben Sie Ihre Daten ein, um Ihr Konto zu erstellen"
   }
 }

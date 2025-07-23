@@ -208,5 +208,20 @@
       "saveState": "Save State",
       "restoreState": "Restore State"
     }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "continueWithGoogle": "Continue with Google",
+    "signInWithGoogle": "Sign in with Google",
+    "signUpWithGoogle": "Sign up with Google",
+    "or": "or",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "enterEmailPassword": "Enter your email and password to access your account",
+    "enterDetailsToCreate": "Enter your details to create your account"
   }
 }
