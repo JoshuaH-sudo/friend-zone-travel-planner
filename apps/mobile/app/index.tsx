@@ -1,20 +1,14 @@
-import { WebView } from "react-native-webview";
 import Constants from "expo-constants";
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
-const isDevelopment = process.env.NODE_ENV === "development";
+import WebView from 'react-native-webview';
 
-export default function Index() {
-  // https://github.com/react-native-webview/react-native-webview/blob/master/docs/Guide.md
+export default function HomeScreen() {
   return (
     <WebView
       style={styles.container}
       showsHorizontalScrollIndicator={false}
-      source={{
-        uri: isDevelopment
-          ? "http://localhost:3000/en/trips"
-          : "https://www.friend-zone.app/en/home",
-      }}
+      source={{ uri: "https://www.friend-zone.app/en/home" }}
     />
   );
 }
