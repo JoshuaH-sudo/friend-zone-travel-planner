@@ -1,31 +1,34 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+import { Database } from './database.types';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
-  })
+  });
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
           supabaseResponse = NextResponse.next({
             request,
-          })
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
-          )
+          );
         },
       },
     }
-  )
+  );
 
   // IMPORTANT: Avoid writing any logic between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
@@ -33,21 +36,15 @@ export async function updateSession(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   // Define public routes that don't require authentication
-  const publicRoutes = [
-    '/signin',
-    '/signup',
-    '/landing',
-    '/api/auth',
-  ]
+  const publicRoutes = ['/signin', '/signup', '/landing', '/api/auth'];
 
   // Helper function to check if a route is public
   const isPublicRoute = (pathname: string) => {
-    return publicRoutes.some(route => 
-      pathname === route || 
-      pathname.startsWith(`${route}/`)
+    return publicRoutes.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
     );
   };
 
@@ -63,10 +60,10 @@ export async function updateSession(request: NextRequest) {
   if (!user) {
     // Create the sign-in URL
     const signInUrl = new URL('/signin', request.url);
-    
+
     // Add the current URL as a callback parameter so user can be redirected back after login
     signInUrl.searchParams.set('callbackUrl', request.url);
-    
+
     return NextResponse.redirect(signInUrl);
   }
 
@@ -83,6 +80,5 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
 
-  return supabaseResponse
+  return supabaseResponse;
 }
-
