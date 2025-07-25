@@ -58,8 +58,7 @@ const TripCard = ({
               <div className='text-muted-foreground flex items-center gap-2 text-sm'>
                 <Calendar className='h-4 w-4' />
                 <span>
-                  {formatDate(trip.startDate.toDateString())} -{' '}
-                  {formatDate(trip.endDate.toDateString())}
+                  {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
                 </span>
               </div>
             </div>

@@ -1,74 +1,37 @@
-import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import CredentialsProvider from "next-auth/providers/credentials"
-import prisma from "@/lib/db"
-import bcryptjs from "bcryptjs"
-import { z } from "zod"
+import { createClient } from './supabase/server'
+import { redirect } from 'next/navigation'
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-})
+export async function getUser() {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error) {
+    console.error('Error getting user:', error)
+    return null
+  }
+  
+  return user
+}
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        try {
-          const { email, password } = loginSchema.parse(credentials)
-          
-          const user = await prisma.user.findUnique({
-            where: { email }
-          })
-          
-          if (!user || !user.password) {
-            return null
-          }
-          
-          const isValidPassword = await bcryptjs.compare(password, user.password)
-          
-          if (!isValidPassword) {
-            return null
-          }
-          
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            image: user.image,
-          }
-        } catch (error) {
-          console.error("Auth error:", error)
-          return null
-        }
-      }
-    })
-  ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/signin",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string
-      }
-      return session
-    },
-  },
-})
+export async function requireAuth() {
+  const user = await getUser()
+  
+  if (!user) {
+    redirect('/signin')
+  }
+  
+  return user
+}
+
+export async function signOut() {
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signOut()
+  
+  if (error) {
+    console.error('Error signing out:', error)
+    throw error
+  }
+  
+  redirect('/signin')
+}
 

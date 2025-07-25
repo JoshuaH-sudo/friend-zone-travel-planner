@@ -1,16 +1,56 @@
-'use server';
+"use server"
 
-import prisma from '@/lib/db';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { revalidatePath } from 'next/cache'
 
-const updateRoute = async (routeId: string, name: string) => {
-  return await prisma.route.update({
-    where: {
-      id: routeId,
-    },
-    data: {
-      name: name,
-    },
-  });
-};
+interface UpdateRouteData {
+  id: string
+  name: string
+  tripId: string
+}
 
-export default updateRoute;
+export async function updateRoute(data: UpdateRouteData) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  // Verify the route belongs to a trip owned by the user
+  const { data: route, error: routeError } = await supabase
+    .from('routes')
+    .select(`
+      id,
+      trips!inner (
+        id,
+        user_id
+      )
+    `)
+    .eq('id', data.id)
+    .eq('trips.user_id', userId)
+    .single()
+
+  if (routeError || !route) {
+    throw new Error('Route not found or access denied')
+  }
+
+  const { data: updatedRoute, error } = await supabase
+    .from('routes')
+    .update({
+      name: data.name,
+    })
+    .eq('id', data.id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating route:', error)
+    throw new Error('Failed to update route')
+  }
+
+  revalidatePath(`/home/trips/${data.tripId}`)
+  return updatedRoute
+}
+

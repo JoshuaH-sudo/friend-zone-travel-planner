@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,8 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   const [name, setName] = useState(initialName);
   const [tempName, setTempName] = useState(initialName);
   const containerRef = useRef<HTMLDivElement>(null);
+  const params = useParams();
+  const tripId = params.tripId as string;
 
   const updateRouteMutation = useUpdateRouteName({
     onSuccess: (updatedRoute) => {
@@ -39,6 +42,7 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
     updateRouteMutation.mutate({
       routeId,
       name: tempName.trim(),
+      tripId,
     });
   };
 
@@ -140,3 +144,4 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
 };
 
 export default RouteNameInput;
+

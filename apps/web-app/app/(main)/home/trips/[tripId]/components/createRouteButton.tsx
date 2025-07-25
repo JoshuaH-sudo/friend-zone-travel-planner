@@ -3,11 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import createRoute from '../actions/createRoute';
+import { createRoute } from '../actions/createRoute';
 
 const CreateRouteButton = ({ tripId }: { tripId: string }) => {
   const createRouteHandler = async () => {
-    const newRoute = await createRoute(tripId);
+    const newRoute = await createRoute({
+      name: 'New Route',
+      tripId: tripId
+    });
     redirect(`./${tripId}/${newRoute.id}`);
   };
 
@@ -19,3 +22,4 @@ const CreateRouteButton = ({ tripId }: { tripId: string }) => {
   );
 };
 export default CreateRouteButton;
+

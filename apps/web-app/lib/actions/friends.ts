@@ -1,40 +1,127 @@
-'use server';
+"use server"
 
-import prisma from '@/lib/db';
-import { getCurrentUserId } from '@/lib/auth-utils';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { revalidatePath } from 'next/cache'
+
+interface CreateFriendData {
+  name: string
+  location: string
+  latitude: number
+  longitude: number
+  destinationId?: string
+}
+
+export async function createFriend(data: CreateFriendData) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  // If destinationId is provided, verify it belongs to the user
+  if (data.destinationId) {
+    const { data: destination, error: destError } = await supabase
+      .from('destinations')
+      .select(`
+        id,
+        routes!inner (
+          id,
+          trips!inner (
+            id,
+            user_id
+          )
+        )
+      `)
+      .eq('id', data.destinationId)
+      .eq('routes.trips.user_id', userId)
+      .single()
+
+    if (destError || !destination) {
+      throw new Error('Destination not found or access denied')
+    }
+  }
+
+  const { data: friend, error } = await supabase
+    .from('friends')
+    .insert({
+      name: data.name,
+      location: data.location,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      user_id: userId,
+      destination_id: data.destinationId || null,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating friend:', error)
+    throw new Error('Failed to create friend')
+  }
+
+  revalidatePath('/home/friends')
+  return friend
+}
+
+export async function getFriends() {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
+
+  if (!userId) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data: friends, error } = await supabase
+    .from('friends')
+    .select(`
+      *,
+      destinations (
+        id,
+        location
+      )
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching friends:', error)
+    throw new Error('Failed to fetch friends')
+  }
+
+  return friends || []
+}
 
 export interface GetFriendsByGeoLocationProps {
   lat: number;
   lng: number;
 }
-export const getFriendsByGeoLocation = async ({
+
+export async function getFriendsByGeoLocation({
   lat,
   lng,
-}: GetFriendsByGeoLocationProps) => {
-  const userId = await getCurrentUserId();
+}: GetFriendsByGeoLocationProps) {
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
   
   if (!userId) {
-    throw new Error('User not authenticated');
+    throw new Error('User not authenticated')
   }
 
-  return await prisma.friend.findMany({
-    where: {
-      userId: userId,
-      latitude: {
-        gte: lat - 0.1,
-        lte: lat + 0.1,
-      },
-      longitude: {
-        gte: lng - 0.1,
-        lte: lng + 0.1,
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      location: true,
-      latitude: true,
-      longitude: true,
-    },
-  });
-};
+  const { data: friends, error } = await supabase
+    .from('friends')
+    .select('id, name, location, latitude, longitude')
+    .eq('user_id', userId)
+    .gte('latitude', lat - 0.1)
+    .lte('latitude', lat + 0.1)
+    .gte('longitude', lng - 0.1)
+    .lte('longitude', lng + 0.1)
+
+  if (error) {
+    console.error('Error fetching friends by geo location:', error)
+    throw new Error('Failed to fetch friends by location')
+  }
+
+  return friends || []
+}

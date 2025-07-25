@@ -45,14 +45,12 @@ const TripHeader = ({ trip }: TripHeaderProps) => {
               <div className='flex items-center gap-2'>
                 <CalendarDays className='h-4 w-4' />
                 <span>
-                  {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                  {/* {formatDate(trip.startDate)} - {formatDate(trip.endDate)} */}
                 </span>
               </div>
-              {getDuration() && (
-                <Badge variant='secondary' className='text-xs'>
-                  {getDuration()}
-                </Badge>
-              )}
+              {/* <Badge variant='secondary' className='text-xs'>
+                {getDuration()}
+              </Badge> */}
             </div>
           </div>
         </div>

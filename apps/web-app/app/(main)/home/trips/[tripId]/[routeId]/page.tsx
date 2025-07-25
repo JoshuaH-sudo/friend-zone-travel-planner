@@ -1,27 +1,46 @@
-import prisma from '@/lib/db';
-import { TripRouteParams } from '../page';
-import AddDestinationForm from './components/addDestinationForm';
-import DestinationList from './components/destinationsList';
-import LocationMap from './components/locationMap';
-import RouteNameInput from './components/routeNameInput';
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserId } from '@/lib/auth-utils'
+import { notFound } from 'next/navigation'
+import { TripRouteParams } from '../page'
+import AddDestinationForm from './components/addDestinationForm'
+import DestinationList from './components/destinationsList'
+import LocationMap from './components/locationMap'
+import RouteNameInput from './components/routeNameInput'
 
 export type RouteParams = TripRouteParams & {
   routeId: string;
 };
+
 export type RoutePageProps = {
   params: Promise<RouteParams>;
 };
+
 export default async function NewRoutePage({ params }: RoutePageProps) {
   const { routeId } = await params;
+  const supabase = await createClient()
+  const userId = await getCurrentUserId()
 
-  const route = await prisma.route.findUnique({
-    where: {
-      id: routeId,
-    },
-  });
+  if (!userId) {
+    notFound()
+  }
 
-  if (!route) {
-    return <div>Route not found</div>;
+  // Fetch route with verification that it belongs to a trip owned by the user
+  const { data: route, error: routeError } = await supabase
+    .from('routes')
+    .select(`
+      *,
+      trips!inner (
+        id,
+        name,
+        user_id
+      )
+    `)
+    .eq('id', routeId)
+    .eq('trips.user_id', userId)
+    .single()
+
+  if (routeError || !route) {
+    notFound()
   }
 
   return (
@@ -62,3 +81,4 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
     </div>
   );
 }
+

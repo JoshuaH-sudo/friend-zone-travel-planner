@@ -1,38 +1,49 @@
 'use server';
-import prisma from '@/lib/db';
+
+import { createClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/auth-utils';
 
-export async function getTrips(userId?: string) {
-  // If no userId provided, get from session
-  const currentUserId = userId || await getCurrentUserId();
-  
-  if (!currentUserId) {
+export async function getTrips() {
+  const supabase = await createClient();
+  const userId = await getCurrentUserId();
+
+  if (!userId) {
     throw new Error('User not authenticated');
   }
 
-  return prisma.trip.findMany({
-    where: { userId: currentUserId },
-    include: {
-      routes: {
-        include: {
-          destinations: {
-            select: {
-              id: true,
-              location: true,
-              latitude: true,
-              longitude: true,
-              order: true,
-              friends: {
-                select: {
-                  id: true,
-                  name: true,
-                  location: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  const { data: trips, error } = await supabase
+    .from('trips')
+    .select(`
+      *,
+      routes (
+        id,
+        name,
+        created_at,
+        updated_at,
+        destinations (
+          id,
+          location,
+          latitude,
+          longitude,
+          order,
+          start_date,
+          end_date,
+          created_at,
+          updated_at,
+          friends (
+            id,
+            name
+          )
+        )
+      )
+    `)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching trips:', error);
+    throw new Error('Failed to fetch trips');
+  }
+
+  return trips || [];
 }
