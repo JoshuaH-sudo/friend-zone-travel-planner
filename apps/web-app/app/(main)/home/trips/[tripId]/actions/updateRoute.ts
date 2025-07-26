@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
 
 interface UpdateRouteData {
@@ -12,9 +12,9 @@ interface UpdateRouteData {
 
 export async function updateRoute(data: UpdateRouteData) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -29,7 +29,7 @@ export async function updateRoute(data: UpdateRouteData) {
       )
     `)
     .eq('id', data.id)
-    .eq('trips.user_id', userId)
+    .eq('trips.user_id', user.id)
     .single()
 
   if (routeError || !route) {

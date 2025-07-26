@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
 
 interface CreateFriendData {
@@ -14,9 +14,9 @@ interface CreateFriendData {
 
 export async function createFriend(data: CreateFriendData) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -35,7 +35,7 @@ export async function createFriend(data: CreateFriendData) {
         )
       `)
       .eq('id', data.destinationId)
-      .eq('routes.trips.user_id', userId)
+      .eq('routes.trips.user_id', user.id)
       .single()
 
     if (destError || !destination) {
@@ -50,7 +50,7 @@ export async function createFriend(data: CreateFriendData) {
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
-      user_id: userId,
+      user_id: user,
       destination_id: data.destinationId || null,
     })
     .select()
@@ -67,9 +67,9 @@ export async function createFriend(data: CreateFriendData) {
 
 export async function getFriends() {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -82,7 +82,7 @@ export async function getFriends() {
         location
       )
     `)
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -103,16 +103,16 @@ export async function getFriendsByGeoLocation({
   lng,
 }: GetFriendsByGeoLocationProps) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
   
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
   const { data: friends, error } = await supabase
     .from('friends')
     .select('id, name, location, latitude, longitude')
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .gte('latitude', lat - 0.1)
     .lte('latitude', lat + 0.1)
     .gte('longitude', lng - 0.1)

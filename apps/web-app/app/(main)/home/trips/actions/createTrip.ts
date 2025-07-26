@@ -1,7 +1,7 @@
 "use server"
 
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
 
 interface CreateTripData {
@@ -12,9 +12,9 @@ interface CreateTripData {
 
 async function createTrip(data: CreateTripData) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -24,7 +24,7 @@ async function createTrip(data: CreateTripData) {
       name: data.name,
       start_date: data.startDate.toISOString(),
       end_date: data.endDate.toISOString(),
-      user_id: userId,
+      user_id: user,
     })
     .select()
     .single()

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import TripOverviewClient from './components/tripOverviewClient';
+import { getUser } from '@/lib/auth';
 
 export type TripRouteParams = {
   locale: string;
@@ -18,18 +19,14 @@ export default async function TripDetails({
 }) {
   const { tripId } = await params;
   const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    notFound();
-  }
+  const user = await getUser();
 
   // Fetch trip with verification that it belongs to the user
   const { data: trip, error: tripError } = await supabase
     .from('trips')
     .select('*')
     .eq('id', tripId)
-    .eq('user_id', user.data.user.id)
+    .eq('user_id', user.id)
     .single();
 
   if (tripError || !trip) {

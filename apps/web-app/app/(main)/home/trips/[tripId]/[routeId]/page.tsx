@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getUser } from '@/lib/auth';
 import { notFound } from 'next/navigation'
 import { TripRouteParams } from '../page'
 import AddDestinationForm from './components/addDestinationForm'
@@ -18,11 +18,7 @@ export type RoutePageProps = {
 export default async function NewRoutePage({ params }: RoutePageProps) {
   const { routeId } = await params;
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
-
-  if (!userId) {
-    notFound()
-  }
+  const user = await getUser()
 
   // Fetch route with verification that it belongs to a trip owned by the user
   const { data: route, error: routeError } = await supabase
@@ -36,7 +32,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
       )
     `)
     .eq('id', routeId)
-    .eq('trips.user_id', userId)
+    .eq('trips.user_id', user.id)
     .single()
 
   if (routeError || !route) {

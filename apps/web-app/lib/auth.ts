@@ -1,37 +1,39 @@
-import { createClient } from './supabase/server'
-import { redirect } from 'next/navigation'
+import { createClient } from './supabase/server';
+import { redirect } from 'next/navigation';
 
 export async function getUser() {
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  
-  if (error) {
-    console.error('Error getting user:', error)
-    return null
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    console.error('Error getting user:', error);
+    throw error;
   }
-  
-  return user
+
+  return user;
 }
 
 export async function requireAuth() {
-  const user = await getUser()
-  
+  const user = await getUser();
+
   if (!user) {
-    redirect('/signin')
+    redirect('/signin');
   }
-  
-  return user
+
+  return user;
 }
 
 export async function signOut() {
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signOut()
-  
-  if (error) {
-    console.error('Error signing out:', error)
-    throw error
-  }
-  
-  redirect('/signin')
-}
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
 
+  if (error) {
+    console.error('Error signing out:', error);
+    throw error;
+  }
+
+  redirect('/signin');
+}

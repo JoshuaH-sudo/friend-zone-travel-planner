@@ -1,14 +1,14 @@
 "use server"
 
 import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
+import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
 
 export async function getDestinations() {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -24,7 +24,7 @@ export async function getDestinations() {
         )
       )
     `)
-    .eq('routes.trips.user_id', userId)
+    .eq('routes.trips.user_id', user.id)
     .order('order', { ascending: true })
 
   if (error) {
@@ -37,9 +37,9 @@ export async function getDestinations() {
 
 export async function getDestinationsByRouteId(routeId: string) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -57,7 +57,7 @@ export async function getDestinationsByRouteId(routeId: string) {
       )
     `)
     .eq('route_id', routeId)
-    .eq('routes.trips.user_id', userId)
+    .eq('routes.trips.user_id', user.id)
     .order('order', { ascending: true })
 
   if (error) {
@@ -88,9 +88,9 @@ interface CreateDestinationData {
 
 export async function createDestination(data: CreateDestinationData) {
   const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const user = await getUser()
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated')
   }
 
@@ -105,7 +105,7 @@ export async function createDestination(data: CreateDestinationData) {
       )
     `)
     .eq('id', data.routeId)
-    .eq('trips.user_id', userId)
+    .eq('trips.user_id', user.id)
     .single()
 
   if (routeError || !route) {

@@ -1,13 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { getCurrentUserId } from '@/lib/auth-utils';
+import { getUser } from '@/lib/auth';;
 
 export async function getTrips() {
   const supabase = await createClient();
-  const userId = await getCurrentUserId();
+  const user = await getUser();
 
-  if (!userId) {
+  if (!user) {
     throw new Error('User not authenticated');
   }
 
@@ -37,7 +37,7 @@ export async function getTrips() {
         )
       )
     `)
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
