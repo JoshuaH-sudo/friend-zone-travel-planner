@@ -50,7 +50,7 @@ export async function createFriend(data: CreateFriendData) {
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
-      user_id: user,
+      user_id: user.id,
       destination_id: data.destinationId || null,
     })
     .select()

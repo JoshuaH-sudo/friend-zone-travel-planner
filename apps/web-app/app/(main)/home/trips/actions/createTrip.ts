@@ -24,7 +24,7 @@ async function createTrip(data: CreateTripData) {
       name: data.name,
       start_date: data.startDate.toISOString(),
       end_date: data.endDate.toISOString(),
-      user_id: user,
+      user_id: user.id,
     })
     .select()
     .single()
