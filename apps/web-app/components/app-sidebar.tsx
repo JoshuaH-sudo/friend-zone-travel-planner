@@ -3,7 +3,6 @@
 import { Plane, LogOut, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { handleLogout } from '@/app/(main)/home/actions';
 
 import {
   Sidebar,
@@ -16,6 +15,7 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
+import { signOut } from '@/lib/auth';
 
 export function AppSidebar() {
   const { t } = useTranslation('common');
@@ -70,7 +70,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <form action={handleLogout}>
+            <form action={signOut}>
               <SidebarMenuButton type='submit' tooltip={t('navigation.logout')}>
                 <LogOut />
                 <span>{t('navigation.logout')}</span>
