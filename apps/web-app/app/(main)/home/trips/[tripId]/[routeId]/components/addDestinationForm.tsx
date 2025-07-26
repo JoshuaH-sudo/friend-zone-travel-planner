@@ -4,7 +4,7 @@ import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { Input } from '@/components/ui/input';
 import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import useAddDestinationToRoute from '@/lib/hooks/useAddDestinationToRoute';
+import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,8 +19,8 @@ import {
 } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combo-box';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
-import useGetFriendsByGeoLocation from '@/lib/hooks/useGetFriendsByGeoLocation';
-import useGetAddressCoordinates from '@/lib/hooks/useGetAddressCoordinates';
+import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
+import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 
 export interface NewDestination {

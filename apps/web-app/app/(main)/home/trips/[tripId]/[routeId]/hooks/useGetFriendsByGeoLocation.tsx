@@ -1,11 +1,11 @@
 'use client';
 
 import { UseMutationOptions, useQuery } from '@tanstack/react-query';
-import {} from '../actions/destinations';
+import {} from '../../../../../../../lib/actions/destinations';
 import {
   getFriendsByGeoLocation,
   GetFriendsByGeoLocationProps,
-} from '../actions/friends';
+} from '../../../../../../../lib/actions/friends';
 
 export type UseGetFriendsByGeoLocation = UseMutationOptions<
   GetFriendsByGeoLocationProps,

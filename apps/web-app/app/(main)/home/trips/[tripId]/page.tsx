@@ -1,7 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserId } from '@/lib/auth-utils'
-import { notFound } from 'next/navigation'
-import TripOverviewClient from './components/tripOverviewClient'
+import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
+import TripOverviewClient from './components/tripOverviewClient';
 
 export type TripRouteParams = {
   locale: string;
@@ -18,11 +17,11 @@ export default async function TripDetails({
   params: Promise<TripRouteParams>;
 }) {
   const { tripId } = await params;
-  const supabase = await createClient()
-  const userId = await getCurrentUserId()
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
 
-  if (!userId) {
-    notFound()
+  if (!user.data.user) {
+    notFound();
   }
 
   // Fetch trip with verification that it belongs to the user
@@ -30,11 +29,11 @@ export default async function TripDetails({
     .from('trips')
     .select('*')
     .eq('id', tripId)
-    .eq('user_id', userId)
-    .single()
+    .eq('user_id', user.data.user.id)
+    .single();
 
   if (tripError || !trip) {
-    notFound()
+    notFound();
   }
 
   // Fetch routes for this trip
@@ -42,10 +41,10 @@ export default async function TripDetails({
     .from('routes')
     .select('*')
     .eq('trip_id', tripId)
-    .order('created_at', { ascending: true })
+    .order('created_at', { ascending: true });
 
   if (routesError) {
-    console.error('Error fetching routes:', routesError)
+    console.error('Error fetching routes:', routesError);
   }
 
   // Transform the data to match the expected interface
@@ -54,13 +53,18 @@ export default async function TripDetails({
     name: trip.name,
     startDate: trip.start_date ? new Date(trip.start_date) : undefined,
     endDate: trip.end_date ? new Date(trip.end_date) : undefined,
-  }
+  };
 
-  const transformedRoutes = (routes || []).map(route => ({
+  const transformedRoutes = (routes || []).map((route) => ({
     id: route.id,
     name: route.name,
-  }))
+  }));
 
-  return <TripOverviewClient trip={transformedTrip} routes={transformedRoutes} tripId={tripId} />
+  return (
+    <TripOverviewClient
+      trip={transformedTrip}
+      routes={transformedRoutes}
+      tripId={tripId}
+    />
+  );
 }
-

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Check, X, Edit, Loader2 } from 'lucide-react';
-import useUpdateRouteName from '@/lib/hooks/useUpdateRouteName';
+import useUpdateRouteName from '../hooks/useUpdateRouteName';
 
 interface RouteNameInputProps {
   routeId: string;

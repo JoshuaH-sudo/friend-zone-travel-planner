@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import useGetTripsWithRoutes, { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
+import useGetTripsWithRoutes, { TripWithRoutes } from '@/app/(main)/home/trips/hooks/useGetTripsWithRoutes';
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
 import createTrip from './actions/createTrip';

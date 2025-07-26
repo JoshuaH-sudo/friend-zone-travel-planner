@@ -1,7 +1,7 @@
 'use client';
 import { AdvancedMarker, APIProvider, Map } from '@vis.gl/react-google-maps';
 import { FC, useEffect, useState } from 'react';
-import { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
+import { TripWithRoutes } from '@/app/(main)/home/trips/hooks/useGetTripsWithRoutes';
 
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 

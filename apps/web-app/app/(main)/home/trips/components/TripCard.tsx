@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, Calendar, Map, Star } from 'lucide-react';
-import { TripWithRoutes } from '@/lib/hooks/useGetTripsWithRoutes';
+import { TripWithRoutes } from '../hooks/useGetTripsWithRoutes';
 
 interface TripCardProps {
   trip: TripWithRoutes;
