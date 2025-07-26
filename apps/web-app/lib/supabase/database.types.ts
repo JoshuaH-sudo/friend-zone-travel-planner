@@ -146,6 +146,7 @@ export type Database = {
           end_date: string
           id: string
           name: string
+          routes: string[] | null
           start_date: string
           updated_at: string | null
           user_id: string
@@ -155,6 +156,7 @@ export type Database = {
           end_date: string
           id?: string
           name: string
+          routes?: string[] | null
           start_date: string
           updated_at?: string | null
           user_id: string
@@ -164,6 +166,7 @@ export type Database = {
           end_date?: string
           id?: string
           name?: string
+          routes?: string[] | null
           start_date?: string
           updated_at?: string | null
           user_id?: string

@@ -17,3 +17,6 @@ export const config = {
   ],
 }
 
+// Use Node.js runtime instead of Edge Runtime for Supabase compatibility
+export const runtime = 'nodejs'
+
