@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["DATABASE_URL", "ARCJET_KEY", "GOOGLE_MAPS_API_KEY"]
+      "env": ["ARCJET_KEY", "GOOGLE_MAPS_API_KEY"]
     },
     "lint": {
       "dependsOn": ["^lint"]
