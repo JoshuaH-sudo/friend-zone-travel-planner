@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import AddFriendForm from '../components/AddFriendForm'
+import AddFriendForm from './components/AddFriendForm'
 
 const NewFriendPage = () => {
   const router = useRouter()
