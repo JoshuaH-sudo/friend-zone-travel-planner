@@ -9,7 +9,9 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "check-types": "tsc --noEmit",
-    "sb:gen": "npx supabase gen types typescript --project-id ksfzgzdpzegwqbcpnjai --schema public > ./supabase/database.types.ts"
+    "sb:gen": "npx supabase gen types typescript --project-id ksfzgzdpzegwqbcpnjai --schema public > ./supabase/database.types.ts",
+    "sb:start": "supabase start",
+    "sb:stop": "supabase stop"
   },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.5",
