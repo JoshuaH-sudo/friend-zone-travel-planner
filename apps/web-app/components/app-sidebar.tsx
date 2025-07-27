@@ -14,14 +14,12 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { usePathname } from 'next/navigation';
-import { signOut } from '@/lib/auth';
+import { redirect, usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 export function AppSidebar() {
   const { t } = useTranslation('common');
   const pathname = usePathname();
-
-  console.log('Current Path:', pathname);
 
   const menuItems = [
     {
@@ -30,6 +28,18 @@ export function AppSidebar() {
       icon: Plane,
     },
   ];
+
+  async function signOut() {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+
+    redirect('/signin');
+  }
 
   return (
     <Sidebar collapsible='icon'>
