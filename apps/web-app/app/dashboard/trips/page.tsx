@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import useGetTripsWithRoutes, { TripWithRoutes } from '@/app/(main)/home/trips/hooks/useGetTripsWithRoutes';
+import useGetTripsWithRoutes, { TripWithRoutes } from '@/app/(main)/dashboard/trips/hooks/useGetTripsWithRoutes';
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
 import createTrip from './actions/createTrip';
@@ -33,7 +33,7 @@ const TripsPage = () => {
   };
 
   const handleTripClick = (tripId: string) => {
-    router.push(`/home/trips/${tripId}`);
+    router.push(`/dashboard/trips/${tripId}`);
   };
 
   const handleCreateNewTrip = async () => {
@@ -42,7 +42,7 @@ const TripsPage = () => {
       startDate: new Date(),
       endDate: new Date(),
     });
-    router.push(`/home/trips/${newTrip.id}`);
+    router.push(`/dashboard/trips/${newTrip.id}`);
   };
 
   if (isLoading) {

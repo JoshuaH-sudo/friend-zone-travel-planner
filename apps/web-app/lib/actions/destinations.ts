@@ -142,7 +142,7 @@ export async function createDestination(data: CreateDestinationData) {
     throw new Error('Failed to create destination')
   }
 
-  revalidatePath(`/home/trips/${route.trips.id}/${data.routeId}`)
+  revalidatePath(`/dashboard/trips/${route.trips.id}/${data.routeId}`)
   return destination
 }
 

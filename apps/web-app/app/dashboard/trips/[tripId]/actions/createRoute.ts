@@ -43,7 +43,7 @@ export async function createRoute(data: CreateRouteData) {
     throw new Error('Failed to create route')
   }
 
-  revalidatePath(`/home/trips/${data.tripId}`)
+  revalidatePath(`/dashboard/trips/${data.tripId}`)
   return route
 }
 

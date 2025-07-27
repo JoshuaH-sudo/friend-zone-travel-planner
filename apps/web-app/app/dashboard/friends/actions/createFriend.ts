@@ -65,7 +65,7 @@ export default async function createFriend(data: CreateFriendData) {
     throw new Error('Failed to create friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return friend
 }
 

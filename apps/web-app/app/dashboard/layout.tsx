@@ -6,11 +6,11 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { ThemeToggle } from '../../../components/theme-toggle';
-import { LanguageSwitcher } from '../../../components/language-switcher';
-import { HomeLayoutContent } from './home-layout-content';
+import { ThemeToggle } from '../../components/theme-toggle';
+import { LanguageSwitcher } from '../../components/language-switcher';
+import { DashboardLayoutContent } from './dashboard-layout-content';
 
-export default async function HomeLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -29,7 +29,7 @@ export default async function HomeLayout({
             <div className='flex items-center space-x-4'>
               <SidebarTrigger />
 
-              <Link href='/home' className='flex items-center space-x-2'>
+              <Link href='/dashboard' className='flex items-center space-x-2'>
                 <h1 className='text-foreground hover:text-primary text-xl font-semibold transition-colors'>
                   Friend Zone Travel Planner
                 </h1>
@@ -43,7 +43,7 @@ export default async function HomeLayout({
         </header>
 
         {/* Main Content */}
-        <HomeLayoutContent>{children}</HomeLayoutContent>
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
       </SidebarInset>
     </SidebarProvider>
   );

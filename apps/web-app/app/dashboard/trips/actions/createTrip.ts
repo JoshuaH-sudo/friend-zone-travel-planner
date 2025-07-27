@@ -34,7 +34,7 @@ async function createTrip(data: CreateTripData) {
     throw new Error('Failed to create trip')
   }
 
-  revalidatePath('/home/trips')
+  revalidatePath('/dashboard/trips')
   return trip
 }
 

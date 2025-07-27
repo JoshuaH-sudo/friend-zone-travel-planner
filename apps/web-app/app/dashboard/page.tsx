@@ -37,7 +37,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <Button asChild className='w-full'>
-              <Link href='/home/trips'>View Trips</Link>
+              <Link href='/dashboard/trips'>View Trips</Link>
             </Button>
           </CardContent>
         </Card>

@@ -71,7 +71,7 @@ export async function createFriend(data: CreateFriendData) {
     throw new Error('Failed to create friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return friend
 }
 
@@ -195,7 +195,7 @@ export async function updateFriend(data: UpdateFriendData) {
     throw new Error('Failed to update friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return friend
 }
 
@@ -218,6 +218,6 @@ export async function deleteFriend(friendId: string) {
     throw new Error('Failed to delete friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return { success: true }
 }

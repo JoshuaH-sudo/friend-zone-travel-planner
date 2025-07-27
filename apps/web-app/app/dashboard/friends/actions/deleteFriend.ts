@@ -23,7 +23,7 @@ export default async function deleteFriend(friendId: string) {
     throw new Error('Failed to delete friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return { success: true }
 }
 

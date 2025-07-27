@@ -98,7 +98,7 @@ export default async function updateFriend(data: UpdateFriendData) {
     throw new Error('Failed to update friend')
   }
 
-  revalidatePath('/home/friends')
+  revalidatePath('/dashboard/friends')
   return friend
 }
 

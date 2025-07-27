@@ -50,7 +50,7 @@ export async function updateRoute(data: UpdateRouteData) {
     throw new Error('Failed to update route')
   }
 
-  revalidatePath(`/home/trips/${data.tripId}`)
+  revalidatePath(`/dashboard/trips/${data.tripId}`)
   return updatedRoute
 }
 
