@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,42 +18,40 @@ interface AddFriendFormProps {
   onCancel?: () => void
 }
 
-interface FormData {
-  name: string
-  street: string
-  city: string
-  state_province: string
-  country: string
-  postal_code: string
-}
+const friendSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  street: z.string().min(1, 'Street address is required'),
+  city: z.string().min(1, 'City is required'),
+  state_province: z.string().optional(),
+  country: z.string().min(1, 'Country is required'),
+  postal_code: z.string().optional(),
+})
+
+type FriendFormData = z.infer<typeof friendSchema>
 
 const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    street: '',
-    city: '',
-    state_province: '',
-    country: '',
-    postal_code: '',
-  })
   const [previewCoordinates, setPreviewCoordinates] = useState<{ lat: number; lng: number } | null>(null)
   const [isPreviewLoading, setIsPreviewLoading] = useState(false)
-  const [errors, setErrors] = useState<Partial<FormData>>({})
 
   const queryClient = useQueryClient()
+
+  const form = useForm<FriendFormData>({
+    resolver: zodResolver(friendSchema),
+    defaultValues: {
+      name: '',
+      street: '',
+      city: '',
+      state_province: '',
+      country: '',
+      postal_code: '',
+    },
+  })
 
   const createFriendMutation = useMutation({
     mutationFn: createFriend,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['friends'] })
-      setFormData({
-        name: '',
-        street: '',
-        city: '',
-        state_province: '',
-        country: '',
-        postal_code: '',
-      })
+      form.reset()
       setPreviewCoordinates(null)
       onSuccess?.()
     },
@@ -59,38 +60,23 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
     },
   })
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
-    }
-  }
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {}
-    
-    if (!formData.name.trim()) newErrors.name = 'Name is required'
-    if (!formData.street.trim()) newErrors.street = 'Street address is required'
-    if (!formData.city.trim()) newErrors.city = 'City is required'
-    if (!formData.country.trim()) newErrors.country = 'Country is required'
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+  const watchedValues = form.watch()
 
   const handlePreviewAddress = async () => {
-    if (!formData.street || !formData.city || !formData.country) {
+    const { street, city, country, state_province, postal_code } = watchedValues
+    
+    if (!street || !city || !country) {
       return
     }
 
     setIsPreviewLoading(true)
     try {
       const addressParts = [
-        formData.street,
-        formData.city,
-        formData.state_province,
-        formData.country,
-        formData.postal_code
+        street,
+        city,
+        state_province,
+        country,
+        postal_code
       ].filter(Boolean)
       
       const fullAddress = addressParts.join(', ')
@@ -109,18 +95,14 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
-    
+  const onSubmit = async (data: FriendFormData) => {
     createFriendMutation.mutate({
-      name: formData.name.trim(),
-      street: formData.street.trim(),
-      city: formData.city.trim(),
-      state_province: formData.state_province.trim() || undefined,
-      country: formData.country.trim(),
-      postal_code: formData.postal_code.trim() || undefined,
+      name: data.name.trim(),
+      street: data.street.trim(),
+      city: data.city.trim(),
+      state_province: data.state_province?.trim() || undefined,
+      country: data.country.trim(),
+      postal_code: data.postal_code?.trim() || undefined,
     })
   }
 
@@ -137,30 +119,36 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
               <Label htmlFor="name">Name *</Label>
               <Input
                 id="name"
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                {...form.register('name')}
                 placeholder="Enter friend's name"
-                className={errors.name ? 'border-red-500' : ''}
+                disabled={createFriendMutation.isPending}
               />
-              {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+              {form.formState.errors.name && (
+                <p className="text-sm text-red-500 mt-1">
+                  {form.formState.errors.name.message}
+                </p>
+              )}
             </div>
 
             <div>
               <Label htmlFor="street">Street Address *</Label>
               <Input
                 id="street"
-                value={formData.street}
-                onChange={(e) => handleInputChange('street', e.target.value)}
+                {...form.register('street')}
                 placeholder="123 Main Street"
-                className={errors.street ? 'border-red-500' : ''}
+                disabled={createFriendMutation.isPending}
               />
-              {errors.street && <p className="text-sm text-red-500 mt-1">{errors.street}</p>}
+              {form.formState.errors.street && (
+                <p className="text-sm text-red-500 mt-1">
+                  {form.formState.errors.street.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -168,21 +156,24 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                 <Label htmlFor="city">City *</Label>
                 <Input
                   id="city"
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  {...form.register('city')}
                   placeholder="New York"
-                  className={errors.city ? 'border-red-500' : ''}
+                  disabled={createFriendMutation.isPending}
                 />
-                {errors.city && <p className="text-sm text-red-500 mt-1">{errors.city}</p>}
+                {form.formState.errors.city && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {form.formState.errors.city.message}
+                  </p>
+                )}
               </div>
 
               <div>
                 <Label htmlFor="state_province">State/Province</Label>
                 <Input
                   id="state_province"
-                  value={formData.state_province}
-                  onChange={(e) => handleInputChange('state_province', e.target.value)}
+                  {...form.register('state_province')}
                   placeholder="NY"
+                  disabled={createFriendMutation.isPending}
                 />
               </div>
             </div>
@@ -192,21 +183,24 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                 <Label htmlFor="country">Country *</Label>
                 <Input
                   id="country"
-                  value={formData.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
+                  {...form.register('country')}
                   placeholder="United States"
-                  className={errors.country ? 'border-red-500' : ''}
+                  disabled={createFriendMutation.isPending}
                 />
-                {errors.country && <p className="text-sm text-red-500 mt-1">{errors.country}</p>}
+                {form.formState.errors.country && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {form.formState.errors.country.message}
+                  </p>
+                )}
               </div>
 
               <div>
                 <Label htmlFor="postal_code">Postal Code</Label>
                 <Input
                   id="postal_code"
-                  value={formData.postal_code}
-                  onChange={(e) => handleInputChange('postal_code', e.target.value)}
+                  {...form.register('postal_code')}
                   placeholder="10001"
+                  disabled={createFriendMutation.isPending}
                 />
               </div>
             </div>
@@ -221,7 +215,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                 variant="outline"
                 size="sm"
                 onClick={handlePreviewAddress}
-                disabled={isPreviewLoading || !formData.street || !formData.city || !formData.country}
+                disabled={isPreviewLoading || !watchedValues.street || !watchedValues.city || !watchedValues.country}
               >
                 {isPreviewLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
