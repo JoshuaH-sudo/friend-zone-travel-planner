@@ -3,18 +3,16 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Loader2, Users } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import useGetFriends, { Friend } from './hooks/useGetFriends'
 import FriendCard from './components/FriendCard'
 import FriendMapView from './components/FriendMapView'
-import AddFriendForm from './components/AddFriendForm'
-import EditFriendForm from './components/EditFriendForm'
 import DeleteFriendDialog from './components/DeleteFriendDialog'
 
 const FriendsPage = () => {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [editingFriend, setEditingFriend] = useState<Friend | null>(null)
   const [deletingFriend, setDeletingFriend] = useState<Friend | null>(null)
+  const router = useRouter()
   
   const { data: friends = [], isLoading, error } = useGetFriends()
 
@@ -27,20 +25,15 @@ const FriendsPage = () => {
   }
 
   const handleEdit = (friend: Friend) => {
-    setEditingFriend(friend)
-    setShowAddForm(false)
+    router.push(`/dashboard/friends/${friend.id}`)
   }
 
   const handleDelete = (friend: Friend) => {
     setDeletingFriend(friend)
   }
 
-  const handleAddSuccess = () => {
-    setShowAddForm(false)
-  }
-
-  const handleEditSuccess = () => {
-    setEditingFriend(null)
+  const handleAddNew = () => {
+    router.push('/dashboard/friends/new')
   }
 
   if (isLoading) {
@@ -82,34 +75,13 @@ const FriendsPage = () => {
             </p>
           </div>
           <Button 
-            onClick={() => {
-              setShowAddForm(true)
-              setEditingFriend(null)
-            }} 
+            onClick={handleAddNew}
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
             Add New Friend
           </Button>
         </div>
-
-        {/* Add/Edit Friend Form */}
-        {(showAddForm || editingFriend) && (
-          <div className="mb-8">
-            {showAddForm ? (
-              <AddFriendForm
-                onSuccess={handleAddSuccess}
-                onCancel={() => setShowAddForm(false)}
-              />
-            ) : editingFriend ? (
-              <EditFriendForm
-                friend={editingFriend}
-                onSuccess={handleEditSuccess}
-                onCancel={() => setEditingFriend(null)}
-              />
-            ) : null}
-          </div>
-        )}
 
         {friends.length === 0 ? (
           /* Empty State */
@@ -123,7 +95,7 @@ const FriendsPage = () => {
               This will make it easier to plan trips and meetups!
             </p>
             <Button 
-              onClick={() => setShowAddForm(true)} 
+              onClick={handleAddNew}
               className="gap-2"
             >
               <Plus className="h-4 w-4" />
