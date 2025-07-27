@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
 import { signup } from '../actions';
+import { signInWithGoogle } from '@/lib/auth';
 
 const signupSchema = z
   .object({
@@ -36,7 +36,6 @@ export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const supabase = createClient();
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -63,7 +62,7 @@ export function SignupForm() {
 
       if (result?.error) {
         setError(result.error);
-      }; 
+      }
     } catch (error) {
       console.error('Signup error:', error);
       setError('An unexpected error occurred. Please try again.');
@@ -72,29 +71,20 @@ export function SignupForm() {
     }
   }
 
-  // async function handleGoogleSignIn() {
-  //   setIsLoading(true);
-  //   setError(null);
-  //   setSuccess(null);
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
 
-  //   try {
-  //     const { data, error } = await supabase.auth.signInWithOAuth({
-  //       provider: 'google',
-  //       options: {
-  //         redirectTo: `${window.location.origin}/auth/callback`,
-  //       },
-  //     });
-
-  //     if (error) {
-  //       setError('Failed to sign in with Google. Please try again.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Google sign-in error:', error);
-  //     setError('An unexpected error occurred. Please try again.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Card className='mx-auto w-full max-w-md'>
@@ -200,7 +190,7 @@ export function SignupForm() {
           </div>
         </div>
 
-        {/* <Button
+        <Button
           type='button'
           variant='outline'
           className='w-full'
@@ -226,7 +216,7 @@ export function SignupForm() {
             />
           </svg>
           Continue with Google
-        </Button> */}
+        </Button>
 
         <p className='text-muted-foreground text-center text-sm'>
           Already have an account?{' '}

@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { createClient } from '@/lib/supabase/client';
 import { login } from '../actions';
+import { signInWithGoogle } from '@/lib/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -28,7 +28,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -65,19 +64,10 @@ export function LoginForm() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) {
-        setError('Failed to sign in with Google. Please try again.');
-      }
+      await signInWithGoogle();
     } catch (error) {
       console.error('Google sign-in error:', error);
-      setError('An unexpected error occurred. Please try again.');
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
