@@ -1,6 +1,6 @@
 'use client';
 
-import { Plane, LogOut, User } from 'lucide-react';
+import { Plane, LogOut, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
@@ -26,6 +26,11 @@ export function AppSidebar() {
       title: t('navigation.trips'),
       url: '/home/trips',
       icon: Plane,
+    },
+    {
+      title: t('navigation.friends'),
+      url: '/home/friends',
+      icon: Users,
     },
   ];
 
