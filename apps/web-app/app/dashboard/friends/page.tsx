@@ -32,8 +32,8 @@ const FriendsPage = () => {
     setDeletingFriend(friend)
   }
 
-  const handleAddNew = () => {
-    router.push('/dashboard/friends/new')
+  const handleAddNewFriend = () => {
+    router.push('/dashboard/friends/new-friend')
   }
 
   if (isLoading) {
@@ -75,7 +75,7 @@ const FriendsPage = () => {
             </p>
           </div>
           <Button 
-            onClick={handleAddNew}
+            onClick={handleAddNewFriend}
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -95,7 +95,7 @@ const FriendsPage = () => {
               This will make it easier to plan trips and meetups!
             </p>
             <Button 
-              onClick={handleAddNew}
+              onClick={handleAddNewFriend}
               className="gap-2"
             >
               <Plus className="h-4 w-4" />

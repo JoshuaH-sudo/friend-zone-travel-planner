@@ -47,7 +47,10 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
     },
   })
 
-  const createFriendMutation = useMutation({
+  const { formState } = form
+  const { isValid } = formState
+
+  const { mutate: createFriendMutation, isPending: isCreateFriendPending } = useMutation({
     mutationFn: createFriend,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['friends'] })
@@ -96,7 +99,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
   }
 
   const onSubmit = async (data: FriendFormData) => {
-    createFriendMutation.mutate({
+    createFriendMutation({
       name: data.name.trim(),
       street: data.street.trim(),
       city: data.city.trim(),
@@ -127,7 +130,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                 id="name"
                 {...form.register('name')}
                 placeholder="Enter friend's name"
-                disabled={createFriendMutation.isPending}
+                disabled={isCreateFriendPending}
               />
               {form.formState.errors.name && (
                 <p className="text-sm text-red-500 mt-1">
@@ -142,7 +145,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                 id="street"
                 {...form.register('street')}
                 placeholder="123 Main Street"
-                disabled={createFriendMutation.isPending}
+                disabled={isCreateFriendPending}
               />
               {form.formState.errors.street && (
                 <p className="text-sm text-red-500 mt-1">
@@ -158,7 +161,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                   id="city"
                   {...form.register('city')}
                   placeholder="New York"
-                  disabled={createFriendMutation.isPending}
+                  disabled={isCreateFriendPending}
                 />
                 {form.formState.errors.city && (
                   <p className="text-sm text-red-500 mt-1">
@@ -173,7 +176,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                   id="state_province"
                   {...form.register('state_province')}
                   placeholder="NY"
-                  disabled={createFriendMutation.isPending}
+                  disabled={isCreateFriendPending}
                 />
               </div>
             </div>
@@ -185,7 +188,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                   id="country"
                   {...form.register('country')}
                   placeholder="United States"
-                  disabled={createFriendMutation.isPending}
+                  disabled={isCreateFriendPending}
                 />
                 {form.formState.errors.country && (
                   <p className="text-sm text-red-500 mt-1">
@@ -200,7 +203,7 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
                   id="postal_code"
                   {...form.register('postal_code')}
                   placeholder="10001"
-                  disabled={createFriendMutation.isPending}
+                  disabled={isCreateFriendPending}
                 />
               </div>
             </div>
@@ -247,9 +250,9 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
             )}
             <Button 
               type="submit" 
-              disabled={createFriendMutation.isPending}
+              disabled={isCreateFriendPending || !isValid}
             >
-              {createFriendMutation.isPending ? (
+              {isCreateFriendPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Adding Friend...
