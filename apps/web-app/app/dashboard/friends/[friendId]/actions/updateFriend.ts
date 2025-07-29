@@ -8,11 +8,7 @@ import { getAddressCoordinates } from '@/lib/actions/google'
 
 const friendSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  street: z.string().min(1, 'Street address is required'),
-  city: z.string().min(1, 'City is required'),
-  state_province: z.string().optional(),
-  country: z.string().min(1, 'Country is required'),
-  postal_code: z.string().optional(),
+  address: z.string().min(1, 'Address is required'),
 })
 
 const updateFriendSchema = z.object({
@@ -51,40 +47,16 @@ export default async function updateFriend(data: UpdateFriendData) {
   const updateData: any = {}
   let shouldGeocode = false
 
-  // Check if address fields have changed
+  // Check if fields have changed
   if (validatedData.name !== undefined) updateData.name = validatedData.name
-  if (validatedData.street !== undefined) {
-    updateData.street = validatedData.street
-    shouldGeocode = true
-  }
-  if (validatedData.city !== undefined) {
-    updateData.city = validatedData.city
-    shouldGeocode = true
-  }
-  if (validatedData.state_province !== undefined) {
-    updateData.state_province = validatedData.state_province
-    shouldGeocode = true
-  }
-  if (validatedData.country !== undefined) {
-    updateData.country = validatedData.country
-    shouldGeocode = true
-  }
-  if (validatedData.postal_code !== undefined) {
-    updateData.postal_code = validatedData.postal_code
+  if (validatedData.address !== undefined) {
+    updateData.location = validatedData.address
     shouldGeocode = true
   }
 
-  // If address fields changed, re-geocode
+  // If address changed, re-geocode
   if (shouldGeocode) {
-    const addressParts = [
-      validatedData.street ?? existingFriend.street,
-      validatedData.city ?? existingFriend.city,
-      validatedData.state_province ?? existingFriend.state_province,
-      validatedData.country ?? existingFriend.country,
-      validatedData.postal_code ?? existingFriend.postal_code
-    ].filter(Boolean)
-    
-    const fullAddress = addressParts.join(', ')
+    const fullAddress = validatedData.address ?? existingFriend.location;
 
     const geocodeResult = await getAddressCoordinates(fullAddress)
     

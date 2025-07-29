@@ -12,23 +12,23 @@ import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { ScrollArea } from './scroll-area';
 
-export type Option = {
+export type Option<T> = {
   label: string;
-  value: string;
+  value: T;
 };
 
-interface AutocompleteProps {
-  options: Option[];
+interface AutocompleteProps<T> {
+  options: Option<T>[];
   value: string;
   onInputChange: (value: string) => void;
   onClear?: () => void;
-  onSelect?: (value: string) => void;
+  onSelect?: (value: T) => void;
   placeholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
 }
 
-export function Autocomplete({
+export function Autocomplete<T>({
   options,
   value,
   onInputChange,
@@ -37,7 +37,7 @@ export function Autocomplete({
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
   disabled = false,
-}: AutocompleteProps) {
+}: AutocompleteProps<T>) {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +45,7 @@ export function Autocomplete({
     onInputChange(search);
   };
 
-  const handleSelect = (currentValue: string) => {
+  const handleSelect = (currentValue: string, option: Option<T>) => {
     const selected = options.find((option) => option.value === currentValue);
     if (selected) {
       onSelect?.(selected.value);
@@ -111,7 +111,7 @@ export function Autocomplete({
           <CommandGroup>
             {options.map((option) => (
               <CommandItem
-                key={option.value}
+                key={option.label}
                 value={option.value}
                 onSelect={handleSelect}
               >

@@ -1,0 +1,83 @@
+import { getPlaceAutocomplete } from '@/lib/actions/google';
+import { useQuery } from '@tanstack/react-query';
+import { useDebounce } from '@uidotdev/usehooks';
+import { useState } from 'react';
+
+type TextMatch = {
+  startOffset: number;
+  endOffset: number;
+};
+
+type FormattedText = {
+  matches: TextMatch[];
+  text: string;
+};
+
+type StructuredFormat = {
+  mainText: FormattedText;
+  secondaryText: FormattedText;
+};
+
+type PlacePrediction = {
+  types: string[];
+  place: string;
+  placeId: string;
+  text: FormattedText;
+  structuredFormat: StructuredFormat;
+  distanceMeters: number;
+};
+
+type PlaceResponse = {
+  placePrediction: PlacePrediction;
+  kind: string;
+};
+
+export type AddressSuggestion = {
+  label: string; // Will use text.text from the API response
+  value: PlacePrediction; // Will use text.text from the API response
+};
+
+export function useAddressAutocomplete(input: string) {
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const debouncedInput = useDebounce(input, 300);
+
+  const { isLoading, error } = useQuery({
+    enabled: !!debouncedInput,
+    queryKey: ['addressAutocomplete', debouncedInput],
+    queryFn: async () => {
+      const response = await getPlaceAutocomplete(debouncedInput);
+
+      if (response.status === 'ERROR') {
+        throw new Error(response.message);
+      }
+
+      try {
+        const newSuggestions: AddressSuggestion[] = response.suggestions.map(
+          (item: PlaceResponse) => {
+            console.log(item);
+            return {
+              label: item.placePrediction.text.text,
+              value: item.placePrediction
+              // placeId: item.placePrediction.placeId,
+              // mainText: item.placePrediction.structuredFormat.mainText.text,
+              // secondaryText: item.placePrediction.structuredFormat.secondaryText.text,
+              // types: item.placePrediction.types,
+            };
+          }
+        );
+
+        setSuggestions(newSuggestions);
+        return newSuggestions;
+      } catch (error) {
+        console.error('Error processing response:', error);
+        throw new Error('Failed to process address suggestions');
+      }
+    },
+  });
+
+  return {
+    suggestions,
+    isLoading,
+    error,
+  };
+}

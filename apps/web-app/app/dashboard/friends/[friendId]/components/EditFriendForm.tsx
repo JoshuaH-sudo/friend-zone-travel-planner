@@ -24,11 +24,7 @@ interface EditFriendFormProps {
 
 const friendSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  street: z.string().min(1, 'Street address is required'),
-  city: z.string().min(1, 'City is required'),
-  state_province: z.string().optional(),
-  country: z.string().min(1, 'Country is required'),
-  postal_code: z.string().optional(),
+  address: z.string().min(1, 'Address is required'),
 })
 
 type FriendFormData = z.infer<typeof friendSchema>
@@ -50,11 +46,7 @@ const EditFriendForm = ({
     resolver: zodResolver(friendSchema),
     defaultValues: {
       name: friend.name,
-      street: friend.street || '',
-      city: friend.city || '',
-      state_province: friend.state_province || '',
-      country: friend.country || '',
-      postal_code: friend.postal_code || '',
+      address: friend.location || '',
     },
   });
 
@@ -81,24 +73,15 @@ const EditFriendForm = ({
   const watchedValues = form.watch();
 
   const handlePreviewAddress = async () => {
-    const { street, city, country, state_province, postal_code } = watchedValues;
+    const { address } = watchedValues;
     
-    if (!street || !city || !country) {
+    if (!address) {
       return;
     }
 
     setIsPreviewLoading(true);
     try {
-      const addressParts = [
-        street,
-        city,
-        state_province,
-        country,
-        postal_code,
-      ].filter(Boolean);
-
-      const fullAddress = addressParts.join(', ');
-      const result = await getAddressCoordinates(fullAddress);
+      const result = await getAddressCoordinates(address);
 
       if (result.status === 'OK' && result.results) {
         setPreviewCoordinates({
@@ -117,11 +100,7 @@ const EditFriendForm = ({
     updateFriendMutation.mutate({
       id: friend.id,
       name: data.name.trim(),
-      street: data.street.trim(),
-      city: data.city.trim(),
-      state_province: data.state_province?.trim() || undefined,
-      country: data.country.trim(),
-      postal_code: data.postal_code?.trim() || undefined,
+      address: data.address.trim(),
     });
   };
 
@@ -156,72 +135,18 @@ const EditFriendForm = ({
             </div>
 
             <div>
-              <Label htmlFor='street'>Street Address *</Label>
+              <Label htmlFor='address'>Address *</Label>
               <Input
-                id='street'
-                {...form.register('street')}
-                placeholder='123 Main Street'
+                id='address'
+                {...form.register('address')}
+                placeholder="Enter friend's address"
                 disabled={updateFriendMutation.isPending}
               />
-              {form.formState.errors.street && (
+              {form.formState.errors.address && (
                 <p className='mt-1 text-sm text-red-500'>
-                  {form.formState.errors.street.message}
+                  {form.formState.errors.address.message}
                 </p>
               )}
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <Label htmlFor='city'>City *</Label>
-                <Input
-                  id='city'
-                  {...form.register('city')}
-                  placeholder='New York'
-                  disabled={updateFriendMutation.isPending}
-                />
-                {form.formState.errors.city && (
-                  <p className='mt-1 text-sm text-red-500'>
-                    {form.formState.errors.city.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor='state_province'>State/Province</Label>
-                <Input
-                  id='state_province'
-                  {...form.register('state_province')}
-                  placeholder='NY'
-                  disabled={updateFriendMutation.isPending}
-                />
-              </div>
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <Label htmlFor='country'>Country *</Label>
-                <Input
-                  id='country'
-                  {...form.register('country')}
-                  placeholder='United States'
-                  disabled={updateFriendMutation.isPending}
-                />
-                {form.formState.errors.country && (
-                  <p className='mt-1 text-sm text-red-500'>
-                    {form.formState.errors.country.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor='postal_code'>Postal Code</Label>
-                <Input
-                  id='postal_code'
-                  {...form.register('postal_code')}
-                  placeholder='10001'
-                  disabled={updateFriendMutation.isPending}
-                />
-              </div>
             </div>
           </div>
 
@@ -236,9 +161,7 @@ const EditFriendForm = ({
                 onClick={handlePreviewAddress}
                 disabled={
                   isPreviewLoading ||
-                  !watchedValues.street ||
-                  !watchedValues.city ||
-                  !watchedValues.country
+                  !watchedValues.address
                 }
               >
                 {isPreviewLoading ? (
