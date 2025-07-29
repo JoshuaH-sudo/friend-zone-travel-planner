@@ -1,20 +1,30 @@
 'use server'
 
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getAddressCoordinates } from '@/lib/actions/google'
 
-interface CreateFriendData {
-  name: string
-  street: string
-  city: string
-  state_province?: string
-  country: string
-  postal_code?: string
-}
+const friendSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  street: z.string().min(1, 'Street address is required'),
+  city: z.string().min(1, 'City is required'),
+  state_province: z.string().optional(),
+  country: z.string().min(1, 'Country is required'),
+  postal_code: z.string().optional(),
+})
+
+type CreateFriendData = z.infer<typeof friendSchema>
 
 export default async function createFriend(data: CreateFriendData) {
+  // Validate input data
+  const validationResult = friendSchema.safeParse(data)
+  if (!validationResult.success) {
+    throw new Error(`Validation failed: ${validationResult.error.errors.map(e => e.message).join(', ')}`)
+  }
+
+  const validatedData = validationResult.data
   const supabase = await createClient()
   const user = await getUser()
 
@@ -22,13 +32,13 @@ export default async function createFriend(data: CreateFriendData) {
     throw new Error('User not authenticated')
   }
 
-  // Construct full address for geocoding
+  // Construct full address for geocoding, filter any empty fields
   const addressParts = [
-    data.street,
-    data.city,
-    data.state_province,
-    data.country,
-    data.postal_code
+    validatedData.street,
+    validatedData.city,
+    validatedData.state_province,
+    validatedData.country,
+    validatedData.postal_code
   ].filter(Boolean)
   
   const fullAddress = addressParts.join(', ')
@@ -45,15 +55,15 @@ export default async function createFriend(data: CreateFriendData) {
   const { data: friend, error } = await supabase
     .from('friends')
     .insert({
-      name: data.name,
+      name: validatedData.name,
       location: fullAddress, // Keep for backward compatibility
       latitude: lat,
       longitude: lng,
-      street: data.street,
-      city: data.city,
-      state_province: data.state_province || null,
-      country: data.country,
-      postal_code: data.postal_code || null,
+      street: validatedData.street,
+      city: validatedData.city,
+      state_province: validatedData.state_province || null,
+      country: validatedData.country,
+      postal_code: validatedData.postal_code || null,
       user_id: user.id,
       destination_id: null,
     })

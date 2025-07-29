@@ -1,21 +1,34 @@
 'use server'
 
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getAddressCoordinates } from '@/lib/actions/google'
 
-interface UpdateFriendData {
-  id: string
-  name?: string
-  street?: string
-  city?: string
-  state_province?: string
-  country?: string
-  postal_code?: string
-}
+const friendSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  street: z.string().min(1, 'Street address is required'),
+  city: z.string().min(1, 'City is required'),
+  state_province: z.string().optional(),
+  country: z.string().min(1, 'Country is required'),
+  postal_code: z.string().optional(),
+})
+
+const updateFriendSchema = z.object({
+  id: z.string(),
+}).merge(friendSchema.partial())
+
+type UpdateFriendData = z.infer<typeof updateFriendSchema>
 
 export default async function updateFriend(data: UpdateFriendData) {
+  // Validate input data
+  const validationResult = updateFriendSchema.safeParse(data)
+  if (!validationResult.success) {
+    throw new Error(`Validation failed: ${validationResult.error.errors.map(e => e.message).join(', ')}`)
+  }
+
+  const validatedData = validationResult.data
   const supabase = await createClient()
   const user = await getUser()
 
@@ -27,7 +40,7 @@ export default async function updateFriend(data: UpdateFriendData) {
   const { data: existingFriend, error: checkError } = await supabase
     .from('friends')
     .select('*')
-    .eq('id', data.id)
+    .eq('id', validatedData.id)
     .eq('user_id', user.id)
     .single()
 
@@ -39,36 +52,36 @@ export default async function updateFriend(data: UpdateFriendData) {
   let shouldGeocode = false
 
   // Check if address fields have changed
-  if (data.name !== undefined) updateData.name = data.name
-  if (data.street !== undefined) {
-    updateData.street = data.street
+  if (validatedData.name !== undefined) updateData.name = validatedData.name
+  if (validatedData.street !== undefined) {
+    updateData.street = validatedData.street
     shouldGeocode = true
   }
-  if (data.city !== undefined) {
-    updateData.city = data.city
+  if (validatedData.city !== undefined) {
+    updateData.city = validatedData.city
     shouldGeocode = true
   }
-  if (data.state_province !== undefined) {
-    updateData.state_province = data.state_province
+  if (validatedData.state_province !== undefined) {
+    updateData.state_province = validatedData.state_province
     shouldGeocode = true
   }
-  if (data.country !== undefined) {
-    updateData.country = data.country
+  if (validatedData.country !== undefined) {
+    updateData.country = validatedData.country
     shouldGeocode = true
   }
-  if (data.postal_code !== undefined) {
-    updateData.postal_code = data.postal_code
+  if (validatedData.postal_code !== undefined) {
+    updateData.postal_code = validatedData.postal_code
     shouldGeocode = true
   }
 
   // If address fields changed, re-geocode
   if (shouldGeocode) {
     const addressParts = [
-      data.street ?? existingFriend.street,
-      data.city ?? existingFriend.city,
-      data.state_province ?? existingFriend.state_province,
-      data.country ?? existingFriend.country,
-      data.postal_code ?? existingFriend.postal_code
+      validatedData.street ?? existingFriend.street,
+      validatedData.city ?? existingFriend.city,
+      validatedData.state_province ?? existingFriend.state_province,
+      validatedData.country ?? existingFriend.country,
+      validatedData.postal_code ?? existingFriend.postal_code
     ].filter(Boolean)
     
     const fullAddress = addressParts.join(', ')
@@ -88,7 +101,7 @@ export default async function updateFriend(data: UpdateFriendData) {
   const { data: friend, error } = await supabase
     .from('friends')
     .update(updateData)
-    .eq('id', data.id)
+    .eq('id', validatedData.id)
     .eq('user_id', user.id)
     .select()
     .single()
