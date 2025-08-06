@@ -41,18 +41,6 @@ const DeleteFriendDialog = ({ friend, open, onOpenChange }: DeleteFriendDialogPr
     }
   }
 
-  const getFormattedAddress = (friend: Friend) => {
-    const addressParts = [
-      friend.street,
-      friend.city,
-      friend.state_province,
-      friend.country,
-      friend.postal_code
-    ].filter(Boolean)
-    
-    return addressParts.length > 0 ? addressParts.join(', ') : friend.location
-  }
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -62,7 +50,7 @@ const DeleteFriendDialog = ({ friend, open, onOpenChange }: DeleteFriendDialogPr
             Are you sure you want to delete <strong>{friend?.name}</strong>?
             {friend && (
               <div className="mt-2 text-sm text-muted-foreground">
-                Location: {getFormattedAddress(friend)}
+                Location: {friend.location}
               </div>
             )}
             <div className="mt-2 text-sm text-red-600">
