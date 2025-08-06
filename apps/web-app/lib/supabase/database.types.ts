@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.12 (cd3cf9e)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
@@ -63,8 +63,6 @@ export type Database = {
       }
       friends: {
         Row: {
-          city: string
-          country: string
           created_at: string | null
           destination_id: string | null
           id: string
@@ -72,15 +70,10 @@ export type Database = {
           location: string
           longitude: number
           name: string
-          postal_code: string | null
-          state_province: string | null
-          street: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          city: string
-          country: string
           created_at?: string | null
           destination_id?: string | null
           id?: string
@@ -88,15 +81,10 @@ export type Database = {
           location: string
           longitude: number
           name: string
-          postal_code?: string | null
-          state_province?: string | null
-          street: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          city?: string
-          country?: string
           created_at?: string | null
           destination_id?: string | null
           id?: string
@@ -104,9 +92,6 @@ export type Database = {
           location?: string
           longitude?: number
           name?: string
-          postal_code?: string | null
-          state_province?: string | null
-          street?: string
           updated_at?: string | null
           user_id?: string
         }

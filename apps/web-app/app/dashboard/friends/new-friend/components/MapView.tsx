@@ -36,19 +36,21 @@ const MapView: FC<MapViewProps> = ({ locations }) => {
           No locations to display. Please add a friend with a valid address.
         </h1>
       )}
-      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
-        <Map
-          key={`${centerLocation.lat}-${centerLocation.lng}-${locations.length}`}
-          mapId='e8e51ecff87a146cf2857bda'
-          style={{ width: '100%', height: '100%' }}
-          defaultCenter={centerLocation}
-          defaultZoom={locations.length > 1 ? 10 : 13}
-          gestureHandling={'greedy'}
-          disableDefaultUI={true}
-        >
-          <PoiMarkers pois={locations} />
-        </Map>
-      </APIProvider>
+      {locations.length > 0 && (
+        <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+          <Map
+            key={`${centerLocation.lat}-${centerLocation.lng}-${locations.length}`}
+            mapId='e8e51ecff87a146cf2857bda'
+            style={{ width: '100%', height: '100%' }}
+            defaultCenter={centerLocation}
+            defaultZoom={locations.length > 1 ? 10 : 13}
+            gestureHandling={'greedy'}
+            disableDefaultUI={true}
+          >
+            <PoiMarkers pois={locations} />
+          </Map>
+        </APIProvider>
+      )}
     </div>
   );
 };

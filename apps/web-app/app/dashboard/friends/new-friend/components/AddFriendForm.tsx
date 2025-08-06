@@ -81,6 +81,9 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
     if (!addressCoordinates) {
       return [];
     }
+
+    console.log('Suggestions:', suggestions);
+    console.log('Address coordinates:', addressCoordinates);
     return [
       {
         key: addressCoordinates.place_id,

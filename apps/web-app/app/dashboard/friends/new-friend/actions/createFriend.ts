@@ -45,10 +45,6 @@ export default async function createFriend(data: CreateFriendData) {
       latitude: lat,
       longitude: lng,
       user_id: user.id,
-      // Set placeholder values for the required fields from migration
-      street: 'N/A',
-      city: 'N/A', 
-      country: 'N/A',
     })
     .select()
     .single()
