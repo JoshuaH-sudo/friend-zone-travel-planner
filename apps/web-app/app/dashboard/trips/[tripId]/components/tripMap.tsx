@@ -69,7 +69,6 @@ const TripMap = ({ selectedRouteId, routes }: TripMapProps) => {
     if (maxSpread > 1) return 9;
     return 11;
   };
-
   const selectedRoute = routes.find((route) => route.id === selectedRouteId);
 
   return (
