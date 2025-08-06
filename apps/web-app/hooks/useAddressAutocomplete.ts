@@ -58,10 +58,6 @@ export function useAddressAutocomplete(input: string) {
             return {
               label: item.placePrediction.text.text,
               value: item.placePrediction
-              // placeId: item.placePrediction.placeId,
-              // mainText: item.placePrediction.structuredFormat.mainText.text,
-              // secondaryText: item.placePrediction.structuredFormat.secondaryText.text,
-              // types: item.placePrediction.types,
             };
           }
         );

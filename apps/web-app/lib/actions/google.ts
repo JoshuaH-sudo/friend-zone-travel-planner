@@ -2,7 +2,6 @@
 
 import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
 import { googleMapsClient, placesClient } from '../google-maps';
-console.log('api key', process.env.GOOGLE_MAPS_API_KEY);
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [

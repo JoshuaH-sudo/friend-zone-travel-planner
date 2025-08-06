@@ -45,8 +45,10 @@ export function Autocomplete<T>({
     onInputChange(search);
   };
 
-  const handleSelect = (currentValue: string, option: Option<T>) => {
-    const selected = options.find((option) => option.value === currentValue);
+  const handleSelect = (currentValue: string) => {
+    console.log('Selected value:', currentValue);
+    console.log('Available options:', options);
+    const selected = options.find((option) => option.label === currentValue);
     if (selected) {
       onSelect?.(selected.value);
     }
@@ -80,8 +82,8 @@ export function Autocomplete<T>({
   }, []);
 
   return (
-    <div ref={wrapperRef}>
-      <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
+    <div ref={wrapperRef} className='relative w-full'>
+      <Command className='rounded-lg border shadow-md w-full'>
         <div className='relative flex w-full items-center px-2'>
           <CommandInput
             value={value}
@@ -112,6 +114,7 @@ export function Autocomplete<T>({
             {options.map((option) => (
               <CommandItem
                 key={option.label}
+                // @ts-expect-error TypeScript doesn't know about the value prop
                 value={option.value}
                 onSelect={handleSelect}
               >
