@@ -200,7 +200,9 @@ const AddFriendForm = ({ onSuccess, onCancel }: AddFriendFormProps) => {
         </CardContent>
       </Card>
 
-      <MapView locations={locations} />
+      <div className='relative h-[500px] w-full'>
+        <MapView locations={locations} />
+      </div>
     </div>
   );
 };

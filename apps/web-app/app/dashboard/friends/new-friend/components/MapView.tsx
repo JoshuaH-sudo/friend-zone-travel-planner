@@ -30,7 +30,7 @@ const MapView: FC<MapViewProps> = ({ locations }) => {
   }, [locations]);
 
   return (
-    <div className='bg-background h-full min-h-[400px] w-full justify-center overflow-hidden rounded-lg border'>
+    <div className='bg-background flex h-full min-h-[400px] w-full justify-center overflow-hidden rounded-lg border'>
       {locations.length === 0 && (
         <h1 className='text-gray-500'>
           No locations to display. Please add a friend with a valid address.
