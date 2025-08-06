@@ -1,91 +1,106 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { Friend } from '../hooks/useGetFriends';
+import {
+  AdvancedMarker,
+  APIProvider,
+  Map,
+  Pin,
+} from '@vis.gl/react-google-maps';
 
 interface FriendMapViewProps {
-  friend: Friend;
+  friend: Friend[];
 }
 
 const FriendMapView = ({ friend }: FriendMapViewProps) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRef = useRef<google.maps.Marker | null>(null);
+  if (friend.length === 0) {
+    return null;
+  }
 
-  useEffect(() => {
-    if (!mapRef.current || !window.google) return;
+  // Calculate center and bounds for multiple friends
+  let center: google.maps.LatLngLiteral;
+  let zoom = 13;
 
-    // Initialize map
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: { lat: friend.latitude, lng: friend.longitude },
-      zoom: 13,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false,
-    });
-
-    mapInstanceRef.current = map;
-
-    // Create marker
-    const marker = new window.google.maps.Marker({
-      position: { lat: friend.latitude, lng: friend.longitude },
-      map: map,
-      title: friend.name,
-      icon: {
-        url:
-          'data:image/svg+xml;charset=UTF-8,' +
-          encodeURIComponent(`
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="16" r="12" fill="#3B82F6" stroke="white" stroke-width="3"/>
-            <circle cx="16" cy="16" r="4" fill="white"/>
-          </svg>
-        `),
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 16),
-      },
-    });
-
-    markerRef.current = marker;
-
-    // Create info window
-    const infoWindow = new window.google.maps.InfoWindow({
-      content: `
-        <div class="p-2">
-          <h3 class="font-semibold text-sm">${friend.name}</h3>
-          <p class="text-xs text-gray-600 mt-1">${friend.location}</p>
-        </div>
-      `,
-    });
-
-    marker.addListener('click', () => {
-      infoWindow.open(map, marker);
-    });
-
-    // Cleanup function
-    return () => {
-      if (markerRef.current) {
-        markerRef.current.setMap(null);
-      }
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current = null;
-      }
+  if (friend.length === 1) {
+    center = { lat: friend[0].latitude, lng: friend[0].longitude };
+  } else {
+    // Calculate center from all friends
+    const totalLat = friend.reduce((sum, f) => sum + f.latitude, 0);
+    const totalLng = friend.reduce((sum, f) => sum + f.longitude, 0);
+    center = {
+      lat: totalLat / friend.length,
+      lng: totalLng / friend.length,
     };
-  }, [friend]);
+    zoom = 2; // Start with a wider zoom for multiple friends
+  }
 
   return (
-    <div className='relative h-full w-full'>
-      <div ref={mapRef} className='h-full w-full rounded-lg' />
+    <div key={friend.map(f => f.id).join('-')} className='relative h-full w-full'>
+      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!}>
+        <Map
+          mapId='e8e51ecff87a146cf2857bda'
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '0.65rem',
+            overflow: 'hidden',
+          }}
+          defaultCenter={center}
+          defaultZoom={zoom}
+          gestureHandling={'greedy'}
+          disableDefaultUI={true}
+        >
+          <FriendMarkers friends={friend} />
+        </Map>
+      </APIProvider>
 
       {/* Friend info overlay */}
-      <div className='absolute top-4 left-4 max-w-xs rounded-lg bg-white p-3 shadow-lg'>
-        <h3 className='text-sm font-semibold text-gray-900'>{friend.name}</h3>
-        <p className='mt-1 text-xs text-gray-600'>{friend.location}</p>
-        <div className='mt-2 flex items-center text-xs text-gray-500'>
-          <div className='mr-2 h-2 w-2 rounded-full bg-blue-500'></div>
-          Current Location
+      {friend.length > 1 ? (
+        // Multiple friends overlay
+        <div className='absolute top-4 left-4 max-w-xs rounded-lg bg-white p-3 shadow-lg'>
+          <h3 className='text-sm font-semibold text-gray-900'>
+            {friend.length} Friend{friend.length !== 1 ? 's' : ''}
+          </h3>
+          <p className='mt-1 text-xs text-gray-600'>
+            Click markers for details
+          </p>
+          <div className='mt-2 flex items-center text-xs text-gray-500'>
+            <div className='mr-2 h-2 w-2 rounded-full bg-blue-500'></div>
+            Friend Locations
+          </div>
         </div>
-      </div>
+      ) : friend.length === 1 ? (
+        // Single friend overlay
+        <div className='absolute top-4 left-4 max-w-xs rounded-lg bg-white p-3 shadow-lg'>
+          <h3 className='text-sm font-semibold text-gray-900'>{friend[0].name}</h3>
+          <p className='mt-1 text-xs text-gray-600'>{friend[0].location}</p>
+          <div className='mt-2 flex items-center text-xs text-gray-500'>
+            <div className='mr-2 h-2 w-2 rounded-full bg-blue-500'></div>
+            Current Location
+          </div>
+        </div>
+      ) : null}
     </div>
+  );
+};
+
+const FriendMarkers = ({ friends }: { friends: Friend[] }) => {
+  return (
+    <>
+      {friends.map((friend) => (
+        <AdvancedMarker 
+          key={friend.id} 
+          position={{ lat: friend.latitude, lng: friend.longitude }}
+          title={friend.name}
+        >
+          <Pin
+            background={'#3B82F6'}
+            glyphColor={'#FFFFFF'}
+            borderColor={'#FFFFFF'}
+          />
+        </AdvancedMarker>
+      ))}
+    </>
   );
 };
 

@@ -10,17 +10,28 @@ import FriendMapView from './components/FriendMapView'
 import DeleteFriendDialog from './components/DeleteFriendDialog'
 
 const FriendsPage = () => {
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
+  const [selectedFriends, setSelectedFriends] = useState<Friend[]>([])
   const [deletingFriend, setDeletingFriend] = useState<Friend | null>(null)
   const router = useRouter()
   
   const { data: friends = [], isLoading, error } = useGetFriends()
 
-  const handleViewMap = (friend: Friend) => {
-    if (selectedFriend?.id === friend.id) {
-      setSelectedFriend(null)
+  const handleViewMap = (friend: Friend | Friend[]) => {
+    if (Array.isArray(friend)) {
+      // Handle viewing all friends
+      if (selectedFriends.length === friend.length && 
+          selectedFriends.every(sf => friend.some(f => f.id === sf.id))) {
+        setSelectedFriends([])
+      } else {
+        setSelectedFriends(friend)
+      }
     } else {
-      setSelectedFriend(friend)
+      // Handle viewing single friend
+      if (selectedFriends.length === 1 && selectedFriends[0].id === friend.id) {
+        setSelectedFriends([])
+      } else {
+        setSelectedFriends([friend])
+      }
     }
   }
 
@@ -111,6 +122,33 @@ const FriendsPage = () => {
                 <h2 className="text-xl font-semibold text-foreground">
                   All Friends ({friends.length})
                 </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleViewMap(friends)}
+                  className="gap-2"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {selectedFriends.length > 1 ? 'Hide Map' : 'View All on Map'}
+                </Button>
               </div>
               
               <div className="space-y-4">
@@ -121,7 +159,7 @@ const FriendsPage = () => {
                     onViewMap={handleViewMap}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    isMapVisible={selectedFriend?.id === friend.id}
+                    isMapVisible={selectedFriends.length === 1 && selectedFriends[0].id === friend.id}
                   />
                 ))}
               </div>
@@ -129,20 +167,25 @@ const FriendsPage = () => {
 
             {/* Right Column - Map Preview */}
             <div className="lg:sticky lg:top-8 lg:h-fit">
-              {selectedFriend ? (
+              {selectedFriends.length > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground">Location Preview</h2>
+                    <h2 className="text-xl font-semibold text-foreground">
+                      {selectedFriends.length > 1 
+                        ? `All Friends Locations (${selectedFriends.length})`
+                        : 'Location Preview'
+                      }
+                    </h2>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setSelectedFriend(null)}
+                      onClick={() => setSelectedFriends([])}
                     >
                       Close Preview
                     </Button>
                   </div>
                   <div className="h-[500px] relative">
-                    <FriendMapView friend={selectedFriend} />
+                    <FriendMapView friend={selectedFriends} />
                   </div>
                 </div>
               ) : (
