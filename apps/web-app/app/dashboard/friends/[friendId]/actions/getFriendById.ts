@@ -23,6 +23,7 @@ export default async function getFriendById(friendId: string) {
     .eq('user_id', user.id)
     .eq('id', friendId)
     .order('created_at', { ascending: false })
+    .single()
 
   if (error) {
     console.error('Error fetching friend:', error)

@@ -68,10 +68,6 @@ export default async function updateFriend(data: UpdateFriendData) {
     updateData.latitude = lat
     updateData.longitude = lng
     updateData.location = fullAddress
-    // Keep placeholder values for backward compatibility
-    updateData.street = 'Unknown'
-    updateData.city = 'Unknown'
-    updateData.country = 'Unknown'
   }
 
   const { data: friend, error } = await supabase

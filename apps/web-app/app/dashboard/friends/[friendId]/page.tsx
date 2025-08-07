@@ -22,7 +22,7 @@ const EditFriendPage = () => {
   if (isLoading) {
     return (
       <main className='bg-background min-h-screen'>
-        <div className='mx-auto max-w-4xl px-4 py-8'>
+        <div className='mx-auto max-w-7xl px-4 py-8'>
           <div className='flex h-64 items-center justify-center'>
             <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
           </div>
@@ -34,7 +34,7 @@ const EditFriendPage = () => {
   if (error || !friend) {
     return (
       <main className='bg-background min-h-screen'>
-        <div className='mx-auto max-w-4xl px-4 py-8'>
+        <div className='mx-auto max-w-7xl px-4 py-8'>
           <div className='text-center'>
             <h1 className='text-foreground mb-4 text-2xl font-bold'>
               Friend Not Found
@@ -54,7 +54,7 @@ const EditFriendPage = () => {
 
   return (
     <main className='bg-background min-h-screen'>
-      <div className='mx-auto max-w-4xl px-4 py-8'>
+      <div className='mx-auto max-w-7xl px-4 py-8'>
         {/* Header */}
         <div className='mb-8 flex items-center gap-4'>
           <Button
