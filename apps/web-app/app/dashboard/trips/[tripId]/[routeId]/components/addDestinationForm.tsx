@@ -1,8 +1,7 @@
 'use client';
 
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
-import { Input } from '@/components/ui/input';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,11 +16,13 @@ import {
   FormDescription,
   FormMessage,
 } from '@/components/ui/form';
+import { Autocomplete } from '@/components/ui/autocomplete';
 import { Combobox } from '@/components/ui/combo-box';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
 import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
 import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
 import { useDebouncedValue } from '@tanstack/react-pacer';
+import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 
 export interface NewDestination {
   routeId: string;
@@ -49,6 +50,8 @@ export interface AddDestinationFormProps {
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   const queryClient = useQueryClient();
+  const [addressSearchInput, setAddressSearchInput] = useState<string>('');
+  const { suggestions } = useAddressAutocomplete(addressSearchInput);
 
   const form = useForm<NewDestination>({
     defaultValues: {
@@ -121,7 +124,29 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
               <FormItem>
                 <FormLabel>Location</FormLabel>
                 <FormControl>
-                  <Input placeholder='Berlin' {...field} />
+                  <Autocomplete
+                    {...field}
+                    value={addressSearchInput}
+                    options={suggestions}
+                    placeholder="Enter your destination"
+                    emptyMessage='No results found'
+                    onInputChange={(value) => {
+                      setAddressSearchInput(value);
+                    }}
+                    onSelect={(suggestion) => {
+                      console.log('Selected suggestion:', suggestion);
+                      // Update the form with the selected address
+                      const selectedAddress = suggestion.text.text;
+                      setAddressSearchInput(selectedAddress);
+                      form.setValue('location', selectedAddress);
+                      field.onChange(selectedAddress);
+                    }}
+                    onClear={() => {
+                      setAddressSearchInput('');
+                      form.setValue('location', '');
+                      field.onChange('');
+                    }}
+                  />
                 </FormControl>
                 <FormDescription>Enter your destination</FormDescription>
                 <FormMessage />
