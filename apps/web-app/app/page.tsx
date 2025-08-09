@@ -8,7 +8,7 @@ export default async function RootPage() {
   
   if (user.data.user) {
     // If the user is already logged in, redirect to the home page
-    return redirect('/home');
+    return redirect('/dashboard');
   }
   return redirect('/signin');
 }

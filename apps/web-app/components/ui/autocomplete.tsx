@@ -12,23 +12,23 @@ import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { ScrollArea } from './scroll-area';
 
-export type Option = {
+export type Option<T> = {
   label: string;
-  value: string;
+  value: T;
 };
 
-interface AutocompleteProps {
-  options: Option[];
+interface AutocompleteProps<T> {
+  options: Option<T>[];
   value: string;
   onInputChange: (value: string) => void;
   onClear?: () => void;
-  onSelect?: (value: string) => void;
+  onSelect?: (value: T) => void;
   placeholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
 }
 
-export function Autocomplete({
+export function Autocomplete<T>({
   options,
   value,
   onInputChange,
@@ -37,7 +37,7 @@ export function Autocomplete({
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
   disabled = false,
-}: AutocompleteProps) {
+}: AutocompleteProps<T>) {
   const [open, setOpen] = React.useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +46,9 @@ export function Autocomplete({
   };
 
   const handleSelect = (currentValue: string) => {
-    const selected = options.find((option) => option.value === currentValue);
+    console.log('Selected value:', currentValue);
+    console.log('Available options:', options);
+    const selected = options.find((option) => option.label === currentValue);
     if (selected) {
       onSelect?.(selected.value);
     }
@@ -80,8 +82,8 @@ export function Autocomplete({
   }, []);
 
   return (
-    <div ref={wrapperRef}>
-      <Command className='rounded-lg border shadow-md md:min-w-[450px]'>
+    <div ref={wrapperRef} className='relative w-full'>
+      <Command className='rounded-lg border shadow-md w-full'>
         <div className='relative flex w-full items-center px-2'>
           <CommandInput
             value={value}
@@ -111,7 +113,8 @@ export function Autocomplete({
           <CommandGroup>
             {options.map((option) => (
               <CommandItem
-                key={option.value}
+                key={option.label}
+                // @ts-expect-error TypeScript doesn't know about the value prop
                 value={option.value}
                 onSelect={handleSelect}
               >

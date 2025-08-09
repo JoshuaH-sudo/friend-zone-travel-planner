@@ -1,0 +1,246 @@
+'use client';
+
+import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
+import { FC, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
+import { useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from '@/components/ui/form';
+import { Autocomplete } from '@/components/ui/autocomplete';
+import { Combobox } from '@/components/ui/combo-box';
+import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
+import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
+import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
+import { useDebouncedValue } from '@tanstack/react-pacer';
+import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
+
+export interface NewDestination {
+  routeId: string;
+  location: string;
+  friendIds: string[];
+  dateRange: {
+    from: Date;
+    to: Date;
+  };
+  latitude: number;
+  longitude: number;
+}
+
+const schema = z.object({
+  routeId: z.string(),
+  location: z.string().min(1, 'Location is required'),
+  friendIds: z.array(z.string()),
+  dateRange: z.object({
+    from: z.date(),
+    to: z.date(),
+  }),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
+export interface AddDestinationFormProps {
+  routeId: string;
+}
+
+const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
+  const queryClient = useQueryClient();
+  const [addressSearchInput, setAddressSearchInput] = useState<string>('');
+  const { suggestions } = useAddressAutocomplete(addressSearchInput);
+
+  const form = useForm<NewDestination>({
+    defaultValues: {
+      routeId,
+      friendIds: [],
+    },
+    resolver: zodResolver(schema),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = form;
+
+  const location = form.watch('location');
+  const [debouncedValue] = useDebouncedValue(location, {
+    wait: 1000,
+  });
+  const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const { data: friends } = useGetFriendsByGeoLocation(
+    coordinates?.geometry?.location
+  );
+
+  useEffect(() => {
+    if (debouncedValue && debouncedValue.trim().length > 0) {
+      console.log('Refetching coordinates for:', debouncedValue);
+      refetch();
+    }
+  }, [debouncedValue, refetch]);
+
+  useEffect(() => {
+    if (coordinates) {
+      form.setValue('latitude', coordinates.geometry.location.lat);
+      form.setValue('longitude', coordinates.geometry.location.lng);
+    }
+  }, [coordinates, form]);
+
+  const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
+    onSuccess: () => {
+      reset();
+      queryClient.invalidateQueries({
+        queryKey: ['destinations', routeId],
+      });
+    },
+    onError: (error) => {
+      console.error('Error adding destination:', error);
+    },
+  });
+
+  const onSubmit = async (data: NewDestination) => {
+    // Transform the form data to match the API expected format
+    const transformedData: AddDestinationToRouteProps = {
+      routeId: data.routeId,
+      location: data.location,
+      friendIds: data.friendIds,
+      startDate: data.dateRange.from,
+      endDate: data.dateRange.to,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
+
+    await addDestinationToRoute(transformedData);
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className='flex h-full flex-col gap-1'
+      >
+        <div>
+          <p>Destination</p>
+          <FormField
+            control={control}
+            name='location'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                  <Autocomplete
+                    {...field}
+                    value={addressSearchInput}
+                    options={suggestions}
+                    placeholder="Enter your destination"
+                    emptyMessage='No results found'
+                    onInputChange={(value) => {
+                      setAddressSearchInput(value);
+                    }}
+                    onSelect={(suggestion) => {
+                      console.log('Selected suggestion:', suggestion);
+                      // Update the form with the selected address
+                      const selectedAddress = suggestion.text.text;
+                      setAddressSearchInput(selectedAddress);
+                      form.setValue('location', selectedAddress);
+                      field.onChange(selectedAddress);
+                    }}
+                    onClear={() => {
+                      setAddressSearchInput('');
+                      form.setValue('location', '');
+                      field.onChange('');
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>Enter your destination</FormDescription>
+                <FormMessage />
+                <FormMessage>
+                  {isError && (
+                    <span className='text-red-500'>
+                      {error?.message || 'Failed to fetch coordinates'}
+                    </span>
+                  )}
+                </FormMessage>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div>
+          <FormField
+            control={control}
+            name='dateRange'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dates</FormLabel>
+                <FormControl>
+                  <DatePickerWithRange
+                    dates={
+                      field.value
+                        ? { from: field.value.from, to: field.value.to }
+                        : { from: undefined, to: undefined }
+                    }
+                    onSelect={field.onChange}
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Select the start and end dates for your trip
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='h-1/3'>
+          <FormField
+            control={control}
+            name='friendIds'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Friends To See</FormLabel>
+                <FormControl>
+                  <Combobox
+                    multiple
+                    options={
+                      friends?.map((friend) => ({
+                        value: friend.id,
+                        label: friend.name,
+                      })) || []
+                    }
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Which friends are you going see
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <button
+          id='add-destination'
+          className='w-full rounded-lg bg-green-500 p-2 text-white transition-colors duration-200 hover:bg-green-600 disabled:opacity-50'
+          type='submit'
+          disabled={!isValid}
+        >
+          Add
+        </button>
+      </form>
+    </Form>
+  );
+};
+
+export default AddDestinationForm;

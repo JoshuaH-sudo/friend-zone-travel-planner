@@ -2,7 +2,6 @@
 
 import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
 import { googleMapsClient, placesClient } from '../google-maps';
-
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [
@@ -101,7 +100,7 @@ export const getPlaceAutocomplete = async (input: string) => {
   }
 
   const result = await placesClient.autocompletePlaces({
-    input
+    input,
   });
 
   return {

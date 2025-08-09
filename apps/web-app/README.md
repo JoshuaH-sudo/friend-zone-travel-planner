@@ -34,3 +34,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Supabase
+### Local Development
+Start the Supabase local development environment using Docker:
+```
+npm run sb:start
+```
+
+- API URL: [http://127.0.0.1:54321](http://127.0.0.1:54321)
+- GraphQL URL: [http://127.0.0.1:54321/graphql/v1](http://127.0.0.1:54321/graphql/v1)
+- S3 Storage URL: [http://127.0.0.1:54321/storage/v1/s3](http://127.0.0.1:54321/storage/v1/s3)
+- DB URL: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+- Studio URL: [http://127.0.0.1:54323](http://127.0.0.1:54323)
+- Inbucket URL: [http://127.0.0.1:54324](http://127.0.0.1:54324)

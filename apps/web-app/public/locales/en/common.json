@@ -47,6 +47,7 @@
   "navigation": {
     "home": "Home",
     "trips": "Trips",
+    "friends": "Friends",
     "calendars": "Friend Calendars",
     "overview": "Availability Overview",
     "timezone": "Timezones",

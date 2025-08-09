@@ -1,6 +1,6 @@
 'use client';
 
-import { Plane, LogOut, User } from 'lucide-react';
+import { Plane, LogOut, User, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 
@@ -24,8 +24,13 @@ export function AppSidebar() {
   const menuItems = [
     {
       title: t('navigation.trips'),
-      url: '/home/trips',
+      url: '/dashboard/trips',
       icon: Plane,
+    },
+    {
+      title: t('navigation.friends'),
+      url: '/dashboard/friends',
+      icon: Users,
     },
   ];
 
@@ -47,7 +52,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size='lg' asChild>
-              <Link href='/home'>
+              <Link href='/dashboard'>
                 <div className='bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
                   <User className='size-4' />
                 </div>

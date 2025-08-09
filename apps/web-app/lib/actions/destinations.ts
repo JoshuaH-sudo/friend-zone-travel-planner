@@ -113,7 +113,7 @@ export async function createDestination(data: CreateDestinationData) {
   }
 
   // Get the highest order number for this route
-  const { data: highestOrderDestination, error: orderError } = await supabase
+  const { data: highestOrderDestination } = await supabase
     .from('destinations')
     .select('order')
     .eq('route_id', data.routeId)
@@ -142,7 +142,7 @@ export async function createDestination(data: CreateDestinationData) {
     throw new Error('Failed to create destination')
   }
 
-  revalidatePath(`/home/trips/${route.trips.id}/${data.routeId}`)
+  revalidatePath(`/dashboard/trips/${route.trips.id}/${data.routeId}`)
   return destination
 }
 
@@ -150,6 +150,8 @@ export async function createDestination(data: CreateDestinationData) {
 export interface AddDestinationToRouteProps {
   routeId: string
   location: string
+  latitude: number
+  longitude: number
   friendIds: string[]
   startDate: Date
   endDate: Date
@@ -166,15 +168,13 @@ export interface AddDestinationToRouteResponse {
 }
 
 export async function addDestinationToRoute(data: AddDestinationToRouteProps): Promise<AddDestinationToRouteResponse> {
-  // For now, we'll use placeholder coordinates since we don't have the geocoding service
-  // In a real implementation, you'd geocode the location to get coordinates
   const destination = await createDestination({
     location: data.location,
-    latitude: 0, // Placeholder - would be geocoded
-    longitude: 0, // Placeholder - would be geocoded
     routeId: data.routeId,
     startDate: data.startDate,
     endDate: data.endDate,
+    latitude: data.latitude,
+    longitude: data.longitude,
   })
 
   return {
