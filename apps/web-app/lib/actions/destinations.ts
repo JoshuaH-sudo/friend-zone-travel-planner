@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
-import { getAddressCoordinates } from './google';
 
 export async function getDestinations() {
   const supabase = await createClient()
@@ -114,7 +113,7 @@ export async function createDestination(data: CreateDestinationData) {
   }
 
   // Get the highest order number for this route
-  const { data: highestOrderDestination, error: orderError } = await supabase
+  const { data: highestOrderDestination } = await supabase
     .from('destinations')
     .select('order')
     .eq('route_id', data.routeId)
