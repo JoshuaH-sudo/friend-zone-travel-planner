@@ -2,9 +2,10 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId';
 import { ChevronDown, Trash2 } from 'lucide-react';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Button } from '@/components/ui/button';
-import DeleteDestinationDialog from './DeleteDestinationDialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import deleteDestination from '../actions/deleteDestination';
 
 export interface DestinationListProps {
   routeId: string;
@@ -13,7 +14,22 @@ export interface DestinationListProps {
 
 const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
-  const [deleting, setDeleting] = useState<{ id: string; location?: string } | null>(null)
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: async (destinationId: string) => {
+      return deleteDestination(destinationId);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['destinations', routeId],
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting destination:', error);
+    },
+  });
+
   return (
     <div>
       <p>Route</p>
@@ -36,10 +52,12 @@ const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
                   variant='ghost'
                   size='icon'
                   className='h-8 w-8'
-                  onClick={() => setDeleting({ id: destination.id, location: destination.location })}
+                  onClick={() =>
+                    mutateAsync(destination.id)
+                  }
                   title='Delete destination'
                 >
-                  <Trash2 className='h-4 w-4 text-muted-foreground hover:text-red-600' />
+                  <Trash2 className='text-muted-foreground h-4 w-4 hover:text-red-600' />
                 </Button>
               </div>
             </div>
@@ -52,13 +70,6 @@ const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
           </div>
         ))}
       </ScrollArea>
-      <DeleteDestinationDialog 
-        destination={deleting}
-        tripId={tripId}
-        routeId={routeId}
-        open={!!deleting}
-        onOpenChange={(open) => !open && setDeleting(null)}
-      />
     </div>
   );
 };
