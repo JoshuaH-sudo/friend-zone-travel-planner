@@ -25,13 +25,13 @@ interface DeleteDestinationDialogProps {
 const DeleteDestinationDialog = ({ destination, tripId, routeId, open, onOpenChange }: DeleteDestinationDialogProps) => {
   const queryClient = useQueryClient()
 
-  const mutation = useMutation({
+  const {mutateAsync, isPending, error } = useMutation({
     mutationFn: async () => {
       if (!destination) throw new Error('No destination to delete')
       return deleteDestination(destination.id, routeId, tripId)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['destinations', routeId] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['destinations', routeId] })
       onOpenChange(false)
     },
     onError: (error) => {
@@ -39,8 +39,8 @@ const DeleteDestinationDialog = ({ destination, tripId, routeId, open, onOpenCha
     },
   })
 
-  const handleDelete = () => {
-    mutation.mutate()
+  const handleDelete = async () => {
+    await mutateAsync()
   }
 
   return (
@@ -54,13 +54,13 @@ const DeleteDestinationDialog = ({ destination, tripId, routeId, open, onOpenCha
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={mutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={mutation.isPending}
+            disabled={isPending}
             className="bg-red-600 hover:bg-red-700"
           >
-            {mutation.isPending ? (
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Deleting...
@@ -70,9 +70,9 @@ const DeleteDestinationDialog = ({ destination, tripId, routeId, open, onOpenCha
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
-        {mutation.error && (
+        {error && (
           <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3">
-            <p className="text-sm text-red-800">{(mutation.error as Error).message}</p>
+            <p className="text-sm text-red-800">{(error as Error).message}</p>
           </div>
         )}
       </AlertDialogContent>

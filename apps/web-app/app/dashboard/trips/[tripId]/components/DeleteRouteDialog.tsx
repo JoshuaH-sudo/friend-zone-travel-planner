@@ -13,7 +13,6 @@ import {
 import { Loader2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import deleteRoute from '../actions/deleteRoute';
-import { useRouter } from 'next/navigation';
 
 interface DeleteRouteDialogProps {
   route: { id: string; name?: string } | null;
@@ -29,20 +28,17 @@ const DeleteRouteDialog = ({
   onOpenChange,
 }: DeleteRouteDialogProps) => {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: async () => {
       if (!route) throw new Error('No route to delete');
       return deleteRoute(route.id, tripId);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalidate any relevant queries
-      queryClient.invalidateQueries({ queryKey: ['routes', tripId] });
-      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      await queryClient.invalidateQueries({ queryKey: ['routes', tripId] });
+      await queryClient.invalidateQueries({ queryKey: ['trips'] });
       onOpenChange(false);
-      // Refresh the page to fetch updated routes from the server
-      router.refresh();
     },
     onError: (error) => {
       console.error('Error deleting route:', error);

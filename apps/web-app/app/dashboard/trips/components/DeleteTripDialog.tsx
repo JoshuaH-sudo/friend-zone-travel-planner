@@ -29,8 +29,8 @@ const DeleteTripDialog = ({
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: deleteTrip,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trips'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['trips'] });
       onOpenChange(false);
     },
     onError: (error) => {
