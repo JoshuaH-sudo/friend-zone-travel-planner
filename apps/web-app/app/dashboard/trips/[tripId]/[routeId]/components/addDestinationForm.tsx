@@ -32,6 +32,8 @@ export interface NewDestination {
     from: Date;
     to: Date;
   };
+  latitude: number;
+  longitude: number;
 }
 
 const schema = z.object({
@@ -42,6 +44,8 @@ const schema = z.object({
     from: z.date(),
     to: z.date(),
   }),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
 });
 
 export interface AddDestinationFormProps {
@@ -84,6 +88,13 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
     }
   }, [debouncedValue, refetch]);
 
+  useEffect(() => {
+    if (coordinates) {
+      form.setValue('latitude', coordinates.geometry.location.lat);
+      form.setValue('longitude', coordinates.geometry.location.lng);
+    }
+  }, [coordinates, form]);
+
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
@@ -104,6 +115,8 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
       friendIds: data.friendIds,
       startDate: data.dateRange.from,
       endDate: data.dateRange.to,
+      latitude: data.latitude,
+      longitude: data.longitude,
     };
 
     await addDestinationToRoute(transformedData);

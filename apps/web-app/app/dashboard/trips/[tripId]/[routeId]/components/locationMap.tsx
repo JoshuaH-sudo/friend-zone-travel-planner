@@ -11,19 +11,9 @@ import { FC, useEffect, useState } from 'react';
 export type Poi = { key: string; location: google.maps.LatLngLiteral };
 
 interface LocationMapProps {
-  routeId: string;
+  locations: Poi[];
 }
-const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
-  const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
-
-  const locations: Poi[] = destinations.map((destination) => ({
-    key: destination.location,
-    location: {
-      lat: destination.latitude,
-      lng: destination.longitude,
-    },
-  }));
-
+const LocationMap: FC<LocationMapProps> = ({ locations }) => {
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral>({
     lat: 0,
     lng: 0,
@@ -40,10 +30,10 @@ const LocationMap: FC<LocationMapProps> = ({ routeId }) => {
     );
   }, []);
 
-  const lastDestination = destinations[destinations.length - 1];
+  const lastDestination = locations[locations.length - 1];
   const lastPosition: google.maps.LatLngLiteral = {
-    lat: lastDestination?.latitude || userLocation.lat,
-    lng: lastDestination?.longitude || userLocation.lng,
+    lat: lastDestination?.location.lat || userLocation.lat,
+    lng: lastDestination?.location.lng || userLocation.lng,
   };
 
   return (

@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { TripRouteParams } from '../page';
 import AddDestinationForm from './components/addDestinationForm';
 import DestinationList from './components/destinationsList';
-import LocationMap from './components/locationMap';
+import LocationMap, { Poi } from './components/locationMap';
 import RouteNameInput from './components/routeNameInput';
 
 export type RouteParams = TripRouteParams & {
@@ -30,6 +30,14 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         id,
         name,
         user_id
+      ),
+      destinations (
+        id,
+        location,
+        latitude,
+        longitude,
+        start_date,
+        end_date
       )
     `
     )
@@ -40,6 +48,17 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
   if (routeError || !route) {
     notFound();
   }
+
+  const locations: Poi[] =
+    route.destinations.map((destination) => ({
+      key: destination.id,
+      location: {
+        lat: destination.latitude,
+        lng: destination.longitude,
+      },
+    })) || [];
+
+    console.log(locations);
 
   return (
     <div className='min-h-screen sm:h-[600px]'>
@@ -73,7 +92,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           id='map-overview'
           className='bg-card h-1/3 w-full max-w-xl rounded-lg border sm:h-full'
         >
-          <LocationMap routeId={routeId} />
+          <LocationMap locations={locations} />
         </div>
       </div>
     </div>

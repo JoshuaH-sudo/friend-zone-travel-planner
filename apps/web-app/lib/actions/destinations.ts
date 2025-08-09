@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
+import { getAddressCoordinates } from './google';
 
 export async function getDestinations() {
   const supabase = await createClient()
@@ -150,6 +151,8 @@ export async function createDestination(data: CreateDestinationData) {
 export interface AddDestinationToRouteProps {
   routeId: string
   location: string
+  latitude: number
+  longitude: number
   friendIds: string[]
   startDate: Date
   endDate: Date
@@ -166,15 +169,13 @@ export interface AddDestinationToRouteResponse {
 }
 
 export async function addDestinationToRoute(data: AddDestinationToRouteProps): Promise<AddDestinationToRouteResponse> {
-  // For now, we'll use placeholder coordinates since we don't have the geocoding service
-  // In a real implementation, you'd geocode the location to get coordinates
   const destination = await createDestination({
     location: data.location,
-    latitude: 0, // Placeholder - would be geocoded
-    longitude: 0, // Placeholder - would be geocoded
     routeId: data.routeId,
     startDate: data.startDate,
     endDate: data.endDate,
+    latitude: data.latitude,
+    longitude: data.longitude,
   })
 
   return {
