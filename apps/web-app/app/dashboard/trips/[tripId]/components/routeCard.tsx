@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Route as RouteIcon, ArrowRight, MapPin } from 'lucide-react';
+import { Route as RouteIcon, ArrowRight, MapPin, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -15,6 +15,7 @@ interface RouteCardProps {
   tripId: string;
   isSelected?: boolean;
   onSelect?: () => void;
+  onDelete: (route: { id: string; name?: string }) => void;
 }
 
 const RouteCard = ({
@@ -22,6 +23,7 @@ const RouteCard = ({
   tripId,
   isSelected = false,
   onSelect,
+  onDelete,
 }: RouteCardProps) => {
   return (
     <Card
@@ -60,6 +62,18 @@ const RouteCard = ({
             <Badge variant='outline' className='text-xs'>
               Active
             </Badge>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='h-8 w-8'
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete({ id: route.id, name: route.name });
+              }}
+              title='Delete route'
+            >
+              <Trash2 className='h-4 w-4 text-muted-foreground hover:text-red-600' />
+            </Button>
           </div>
         </div>
       </CardHeader>

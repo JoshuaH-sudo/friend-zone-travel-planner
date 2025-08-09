@@ -1,7 +1,8 @@
 'use client';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Calendar, Map, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Users, Calendar, Map, Star, Trash2 } from 'lucide-react';
 import { TripWithRoutes } from '../hooks/useGetTripsWithRoutes';
 
 interface TripCardProps {
@@ -9,6 +10,7 @@ interface TripCardProps {
   onViewMap: (trip: TripWithRoutes) => void;
   onRouteSelect: (trip: TripWithRoutes, routeId: string) => void;
   onTripClick: (tripId: string) => void;
+  onDelete: (trip: { id: string; name: string }) => void;
   selectedRouteId: string | null;
   isMapVisible: boolean;
 }
@@ -18,6 +20,7 @@ const TripCard = ({
   onViewMap,
   onRouteSelect,
   onTripClick,
+  onDelete,
   selectedRouteId,
   isMapVisible,
 }: TripCardProps) => {
@@ -63,9 +66,23 @@ const TripCard = ({
               </div>
             </div>
           </div>
-          <Badge variant='outline' className='text-xs'>
-            {trip.routes.length} {trip.routes.length === 1 ? 'Route' : 'Routes'}
-          </Badge>
+          <div className='flex items-center gap-2'>
+            <Badge variant='outline' className='text-xs'>
+              {trip.routes.length} {trip.routes.length === 1 ? 'Route' : 'Routes'}
+            </Badge>
+            <Button
+              variant='ghost'
+              size='icon'
+              className='h-8 w-8'
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete({ id: trip.id, name: trip.name });
+              }}
+              title='Delete trip'
+            >
+              <Trash2 className='h-4 w-4 text-muted-foreground hover:text-red-600' />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 

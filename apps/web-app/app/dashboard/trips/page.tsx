@@ -7,11 +7,13 @@ import useGetTripsWithRoutes, { TripWithRoutes } from '@/app/dashboard/trips/hoo
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
 import createTrip from './actions/createTrip';
+import DeleteTripDialog from './components/DeleteTripDialog';
 
 const TripsPage = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const router = useRouter();
+  const [deletingTrip, setDeletingTrip] = useState<{ id: string; name: string } | null>(null);
   const { data: trips = [], isLoading, error } = useGetTripsWithRoutes();
 
   const handleViewMap = (trip: TripWithRoutes) => {
@@ -43,6 +45,10 @@ const TripsPage = () => {
       endDate: new Date(),
     });
     router.push(`/dashboard/trips/${newTrip.id}`);
+  };
+
+  const handleDeleteClick = (trip: { id: string; name: string }) => {
+    setDeletingTrip(trip);
   };
 
   if (isLoading) {
@@ -124,6 +130,7 @@ const TripsPage = () => {
                     onViewMap={handleViewMap}
                     onRouteSelect={handleRouteSelect}
                     onTripClick={handleTripClick}
+                    onDelete={handleDeleteClick}
                     selectedRouteId={selectedTrip?.id === trip.id ? selectedRouteId : null}
                     isMapVisible={selectedTrip?.id === trip.id}
                   />
@@ -189,6 +196,12 @@ const TripsPage = () => {
           </div>
         )}
       </div>
+      {/* Delete Trip Dialog */}
+      <DeleteTripDialog
+        trip={deletingTrip}
+        open={!!deletingTrip}
+        onOpenChange={(open) => !open && setDeletingTrip(null)}
+      />
     </main>
   );
 };

@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
-import { notFound } from 'next/navigation'
-import { TripRouteParams } from '../page'
-import AddDestinationForm from './components/addDestinationForm'
-import DestinationList from './components/destinationsList'
-import LocationMap from './components/locationMap'
-import RouteNameInput from './components/routeNameInput'
+import { notFound } from 'next/navigation';
+import { TripRouteParams } from '../page';
+import AddDestinationForm from './components/addDestinationForm';
+import DestinationList from './components/destinationsList';
+import LocationMap from './components/locationMap';
+import RouteNameInput from './components/routeNameInput';
 
 export type RouteParams = TripRouteParams & {
   routeId: string;
@@ -17,26 +17,28 @@ export type RoutePageProps = {
 
 export default async function NewRoutePage({ params }: RoutePageProps) {
   const { routeId } = await params;
-  const supabase = await createClient()
-  const user = await getUser()
+  const supabase = await createClient();
+  const user = await getUser();
 
   // Fetch route with verification that it belongs to a trip owned by the user
   const { data: route, error: routeError } = await supabase
     .from('routes')
-    .select(`
+    .select(
+      `
       *,
       trips!inner (
         id,
         name,
         user_id
       )
-    `)
+    `
+    )
     .eq('id', routeId)
     .eq('trips.user_id', user.id)
-    .single()
+    .single();
 
   if (routeError || !route) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -57,7 +59,7 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
           id='route-list'
           className='bg-card h-1/3 rounded-lg border p-2 sm:h-full sm:w-[30%]'
         >
-          <DestinationList routeId={routeId} />
+          <DestinationList routeId={routeId} tripId={route.trips.id} />
         </div>
 
         <div
@@ -77,4 +79,3 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
     </div>
   );
 }
-
