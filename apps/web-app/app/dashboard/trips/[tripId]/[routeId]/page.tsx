@@ -2,10 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
 import { notFound } from 'next/navigation';
 import { TripRouteParams } from '../page';
-import AddDestinationForm from './components/addDestinationForm';
-import DestinationList from './components/destinationsList';
-import LocationMap, { Poi } from './components/locationMap';
-import RouteNameInput from './components/routeNameInput';
+import RouteClientWrapper from './components/routeClientWrapper';
 
 export type RouteParams = TripRouteParams & {
   routeId: string;
@@ -49,52 +46,30 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
     notFound();
   }
 
-  const locations: Poi[] =
-    route.destinations.map((destination) => ({
-      key: destination.id,
-      location: {
-        lat: destination.latitude,
-        lng: destination.longitude,
-      },
-    })) || [];
+  const locations = route.destinations.map((destination) => ({
+    key: destination.id,
+    location: {
+      lat: destination.latitude,
+      lng: destination.longitude,
+    },
+  }));
 
-    console.log(locations);
+  // Get the most recent destination to use as previous destination for transport
+  const previousDestination = route.destinations.length > 0 
+    ? route.destinations[route.destinations.length - 1]
+    : undefined;
 
   return (
-    <div className='min-h-screen sm:h-[600px]'>
-      <div
-        id='route-name-section'
-        className='mb-4 flex flex-row items-end justify-between gap-2'
-      >
-        <div className='grow space-y-2'>
-          <RouteNameInput routeId={routeId} initialName={route.name} />
-        </div>
-      </div>
-      <div
-        id='trip-details'
-        className='flex h-2/3 flex-col justify-between gap-4 sm:flex-row sm:items-start sm:justify-center'
-      >
-        <div
-          id='route-list'
-          className='bg-card h-1/3 rounded-lg border p-2 sm:h-full sm:w-[30%]'
-        >
-          <DestinationList routeId={routeId} tripId={route.trips.id} />
-        </div>
-
-        <div
-          id='destination-details'
-          className='bg-card flex h-2/3 w-full flex-col gap-4 rounded-lg border p-2 sm:h-full sm:w-[30%]'
-        >
-          <AddDestinationForm routeId={routeId} />
-        </div>
-
-        <div
-          id='map-overview'
-          className='bg-card h-1/3 w-full max-w-xl rounded-lg border sm:h-full'
-        >
-          <LocationMap locations={locations} />
-        </div>
-      </div>
-    </div>
+    <RouteClientWrapper
+      routeId={routeId}
+      tripId={route.trips.id}
+      initialRouteName={route.name}
+      locations={locations}
+      previousDestination={previousDestination ? {
+        location: previousDestination.location,
+        latitude: previousDestination.latitude,
+        longitude: previousDestination.longitude,
+      } : undefined}
+    />
   );
 }

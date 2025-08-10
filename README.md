@@ -1,32 +1,44 @@
-# Turborepo starter
+# Friend Zone Travel Planner
 
-This Turborepo starter is maintained by the Turborepo core team.
+A website to make it easier to plan trips with your friends overseas.
 
-## Using this example
+## Features
 
-Run the following command:
+- **Route Planning**: Create and manage travel routes with multiple destinations
+- **Friend Integration**: Connect with friends and see who's available at each destination
+- **Real-time Pricing**: Get accommodation and flight prices powered by SerpAPI
+  - 🏨 **Accommodation Tab**: View hotel options with prices, ratings, and booking links
+  - ✈️ **Transport Tab**: Compare flight options between destinations with prices and booking links
+- **Interactive Maps**: Visualize your route with Google Maps integration
+- **Date Management**: Plan your trip with flexible date ranges
 
-```sh
-npx create-turbo@latest
-```
+## Tech Stack
 
-## What's inside?
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS with Radix UI components
+- **Database**: Supabase
+- **Maps**: Google Maps API
+- **Pricing Data**: SerpAPI (Google Hotels & Google Flights)
+- **State Management**: TanStack Query
+- **Forms**: React Hook Form with Zod validation
 
-This Turborepo includes the following packages/apps:
+## Environment Setup
 
-### Apps and Packages
+1. Copy the environment variables:
+   ```bash
+   cp apps/web-app/.env.example apps/web-app/.env.local
+   ```
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+2. Configure the required API keys:
+   - **SERPAPI_API_KEY**: Get your API key from [SerpAPI](https://serpapi.com/) for accommodation and flight pricing
+   - **GOOGLE_MAPS_API_KEY**: Google Maps API key for geocoding and maps
+   - **NEXT_PUBLIC_GOOGLE_MAPS_API_KEY**: Public Google Maps API key for client-side maps
+   - **ARCJET_KEY**: Security and rate limiting from [Arcjet](https://arcjet.com/)
+   - **Supabase keys**: Database connection from your Supabase project
 
 ### Utilities
 
-This Turborepo has some additional tools already setup for you:
+This project includes:
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting

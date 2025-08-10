@@ -50,9 +50,14 @@ const schema = z.object({
 
 export interface AddDestinationFormProps {
   routeId: string;
+  onDestinationChange?: (destination: {
+    location?: string;
+    checkInDate?: string;
+    checkOutDate?: string;
+  }) => void;
 }
 
-const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
+const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId, onDestinationChange }) => {
   const queryClient = useQueryClient();
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
@@ -73,9 +78,21 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({ routeId }) => {
   } = form;
 
   const location = form.watch('location');
+  const dateRange = form.watch('dateRange');
   const [debouncedValue] = useDebouncedValue(location, {
     wait: 1000,
   });
+
+  // Notify parent component of form changes for pricing panel
+  useEffect(() => {
+    if (onDestinationChange) {
+      onDestinationChange({
+        location: location || undefined,
+        checkInDate: dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined,
+        checkOutDate: dateRange?.to ? dateRange.to.toISOString().split('T')[0] : undefined,
+      });
+    }
+  }, [location, dateRange, onDestinationChange]);
   const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
