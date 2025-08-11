@@ -44,8 +44,8 @@ const schema = z.object({
     from: z.date(),
     to: z.date(),
   }),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.number(),
+  longitude: z.number()
 });
 
 export interface AddDestinationFormProps {

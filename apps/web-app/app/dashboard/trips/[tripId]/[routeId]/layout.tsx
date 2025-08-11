@@ -10,7 +10,7 @@ export default function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   return (
-    <main className='max-w-8xl container mx-auto p-4 sm:h-screen'>
+    <main className='max-w-8xl container mx-auto p-4'>
       {children}
     </main>
   );

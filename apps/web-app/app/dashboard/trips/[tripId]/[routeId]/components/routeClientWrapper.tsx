@@ -34,7 +34,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
   }>({});
 
   return (
-    <div className='min-h-screen sm:h-[600px]'>
+    <div className='sm:h-[600px]'>
       <div
         id='route-name-section'
         className='mb-4 flex flex-row items-end justify-between gap-2'
@@ -45,12 +45,9 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
       </div>
       <div
         id='trip-details'
-        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2'
+        className='grid h-2/3 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
       >
-        <div
-          id='route-list'
-          className='bg-card rounded-lg border p-2'
-        >
+        <div id='route-list' className='bg-card rounded-lg border p-2'>
           <DestinationList routeId={routeId} tripId={tripId} />
         </div>
 
@@ -58,17 +55,17 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           id='destination-details'
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'
         >
-          <AddDestinationForm 
-            routeId={routeId} 
+          <AddDestinationForm
+            routeId={routeId}
             onDestinationChange={setCurrentDestination}
           />
         </div>
 
         <div
           id='pricing-panel'
-          className='bg-card rounded-lg border p-2'
+          className='bg-card h-full rounded-lg border p-2'
         >
-          <PricingPanel 
+          <PricingPanel
             location={currentDestination.location}
             checkInDate={currentDestination.checkInDate}
             checkOutDate={currentDestination.checkOutDate}
@@ -76,10 +73,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           />
         </div>
 
-        <div
-          id='map-overview'
-          className='bg-card rounded-lg border'
-        >
+        <div id='map-overview' className='bg-card h-full rounded-lg border'>
           <LocationMap locations={locations} />
         </div>
       </div>
@@ -88,4 +82,3 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
 };
 
 export default RouteClientWrapper;
-
