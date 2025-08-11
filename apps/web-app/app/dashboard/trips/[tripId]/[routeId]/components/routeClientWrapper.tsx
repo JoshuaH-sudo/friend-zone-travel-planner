@@ -34,7 +34,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
   }>({});
 
   return (
-    <div className='sm:h-[600px]'>
+    <div className='sm:h-[600px] w-[90%] px-12'>
       <div
         id='route-name-section'
         className='mb-4 flex flex-row items-end justify-between gap-2'
@@ -73,7 +73,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           />
         </div>
 
-        <div id='map-overview' className='bg-card h-full rounded-lg border'>
+        <div id='map-overview' className='bg-card size-70 rounded-lg border'>
           <LocationMap locations={locations} />
         </div>
       </div>
