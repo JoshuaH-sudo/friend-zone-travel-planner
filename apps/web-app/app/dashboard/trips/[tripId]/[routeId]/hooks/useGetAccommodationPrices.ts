@@ -1,47 +1,34 @@
 'use client';
 
-import { getAccommodationPrices, AccommodationResponse } from '@/lib/actions/serpapi';
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { getAccommodationPrices } from '@/lib/actions/serpapi';
 
-type UseGetAccommodationPricesOptions = UseQueryOptions<
-  AccommodationResponse,
-  Error,
-  AccommodationResponse
->;
-
-interface AccommodationParams {
-  location?: string;
-  checkInDate?: string;
-  checkOutDate?: string;
+interface UseGetAccommodationPricesProps {
+  location: string;
+  checkInDate: string;
+  checkOutDate: string;
+  enabled?: boolean;
 }
 
-const useGetAccommodationPrices = (
-  params: AccommodationParams,
-  options?: Partial<UseGetAccommodationPricesOptions>
-) => {
-  const { location, checkInDate, checkOutDate } = params;
-  
+const useGetAccommodationPrices = ({
+  location,
+  checkInDate,
+  checkOutDate,
+  enabled = true,
+}: UseGetAccommodationPricesProps) => {
   return useQuery({
-    enabled: !!(location && checkInDate && checkOutDate),
-    queryKey: ['accommodation-prices', location, checkInDate, checkOutDate],
+    queryKey: ['accommodationPrices', location, checkInDate, checkOutDate],
     queryFn: async () => {
       if (!location || !checkInDate || !checkOutDate) {
-        throw new Error('Missing required parameters');
+        return { status: 'ERROR', message: 'Missing required parameters' };
       }
       
-      const response = await getAccommodationPrices(location, checkInDate, checkOutDate);
-      
-      if (response.status === 'ERROR') {
-        throw new Error(response.message || 'Failed to fetch accommodation prices');
-      }
-      
-      return response;
+      return getAccommodationPrices(location, checkInDate, checkOutDate);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    ...options,
+    enabled: enabled && !!location && !!checkInDate && !!checkOutDate,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    retry: 1,
   });
 };
 
