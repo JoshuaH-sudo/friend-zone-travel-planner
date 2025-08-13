@@ -1,7 +1,6 @@
 'use server';
 
 import arcjet, { shield, detectBot, fixedWindow, request } from '@arcjet/next';
-import { getJson } from 'serpapi';
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
@@ -99,7 +98,17 @@ export const getAccommodationPrices = async (
     };
   }
 
+  if (!process.env.SERPAPI_API_KEY) {
+    console.error('SERPAPI_API_KEY not configured');
+    return {
+      status: 'ERROR',
+      message: 'API configuration error',
+    };
+  }
+
   try {
+    const { getJson } = await import('serpapi');
+    
     const response = await getJson({
       engine: 'google_hotels',
       q: location,
@@ -120,17 +129,15 @@ export const getAccommodationPrices = async (
       };
     }
 
-    const hotels: HotelOption[] = (response.properties || [])
-      .slice(0, 5)
-      .map((property: any) => ({
-        name: property.name || 'Unknown Hotel',
-        price: property.rate_per_night?.lowest || property.total_rate?.lowest,
-        rating: property.overall_rating,
-        link: property.link,
-        thumbnail: property.images?.[0]?.thumbnail,
-        description: property.description,
-        amenities: property.amenities?.slice(0, 3) || [],
-      }));
+    const hotels: HotelOption[] = (response.properties || []).slice(0, 5).map((property: any) => ({
+      name: property.name || 'Unknown Hotel',
+      price: property.rate_per_night?.lowest || property.total_rate?.lowest,
+      rating: property.overall_rating,
+      link: property.link,
+      thumbnail: property.images?.[0]?.thumbnail,
+      description: property.description,
+      amenities: property.amenities?.slice(0, 3) || [],
+    }));
 
     return {
       status: 'OK',
@@ -161,7 +168,17 @@ export const getFlightPrices = async (
     };
   }
 
+  if (!process.env.SERPAPI_API_KEY) {
+    console.error('SERPAPI_API_KEY not configured');
+    return {
+      status: 'ERROR',
+      message: 'API configuration error',
+    };
+  }
+
   try {
+    const { getJson } = await import('serpapi');
+    
     const response = await getJson({
       engine: 'google_flights',
       departure_id: fromLocation,
@@ -181,20 +198,17 @@ export const getFlightPrices = async (
       };
     }
 
-    const flights: FlightOption[] = (response.best_flights || [])
-      .slice(0, 5)
-      .map((flight: any) => ({
-        airline: flight.flights?.[0]?.airline || 'Unknown Airline',
-        departure_time: flight.flights?.[0]?.departure_airport?.time || '',
-        arrival_time: flight.flights?.[0]?.arrival_airport?.time || '',
-        duration: flight.total_duration || '',
-        price: flight.price?.toString(),
-        link: flight.booking_link,
-        stops: flight.flights?.length - 1 || 0,
-        departure_airport:
-          flight.flights?.[0]?.departure_airport?.id || fromLocation,
-        arrival_airport: flight.flights?.[0]?.arrival_airport?.id || toLocation,
-      }));
+    const flights: FlightOption[] = (response.best_flights || []).slice(0, 5).map((flight: any) => ({
+      airline: flight.flights?.[0]?.airline || 'Unknown Airline',
+      departure_time: flight.flights?.[0]?.departure_airport?.time || '',
+      arrival_time: flight.flights?.[0]?.arrival_airport?.time || '',
+      duration: flight.total_duration || '',
+      price: flight.price?.toString(),
+      link: flight.booking_link,
+      stops: flight.flights?.length - 1 || 0,
+      departure_airport: flight.flights?.[0]?.departure_airport?.id || fromLocation,
+      arrival_airport: flight.flights?.[0]?.arrival_airport?.id || toLocation,
+    }));
 
     return {
       status: 'OK',
@@ -208,3 +222,4 @@ export const getFlightPrices = async (
     };
   }
 };
+

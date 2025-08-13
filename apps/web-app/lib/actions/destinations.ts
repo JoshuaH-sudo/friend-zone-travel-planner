@@ -155,6 +155,26 @@ export interface AddDestinationToRouteProps {
   friendIds: string[]
   startDate: Date
   endDate: Date
+  accommodation?: {
+    name: string
+    address: string
+    cost: number
+    currency: string
+    href?: string
+    type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other'
+    friendId?: string
+  }
+  transport?: {
+    name: string
+    address: string
+    cost: number
+    currency: string
+    href?: string
+    type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other'
+    departureAt?: Date
+    arrivalAt?: Date
+    duration?: number
+  }
 }
 
 export interface AddDestinationToRouteResponse {
@@ -165,6 +185,8 @@ export interface AddDestinationToRouteResponse {
   startDate: Date
   endDate: Date
   order: number
+  accommodationId?: string
+  transportId?: string
 }
 
 export async function addDestinationToRoute(data: AddDestinationToRouteProps): Promise<AddDestinationToRouteResponse> {
@@ -177,6 +199,43 @@ export async function addDestinationToRoute(data: AddDestinationToRouteProps): P
     longitude: data.longitude,
   })
 
+  let accommodationId: string | undefined;
+  let transportId: string | undefined;
+
+  // Create accommodation if provided
+  if (data.accommodation) {
+    const { createAccommodation } = await import('./accommodations');
+    const accommodation = await createAccommodation({
+      destinationId: destination.id,
+      name: data.accommodation.name,
+      address: data.accommodation.address,
+      cost: data.accommodation.cost,
+      currency: data.accommodation.currency,
+      href: data.accommodation.href,
+      type: data.accommodation.type,
+      friendId: data.accommodation.friendId,
+    });
+    accommodationId = accommodation.id;
+  }
+
+  // Create transport if provided
+  if (data.transport) {
+    const { createTransport } = await import('./transports');
+    const transport = await createTransport({
+      destinationId: destination.id,
+      name: data.transport.name,
+      address: data.transport.address,
+      cost: data.transport.cost,
+      currency: data.transport.currency,
+      href: data.transport.href,
+      type: data.transport.type,
+      departureAt: data.transport.departureAt,
+      arrivalAt: data.transport.arrivalAt,
+      duration: data.transport.duration,
+    });
+    transportId = transport.id;
+  }
+
   return {
     id: destination.id,
     location: destination.location,
@@ -185,6 +244,7 @@ export async function addDestinationToRoute(data: AddDestinationToRouteProps): P
     startDate: new Date(destination.start_date),
     endDate: new Date(destination.end_date),
     order: destination.order,
+    accommodationId,
+    transportId,
   }
 }
-

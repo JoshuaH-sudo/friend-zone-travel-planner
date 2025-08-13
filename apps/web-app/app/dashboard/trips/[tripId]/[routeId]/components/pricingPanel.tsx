@@ -4,7 +4,6 @@ import { FC } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AccommodationTab from './accommodationTab';
 import TransportTab from './transportTab';
-import { cn } from '@/lib/utils';
 
 export interface PricingPanelProps {
   location?: string;
@@ -15,7 +14,6 @@ export interface PricingPanelProps {
     latitude: number;
     longitude: number;
   };
-  className?: string
 }
 
 const PricingPanel: FC<PricingPanelProps> = ({
@@ -23,14 +21,13 @@ const PricingPanel: FC<PricingPanelProps> = ({
   checkInDate,
   checkOutDate,
   previousDestination,
-  className
 }) => {
   const hasRequiredData = location && checkInDate && checkOutDate;
   const showTransportTab = hasRequiredData && previousDestination;
 
   if (!hasRequiredData) {
     return (
-      <div className={cn("h-full", className)}>
+      <div className="bg-card rounded-lg border p-4">
         <div className="text-center text-muted-foreground">
           <p className="text-sm">Enter destination and dates to see pricing options</p>
         </div>
@@ -39,7 +36,7 @@ const PricingPanel: FC<PricingPanelProps> = ({
   }
 
   return (
-    <div className={cn("h-full", className)}>
+    <div className="bg-card rounded-lg border p-4">
       <div className="mb-3">
         <h3 className="text-lg font-semibold">Pricing Options</h3>
         <p className="text-sm text-muted-foreground">
@@ -47,7 +44,7 @@ const PricingPanel: FC<PricingPanelProps> = ({
         </p>
       </div>
       
-      <Tabs defaultValue="accommodation" className="w-full h-full">
+      <Tabs defaultValue="accommodation" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="accommodation">🏨 Accommodation</TabsTrigger>
           <TabsTrigger 
