@@ -222,6 +222,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
+      setAddressSearchInput('');
       setActiveTab('details');
       queryClient.invalidateQueries({
         queryKey: ['destinations', routeId],
@@ -291,7 +292,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                     <FormControl>
                       <Autocomplete
                         {...field}
-                        value={addressSearchInput}
+                        value={field.value}
                         options={suggestions}
                         placeholder="Enter your destination"
                         emptyMessage='No results found'

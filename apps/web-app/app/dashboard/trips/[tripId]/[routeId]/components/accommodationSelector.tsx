@@ -148,6 +148,8 @@ const AccommodationSelector: FC<AccommodationSelectorProps> = ({
                       <div className='flex items-start justify-between'>
                         <div className='flex-1'>
                           <CardTitle className='line-clamp-1 text-sm font-medium'>
+                            {hotel.link && (
+
                             <Link
                               href={hotel.link}
                               target='_blank'
@@ -157,6 +159,10 @@ const AccommodationSelector: FC<AccommodationSelectorProps> = ({
                             >
                               {hotel.name}
                             </Link>
+                            )}
+                            {!hotel.link && (
+                              <span>{hotel.name}</span>
+                            )}
                           </CardTitle>
                           {hotel.rating && (
                             <div className='mt-1 flex items-center gap-1'>
