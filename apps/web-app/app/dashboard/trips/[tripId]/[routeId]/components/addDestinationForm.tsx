@@ -99,11 +99,6 @@ const schema = z.object({
 
 export interface AddDestinationFormProps {
   routeId: string;
-  onDestinationChange?: (destination: {
-    location?: string;
-    checkInDate?: string;
-    checkOutDate?: string;
-  }) => void;
   previousDestination?: {
     location: string;
     latitude: number;
@@ -113,7 +108,6 @@ export interface AddDestinationFormProps {
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({ 
   routeId, 
-  onDestinationChange,
   previousDestination
 }) => {
   const queryClient = useQueryClient();
@@ -150,18 +144,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     wait: 1000,
   });
 
-  // Notify parent component of form changes for pricing panel
-  useEffect(() => {
-    if (onDestinationChange && !stayingWithFriend) {
-      onDestinationChange({
-        location: location || undefined,
-        checkInDate: dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined,
-        checkOutDate: dateRange?.to ? dateRange.to.toISOString().split('T')[0] : undefined,
-      });
-    }
-  }, [location, dateRange, onDestinationChange, stayingWithFriend]);
-
-  const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const { data: coordinates, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
   const { data: friends, isLoading: isFriendsLoading, error: friendsError, refetch: refetchFriends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
