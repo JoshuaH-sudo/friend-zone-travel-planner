@@ -22,7 +22,7 @@ const useGetAccommodationPrices = ({
       if (!location || !checkInDate || !checkOutDate) {
         return { status: 'ERROR', message: 'Missing required parameters' };
       }
-      
+
       return getAccommodationPrices(location, checkInDate, checkOutDate);
     },
     enabled: enabled && !!location && !!checkInDate && !!checkOutDate,
@@ -33,4 +33,3 @@ const useGetAccommodationPrices = ({
 };
 
 export default useGetAccommodationPrices;
-

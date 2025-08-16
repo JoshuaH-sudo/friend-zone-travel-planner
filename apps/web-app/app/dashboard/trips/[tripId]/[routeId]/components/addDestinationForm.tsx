@@ -280,7 +280,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1'
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger 
@@ -332,13 +332,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                     </FormControl>
                     <FormDescription>Enter your destination</FormDescription>
                     <FormMessage />
-                    <FormMessage>
-                      {isError && (
-                        <span className='text-red-500'>
-                          {error?.message || 'Failed to fetch coordinates'}
-                        </span>
-                      )}
-                    </FormMessage>
                   </FormItem>
                 )}
               />

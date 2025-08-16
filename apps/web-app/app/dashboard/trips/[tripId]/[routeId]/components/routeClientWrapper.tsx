@@ -45,7 +45,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
       </div>
       <div
         id='trip-details'
-        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2'
+        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       >
         <div
           id='route-list'
@@ -61,18 +61,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           <AddDestinationForm 
             routeId={routeId} 
             onDestinationChange={setCurrentDestination}
-            previousDestination={previousDestination}
-          />
-        </div>
-
-        <div
-          id='pricing-panel'
-          className='bg-card rounded-lg border p-2'
-        >
-          <PricingPanel 
-            location={currentDestination.location}
-            checkInDate={currentDestination.checkInDate}
-            checkOutDate={currentDestination.checkOutDate}
             previousDestination={previousDestination}
           />
         </div>
