@@ -7,13 +7,70 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
+      accommodations: {
+        Row: {
+          address: string
+          cost: number
+          created_at: string
+          currency: string
+          destination_id: string
+          friend_id: string | null
+          href: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          cost: number
+          created_at?: string
+          currency: string
+          destination_id: string
+          friend_id?: string | null
+          href?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          cost?: number
+          created_at?: string
+          currency?: string
+          destination_id?: string
+          friend_id?: string | null
+          href?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accommodations_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accommodations_friend_id_fkey"
+            columns: ["friend_id"]
+            isOneToOne: false
+            referencedRelation: "friends"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       destinations: {
         Row: {
           created_at: string | null
@@ -110,7 +167,6 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
-          total_cost: number | null
           trip_id: string
           updated_at: string | null
         }
@@ -118,7 +174,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name: string
-          total_cost?: number | null
           trip_id: string
           updated_at?: string | null
         }
@@ -126,7 +181,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
-          total_cost?: number | null
           trip_id?: string
           updated_at?: string | null
         }
@@ -136,6 +190,62 @@ export type Database = {
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transports: {
+        Row: {
+          address: string
+          arrival_at: string | null
+          cost: number
+          created_at: string
+          currency: string
+          departure_at: string | null
+          destination_id: string
+          duration: number | null
+          href: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          arrival_at?: string | null
+          cost: number
+          created_at?: string
+          currency: string
+          departure_at?: string | null
+          destination_id: string
+          duration?: number | null
+          href?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          arrival_at?: string | null
+          cost?: number
+          created_at?: string
+          currency?: string
+          departure_at?: string | null
+          destination_id?: string
+          duration?: number | null
+          href?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transports_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
         ]
