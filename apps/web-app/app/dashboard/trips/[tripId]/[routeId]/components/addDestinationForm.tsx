@@ -1,6 +1,6 @@
 'use client';
 
-import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
+import { DaysSlider } from '@/components/ui/daysSlider';
 import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
@@ -33,10 +33,7 @@ export interface NewDestination {
   routeId: string;
   location: string;
   friendIds: string[];
-  dateRange: {
-    from: Date;
-    to: Date;
-  };
+  days: number;
   latitude: number;
   longitude: number;
   stayingWithFriend: boolean;
@@ -67,10 +64,7 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
-  dateRange: z.object({
-    from: z.date(),
-    to: z.date(),
-  }),
+  days: z.number().min(1, 'At least 1 day is required').max(30, 'Maximum 30 days allowed'),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   stayingWithFriend: z.boolean().default(false),
@@ -125,6 +119,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     defaultValues: {
       routeId,
       friendIds: [],
+      days: 3,
       stayingWithFriend: false,
     },
     resolver: zodResolver(schema),
@@ -140,7 +135,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   } = form;
 
   const location = watch('location');
-  const dateRange = watch('dateRange');
+  const days = watch('days');
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
   const selectedAccommodation = watch('accommodation');
@@ -155,11 +150,10 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     if (onDestinationChange && !stayingWithFriend) {
       onDestinationChange({
         location: location || undefined,
-        checkInDate: dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined,
-        checkOutDate: dateRange?.to ? dateRange.to.toISOString().split('T')[0] : undefined,
+        days: days,
       });
     }
-  }, [location, dateRange, onDestinationChange, stayingWithFriend]);
+  }, [location, days, onDestinationChange, stayingWithFriend]);
 
   const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
   const { data: friends, isLoading: isFriendsLoading, error: friendsError, refetch: refetchFriends } = useGetFriendsByGeoLocation(
@@ -255,8 +249,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       routeId: data.routeId,
       location: data.location,
       friendIds: data.friendIds,
-      startDate: data.dateRange.from,
-      endDate: data.dateRange.to,
+      days: data.days,
       latitude: data.latitude,
       longitude: data.longitude,
     };
@@ -285,13 +278,13 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger 
               value="accommodation" 
-              disabled={!location || !dateRange?.from || !dateRange?.to}
+              disabled={!location || !watch('days')}
             >
               Accommodation
             </TabsTrigger>
             <TabsTrigger 
               value="transport" 
-              disabled={!location || !dateRange?.from || !dateRange?.to || !previousDestination}
+              disabled={!location || !watch('days') || !previousDestination}
             >
               Transport
             </TabsTrigger>
@@ -347,23 +340,22 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
             <div>
               <FormField
                 control={control}
-                name='dateRange'
+                name='days'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dates</FormLabel>
+                    <FormLabel>Duration</FormLabel>
                     <FormControl>
-                      <DatePickerWithRange
-                        dates={
-                          field.value
-                            ? { from: field.value.from, to: field.value.to }
-                            : { from: undefined, to: undefined }
-                        }
-                        onSelect={field.onChange}
-                        {...field}
+                      <DaysSlider
+                        value={field.value || 1}
+                        onChange={field.onChange}
+                        min={1}
+                        max={30}
+                        step={1}
+                        label="Duration"
                       />
                     </FormControl>
                     <FormDescription>
-                      Select the start and end dates for your trip
+                      Select how many days you'll stay at this destination
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -434,11 +426,10 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                 onRefresh={refetchFriends}
               />
             ) : (
-              location && dateRange?.from && dateRange?.to && (
+              location && days && (
                 <AccommodationSelector
                   location={location}
-                  checkInDate={dateRange.from.toISOString().split('T')[0]}
-                  checkOutDate={dateRange.to.toISOString().split('T')[0]}
+                  days={days}
                   selectedAccommodation={selectedAccommodation || null}
                   onSelectAccommodation={handleAccommodationSelect}
                 />
@@ -447,11 +438,11 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
           </TabsContent>
           
           <TabsContent value="transport" className="space-y-4 mt-2">
-            {previousDestination && location && dateRange?.from && (
+            {previousDestination && location && days && (
               <TransportSelector
                 fromLocation={previousDestination.location}
                 toLocation={location}
-                departureDate={dateRange.from.toISOString().split('T')[0]}
+                days={days}
                 selectedTransport={selectedTransport || null}
                 onSelectTransport={handleTransportSelect}
               />
@@ -475,13 +466,13 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
               type="button"
               className="px-4 py-2 bg-blue-500 rounded-md text-white hover:bg-blue-600 ml-auto"
               onClick={() => {
-                if (activeTab === "details" && location && dateRange?.from && dateRange?.to) {
+                if (activeTab === "details" && location && days) {
                   setActiveTab("accommodation");
                 } else if (activeTab === "accommodation") {
                   setActiveTab("transport");
                 }
               }}
-              disabled={activeTab === "details" && (!location || !dateRange?.from || !dateRange?.to)}
+              disabled={activeTab === "details" && (!location || !days)}
             >
               Next
             </button>

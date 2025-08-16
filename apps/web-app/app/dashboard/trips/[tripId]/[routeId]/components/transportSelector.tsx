@@ -12,8 +12,7 @@ import useGetFlightPrices from '../hooks/useGetFlightPrices';
 export interface TransportSelectorProps {
   fromLocation: string;
   toLocation: string;
-  departureDate: string;
-  returnDate?: string;
+  days: number;
   selectedTransport: {
     name: string;
     address: string;
@@ -41,11 +40,16 @@ export interface TransportSelectorProps {
 const TransportSelector: FC<TransportSelectorProps> = ({
   fromLocation,
   toLocation,
-  departureDate,
-  returnDate,
+  days,
   selectedTransport,
   onSelectTransport,
 }) => {
+  // Calculate departure date based on current date
+  const today = new Date();
+  const departureDate = today.toISOString().split('T')[0];
+  // Calculate return date based on days
+  const returnDate = new Date(today.setDate(today.getDate() + days)).toISOString().split('T')[0];
+
   const { data, isLoading, error, refetch } = useGetFlightPrices({
     fromLocation,
     toLocation,
@@ -246,4 +250,3 @@ const TransportSelector: FC<TransportSelectorProps> = ({
 };
 
 export default TransportSelector;
-

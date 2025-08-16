@@ -7,6 +7,8 @@ import { revalidatePath } from 'next/cache'
 interface CreateRouteData {
   name: string
   tripId: string
+  dateFrom?: Date
+  dateTo?: Date
 }
 
 export async function createRoute(data: CreateRouteData) {
@@ -29,12 +31,22 @@ export async function createRoute(data: CreateRouteData) {
     throw new Error('Trip not found or access denied')
   }
 
+  const routeData: any = {
+    name: data.name,
+    trip_id: data.tripId,
+  };
+
+  // Add date range if provided
+  if (data.dateFrom) {
+    routeData.date_from = data.dateFrom.toISOString();
+  }
+  if (data.dateTo) {
+    routeData.date_to = data.dateTo.toISOString();
+  }
+
   const { data: route, error } = await supabase
     .from('routes')
-    .insert({
-      name: data.name,
-      trip_id: data.tripId,
-    })
+    .insert(routeData)
     .select()
     .single()
 
@@ -46,4 +58,3 @@ export async function createRoute(data: CreateRouteData) {
   revalidatePath(`/dashboard/trips/${data.tripId}`)
   return route
 }
-

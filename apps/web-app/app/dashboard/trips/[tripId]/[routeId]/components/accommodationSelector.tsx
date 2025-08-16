@@ -12,8 +12,7 @@ import useGetAccommodationPrices from '../hooks/useGetAccommodationPrices';
 
 export interface AccommodationSelectorProps {
   location: string;
-  checkInDate: string;
-  checkOutDate: string;
+  days: number;
   selectedAccommodation: {
     name: string;
     address: string;
@@ -34,11 +33,15 @@ export interface AccommodationSelectorProps {
 
 const AccommodationSelector: FC<AccommodationSelectorProps> = ({
   location,
-  checkInDate,
-  checkOutDate,
+  days,
   selectedAccommodation,
   onSelectAccommodation,
 }) => {
+  // Calculate check-in and check-out dates based on days
+  const today = new Date();
+  const checkInDate = today.toISOString().split('T')[0];
+  const checkOutDate = new Date(today.setDate(today.getDate() + days)).toISOString().split('T')[0];
+
   const { data, isLoading, error, refetch } = useGetAccommodationPrices({
     location,
     checkInDate,
@@ -201,4 +204,3 @@ const AccommodationSelector: FC<AccommodationSelectorProps> = ({
 };
 
 export default AccommodationSelector;
-

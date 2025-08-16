@@ -82,8 +82,9 @@ interface CreateDestinationData {
   latitude: number
   longitude: number
   routeId: string
-  startDate: Date
-  endDate: Date
+  days: number
+  startDate?: Date
+  endDate?: Date
 }
 
 export async function createDestination(data: CreateDestinationData) {
@@ -123,6 +124,15 @@ export async function createDestination(data: CreateDestinationData) {
 
   const nextOrder = highestOrderDestination ? highestOrderDestination.order + 1 : 1
 
+  // For backward compatibility, we'll still set start_date and end_date
+  // We'll use the current date as start_date and calculate end_date based on days
+  // if they're not provided
+  const startDate = data.startDate || new Date();
+  const endDate = data.endDate || new Date(startDate);
+  if (!data.endDate) {
+    endDate.setDate(startDate.getDate() + data.days - 1);
+  }
+
   const { data: destination, error } = await supabase
     .from('destinations')
     .insert({
@@ -130,8 +140,9 @@ export async function createDestination(data: CreateDestinationData) {
       latitude: data.latitude,
       longitude: data.longitude,
       route_id: data.routeId,
-      start_date: data.startDate.toISOString(),
-      end_date: data.endDate.toISOString(),
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      days: data.days,
       order: nextOrder,
     })
     .select()
@@ -153,8 +164,9 @@ export interface AddDestinationToRouteProps {
   latitude: number
   longitude: number
   friendIds: string[]
-  startDate: Date
-  endDate: Date
+  days: number
+  startDate?: Date
+  endDate?: Date
   accommodation?: {
     name: string
     address: string
@@ -182,8 +194,9 @@ export interface AddDestinationToRouteResponse {
   location: string
   latitude: number
   longitude: number
-  startDate: Date
-  endDate: Date
+  days: number
+  startDate?: Date
+  endDate?: Date
   order: number
   accommodationId?: string
   transportId?: string
@@ -193,6 +206,7 @@ export async function addDestinationToRoute(data: AddDestinationToRouteProps): P
   const destination = await createDestination({
     location: data.location,
     routeId: data.routeId,
+    days: data.days,
     startDate: data.startDate,
     endDate: data.endDate,
     latitude: data.latitude,
