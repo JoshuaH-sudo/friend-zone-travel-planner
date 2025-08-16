@@ -101,6 +101,13 @@ export const getPlaceAutocomplete = async (input: string) => {
 
   const result = await placesClient.autocompletePlaces({
     input,
+    includedPrimaryTypes: [
+      'geocode',
+      'street_address',
+      'locality',
+    ],
+  },{
+
   });
 
   return {
