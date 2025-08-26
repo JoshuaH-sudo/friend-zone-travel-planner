@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import useGetTripsWithRoutes, { TripWithRoutes } from '@/app/dashboard/trips/hooks/useGetTripsWithRoutes';
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
-import createTrip from './actions/createTrip';
 import DeleteTripDialog from './components/DeleteTripDialog';
+import CreateTripDialog from './components/createTripDialog';
 
 const TripsPage = () => {
   const [selectedTrip, setSelectedTrip] = useState<TripWithRoutes | null>(null);
@@ -38,14 +38,7 @@ const TripsPage = () => {
     router.push(`/dashboard/trips/${tripId}`);
   };
 
-  const handleCreateNewTrip = async () => {
-    const newTrip = await createTrip({
-      name: 'New Trip',
-      startDate: new Date(),
-      endDate: new Date(),
-    });
-    router.push(`/dashboard/trips/${newTrip.id}`);
-  };
+  // Removed handleCreateNewTrip as it's now handled by the CreateTripDialog component
 
   const handleDeleteClick = (trip: { id: string; name: string }) => {
     setDeletingTrip(trip);
@@ -89,10 +82,7 @@ const TripsPage = () => {
               Manage your travel plans and explore destinations with friends
             </p>
           </div>
-          <Button onClick={handleCreateNewTrip} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create New Trip
-          </Button>
+          <CreateTripDialog buttonText="Create New Trip" />
         </div>
 
         {trips.length === 0 ? (
@@ -106,10 +96,7 @@ const TripsPage = () => {
               Start planning your next adventure by creating your first trip. 
               Add destinations and invite friends to join you!
             </p>
-            <Button onClick={handleCreateNewTrip} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create Your First Trip
-            </Button>
+            <CreateTripDialog buttonText="Create Your First Trip" />
           </div>
         ) : (
           /* Trips Grid Layout */
