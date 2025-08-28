@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import AddDestinationForm from './addDestinationForm';
+import AddDestinationWorkflow from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
 import LocationMap, { Poi } from './locationMap';
 import RouteNameInput from './routeNameInput';
@@ -49,7 +49,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           id='destination-details'
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'
         >
-          <AddDestinationForm 
+          <AddDestinationWorkflow 
             routeId={routeId} 
             previousDestination={previousDestination}
           />

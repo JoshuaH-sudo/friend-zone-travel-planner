@@ -98,7 +98,7 @@ const tabs = [
   { value: 'transport', label: 'Transport' },
 ];
 
-export interface AddDestinationFormProps {
+export interface AddDestinationWorkflowProps {
   routeId: string;
   previousDestination?: {
     location: string;
@@ -107,7 +107,7 @@ export interface AddDestinationFormProps {
   };
 }
 
-const AddDestinationForm: FC<AddDestinationFormProps> = ({
+const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   routeId,
   previousDestination,
 }) => {
@@ -349,4 +349,4 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   );
 };
 
-export default AddDestinationForm;
+export default AddDestinationWorkflow;
