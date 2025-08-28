@@ -51,7 +51,7 @@ const DestinationForm = () => {
     }
   }, [coordinates, setValue]);
   return (
-    <div>
+    <div className='space-y-6 py-2'>
       <FormField
         control={control}
         name='location'
@@ -101,7 +101,6 @@ const DestinationForm = () => {
         name='days'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Duration</FormLabel>
             <FormControl>
               <DaysSlider
                 value={field.value || 1}

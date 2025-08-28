@@ -246,7 +246,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         className='flex h-full flex-col gap-1'
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full h-full'>
-          <TabsList className='grid w-full grid-cols-4'>
+          <TabsList className='grid w-full grid-cols-3'>
             <TabsTrigger value='destination'>Destination</TabsTrigger>
             <TabsTrigger
               value='accommodation'
