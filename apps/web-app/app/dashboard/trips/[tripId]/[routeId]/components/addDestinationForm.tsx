@@ -1,6 +1,5 @@
 'use client';
 
-import { DaysSlider } from '@/components/ui/daysSlider';
 import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
@@ -14,21 +13,15 @@ import {
   FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
 } from '@/components/ui/form';
-import { Autocomplete } from '@/components/ui/autocomplete';
-import { Combobox } from '@/components/ui/combo-box';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
-import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
-import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
-import { useDebouncedValue } from '@tanstack/react-pacer';
-import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import FriendAccommodationSelector from './friendAccommodationSelector';
 import AccommodationForm from './accommodationForm';
 import ManualTransportForm from './transportForm';
-import DestinationList from './destinationsList';
+import { Button } from '@/components/ui/button';
+import DestinationForm from './destinationForm';
 
 export interface NewDestination {
   routeId: string;
@@ -99,13 +92,14 @@ const schema = z.object({
     .optional(),
 });
 
+const tabs = [
+  { value: 'destination', label: 'Details' },
+  { value: 'accommodation', label: 'Accommodation' },
+  { value: 'transport', label: 'Transport' },
+];
+
 export interface AddDestinationFormProps {
   routeId: string;
-  onDestinationChange?: (destination: {
-    location?: string;
-    checkInDate?: string;
-    checkOutDate?: string;
-  }) => void;
   previousDestination?: {
     location: string;
     latitude: number;
@@ -115,13 +109,11 @@ export interface AddDestinationFormProps {
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({
   routeId,
-  onDestinationChange,
   previousDestination,
 }) => {
   const queryClient = useQueryClient();
-  const [addressSearchInput, setAddressSearchInput] = useState<string>('');
-  const { suggestions } = useAddressAutocomplete(addressSearchInput);
-  const [activeTab, setActiveTab] = useState<string>('details');
+
+  const [activeTab, setActiveTab] = useState<string>('destination');
 
   const form = useForm<NewDestination>({
     defaultValues: {
@@ -139,7 +131,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     reset,
     watch,
     setValue,
-    formState: { isValid },
   } = form;
 
   const location = watch('location');
@@ -147,47 +138,8 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
   const selectedAccommodation = watch('accommodation');
-
-  const [debouncedValue] = useDebouncedValue(location, {
-    wait: 1000,
-  });
-
-  // Notify parent component of form changes for pricing panel
-  useEffect(() => {
-    if (onDestinationChange && !stayingWithFriend) {
-      onDestinationChange({
-        location: location || undefined,
-        days: days,
-      });
-    }
-  }, [location, days, onDestinationChange, stayingWithFriend]);
-
-  const {
-    data: coordinates,
-    isError,
-    error,
-    refetch,
-  } = useGetAddressCoordinates(debouncedValue, { enabled: false });
-  const {
-    data: friends,
-    isLoading: isFriendsLoading,
-    error: friendsError,
-    refetch: refetchFriends,
-  } = useGetFriendsByGeoLocation(coordinates?.geometry?.location);
-
-  useEffect(() => {
-    if (debouncedValue && debouncedValue.trim().length > 0) {
-      console.log('Refetching coordinates for:', debouncedValue);
-      refetch();
-    }
-  }, [debouncedValue, refetch]);
-
-  useEffect(() => {
-    if (coordinates) {
-      setValue('latitude', coordinates.geometry.location.lat);
-      setValue('longitude', coordinates.geometry.location.lng);
-    }
-  }, [coordinates, setValue]);
+  const latitude = watch('latitude');
+  const longitude = watch('longitude');
 
   // Handle staying with friend toggle
   useEffect(() => {
@@ -252,7 +204,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
-      setActiveTab('details');
+      setActiveTab('destination');
       queryClient.invalidateQueries({
         queryKey: ['destinations', routeId],
       });
@@ -286,134 +238,32 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     await addDestinationToRoute(transformedData);
   };
 
+  const currentTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
   return (
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1'
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-3'>
-            <TabsTrigger value="routes">Routes</TabsTrigger>
-            <TabsTrigger value='details'>Details</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full h-full'>
+          <TabsList className='grid w-full grid-cols-4'>
+            <TabsTrigger value='destination'>Destination</TabsTrigger>
             <TabsTrigger
               value='accommodation'
-              disabled={!location || !watch('days')}
+              disabled={!location || !days}
             >
               Accommodation
             </TabsTrigger>
             <TabsTrigger
               value='transport'
-              disabled={!location || !watch('days') || !previousDestination}
+              disabled={!location || !days || !previousDestination}
             >
               Transport
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value='routes'className='mt-2 space-y-4'>
-            <DestinationList routeId={routeId}/>
-          </TabsContent>
-
-          <TabsContent value='details' className='mt-2 space-y-4'>
-            <div>
-              <FormField
-                control={control}
-                name='location'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Location</FormLabel>
-                    <FormControl>
-                      <Autocomplete
-                        {...field}
-                        value={addressSearchInput}
-                        options={suggestions}
-                        placeholder='Enter your destination'
-                        emptyMessage='No results found'
-                        onInputChange={(value) => {
-                          setAddressSearchInput(value);
-                        }}
-                        onSelect={(suggestion) => {
-                          console.log('Selected suggestion:', suggestion);
-                          // Update the form with the selected address
-                          const selectedAddress = suggestion.text.text;
-                          setAddressSearchInput(selectedAddress);
-                          setValue('location', selectedAddress);
-                          field.onChange(selectedAddress);
-                        }}
-                        onClear={() => {
-                          setAddressSearchInput('');
-                          setValue('location', '');
-                          field.onChange('');
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>Enter your destination</FormDescription>
-                    <FormMessage />
-                    <FormMessage>
-                      {isError && (
-                        <span className='text-red-500'>
-                          {error?.message || 'Failed to fetch coordinates'}
-                        </span>
-                      )}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div>
-              <FormField
-                control={control}
-                name='days'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration</FormLabel>
-                    <FormControl>
-                      <DaysSlider
-                        value={field.value || 1}
-                        onChange={field.onChange}
-                        min={1}
-                        max={30}
-                        step={1}
-                        label='Duration'
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Select how many days you'll stay at this destination
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div>
-              <FormField
-                control={control}
-                name='friendIds'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Friends To See</FormLabel>
-                    <FormControl>
-                      <Combobox
-                        multiple
-                        options={
-                          friends?.map((friend) => ({
-                            value: friend.id,
-                            label: friend.name,
-                          })) || []
-                        }
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Which friends are you going see
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <TabsContent value='destination' className='mt-2 space-y-4'>
+            <DestinationForm />
           </TabsContent>
 
           <TabsContent value='accommodation' className='mt-2 space-y-4'>
@@ -442,12 +292,9 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
 
             {stayingWithFriend ? (
               <FriendAccommodationSelector
-                friends={friends || []}
-                isLoading={isFriendsLoading}
-                error={friendsError}
                 selectedFriendId={selectedFriendId || null}
+                coordinates={{ lat: latitude, lng: longitude }}
                 onSelectFriend={handleFriendSelect}
-                onRefresh={refetchFriends}
               />
             ) : (
               location &&
@@ -472,44 +319,29 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         </Tabs>
 
         <div className='mt-4 flex justify-between'>
-          {activeTab !== 'details' && (
-            <button
+          {currentTabIndex > 0 && (
+            <Button
               type='button'
               className='rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300'
               onClick={() =>
-                setActiveTab(
-                  activeTab === 'accommodation' ? 'details' : 'accommodation'
-                )
+                setActiveTab(tabs[currentTabIndex - 1]?.value)
               }
             >
               Back
-            </button>
+            </Button>
           )}
 
-          {activeTab !== 'transport' ? (
-            <button
+          {currentTabIndex < tabs.length - 1 && (
+            <Button
               type='button'
               className='ml-auto rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
               onClick={() => {
-                if (activeTab === 'details' && location && days) {
-                  setActiveTab('accommodation');
-                } else if (activeTab === 'accommodation') {
-                  setActiveTab('transport');
-                }
+                setActiveTab(tabs[currentTabIndex + 1]?.value);
               }}
-              disabled={activeTab === 'details' && (!location || !days)}
+              disabled={activeTab === 'destination' && (!location || !days)}
             >
               Next
-            </button>
-          ) : (
-            <button
-              id='add-destination'
-              className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
-              type='submit'
-              disabled={!isValid}
-            >
-              Add Destination
-            </button>
+            </Button>
           )}
         </div>
       </form>
