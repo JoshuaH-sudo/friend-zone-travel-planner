@@ -20,10 +20,9 @@ const DestinationForm = () => {
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
 
-  const { watch, setValue, control } = useFormContext();
-  const location = watch('location');
+  const { setValue, control } = useFormContext();
 
-  const [debouncedValue] = useDebouncedValue(location, {
+  const [debouncedValue] = useDebouncedValue(addressSearchInput, {
     wait: 1000,
   });
 
