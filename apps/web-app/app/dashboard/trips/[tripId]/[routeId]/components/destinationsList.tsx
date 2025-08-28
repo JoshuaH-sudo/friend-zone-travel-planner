@@ -9,10 +9,9 @@ import deleteDestination from '../actions/deleteDestination';
 
 export interface DestinationListProps {
   routeId: string;
-  tripId: string;
 }
 
-const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
+const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
   const queryClient = useQueryClient();
 

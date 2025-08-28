@@ -1,8 +1,7 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import AddDestinationForm from './addDestinationForm';
-import DestinationList from './destinationsList';
 import LocationMap, { Poi } from './locationMap';
 import RouteNameInput from './routeNameInput';
 
@@ -20,7 +19,6 @@ export interface RouteClientWrapperProps {
 
 const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
   routeId,
-  tripId,
   initialRouteName,
   locations,
   previousDestination,
@@ -37,15 +35,8 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
       </div>
       <div
         id='trip-details'
-        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2'
       >
-        <div
-          id='route-list'
-          className='bg-card rounded-lg border p-2'
-        >
-          <DestinationList routeId={routeId} tripId={tripId} />
-        </div>
-
         <div
           id='destination-details'
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'

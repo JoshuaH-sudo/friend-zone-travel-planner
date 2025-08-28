@@ -28,6 +28,7 @@ import { Switch } from '@/components/ui/switch';
 import FriendAccommodationSelector from './friendAccommodationSelector';
 import AccommodationForm from './accommodationForm';
 import ManualTransportForm from './transportForm';
+import DestinationList from './destinationsList';
 
 export interface NewDestination {
   routeId: string;
@@ -293,6 +294,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
           <TabsList className='grid w-full grid-cols-3'>
+            <TabsTrigger value="routes">Routes</TabsTrigger>
             <TabsTrigger value='details'>Details</TabsTrigger>
             <TabsTrigger
               value='accommodation'
@@ -307,6 +309,10 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
               Transport
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value='routes'className='mt-2 space-y-4'>
+            <DestinationList routeId={routeId}/>
+          </TabsContent>
 
           <TabsContent value='details' className='mt-2 space-y-4'>
             <div>
