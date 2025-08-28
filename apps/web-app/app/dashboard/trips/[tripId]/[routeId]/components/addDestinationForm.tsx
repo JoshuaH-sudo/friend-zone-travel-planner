@@ -26,8 +26,8 @@ import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import FriendAccommodationSelector from './friendAccommodationSelector';
-import AccommodationSelector from './accommodationSelector';
-import TransportSelector from './transportSelector';
+import AccommodationForm from './accommodationForm';
+import ManualTransportForm from './transportForm';
 
 export interface NewDestination {
   routeId: string;
@@ -64,31 +64,38 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
-  days: z.number().min(1, 'At least 1 day is required').max(30, 'Maximum 30 days allowed'),
+  days: z
+    .number()
+    .min(1, 'At least 1 day is required')
+    .max(30, 'Maximum 30 days allowed'),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   stayingWithFriend: z.boolean().default(false),
   selectedFriendId: z.string().optional(),
-  accommodation: z.object({
-    name: z.string(),
-    address: z.string(),
-    cost: z.number(),
-    currency: z.string(),
-    href: z.string().optional(),
-    type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
-    friendId: z.string().optional(),
-  }).optional(),
-  transport: z.object({
-    name: z.string(),
-    address: z.string(),
-    cost: z.number(),
-    currency: z.string(),
-    href: z.string().optional(),
-    type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-    departureAt: z.date().optional(),
-    arrivalAt: z.date().optional(),
-    duration: z.number().optional(),
-  }).optional(),
+  accommodation: z
+    .object({
+      name: z.string(),
+      address: z.string(),
+      cost: z.number(),
+      currency: z.string(),
+      href: z.string().optional(),
+      type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
+      friendId: z.string().optional(),
+    })
+    .optional(),
+  transport: z
+    .object({
+      name: z.string(),
+      address: z.string(),
+      cost: z.number(),
+      currency: z.string(),
+      href: z.string().optional(),
+      type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
+      departureAt: z.date().optional(),
+      arrivalAt: z.date().optional(),
+      duration: z.number().optional(),
+    })
+    .optional(),
 });
 
 export interface AddDestinationFormProps {
@@ -105,10 +112,10 @@ export interface AddDestinationFormProps {
   };
 }
 
-const AddDestinationForm: FC<AddDestinationFormProps> = ({ 
-  routeId, 
+const AddDestinationForm: FC<AddDestinationFormProps> = ({
+  routeId,
   onDestinationChange,
-  previousDestination
+  previousDestination,
 }) => {
   const queryClient = useQueryClient();
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
@@ -139,7 +146,6 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
   const selectedAccommodation = watch('accommodation');
-  const selectedTransport = watch('transport');
 
   const [debouncedValue] = useDebouncedValue(location, {
     wait: 1000,
@@ -155,10 +161,18 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     }
   }, [location, days, onDestinationChange, stayingWithFriend]);
 
-  const { data: coordinates, isError, error, refetch } = useGetAddressCoordinates(debouncedValue, { enabled: false });
-  const { data: friends, isLoading: isFriendsLoading, error: friendsError, refetch: refetchFriends } = useGetFriendsByGeoLocation(
-    coordinates?.geometry?.location
-  );
+  const {
+    data: coordinates,
+    isError,
+    error,
+    refetch,
+  } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const {
+    data: friends,
+    isLoading: isFriendsLoading,
+    error: friendsError,
+    refetch: refetchFriends,
+  } = useGetFriendsByGeoLocation(coordinates?.geometry?.location);
 
   useEffect(() => {
     if (debouncedValue && debouncedValue.trim().length > 0) {
@@ -182,7 +196,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     } else {
       // Clear selected friend when switching to regular accommodation
       setValue('selectedFriendId', undefined);
-      
+
       // Clear friend accommodation when switching back
       if (selectedAccommodation?.type === 'friend') {
         setValue('accommodation', undefined);
@@ -191,7 +205,11 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   }, [stayingWithFriend, setValue, selectedAccommodation]);
 
   // Handle friend selection for accommodation
-  const handleFriendSelect = (friendId: string, name: string, address: string) => {
+  const handleFriendSelect = (
+    friendId: string,
+    name: string,
+    address: string
+  ) => {
     setValue('selectedFriendId', friendId);
     setValue('accommodation', {
       name: `Staying with ${name}`,
@@ -204,7 +222,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
   };
 
   // Handle accommodation selection
-  const handleAccommodationSelect = (accommodation: {
+  const handleAccommodationSubmit = (accommodation: {
     name: string;
     address: string;
     cost: number;
@@ -273,24 +291,24 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1'
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger 
-              value="accommodation" 
+        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+          <TabsList className='grid w-full grid-cols-3'>
+            <TabsTrigger value='details'>Details</TabsTrigger>
+            <TabsTrigger
+              value='accommodation'
               disabled={!location || !watch('days')}
             >
               Accommodation
             </TabsTrigger>
-            <TabsTrigger 
-              value="transport" 
+            <TabsTrigger
+              value='transport'
               disabled={!location || !watch('days') || !previousDestination}
             >
               Transport
             </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="details" className="space-y-4 mt-2">
+
+          <TabsContent value='details' className='mt-2 space-y-4'>
             <div>
               <FormField
                 control={control}
@@ -303,7 +321,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                         {...field}
                         value={addressSearchInput}
                         options={suggestions}
-                        placeholder="Enter your destination"
+                        placeholder='Enter your destination'
                         emptyMessage='No results found'
                         onInputChange={(value) => {
                           setAddressSearchInput(value);
@@ -351,7 +369,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                         min={1}
                         max={30}
                         step={1}
-                        label="Duration"
+                        label='Duration'
                       />
                     </FormControl>
                     <FormDescription>
@@ -391,15 +409,15 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
               />
             </div>
           </TabsContent>
-          
-          <TabsContent value="accommodation" className="space-y-4 mt-2">
-            <div className="flex items-center space-x-2 mb-4">
+
+          <TabsContent value='accommodation' className='mt-2 space-y-4'>
+            <div className='mb-4 flex items-center space-x-2'>
               <FormField
                 control={control}
-                name="stayingWithFriend"
+                name='stayingWithFriend'
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
+                  <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
+                    <div className='space-y-0.5'>
                       <FormLabel>Staying with a friend?</FormLabel>
                       <FormDescription>
                         Toggle this if you'll be staying at a friend's place
@@ -415,7 +433,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                 )}
               />
             </div>
-            
+
             {stayingWithFriend ? (
               <FriendAccommodationSelector
                 friends={friends || []}
@@ -426,60 +444,61 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
                 onRefresh={refetchFriends}
               />
             ) : (
-              location && days && (
-                <AccommodationSelector
+              location &&
+              days && (
+                <AccommodationForm
                   location={location}
-                  days={days}
-                  selectedAccommodation={selectedAccommodation || null}
-                  onSelectAccommodation={handleAccommodationSelect}
+                  onSubmit={handleAccommodationSubmit}
                 />
               )
             )}
           </TabsContent>
-          
-          <TabsContent value="transport" className="space-y-4 mt-2">
+
+          <TabsContent value='transport' className='mt-2 space-y-4'>
             {previousDestination && location && days && (
-              <TransportSelector
+              <ManualTransportForm
+                onSubmit={handleTransportSelect}
                 fromLocation={previousDestination.location}
                 toLocation={location}
-                days={days}
-                selectedTransport={selectedTransport || null}
-                onSelectTransport={handleTransportSelect}
               />
             )}
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-between mt-4">
-          {activeTab !== "details" && (
+        <div className='mt-4 flex justify-between'>
+          {activeTab !== 'details' && (
             <button
-              type="button"
-              className="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
-              onClick={() => setActiveTab(activeTab === "accommodation" ? "details" : "accommodation")}
+              type='button'
+              className='rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300'
+              onClick={() =>
+                setActiveTab(
+                  activeTab === 'accommodation' ? 'details' : 'accommodation'
+                )
+              }
             >
               Back
             </button>
           )}
-          
-          {activeTab !== "transport" ? (
+
+          {activeTab !== 'transport' ? (
             <button
-              type="button"
-              className="px-4 py-2 bg-blue-500 rounded-md text-white hover:bg-blue-600 ml-auto"
+              type='button'
+              className='ml-auto rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
               onClick={() => {
-                if (activeTab === "details" && location && days) {
-                  setActiveTab("accommodation");
-                } else if (activeTab === "accommodation") {
-                  setActiveTab("transport");
+                if (activeTab === 'details' && location && days) {
+                  setActiveTab('accommodation');
+                } else if (activeTab === 'accommodation') {
+                  setActiveTab('transport');
                 }
               }}
-              disabled={activeTab === "details" && (!location || !days)}
+              disabled={activeTab === 'details' && (!location || !days)}
             >
               Next
             </button>
           ) : (
             <button
               id='add-destination'
-              className='px-4 py-2 bg-green-500 rounded-md text-white hover:bg-green-600 ml-auto'
+              className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
               type='submit'
               disabled={!isValid}
             >

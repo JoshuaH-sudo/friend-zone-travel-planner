@@ -5,7 +5,6 @@ import AddDestinationForm from './addDestinationForm';
 import DestinationList from './destinationsList';
 import LocationMap, { Poi } from './locationMap';
 import RouteNameInput from './routeNameInput';
-import PricingPanel from './pricingPanel';
 
 export interface RouteClientWrapperProps {
   routeId: string;
@@ -26,13 +25,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
   locations,
   previousDestination,
 }) => {
-  // State for sharing form data with pricing panel
-  const [currentDestination, setCurrentDestination] = useState<{
-    location?: string;
-    checkInDate?: string;
-    checkOutDate?: string;
-  }>({});
-
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
@@ -45,7 +37,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
       </div>
       <div
         id='trip-details'
-        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2'
+        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
       >
         <div
           id='route-list'
@@ -60,19 +52,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
         >
           <AddDestinationForm 
             routeId={routeId} 
-            onDestinationChange={setCurrentDestination}
-            previousDestination={previousDestination}
-          />
-        </div>
-
-        <div
-          id='pricing-panel'
-          className='bg-card rounded-lg border p-2'
-        >
-          <PricingPanel 
-            location={currentDestination.location}
-            checkInDate={currentDestination.checkInDate}
-            checkOutDate={currentDestination.checkOutDate}
             previousDestination={previousDestination}
           />
         </div>

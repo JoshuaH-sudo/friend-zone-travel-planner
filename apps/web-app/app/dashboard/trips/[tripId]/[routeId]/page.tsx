@@ -33,8 +33,8 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
         location,
         latitude,
         longitude,
-        start_date,
-        end_date
+        order,
+        days
       )
     `
     )

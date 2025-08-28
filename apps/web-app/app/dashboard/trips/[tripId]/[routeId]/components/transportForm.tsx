@@ -3,7 +3,6 @@
 import { FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { z } from 'zod';
@@ -11,41 +10,49 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
-const accommodationSchema = z.object({
+const transportSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  address: z.string().min(1, 'Address is required'),
+  address: z.string().min(1, 'Route is required'),
   cost: z.coerce.number().min(0, 'Cost must be a positive number'),
   currency: z.enum(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD']),
   href: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
+  type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
+  departureTime: z.string().optional(),
+  arrivalTime: z.string().optional(),
+  duration: z.coerce.number().min(0).optional(),
 });
 
-type AccommodationFormValues = z.infer<typeof accommodationSchema>;
+type TransportFormValues = z.infer<typeof transportSchema>;
 
-export interface ManualAccommodationFormProps {
-  onSubmit: (values: AccommodationFormValues) => void;
-  defaultValues?: Partial<AccommodationFormValues>;
-  location?: string;
+export interface TransportFormProps {
+  onSubmit: (values: TransportFormValues) => void;
+  defaultValues?: Partial<TransportFormValues>;
+  fromLocation?: string;
+  toLocation?: string;
 }
 
-const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
+const TransportForm: FC<TransportFormProps> = ({
   onSubmit,
   defaultValues,
-  location,
+  fromLocation,
+  toLocation,
 }) => {
-  const form = useForm<AccommodationFormValues>({
-    resolver: zodResolver(accommodationSchema),
+  const form = useForm<TransportFormValues>({
+    resolver: zodResolver(transportSchema),
     defaultValues: {
       name: defaultValues?.name || '',
-      address: defaultValues?.address || location || '',
+      address: defaultValues?.address || (fromLocation && toLocation ? `${fromLocation} to ${toLocation}` : ''),
       cost: defaultValues?.cost || 0,
       currency: defaultValues?.currency || 'USD',
       href: defaultValues?.href || '',
-      type: defaultValues?.type || 'hotel',
+      type: defaultValues?.type || 'airplane',
+      departureTime: defaultValues?.departureTime || '',
+      arrivalTime: defaultValues?.arrivalTime || '',
+      duration: defaultValues?.duration || 0,
     },
   });
 
-  const handleSubmit = (values: AccommodationFormValues) => {
+  const handleSubmit = (values: TransportFormValues) => {
     onSubmit(values);
     form.reset();
   };
@@ -53,7 +60,7 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Add Accommodation Details</CardTitle>
+        <CardTitle className="text-lg">Add Transport Details</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -63,9 +70,9 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Provider Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Hotel name" {...field} />
+                    <Input placeholder="Airline/Company name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,9 +84,9 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>Route</FormLabel>
                   <FormControl>
-                    <Input placeholder="Address" {...field} />
+                    <Input placeholder="From → To" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,7 +99,7 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
                 name="cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cost per night</FormLabel>
+                    <FormLabel>Cost</FormLabel>
                     <FormControl>
                       <Input type="number" min="0" step="0.01" {...field} />
                     </FormControl>
@@ -150,7 +157,7 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Accommodation Type</FormLabel>
+                  <FormLabel>Transport Type</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -158,11 +165,11 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="hotel">Hotel</SelectItem>
-                      <SelectItem value="motel">Motel</SelectItem>
-                      <SelectItem value="hostel">Hostel</SelectItem>
-                      <SelectItem value="airbnb">Airbnb</SelectItem>
-                      <SelectItem value="friend">Friend's Place</SelectItem>
+                      <SelectItem value="airplane">Airplane</SelectItem>
+                      <SelectItem value="bus">Bus</SelectItem>
+                      <SelectItem value="car">Car</SelectItem>
+                      <SelectItem value="train">Train</SelectItem>
+                      <SelectItem value="ferry">Ferry</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
@@ -171,7 +178,51 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
               )}
             />
 
-            <Button type="submit" className="w-full">Add Accommodation</Button>
+            <div className="grid grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="departureTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Departure Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="arrivalTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Arrival Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duration (hours)</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.5" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button type="submit" className="w-full">Add Transport</Button>
           </form>
         </Form>
       </CardContent>
@@ -179,5 +230,5 @@ const ManualAccommodationForm: FC<ManualAccommodationFormProps> = ({
   );
 };
 
-export default ManualAccommodationForm;
+export default TransportForm;
 
