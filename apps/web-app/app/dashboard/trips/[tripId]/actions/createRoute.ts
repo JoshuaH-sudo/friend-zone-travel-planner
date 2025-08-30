@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
+import { Database } from '@/lib/supabase/database.types';
 
 interface CreateRouteData {
   name: string
@@ -22,7 +23,7 @@ export async function createRoute(data: CreateRouteData) {
   // Verify the trip belongs to the user
   const { data: trip, error: tripError } = await supabase
     .from('trips')
-    .select('id')
+    .select('id, start_date, end_date')
     .eq('id', data.tripId)
     .eq('user_id', user.id)
     .single()
@@ -31,9 +32,11 @@ export async function createRoute(data: CreateRouteData) {
     throw new Error('Trip not found or access denied')
   }
 
-  const routeData: any = {
+  const routeData: Database['public']['Tables']['routes']['Insert'] = {
     name: data.name,
     trip_id: data.tripId,
+    date_from: trip.start_date,
+    date_to: trip.end_date,
   };
 
   // Add date range if provided
