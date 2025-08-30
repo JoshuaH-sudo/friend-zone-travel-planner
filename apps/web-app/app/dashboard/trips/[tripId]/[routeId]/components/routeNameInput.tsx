@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Check, X, Edit, Loader2 } from 'lucide-react';
 import useUpdateRouteName from '../hooks/useUpdateRouteName';
+import { DateRange } from 'react-day-picker';
+import useGetRouteById from '../../hooks/useGetRouteById';
+import { DateRangeInput } from '@/components/ui/dateRangeInput';
 
 interface RouteNameInputProps {
   routeId: string;
@@ -17,6 +20,11 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(initialName);
   const [tempName, setTempName] = useState(initialName);
+  const { data: route } = useGetRouteById({ routeId });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: route?.date_from ? new Date(route.date_from) : new Date(),
+    to: route?.date_to ? new Date(route.date_to) : undefined,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const params = useParams();
   const tripId = params.tripId as string;
@@ -62,7 +70,10 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   // Handle click outside to exit edit mode
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         if (isEditing && !updateRouteMutation.isPending) {
           handleCancel();
         }
@@ -94,7 +105,7 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
               autoFocus
               disabled={updateRouteMutation.isPending}
             />
-            <div className='flex gap-1 animate-in slide-in-from-left-3 duration-300 ease-out'>
+            <div className='animate-in slide-in-from-left-3 flex gap-1 duration-300 ease-out'>
               <Button
                 size='sm'
                 variant='outline'
@@ -138,11 +149,14 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
             </Button>
           </>
         )}
-        
+        <DateRangeInput
+          dates={dateRange}
+          onSelect={setDateRange}
+          label='Route Duration'
+        />
       </div>
     </div>
   );
 };
 
 export default RouteNameInput;
-

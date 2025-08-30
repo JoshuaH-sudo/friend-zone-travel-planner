@@ -44,24 +44,7 @@ export default async function TripDetails({
     console.error('Error fetching routes:', routesError);
   }
 
-  // Transform the data to match the expected interface
-  const transformedTrip = {
-    id: trip.id,
-    name: trip.name,
-    startDate: trip.start_date ? new Date(trip.start_date) : undefined,
-    endDate: trip.end_date ? new Date(trip.end_date) : undefined,
-  };
-
-  const transformedRoutes = (routes || []).map((route) => ({
-    id: route.id,
-    name: route.name,
-  }));
-
   return (
-    <TripOverviewClient
-      trip={transformedTrip}
-      routes={transformedRoutes}
-      tripId={tripId}
-    />
+    <TripOverviewClient trip={trip} routes={routes || []} tripId={tripId} />
   );
 }

@@ -35,6 +35,7 @@ export async function createRoute(data: CreateRouteData) {
   const routeData: Database['public']['Tables']['routes']['Insert'] = {
     name: data.name,
     trip_id: data.tripId,
+    // Should share the same date range as the trip initially
     date_from: trip.start_date,
     date_to: trip.end_date,
   };

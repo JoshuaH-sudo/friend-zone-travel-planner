@@ -10,24 +10,29 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
+import { Database } from '@/lib/supabase/database.types';
 
-const CreateRouteButton = ({ tripId }: { tripId: string }) => {
+export interface CreateRouteButtonProps {
+  trip: Database['public']['Tables']['trips']['Row'];
+}
+
+const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
   const [open, setOpen] = useState(false);
   const [routeName, setRouteName] = useState('New Route');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: undefined,
+    from: new Date(trip.start_date),
+    to: new Date(trip.end_date)
   });
 
   const createRouteHandler = async () => {
     const newRoute = await createRoute({
       name: routeName,
-      tripId: tripId,
+      tripId: trip.id,
       dateFrom: dateRange?.from,
       dateTo: dateRange?.to,
     });
     setOpen(false);
-    redirect(`./${tripId}/${newRoute.id}`);
+    redirect(`./${trip.id}/${newRoute.id}`);
   };
 
   return (
@@ -56,7 +61,7 @@ const CreateRouteButton = ({ tripId }: { tripId: string }) => {
             <DateRangeInput
               dates={dateRange}
               onSelect={setDateRange}
-              label="Trip Duration"
+              label="Route Duration"
             />
           </div>
           <Button onClick={createRouteHandler} className="w-full">

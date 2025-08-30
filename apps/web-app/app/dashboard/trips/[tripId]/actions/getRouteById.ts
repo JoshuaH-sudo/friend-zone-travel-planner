@@ -24,6 +24,8 @@ export async function getRouteById({ routeId }: GetRouteByIdParams) {
       trip_id,
       created_at,
       updated_at,
+      date_to,
+      date_from,
       destinations (
         id,
         location,
