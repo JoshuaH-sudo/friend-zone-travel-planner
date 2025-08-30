@@ -18,6 +18,7 @@ import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 import { differenceInDays } from 'date-fns';
+import useGetRouteById from '../../hooks/useGetRouteById';
 
 interface DestinationFormProps {
   routeId: string;
@@ -30,7 +31,7 @@ const DestinationForm = ({ routeId }: DestinationFormProps) => {
     from: new Date(),
     to: undefined,
   });
-  const {} = useGetRout
+  const { data: route } = useGetRouteById({ routeId });
 
   const { setValue, control, watch } = useFormContext();
   const days = watch('days');
