@@ -15,12 +15,25 @@ import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
 import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useFormContext } from 'react-hook-form';
+import { DateRangeInput } from '@/components/ui/dateRangeInput';
+import { DateRange } from 'react-day-picker';
+import { differenceInDays } from 'date-fns';
 
-const DestinationForm = () => {
+interface DestinationFormProps {
+  routeId: string;
+}
+
+const DestinationForm = ({ routeId }: DestinationFormProps) => {
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: undefined,
+  });
+  const {} = useGetRout
 
-  const { setValue, control } = useFormContext();
+  const { setValue, control, watch } = useFormContext();
+  const days = watch('days');
 
   const [debouncedValue] = useDebouncedValue(addressSearchInput, {
     wait: 1000,
@@ -49,6 +62,26 @@ const DestinationForm = () => {
       setValue('longitude', coordinates.geometry.location.lng);
     }
   }, [coordinates, setValue]);
+
+  // Set the initial date range from the provided days form
+  useEffect(() => {
+    if (days && days > 0) {
+      const today = new Date();
+      const from = today;
+      const to = new Date(today);
+      to.setDate(to.getDate() + days);
+      setDateRange({ from, to });
+    }
+  }, [days, setValue]);
+
+  // Set the number of days from the selectedDate
+  const setDurationFromDates = (dates?: DateRange) => {
+    if (dates?.from && dates?.to) {
+      const days = differenceInDays(dates.to, dates.from) + 1;
+      setValue('days', days);
+    }
+  };
+
   return (
     <div className='space-y-6 py-2'>
       <FormField
@@ -94,7 +127,11 @@ const DestinationForm = () => {
           </FormItem>
         )}
       />
-
+      <DateRangeInput
+        dates={dateRange}
+        onSelect={setDurationFromDates}
+        label='Dates'
+      />
       <FormField
         control={control}
         name='days'

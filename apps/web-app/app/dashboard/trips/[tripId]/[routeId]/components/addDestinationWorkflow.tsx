@@ -263,7 +263,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           </TabsList>
 
           <TabsContent value='destination' className='mt-2 space-y-4'>
-            <DestinationForm />
+            <DestinationForm routeId={routeId} />
           </TabsContent>
 
           <TabsContent value='accommodation' className='mt-2 space-y-4'>

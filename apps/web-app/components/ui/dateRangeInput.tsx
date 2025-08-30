@@ -8,8 +8,8 @@ import { cn } from '@/lib/utils';
 
 interface DateRangeInputProps {
   className?: string;
-  dates: DateRange;
-  onSelect: (dates: DateRange | undefined) => void;
+  dates?: DateRange ;
+  onSelect: (dates?: DateRange) => void;
   label?: string;
 }
 
