@@ -27,38 +27,28 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
-        id='route-name-section'
-        className='mb-4 flex flex-row items-end justify-between gap-2'
-      >
-        <div className='grow space-y-2'>
-          <RouteNameInput routeId={routeId} initialName={initialRouteName} />
-        </div>
-      </div>
-      <div
         id='trip-details'
-        className='grid h-2/3 gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+        className='grid h-2/3 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
       >
-        <div
-          id='route-list'
-          className='bg-card rounded-lg border p-2'
-        >
-          <DestinationList routeId={routeId} />
+        <div className='flex flex-col gap-4'>
+          <RouteNameInput routeId={routeId} initialName={initialRouteName} />
+
+          <div id='route-list' className='bg-card grow rounded-lg border p-2'>
+            <DestinationList routeId={routeId} />
+          </div>
         </div>
 
         <div
           id='destination-details'
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'
         >
-          <AddDestinationWorkflow 
-            routeId={routeId} 
+          <AddDestinationWorkflow
+            routeId={routeId}
             previousDestination={previousDestination}
           />
         </div>
 
-        <div
-          id='map-overview'
-          className='bg-card rounded-lg border'
-        >
+        <div id='map-overview' className='bg-card rounded-lg border'>
           <LocationMap locations={locations} />
         </div>
       </div>

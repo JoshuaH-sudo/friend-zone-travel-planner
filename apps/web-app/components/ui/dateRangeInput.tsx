@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { DatePickerWithRange } from '@/components/ui/datePickerWithRange';
 import { DateRange } from 'react-day-picker';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface DateRangeInputProps {
@@ -35,9 +35,6 @@ export function DateRangeInput({
         {daysInRange > 0 && (
           <p className="text-xs text-muted-foreground mt-1">
             {daysInRange} {daysInRange === 1 ? 'day' : 'days'} total
-            {dates?.from && dates?.to && (
-              <> ({format(dates.from, 'MMM d')} - {format(dates.to, 'MMM d, yyyy')})</>
-            )}
           </p>
         )}
       </div>

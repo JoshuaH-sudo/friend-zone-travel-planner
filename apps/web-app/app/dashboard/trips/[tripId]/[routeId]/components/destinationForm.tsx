@@ -140,9 +140,9 @@ const DestinationForm = ({ routeId }: DestinationFormProps) => {
           <FormItem>
             <FormControl>
               <DaysSlider
-                value={field.value || 1}
+                value={field.value}
                 onChange={field.onChange}
-                min={1}
+                min={0}
                 max={30}
                 step={1}
                 label='Duration'

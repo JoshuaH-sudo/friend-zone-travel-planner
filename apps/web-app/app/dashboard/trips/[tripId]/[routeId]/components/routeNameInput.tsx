@@ -90,71 +90,73 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   }, [isEditing, updateRouteMutation.isPending]);
 
   return (
-    <div className='grow space-y-2'>
-      <Label htmlFor='route-name'>Route Name</Label>
-      <div ref={containerRef} className='flex items-center gap-2'>
-        {isEditing ? (
-          <>
-            <Input
-              id='route-name'
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder='Enter route name'
-              className='max-w-md'
-              autoFocus
-              disabled={updateRouteMutation.isPending}
-            />
-            <div className='animate-in slide-in-from-left-3 flex gap-1 duration-300 ease-out'>
+    <div className='flex flex-col gap-2'>
+      <div>
+        <Label htmlFor='route-name'>Route Name</Label>
+        <div ref={containerRef} className='flex items-center gap-2'>
+          {isEditing ? (
+            <>
+              <Input
+                id='route-name'
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder='Enter route name'
+                className='max-w-md'
+                autoFocus
+                disabled={updateRouteMutation.isPending}
+              />
+              <div className='animate-in slide-in-from-left-3 flex gap-1 duration-300 ease-out'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleSave}
+                  disabled={updateRouteMutation.isPending}
+                  className='transition-all duration-200 hover:scale-105'
+                >
+                  {updateRouteMutation.isPending ? (
+                    <Loader2 className='h-4 w-4 animate-spin' />
+                  ) : (
+                    <Check className='h-4 w-4' />
+                  )}
+                </Button>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleCancel}
+                  disabled={updateRouteMutation.isPending}
+                  className='transition-all duration-200 hover:scale-105'
+                >
+                  <X className='h-4 w-4' />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Input
+                id='route-name'
+                value={name}
+                readOnly
+                className='max-w-md cursor-pointer'
+                onClick={() => setIsEditing(true)}
+              />
               <Button
                 size='sm'
                 variant='outline'
-                onClick={handleSave}
-                disabled={updateRouteMutation.isPending}
+                onClick={() => setIsEditing(true)}
                 className='transition-all duration-200 hover:scale-105'
               >
-                {updateRouteMutation.isPending ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
-                ) : (
-                  <Check className='h-4 w-4' />
-                )}
+                <Edit className='h-4 w-4' />
               </Button>
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={handleCancel}
-                disabled={updateRouteMutation.isPending}
-                className='transition-all duration-200 hover:scale-105'
-              >
-                <X className='h-4 w-4' />
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <Input
-              id='route-name'
-              value={name}
-              readOnly
-              className='max-w-md cursor-pointer'
-              onClick={() => setIsEditing(true)}
-            />
-            <Button
-              size='sm'
-              variant='outline'
-              onClick={() => setIsEditing(true)}
-              className='transition-all duration-200 hover:scale-105'
-            >
-              <Edit className='h-4 w-4' />
-            </Button>
-          </>
-        )}
-        <DateRangeInput
-          dates={dateRange}
-          onSelect={setDateRange}
-          label='Route Duration'
-        />
+            </>
+          )}
+        </div>
       </div>
+      <DateRangeInput
+        dates={dateRange}
+        onSelect={setDateRange}
+        label='Route Duration'
+      />
     </div>
   );
 };
