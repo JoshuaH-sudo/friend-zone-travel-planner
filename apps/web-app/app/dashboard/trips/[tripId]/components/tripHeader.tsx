@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin } from 'lucide-react';
-import { format, differenceInDays } from 'date-fns';
+import { format, formatDistance } from 'date-fns';
 import { TripByIdResponse } from '../../hooks/useGetTripById';
 
 interface TripHeaderProps {
@@ -10,8 +10,7 @@ interface TripHeaderProps {
 const TripHeader = ({ trip }: TripHeaderProps) => {
   const formattedStartDate = format(trip.start_date, 'MMM d, yyyy');
   const formattedEndDate = format(trip.end_date, 'MMM d, yyyy');
-
-  const tripDuration = `${differenceInDays(trip.end_date, trip.start_date)} day${differenceInDays(trip.end_date, trip.start_date) !== 1 ? 's' : ''}`;
+  const tripDuration = formatDistance(trip.start_date, trip.end_date);
 
   return (
     <div className='border-b'>
