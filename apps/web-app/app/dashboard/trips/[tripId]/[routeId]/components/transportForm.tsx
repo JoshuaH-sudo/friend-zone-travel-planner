@@ -4,75 +4,44 @@ import { FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useFormContext } from 'react-hook-form';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { NewDestinationForm } from './addDestinationWorkflow';
 
-const transportSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  address: z.string().min(1, 'Route is required'),
-  cost: z.coerce.number().min(0, 'Cost must be a positive number'),
-  currency: z.enum(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD']),
-  href: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-  departureTime: z.string().optional(),
-  arrivalTime: z.string().optional(),
-  duration: z.coerce.number().min(0).optional(),
-});
-
-type TransportFormValues = z.infer<typeof transportSchema>;
-
-export interface TransportFormProps {
-  onSubmit: (values: TransportFormValues) => void;
-  defaultValues?: Partial<TransportFormValues>;
-  fromLocation?: string;
-  toLocation?: string;
-}
-
-const TransportForm: FC<TransportFormProps> = ({
-  onSubmit,
-  defaultValues,
-  fromLocation,
-  toLocation,
-}) => {
-  const form = useForm<TransportFormValues>({
-    resolver: zodResolver(transportSchema),
-    defaultValues: {
-      name: defaultValues?.name || '',
-      address: defaultValues?.address || (fromLocation && toLocation ? `${fromLocation} to ${toLocation}` : ''),
-      cost: defaultValues?.cost || 0,
-      currency: defaultValues?.currency || 'USD',
-      href: defaultValues?.href || '',
-      type: defaultValues?.type || 'airplane',
-      departureTime: defaultValues?.departureTime || '',
-      arrivalTime: defaultValues?.arrivalTime || '',
-      duration: defaultValues?.duration || 0,
-    },
-  });
-
-  const handleSubmit = (values: TransportFormValues) => {
-    onSubmit(values);
-    form.reset();
-  };
+const TransportForm: FC = () => {
+  const form = useFormContext<NewDestinationForm>();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Add Transport Details</CardTitle>
+        <CardTitle className='text-lg'>Add Transport Details</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form className='space-y-4'>
             <FormField
               control={form.control}
-              name="name"
+              name='transport.name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Provider Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Airline/Company name" {...field} />
+                    <Input placeholder='Airline/Company name' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -81,27 +50,27 @@ const TransportForm: FC<TransportFormProps> = ({
 
             <FormField
               control={form.control}
-              name="address"
+              name='transport.address'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Route</FormLabel>
                   <FormControl>
-                    <Input placeholder="From → To" {...field} />
+                    <Input placeholder='From → To' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="cost"
+                name='transport.cost'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cost</FormLabel>
                     <FormControl>
-                      <Input type="number" min="0" step="0.01" {...field} />
+                      <Input type='number' min='0' step='0.01' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -110,23 +79,26 @@ const TransportForm: FC<TransportFormProps> = ({
 
               <FormField
                 control={form.control}
-                name="currency"
+                name='transport.currency'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select currency" />
+                          <SelectValue placeholder='Select currency' />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="USD">USD ($)</SelectItem>
-                        <SelectItem value="EUR">EUR (€)</SelectItem>
-                        <SelectItem value="GBP">GBP (£)</SelectItem>
-                        <SelectItem value="JPY">JPY (¥)</SelectItem>
-                        <SelectItem value="AUD">AUD (A$)</SelectItem>
-                        <SelectItem value="CAD">CAD (C$)</SelectItem>
+                        <SelectItem value='USD'>USD ($)</SelectItem>
+                        <SelectItem value='EUR'>EUR (€)</SelectItem>
+                        <SelectItem value='GBP'>GBP (£)</SelectItem>
+                        <SelectItem value='JPY'>JPY (¥)</SelectItem>
+                        <SelectItem value='AUD'>AUD (A$)</SelectItem>
+                        <SelectItem value='CAD'>CAD (C$)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -137,12 +109,12 @@ const TransportForm: FC<TransportFormProps> = ({
 
             <FormField
               control={form.control}
-              name="href"
+              name='transport.href'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Website URL (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Input placeholder='https://example.com' {...field} />
                   </FormControl>
                   <FormDescription>
                     Link to booking website or more information
@@ -154,23 +126,26 @@ const TransportForm: FC<TransportFormProps> = ({
 
             <FormField
               control={form.control}
-              name="type"
+              name='transport.type'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Transport Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder='Select type' />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="airplane">Airplane</SelectItem>
-                      <SelectItem value="bus">Bus</SelectItem>
-                      <SelectItem value="car">Car</SelectItem>
-                      <SelectItem value="train">Train</SelectItem>
-                      <SelectItem value="ferry">Ferry</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value='airplane'>Airplane</SelectItem>
+                      <SelectItem value='bus'>Bus</SelectItem>
+                      <SelectItem value='car'>Car</SelectItem>
+                      <SelectItem value='train'>Train</SelectItem>
+                      <SelectItem value='ferry'>Ferry</SelectItem>
+                      <SelectItem value='other'>Other</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -178,15 +153,15 @@ const TransportForm: FC<TransportFormProps> = ({
               )}
             />
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className='grid grid-cols-3 gap-4'>
               <FormField
                 control={form.control}
-                name="departureTime"
+                name='transport.departureAt'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Departure Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <Input type='time' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,12 +170,12 @@ const TransportForm: FC<TransportFormProps> = ({
 
               <FormField
                 control={form.control}
-                name="arrivalTime"
+                name='transport.arrivalAt'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Arrival Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <Input type='time' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -209,12 +184,12 @@ const TransportForm: FC<TransportFormProps> = ({
 
               <FormField
                 control={form.control}
-                name="duration"
+                name='transport.duration'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Duration (hours)</FormLabel>
                     <FormControl>
-                      <Input type="number" min="0" step="0.5" {...field} />
+                      <Input type='number' min='0' step='0.5' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,7 +197,9 @@ const TransportForm: FC<TransportFormProps> = ({
               />
             </div>
 
-            <Button type="submit" className="w-full">Add Transport</Button>
+            <Button type='submit' className='w-full'>
+              Add Transport
+            </Button>
           </form>
         </Form>
       </CardContent>
@@ -231,4 +208,3 @@ const TransportForm: FC<TransportFormProps> = ({
 };
 
 export default TransportForm;
-

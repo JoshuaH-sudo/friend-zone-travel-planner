@@ -59,10 +59,7 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
-  days: z
-    .number()
-    .min(1, 'At least 1 day is required')
-    .max(30, 'Maximum 30 days allowed'),
+  days: z.number(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   stayingWithFriend: z.boolean().default(false),
@@ -95,12 +92,6 @@ const schema = z.object({
 
 export type NewDestinationForm = z.infer<typeof schema>;
 
-const tabs = [
-  { value: 'destination', label: 'Details' },
-  { value: 'accommodation', label: 'Accommodation' },
-  { value: 'transport', label: 'Transport' },
-];
-
 export interface AddDestinationWorkflowProps {
   routeId: string;
   previousDestination?: {
@@ -128,7 +119,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     resolver: zodResolver(schema),
   });
 
-  const { control, handleSubmit, reset, watch, setValue } = form;
+  const { control, handleSubmit, reset, watch, setValue, formState } = form;
+  const { isValid } = formState;
 
   const location = watch('location');
   const days = watch('days');
@@ -171,33 +163,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     });
   };
 
-  // Handle accommodation selection
-  const handleAccommodationSubmit = (accommodation: {
-    name: string;
-    address: string;
-    cost: number;
-    currency: string;
-    href?: string;
-    type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
-  }) => {
-    setValue('accommodation', accommodation);
-  };
-
-  // Handle transport selection
-  const handleTransportSelect = (transport: {
-    name: string;
-    address: string;
-    cost: number;
-    currency: string;
-    href?: string;
-    type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt?: Date;
-    arrivalAt?: Date;
-    duration?: number;
-  }) => {
-    setValue('transport', transport);
-  };
-
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: () => {
       reset();
@@ -235,7 +200,18 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     await addDestinationToRoute(transformedData);
   };
 
+  let tabs = [
+    { value: 'destination', label: 'Details' },
+    { value: 'accommodation', label: 'Accommodation' },
+    { value: 'transport', label: 'Transport' },
+  ];
+
+  // Don't need transport and stuff when it is the starting point.
   const currentTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
+  const isStartDestination = currentTabIndex === 0;
+  const showBackButton = currentTabIndex > 0;
+  const showNextButton = currentTabIndex < tabs.length - 1 && !isStartDestination; 
+
   return (
     <Form {...form}>
       <form
@@ -250,13 +226,18 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           <TabsList
             className={cn(
               'grid w-full',
-              previousDestination ? 'grid-cols-3' : 'grid-cols-2'
+              previousDestination ? 'grid-cols-3' : 'grid-cols-1'
             )}
           >
-            <TabsTrigger value='destination'>Destination</TabsTrigger>
-            <TabsTrigger value='accommodation' disabled={!location || !days}>
-              Accommodation
+            <TabsTrigger value='destination'>{
+              isStartDestination ? 'Starting Point' : 'Details'
+              }
             </TabsTrigger>
+            {previousDestination && (
+              <TabsTrigger value='accommodation' disabled={!location || !days}>
+                Accommodation
+              </TabsTrigger>
+            )}
             {previousDestination && (
               <TabsTrigger
                 value='transport'
@@ -307,47 +288,42 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           </TabsContent>
 
           <TabsContent value='transport' className='mt-2 space-y-4'>
-            {previousDestination && (
-              <ManualTransportForm
-                onSubmit={handleTransportSelect}
-                fromLocation={previousDestination.location}
-                toLocation={location}
-              />
-            )}
+            <ManualTransportForm />
           </TabsContent>
         </Tabs>
 
         <div className='mt-4 flex justify-between'>
-          {currentTabIndex > 0 && (
-            <Button
-              type='button'
-              className='rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300'
-              onClick={() => setActiveTab(tabs[currentTabIndex - 1]?.value)}
-            >
-              Back
-            </Button>
-          )}
+          <Button
+            type='button'
+            className={cn(
+              'rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300',
+              { invisible: !showBackButton }
+            )}
+            onClick={() => setActiveTab(tabs[currentTabIndex - 1]?.value)}
+          >
+            Back
+          </Button>
 
-          {currentTabIndex < tabs.length - 1 && (
-            <Button
-              type='button'
-              className='ml-auto rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600'
-              onClick={() => {
-                setActiveTab(tabs[currentTabIndex + 1]?.value);
-              }}
-            >
-              Next
-            </Button>
-          )}
+          <Button
+            type='submit'
+            className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
+            hidden={!isValid}
+          >
+            Submit
+          </Button>
 
-          {currentTabIndex === tabs.length - 1 && (
-            <Button
-              type='submit'
-              className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
-            >
-              Submit
-            </Button>
-          )}
+          <Button
+            type='button'
+            className={cn(
+              'ml-auto rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600',
+              { invisible: !showNextButton }
+            )}
+            onClick={() => {
+              setActiveTab(tabs[currentTabIndex + 1]?.value);
+            }}
+          >
+            Next
+          </Button>
         </div>
       </form>
     </Form>
