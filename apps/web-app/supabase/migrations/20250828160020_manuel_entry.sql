@@ -21,11 +21,6 @@ WHERE days IS NULL;
 ALTER TABLE destinations
 ALTER COLUMN days SET NOT NULL;
 
--- Drop start_date and end_date columns from destinations
-ALTER TABLE destinations
-DROP COLUMN start_date,
-DROP COLUMN end_date;
-
 -- Add date_from and date_to to trips table if they don't exist
 ALTER TABLE trips
 ADD COLUMN IF NOT EXISTS date_from TIMESTAMP WITH TIME ZONE,

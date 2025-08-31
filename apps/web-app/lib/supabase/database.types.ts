@@ -95,34 +95,40 @@ export type Database = {
         Row: {
           created_at: string | null
           days: number
+          end_date: string
           id: string
           latitude: number
           location: string
           longitude: number
           order: number
           route_id: string
+          start_date: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           days: number
+          end_date: string
           id?: string
           latitude: number
           location: string
           longitude: number
           order: number
           route_id: string
+          start_date: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           days?: number
+          end_date?: string
           id?: string
           latitude?: number
           location?: string
           longitude?: number
           order?: number
           route_id?: string
+          start_date?: string
           updated_at?: string | null
         }
         Relationships: [
