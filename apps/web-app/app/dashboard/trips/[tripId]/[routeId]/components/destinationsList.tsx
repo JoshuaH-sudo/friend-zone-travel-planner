@@ -35,13 +35,16 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
         <div key={destination.id} className='flex flex-col items-center'>
           <div className='flex w-full flex-row items-center gap-2'>
             <div className='flex size-8 items-center justify-center rounded-full bg-gray-200 text-black'>
-              {index + 1}
+              {destination.order}
             </div>
 
             <div className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
               <p className='flex-1'>{destination.location}</p>
-              <p>{destination.startDate.toLocaleDateString()}</p>
-              <p>{destination.endDate.toLocaleDateString()}</p>
+              {destination.order === 1 ? (
+                <p>Start</p>
+              ) : (
+                <p>{destination.days}</p>
+              )}
             </div>
 
             <div className='text-sm text-gray-500'>

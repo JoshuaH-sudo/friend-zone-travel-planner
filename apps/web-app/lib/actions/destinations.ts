@@ -73,13 +73,7 @@ export async function getDestinationsByRouteId(routeId: string) {
   }
 
   // Transform the data to match the expected interface
-  return (destinations || []).map((destination) => ({
-    id: destination.id,
-    location: destination.location,
-    latitude: destination.latitude,
-    longitude: destination.longitude,
-    order: destination.order,
-  }));
+  return destinations || [];
 }
 
 type CreateDestinationData = Omit<
