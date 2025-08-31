@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import TripOverviewClient from './components/tripOverviewClient';
 import { getUser } from '@/lib/auth';
+import useGetTripById from '../hooks/useGetTripById';
 
 export type TripRouteParams = {
   locale: string;
@@ -18,33 +19,15 @@ export default async function TripDetails({
   params: Promise<TripRouteParams>;
 }) {
   const { tripId } = await params;
-  const supabase = await createClient();
-  const user = await getUser();
 
-  // Fetch trip with verification that it belongs to the user
-  const { data: trip, error: tripError } = await supabase
-    .from('trips')
-    .select('*')
-    .eq('id', tripId)
-    .eq('user_id', user.id)
-    .single();
+  const { data: trip, error: tripError } = useGetTripById({ tripId });
 
   if (tripError || !trip) {
+    console.error('Error fetching trip:', tripError);
     notFound();
   }
 
-  // Fetch routes for this trip
-  const { data: routes, error: routesError } = await supabase
-    .from('routes')
-    .select('*')
-    .eq('trip_id', tripId)
-    .order('created_at', { ascending: true });
-
-  if (routesError) {
-    console.error('Error fetching routes:', routesError);
-  }
-
   return (
-    <TripOverviewClient trip={trip} routes={routes || []} tripId={tripId} />
+    <TripOverviewClient trip={trip} routes={trip?.routes || []} tripId={tripId} />
   );
 }

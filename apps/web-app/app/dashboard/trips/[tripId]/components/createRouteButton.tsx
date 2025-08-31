@@ -10,10 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { Database } from '@/lib/supabase/database.types';
+import { TripByIdResponse } from '../../hooks/useGetTripById';
 
 export interface CreateRouteButtonProps {
-  trip: Database['public']['Tables']['trips']['Row'];
+  trip: TripByIdResponse;
 }
 
 const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {

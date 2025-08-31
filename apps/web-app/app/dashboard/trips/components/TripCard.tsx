@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Users, Calendar, Map, Star, Trash2 } from 'lucide-react';
-import { TripWithRoutes } from '../hooks/useGetTripsWithRoutes';
+import { TripsResponse } from '../hooks/useGetTrips';
 
 interface TripCardProps {
-  trip: TripWithRoutes;
-  onViewMap: (trip: TripWithRoutes) => void;
-  onRouteSelect: (trip: TripWithRoutes, routeId: string) => void;
+  trip: TripsResponse;
+  onViewMap: (trip: TripsResponse) => void;
+  onRouteSelect: (trip: TripsResponse, routeId: string) => void;
   onTripClick: (tripId: string) => void;
   onDelete: (trip: { id: string; name: string }) => void;
   selectedRouteId: string | null;

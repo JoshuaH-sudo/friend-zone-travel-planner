@@ -7,9 +7,10 @@ import TripHeader from './tripHeader';
 import TripMap from './tripMap';
 import DeleteRouteDialog from './DeleteRouteDialog';
 import { Database } from '@/lib/supabase/database.types';
+import { TripByIdResponse } from '../../hooks/useGetTripById';
 
 interface TripOverviewClientProps {
-  trip: Database['public']['Tables']['trips']['Row'];
+  trip: TripByIdResponse;
   routes: Database['public']['Tables']['routes']['Row'][];
   tripId: string;
 }
