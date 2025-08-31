@@ -22,6 +22,7 @@ import AccommodationForm from './accommodationForm';
 import ManualTransportForm from './transportForm';
 import { Button } from '@/components/ui/button';
 import DestinationForm from './destinationForm';
+import { cn } from '@/lib/utils';
 
 export interface NewDestination {
   routeId: string;
@@ -92,6 +93,8 @@ const schema = z.object({
     .optional(),
 });
 
+export type NewDestinationForm = z.infer<typeof schema>;
+
 const tabs = [
   { value: 'destination', label: 'Details' },
   { value: 'accommodation', label: 'Accommodation' },
@@ -125,13 +128,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     resolver: zodResolver(schema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-  } = form;
+  const { control, handleSubmit, reset, watch, setValue } = form;
 
   const location = watch('location');
   const days = watch('days');
@@ -245,21 +242,29 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1'
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full h-full'>
-          <TabsList className='grid w-full grid-cols-3'>
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className='h-full w-full'
+        >
+          <TabsList
+            className={cn(
+              'grid w-full',
+              previousDestination ? 'grid-cols-3' : 'grid-cols-2'
+            )}
+          >
             <TabsTrigger value='destination'>Destination</TabsTrigger>
-            <TabsTrigger
-              value='accommodation'
-              disabled={!location || !days}
-            >
+            <TabsTrigger value='accommodation' disabled={!location || !days}>
               Accommodation
             </TabsTrigger>
-            <TabsTrigger
-              value='transport'
-              disabled={!location || !days || !previousDestination}
-            >
-              Transport
-            </TabsTrigger>
+            {previousDestination && (
+              <TabsTrigger
+                value='transport'
+                disabled={!location || !previousDestination}
+              >
+                Transport
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value='destination' className='mt-2 space-y-4'>
@@ -297,18 +302,12 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
                 onSelectFriend={handleFriendSelect}
               />
             ) : (
-              location &&
-              days && (
-                <AccommodationForm
-                  location={location}
-                  onSubmit={handleAccommodationSubmit}
-                />
-              )
+              <AccommodationForm />
             )}
           </TabsContent>
 
           <TabsContent value='transport' className='mt-2 space-y-4'>
-            {previousDestination && location && days && (
+            {previousDestination && (
               <ManualTransportForm
                 onSubmit={handleTransportSelect}
                 fromLocation={previousDestination.location}
@@ -323,9 +322,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             <Button
               type='button'
               className='rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300'
-              onClick={() =>
-                setActiveTab(tabs[currentTabIndex - 1]?.value)
-              }
+              onClick={() => setActiveTab(tabs[currentTabIndex - 1]?.value)}
             >
               Back
             </Button>
@@ -338,9 +335,17 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
               onClick={() => {
                 setActiveTab(tabs[currentTabIndex + 1]?.value);
               }}
-              disabled={activeTab === 'destination' && (!location || !days)}
             >
               Next
+            </Button>
+          )}
+
+          {currentTabIndex === tabs.length - 1 && (
+            <Button
+              type='submit'
+              className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
+            >
+              Submit
             </Button>
           )}
         </div>
