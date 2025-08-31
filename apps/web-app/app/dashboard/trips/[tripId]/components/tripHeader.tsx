@@ -1,35 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin } from 'lucide-react';
-
-interface Trip {
-  id: string;
-  name: string;
-  startDate?: Date;
-  endDate?: Date;
-}
+import { format, differenceInDays } from 'date-fns';
+import { TripByIdResponse } from '../../hooks/useGetTripById';
 
 interface TripHeaderProps {
-  trip: Trip;
+  trip: TripByIdResponse;
 }
 
 const TripHeader = ({ trip }: TripHeaderProps) => {
-  const formatDate = (date: Date | undefined) => {
-    if (!date) return 'Not set';
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date);
-  };
+  const formattedStartDate = format(trip.start_date, 'MMM d, yyyy');
+  const formattedEndDate = format(trip.end_date, 'MMM d, yyyy');
 
-  const getDuration = () => {
-    if (!trip.startDate || !trip.endDate) return null;
-    const diffTime = Math.abs(
-      trip.endDate.getTime() - trip.startDate.getTime()
-    );
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-  };
+  const tripDuration = `${differenceInDays(trip.end_date, trip.start_date)} day${differenceInDays(trip.end_date, trip.start_date) !== 1 ? 's' : ''}`;
 
   return (
     <div className='border-b'>
@@ -45,11 +27,11 @@ const TripHeader = ({ trip }: TripHeaderProps) => {
               <div className='flex items-center gap-2'>
                 <CalendarDays className='h-4 w-4' />
                 <span>
-                  {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                  {formattedStartDate} - {formattedEndDate}
                 </span>
               </div>
               <Badge variant='secondary' className='text-xs'>
-                {getDuration()}
+                {tripDuration}
               </Badge>
             </div>
           </div>
