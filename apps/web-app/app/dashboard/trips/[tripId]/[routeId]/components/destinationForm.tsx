@@ -128,16 +128,18 @@ const DestinationForm = ({ routeId }: DestinationFormProps) => {
           </FormItem>
         )}
       />
-      <DateRangeInput
-        dates={dateRange}
-        onSelect={setDurationFromDates}
-        label='Dates'
-      />
+
       <FormField
         control={control}
         name='days'
         render={({ field }) => (
           <FormItem>
+            <DateRangeInput
+              className='mb-4'
+              dates={field.value !== 0 ? dateRange : undefined}
+              onSelect={setDurationFromDates}
+              label='Dates'
+            />
             <FormControl>
               <DaysSlider
                 value={field.value}
