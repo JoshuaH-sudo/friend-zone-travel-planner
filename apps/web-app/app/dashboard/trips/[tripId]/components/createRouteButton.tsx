@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { createRoute } from '../actions/createRoute';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,10 +19,14 @@ export interface CreateRouteButtonProps {
 const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
   const [open, setOpen] = useState(false);
   const [routeName, setRouteName] = useState('New Route');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(trip.start_date),
-    to: new Date(trip.end_date)
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  useEffect(() => {
+    setDateRange({
+      from: new Date(trip.start_date),
+      to: new Date(trip.end_date)
+    });
+  }, [trip]);
 
   const createRouteHandler = async () => {
     const newRoute = await createRoute({
