@@ -3,13 +3,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import updateTrip from '../actions/updateTrip';
 
-interface UpdateTripData {
-  tripId: string;
-  name?: string;
-  startDate?: Date;
-  endDate?: Date;
-}
-
 interface UseUpdateTripProps {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
