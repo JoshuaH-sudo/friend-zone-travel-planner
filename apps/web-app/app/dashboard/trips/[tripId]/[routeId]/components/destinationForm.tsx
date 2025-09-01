@@ -18,18 +18,27 @@ import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 import { differenceInDays } from 'date-fns';
+import { Database } from '@/lib/supabase/database.types';
 
 interface DestinationFormProps {
   routeId: string;
+  previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
-const DestinationForm = ({ routeId }: DestinationFormProps) => {
+const DestinationForm = ({ previousDestination }: DestinationFormProps) => {
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: undefined,
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  useEffect(() => {
+    if (previousDestination) {
+      // Start date should be the end date of the last destination
+      setDateRange({
+        from: new Date(previousDestination.end_date),
+        to: undefined,
+      });
+    }
+  }, [previousDestination]);
 
   const { setValue, control, watch } = useFormContext();
   const days = watch('days');

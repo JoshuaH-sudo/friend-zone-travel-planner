@@ -5,22 +5,17 @@ import AddDestinationWorkflow from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
 import LocationMap, { Poi } from './locationMap';
 import RouteNameInput from './routeNameInput';
+import { Database } from '@/lib/supabase/database.types';
 
 export interface RouteClientWrapperProps {
-  routeId: string;
+  route: Database['public']['Tables']['routes']['Row'];
   tripId: string;
-  initialRouteName: string;
   locations: Poi[];
-  previousDestination?: {
-    location: string;
-    latitude: number;
-    longitude: number;
-  };
+  previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
 const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
-  routeId,
-  initialRouteName,
+  route,
   locations,
   previousDestination,
 }) => {
@@ -31,10 +26,10 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
         className='grid h-2/3 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
       >
         <div className='flex flex-col gap-4'>
-          <RouteNameInput routeId={routeId} initialName={initialRouteName} />
+          <RouteNameInput routeId={route.id} initialName={route.name} />
 
           <div id='route-list' className='bg-card grow rounded-lg border p-2'>
-            <DestinationList routeId={routeId} />
+            <DestinationList routeId={route.id} />
           </div>
         </div>
 
@@ -43,7 +38,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'
         >
           <AddDestinationWorkflow
-            routeId={routeId}
+            routeId={route.id}
             previousDestination={previousDestination}
           />
         </div>

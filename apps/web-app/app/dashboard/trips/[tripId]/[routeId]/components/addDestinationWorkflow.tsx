@@ -23,6 +23,7 @@ import ManualTransportForm from './transportForm';
 import { Button } from '@/components/ui/button';
 import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
+import { Database } from '@/lib/supabase/database.types';
 
 export interface NewDestination {
   routeId: string;
@@ -94,11 +95,7 @@ export type NewDestinationForm = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
   routeId: string;
-  previousDestination?: {
-    location: string;
-    latitude: number;
-    longitude: number;
-  };
+  previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
@@ -208,7 +205,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
 
   // Don't need transport and stuff when it is the starting point.
   const currentTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
-  const isStartDestination = currentTabIndex === 0;
+  const isStartDestination = !previousDestination;
   const showBackButton = currentTabIndex > 0;
   const showNextButton = currentTabIndex < tabs.length - 1 && !isStartDestination; 
 

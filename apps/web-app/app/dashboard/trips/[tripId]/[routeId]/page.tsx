@@ -30,11 +30,16 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
       ),
       destinations (
         id,
+        route_id,
         location,
         latitude,
         longitude,
         order,
-        days
+        days,
+        start_date,
+        end_date,
+        created_at,
+        updated_at
       )
     `
     )
@@ -55,21 +60,17 @@ export default async function NewRoutePage({ params }: RoutePageProps) {
   }));
 
   // Get the most recent destination to use as previous destination for transport
-  const previousDestination = route.destinations.length > 0 
-    ? route.destinations[route.destinations.length - 1]
-    : undefined;
+  const previousDestination =
+    route.destinations.length > 0
+      ? route.destinations[route.destinations.length - 1]
+      : undefined;
 
   return (
     <RouteClientWrapper
-      routeId={routeId}
+      route={route}
       tripId={route.trips.id}
-      initialRouteName={route.name}
       locations={locations}
-      previousDestination={previousDestination ? {
-        location: previousDestination.location,
-        latitude: previousDestination.latitude,
-        longitude: previousDestination.longitude,
-      } : undefined}
+      previousDestination={previousDestination}
     />
   );
 }
