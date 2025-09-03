@@ -17,8 +17,8 @@ import useGetDateLocale from '@/lib/hooks/useGetDateLocale';
 
 interface DatePickerWithRangeProps {
   className?: string;
-  dates: DateRange;
-  onSelect: (dates: DateRange | undefined) => void;
+  dates?: DateRange;
+  onSelect: (dates?: DateRange) => void;
 }
 
 export function DatePickerWithRange({

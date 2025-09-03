@@ -46,8 +46,6 @@ export function Autocomplete<T>({
   };
 
   const handleSelect = (currentValue: string) => {
-    console.log('Selected value:', currentValue);
-    console.log('Available options:', options);
     const selected = options.find((option) => option.label === currentValue);
     if (selected) {
       onSelect?.(selected.value);

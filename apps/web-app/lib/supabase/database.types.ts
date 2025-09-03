@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -74,6 +94,7 @@ export type Database = {
       destinations: {
         Row: {
           created_at: string | null
+          days: number
           end_date: string
           id: string
           latitude: number
@@ -86,6 +107,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          days: number
           end_date: string
           id?: string
           latitude: number
@@ -98,6 +120,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          days?: number
           end_date?: string
           id?: string
           latitude?: number
@@ -165,6 +188,8 @@ export type Database = {
       routes: {
         Row: {
           created_at: string | null
+          date_from: string | null
+          date_to: string | null
           id: string
           name: string
           trip_id: string
@@ -172,6 +197,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          date_from?: string | null
+          date_to?: string | null
           id?: string
           name: string
           trip_id: string
@@ -179,6 +206,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          date_from?: string | null
+          date_to?: string | null
           id?: string
           name?: string
           trip_id?: string
@@ -253,6 +282,8 @@ export type Database = {
       trips: {
         Row: {
           created_at: string | null
+          date_from: string | null
+          date_to: string | null
           end_date: string
           id: string
           name: string
@@ -262,6 +293,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          date_from?: string | null
+          date_to?: string | null
           end_date: string
           id?: string
           name: string
@@ -271,6 +304,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          date_from?: string | null
+          date_to?: string | null
           end_date?: string
           id?: string
           name?: string
@@ -414,7 +449,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+

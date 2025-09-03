@@ -6,22 +6,12 @@ import RouteCard from './routeCard';
 import TripHeader from './tripHeader';
 import TripMap from './tripMap';
 import DeleteRouteDialog from './DeleteRouteDialog';
-
-interface Trip {
-  id: string;
-  name: string;
-  startDate?: Date;
-  endDate?: Date;
-}
-
-interface Route {
-  id: string;
-  name: string;
-}
+import { Database } from '@/lib/supabase/database.types';
+import { TripByIdResponse } from '../../hooks/useGetTripById';
 
 interface TripOverviewClientProps {
-  trip: Trip;
-  routes: Route[];
+  trip: TripByIdResponse;
+  routes: Database['public']['Tables']['routes']['Row'][];
   tripId: string;
 }
 
@@ -56,7 +46,7 @@ const TripOverviewClient = ({
           <div className='space-y-4 lg:col-span-2'>
             <div className='flex items-center justify-between'>
               <h2 className='text-foreground text-xl font-semibold'>Routes</h2>
-              <CreateRouteButton tripId={tripId} />
+              <CreateRouteButton trip={trip} />
             </div>
 
             {routes.length > 0 ? (
@@ -75,7 +65,7 @@ const TripOverviewClient = ({
             ) : (
               <div className='bg-card rounded-lg border py-12 text-center'>
                 <p className='text-foreground mb-4'>No routes added yet</p>
-                <CreateRouteButton tripId={tripId} />
+                <CreateRouteButton trip={trip} />
               </div>
             )}
           </div>
