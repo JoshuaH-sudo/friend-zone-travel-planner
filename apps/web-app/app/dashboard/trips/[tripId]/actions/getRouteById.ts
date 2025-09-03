@@ -28,6 +28,7 @@ export async function getRouteById({ routeId }: GetRouteByIdParams) {
       date_from,
       destinations (
         id,
+        route_id,
         location,
         latitude,
         longitude,
@@ -35,6 +36,8 @@ export async function getRouteById({ routeId }: GetRouteByIdParams) {
         created_at,
         updated_at,
         days,
+        start_date,
+        end_date,
         friends (
           id,
           name

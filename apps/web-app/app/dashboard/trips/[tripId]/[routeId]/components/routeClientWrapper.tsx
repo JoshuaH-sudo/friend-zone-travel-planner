@@ -3,22 +3,38 @@
 import { FC } from 'react';
 import AddDestinationWorkflow from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
-import LocationMap, { Poi } from './locationMap';
+import LocationMap from './locationMap';
 import RouteNameInput from './routeNameInput';
-import { Database } from '@/lib/supabase/database.types';
+import useGetRouteById from '../../hooks/useGetRouteById';
 
 export interface RouteClientWrapperProps {
-  route: Database['public']['Tables']['routes']['Row'];
   tripId: string;
-  locations: Poi[];
-  previousDestination?: Database['public']['Tables']['destinations']['Row'];
+  routeId: string;
 }
 
-const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
-  route,
-  locations,
-  previousDestination,
-}) => {
+const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
+  const { data: route } = useGetRouteById({
+    routeId,
+  });
+
+  if (!route) {
+    return <div>Loading...</div>;
+  }
+
+  const locations = route.destinations.map((destination) => ({
+    key: destination.id,
+    location: {
+      lat: destination.latitude,
+      lng: destination.longitude,
+    },
+  }));
+
+  // Get the most recent destination to use as previous destination for transport
+  const previousDestination =
+    route.destinations.length > 0
+      ? route.destinations[route.destinations.length - 1]
+      : undefined;
+
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
