@@ -26,12 +26,16 @@ interface DestinationFormProps {
   previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
-const DestinationForm = ({ route, previousDestination }: DestinationFormProps) => {
+const DestinationForm = ({
+  route,
+  previousDestination,
+}: DestinationFormProps) => {
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
+    console.log('Previous destination:', previousDestination);
     if (previousDestination) {
       // Start date should be the end date of the last destination
       setDateRange({
@@ -39,16 +43,16 @@ const DestinationForm = ({ route, previousDestination }: DestinationFormProps) =
         to: undefined,
       });
     } else {
+      console.log('Route start date:', route.date_from);
       // set from to be the route start date
       setDateRange({
         from: new Date(route.date_from!),
         to: undefined,
       });
     }
-  }, [previousDestination, route]);
+  }, [previousDestination?.end_date, route.date_from]);
 
-  const { setValue, control, watch } = useFormContext();
-  const days = watch('days');
+  const { setValue, control } = useFormContext();
 
   const [debouncedValue] = useDebouncedValue(addressSearchInput, {
     wait: 1000,
@@ -78,19 +82,9 @@ const DestinationForm = ({ route, previousDestination }: DestinationFormProps) =
     }
   }, [coordinates, setValue]);
 
-  // Set the initial date range from the provided days form
-  useEffect(() => {
-    if (days && days > 0) {
-      const today = new Date();
-      const from = today;
-      const to = new Date(today);
-      to.setDate(to.getDate() + days);
-      setDateRange({ from, to });
-    }
-  }, [days, setValue]);
-
   // Set the number of days from the selectedDate
   const setDurationFromDates = (dates?: DateRange) => {
+    setDateRange(dates);
     if (dates?.from && dates?.to) {
       const days = differenceInDays(dates.to, dates.from) + 1;
       setValue('days', days);

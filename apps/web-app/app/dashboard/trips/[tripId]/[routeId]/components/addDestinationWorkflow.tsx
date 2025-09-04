@@ -61,6 +61,8 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
   days: z.number(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
@@ -111,7 +113,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     defaultValues: {
       routeId: route.id,
       friendIds: [],
-      days: 3,
+      days: 1,
       stayingWithFriend: false,
     },
     resolver: zodResolver(schema),
