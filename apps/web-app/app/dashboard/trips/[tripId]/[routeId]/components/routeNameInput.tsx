@@ -8,19 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Check, X, Edit, Loader2 } from 'lucide-react';
 import useUpdateRouteName from '../hooks/useUpdateRouteName';
 import { DateRange } from 'react-day-picker';
-import useGetRouteById from '../../hooks/useGetRouteById';
+import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 
 interface RouteNameInputProps {
-  routeId: string;
+  route: GetRouteByIdResponse;
   initialName: string;
 }
 
-const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
+const RouteNameInput = ({ route, initialName }: RouteNameInputProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(initialName);
   const [tempName, setTempName] = useState(initialName);
-  const { data: route } = useGetRouteById({ routeId });
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: route?.date_from ? new Date(route.date_from) : new Date(),
     to: route?.date_to ? new Date(route.date_to) : undefined,
@@ -48,7 +47,7 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
     }
 
     updateRouteMutation.mutate({
-      routeId,
+      routeId: route.id,
       name: tempName.trim(),
       tripId,
     });

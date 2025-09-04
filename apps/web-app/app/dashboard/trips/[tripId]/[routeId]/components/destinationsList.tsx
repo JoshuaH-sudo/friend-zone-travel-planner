@@ -6,13 +6,14 @@ import { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import deleteDestination from '../actions/deleteDestination';
+import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 
 export interface DestinationListProps {
-  routeId: string;
+  route: GetRouteByIdResponse;
 }
 
-const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
-  const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
+const DestinationList: FC<DestinationListProps> = ({ route }) => {
+  const { data: destinations = [] } = useGetDestinationsByRouteId(route.id);
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useMutation({
@@ -21,7 +22,7 @@ const DestinationList: FC<DestinationListProps> = ({ routeId }) => {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['destinations', routeId],
+        queryKey: ['destinations', route.id],
       });
     },
     onError: (error) => {

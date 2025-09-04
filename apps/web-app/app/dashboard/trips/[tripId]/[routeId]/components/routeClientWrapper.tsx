@@ -42,10 +42,10 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
         className='grid h-2/3 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
       >
         <div className='flex flex-col gap-4'>
-          <RouteNameInput routeId={route.id} initialName={route.name} />
+          <RouteNameInput route={route} initialName={route.name} />
 
           <div id='route-list' className='bg-card grow rounded-lg border p-2'>
-            <DestinationList routeId={route.id} />
+            <DestinationList route={route} />
           </div>
         </div>
 
@@ -54,7 +54,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           className='bg-card flex flex-col gap-4 rounded-lg border p-2'
         >
           <AddDestinationWorkflow
-            routeId={route.id}
+            route={route}
             previousDestination={previousDestination}
           />
         </div>

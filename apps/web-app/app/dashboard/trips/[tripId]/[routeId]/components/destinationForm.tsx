@@ -19,13 +19,14 @@ import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 import { differenceInDays } from 'date-fns';
 import { Database } from '@/lib/supabase/database.types';
+import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 
 interface DestinationFormProps {
-  routeId: string;
+  route: GetRouteByIdResponse;
   previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
-const DestinationForm = ({ previousDestination }: DestinationFormProps) => {
+const DestinationForm = ({ route, previousDestination }: DestinationFormProps) => {
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
   const { suggestions } = useAddressAutocomplete(addressSearchInput);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -37,8 +38,14 @@ const DestinationForm = ({ previousDestination }: DestinationFormProps) => {
         from: new Date(previousDestination.end_date),
         to: undefined,
       });
+    } else {
+      // set from to be the route start date
+      setDateRange({
+        from: new Date(route.date_from!),
+        to: undefined,
+      });
     }
-  }, [previousDestination]);
+  }, [previousDestination, route]);
 
   const { setValue, control, watch } = useFormContext();
   const days = watch('days');

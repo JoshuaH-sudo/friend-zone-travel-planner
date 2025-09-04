@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRouteById } from '@/app/dashboard/trips/[tripId]/actions/getRouteById';
 
-export type RouteWithDestinations = Awaited<ReturnType<typeof getRouteById>>;
+export type GetRouteByIdResponse = Awaited<ReturnType<typeof getRouteById>>;
 
 interface UseGetRouteByIdProps {
   routeId: string;

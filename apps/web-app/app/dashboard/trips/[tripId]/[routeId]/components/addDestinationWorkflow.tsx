@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
 import { Database } from '@/lib/supabase/database.types';
+import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 
 export interface NewDestination {
   routeId: string;
@@ -94,12 +95,12 @@ const schema = z.object({
 export type NewDestinationForm = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
-  routeId: string;
+  route: GetRouteByIdResponse;
   previousDestination?: Database['public']['Tables']['destinations']['Row'];
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
-  routeId,
+  route,
   previousDestination,
 }) => {
   const queryClient = useQueryClient();
@@ -108,7 +109,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
 
   const form = useForm<NewDestination>({
     defaultValues: {
-      routeId,
+      routeId: route.id,
       friendIds: [],
       days: 3,
       stayingWithFriend: false,
@@ -165,7 +166,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       reset();
       setActiveTab('destination');
       queryClient.invalidateQueries({
-        queryKey: ['destinations', routeId],
+        queryKey: ['destinations', route.id],
       });
     },
     onError: (error) => {
@@ -246,7 +247,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           </TabsList>
 
           <TabsContent value='destination' className='mt-2 space-y-4'>
-            <DestinationForm routeId={routeId} previousDestination={previousDestination} />
+            <DestinationForm route={route} previousDestination={previousDestination} />
           </TabsContent>
 
           <TabsContent value='accommodation' className='mt-2 space-y-4'>
