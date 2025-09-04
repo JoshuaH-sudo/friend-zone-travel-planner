@@ -91,6 +91,10 @@ const DestinationForm = ({
     }
   };
 
+  const startDateSelection = previousDestination
+    ? new Date(previousDestination.end_date)
+    : new Date(route.date_from!);
+
   return (
     <div className='space-y-6 py-2'>
       <FormField
@@ -148,9 +152,10 @@ const DestinationForm = ({
               onSelect={setDurationFromDates}
               label='Dates'
               calendarProps={{
-                startMonth: previousDestination
-                  ? new Date(previousDestination.start_date)
-                  : new Date(route.date_from!),
+                disabled: {
+                  before: startDateSelection
+                },
+                startMonth: startDateSelection,
               }}
             />
             <FormControl>

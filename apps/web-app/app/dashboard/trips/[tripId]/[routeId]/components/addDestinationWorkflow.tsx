@@ -164,12 +164,13 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   };
 
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
-    onSuccess: () => {
+    onSuccess: async () => {
       reset();
       setActiveTab('destination');
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: ['destinations', route.id],
       });
+      await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
     },
     onError: (error) => {
       console.error('Error adding destination:', error);
@@ -210,7 +211,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const currentTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
   const isStartDestination = !previousDestination;
   const showBackButton = currentTabIndex > 0;
-  const showNextButton = currentTabIndex < tabs.length - 1 && !isStartDestination; 
+  const showNextButton =
+    currentTabIndex < tabs.length - 1 && !isStartDestination;
 
   return (
     <Form {...form}>
@@ -229,9 +231,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
               previousDestination ? 'grid-cols-3' : 'grid-cols-1'
             )}
           >
-            <TabsTrigger value='destination'>{
-              isStartDestination ? 'Starting Point' : 'Details'
-              }
+            <TabsTrigger value='destination'>
+              {isStartDestination ? 'Starting Point' : 'Details'}
             </TabsTrigger>
             {previousDestination && (
               <TabsTrigger value='accommodation' disabled={!location || !days}>
@@ -249,7 +250,10 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           </TabsList>
 
           <TabsContent value='destination' className='mt-2 space-y-4'>
-            <DestinationForm route={route} previousDestination={previousDestination} />
+            <DestinationForm
+              route={route}
+              previousDestination={previousDestination}
+            />
           </TabsContent>
 
           <TabsContent value='accommodation' className='mt-2 space-y-4'>
