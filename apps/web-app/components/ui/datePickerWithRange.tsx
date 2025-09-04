@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { addYears, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
+import { DateRange, DayPicker, DayPickerProps } from 'react-day-picker';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,12 +19,14 @@ interface DatePickerWithRangeProps {
   className?: string;
   dates?: DateRange;
   onSelect: (dates?: DateRange) => void;
+  calendarProps?: DayPickerProps
 }
 
 export function DatePickerWithRange({
   className,
   dates,
   onSelect: setDates,
+  calendarProps,
 }: DatePickerWithRangeProps) {
   const dateLocale = useGetDateLocale();
 
@@ -69,9 +71,10 @@ export function DatePickerWithRange({
             endMonth={addYears(new Date(), 5)}
             locale={dateLocale}
             defaultMonth={dates?.from}
+            numberOfMonths={1}
+            {...calendarProps}
             selected={dates}
             onSelect={setDates}
-            numberOfMonths={1}
           />
         </PopoverContent>
       </Popover>

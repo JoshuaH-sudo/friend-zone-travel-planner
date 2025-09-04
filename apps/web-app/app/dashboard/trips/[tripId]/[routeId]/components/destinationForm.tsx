@@ -147,6 +147,11 @@ const DestinationForm = ({
               dates={field.value !== 0 ? dateRange : undefined}
               onSelect={setDurationFromDates}
               label='Dates'
+              calendarProps={{
+                startMonth: previousDestination
+                  ? new Date(previousDestination.start_date)
+                  : new Date(route.date_from!),
+              }}
             />
             <FormControl>
               <DaysSlider
