@@ -31,7 +31,7 @@ const AccommodationForm: FC = () => {
         <CardTitle className='text-lg'>Add Accommodation Details</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className='space-y-4'>
+        <div className='space-y-4'>
           <Form {...form}>
             <FormField
               control={form.control}
@@ -152,7 +152,7 @@ const AccommodationForm: FC = () => {
               )}
             />
           </Form>
-        </form>
+        </div>
       </CardContent>
     </Card>
   );

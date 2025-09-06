@@ -11,14 +11,14 @@ interface DateRangeInputProps {
   dates?: DateRange;
   onSelect: (dates?: DateRange) => void;
   label?: string;
-  calendarProps?: DayPickerProps
+  calendarProps?: DayPickerProps;
 }
 
 export function DateRangeInput({
   className,
   dates,
   onSelect,
-  label = 'Date Range',
+  label,
   calendarProps,
 }: DateRangeInputProps) {
   // Calculate the number of days in the range
@@ -32,7 +32,13 @@ export function DateRangeInput({
   return (
     <div className={cn('grid gap-1', className)}>
       <div className='flex flex-col'>
-        <span className='mb-1 text-sm font-medium'>{label}</span>
+        <span
+          className={cn('mb-1 text-sm font-medium', {
+            hidden: !label,
+          })}
+        >
+          {label}
+        </span>
         <DatePickerWithRange
           dates={dates}
           onSelect={onSelect}

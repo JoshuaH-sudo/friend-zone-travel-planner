@@ -17,7 +17,7 @@ import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, set } from 'date-fns';
 import { Database } from '@/lib/supabase/database.types';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 
@@ -30,40 +30,31 @@ const DestinationForm = ({
   route,
   previousDestination,
 }: DestinationFormProps) => {
-  const [addressSearchInput, setAddressSearchInput] = useState<string>('');
-  const { suggestions } = useAddressAutocomplete(addressSearchInput);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const { setValue, control, watch } = useFormContext();
+  const address = watch('location');
+  const startDate = watch('startDate');
+  const endDate = watch('endDate');
 
   useEffect(() => {
     console.log('Previous destination:', previousDestination);
     if (previousDestination) {
       // Start date should be the end date of the last destination
-      setDateRange({
-        from: new Date(previousDestination.end_date),
-        to: undefined,
-      });
+      setValue('startDate', new Date(previousDestination.end_date));
     } else {
       console.log('Route start date:', route.date_from);
       // set from to be the route start date
-      setDateRange({
-        from: new Date(route.date_from!),
-        to: undefined,
-      });
+      setValue('startDate', new Date(route.date_from!));
     }
   }, [previousDestination?.end_date, route.date_from]);
 
-  const { setValue, control } = useFormContext();
-
-  const [debouncedValue] = useDebouncedValue(addressSearchInput, {
+  const [debouncedValue] = useDebouncedValue(address, {
     wait: 1000,
   });
-
-  const {
-    data: coordinates,
-    isError,
-    error,
-    refetch,
-  } = useGetAddressCoordinates(debouncedValue, { enabled: false });
+  const { suggestions } = useAddressAutocomplete(debouncedValue);
+  const { data: coordinates, refetch } = useGetAddressCoordinates(
+    debouncedValue,
+    { enabled: false }
+  );
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
@@ -82,18 +73,14 @@ const DestinationForm = ({
     }
   }, [coordinates, setValue]);
 
-  // Handle date range selection
-  useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
-      // Both dates are selected
-      setValue('startDate', dateRange.from);
-      setValue('endDate', dateRange.to);
-    }
-  }, [dateRange, setValue]);
-
   const startDateSelection = previousDestination
     ? new Date(previousDestination.end_date)
     : new Date(route.date_from!);
+
+  const dateRange: DateRange = {
+    from: startDate,
+    to: endDate,
+  };
 
   return (
     <div className='space-y-6 py-2'>
@@ -106,81 +93,59 @@ const DestinationForm = ({
             <FormControl>
               <Autocomplete
                 {...field}
-                value={addressSearchInput}
                 options={suggestions}
                 placeholder='Enter your destination'
                 emptyMessage='No results found'
                 onInputChange={(value) => {
-                  setAddressSearchInput(value);
+                  field.onChange(value);
                 }}
                 onSelect={(suggestion) => {
-                  console.log('Selected suggestion:', suggestion);
                   // Update the form with the selected address
                   const selectedAddress = suggestion.text.text;
-                  setAddressSearchInput(selectedAddress);
-                  setValue('location', selectedAddress);
                   field.onChange(selectedAddress);
                 }}
                 onClear={() => {
-                  setAddressSearchInput('');
-                  setValue('location', '');
                   field.onChange('');
                 }}
               />
             </FormControl>
             <FormDescription>Enter your destination</FormDescription>
             <FormMessage />
-            <FormMessage>
-              {isError && (
-                <span className='text-red-500'>
-                  {error?.message || 'Failed to fetch coordinates'}
-                </span>
-              )}
-            </FormMessage>
           </FormItem>
         )}
       />
 
-      <div className="grid grid-cols-1 gap-4">
-        <FormField
-          control={control}
-          name='startDate'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Start Date</FormLabel>
-              <FormControl>
-                <DateRangeInput
-                  className='mb-2'
-                  dates={dateRange}
-                  onSelect={(dates) => {
-                    setDateRange(dates);
-                    // Update start date when from is selected
-                    if (dates?.from) {
-                      field.onChange(dates.from);
-                      setValue('startDate', dates.from);
-                    }
-                    // Update end date when to is selected
-                    if (dates?.to) {
-                      setValue('endDate', dates.to);
-                    }
-                  }}
-                  label='Trip Dates'
-                  calendarProps={{
-                    disabled: {
-                      before: startDateSelection
-                    },
-                    startMonth: startDateSelection,
-                    mode: "range"
-                  }}
-                />
-              </FormControl>
-              <FormDescription>
-                Select the start and end dates for your stay
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className='grid grid-cols-1 gap-4'>
+        <FormItem>
+          <FormLabel>Dates</FormLabel>
+          <FormControl>
+            <DateRangeInput
+              className='mb-2'
+              dates={dateRange}
+              onSelect={(dates) => {
+                // Update start date when from is selected
+                if (dates?.from) {
+                  setValue('startDate', dates.from);
+                }
+                // Update end date when to is selected
+                if (dates?.to) {
+                  setValue('endDate', dates.to);
+                }
+              }}
+              calendarProps={{
+                disabled: {
+                  before: startDateSelection,
+                },
+                startMonth: startDateSelection,
+                mode: 'range',
+              }}
+            />
+          </FormControl>
+          <FormDescription>
+            Select the start and end dates for your stay
+          </FormDescription>
+          <FormMessage />
+        </FormItem>
       </div>
 
       <FormField
