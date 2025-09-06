@@ -6,6 +6,7 @@ import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { differenceInDays } from 'date-fns';
 import {
   Form,
   FormField,
@@ -30,7 +31,9 @@ export interface NewDestination {
   routeId: string;
   location: string;
   friendIds: string[];
-  days: number;
+  startDate: Date;
+  endDate: Date;
+  days?: number;
   latitude: number;
   longitude: number;
   stayingWithFriend: boolean;
@@ -61,9 +64,9 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  days: z.number(),
+  startDate: z.date({ required_error: "Start date is required" }),
+  endDate: z.date({ required_error: "End date is required" }),
+  days: z.number().optional(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   stayingWithFriend: z.boolean().default(false),
@@ -113,8 +116,13 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     defaultValues: {
       routeId: route.id,
       friendIds: [],
-      days: 1,
       stayingWithFriend: false,
+      startDate: previousDestination 
+        ? new Date(previousDestination.end_date) 
+        : route.date_from ? new Date(route.date_from) : new Date(),
+      endDate: previousDestination 
+        ? new Date(previousDestination.end_date) 
+        : route.date_from ? new Date(route.date_from) : new Date(),
     },
     resolver: zodResolver(schema),
   });
@@ -123,7 +131,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const { isValid } = formState;
 
   const location = watch('location');
-  const days = watch('days');
+  const startDate = watch('startDate');
+  const endDate = watch('endDate');
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
   const selectedAccommodation = watch('accommodation');
@@ -178,14 +187,19 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   });
 
   const onSubmit = async (data: NewDestination) => {
+    // Calculate days based on startDate and endDate
+    const days = differenceInDays(data.endDate, data.startDate) + 1;
+    
     // Transform the form data to match the API expected format
     const transformedData: AddDestinationToRouteProps = {
       routeId: data.routeId,
       location: data.location,
       friendIds: data.friendIds,
-      days: data.days,
+      days: days,
       latitude: data.latitude,
       longitude: data.longitude,
+      startDate: data.startDate,
+      endDate: data.endDate,
     };
 
     // Add accommodation data if selected
@@ -235,7 +249,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
               {isStartDestination ? 'Starting Point' : 'Details'}
             </TabsTrigger>
             {previousDestination && (
-              <TabsTrigger value='accommodation' disabled={!location || !days}>
+              <TabsTrigger value='accommodation' disabled={!location || !startDate || !endDate}>
                 Accommodation
               </TabsTrigger>
             )}

@@ -158,6 +158,8 @@ export interface AddDestinationToRouteProps {
   longitude: number;
   friendIds: string[];
   days: number;
+  startDate: Date;
+  endDate: Date;
   accommodation?: {
     name: string;
     address: string;
@@ -280,20 +282,12 @@ export async function addDestinationToRoute(
     throw new Error('Failed to fetch destinations');
   }
   
-  // Calculate start_date based on previous destination or route date_from
-  let start_date: string;
-  if (destinations && destinations.length > 0) {
-    // Use the end date of the last destination as the start date for this one
-    const lastDestination = destinations[destinations.length - 1];
-    start_date = new Date(lastDestination.end_date).toISOString();
-  } else {
-    // First destination - use the route's date_from or fallback to the current date if null
-    start_date = route.date_from ?? new Date().toISOString();
-  }
+  // Use the provided start and end dates
+  const start_date = data.startDate.toISOString();
+  const end_date = data.endDate.toISOString();
   
-  // Calculate end_date by adding the days to the start_date
-  const end_date = new Date(start_date);
-  end_date.setDate(end_date.getDate() + (data.days - 1)); // -1 because the first day counts
+  // Calculate days based on start and end dates
+  const days = Math.round((new Date(end_date).getTime() - new Date(start_date).getTime()) / (1000 * 60 * 60 * 24)) + 1;
   
   // Update route date_from and date_to based on destinations
   // await updateRouteDateRange(data.routeId, destinations, start_date, end_date.toISOString());
@@ -301,12 +295,12 @@ export async function addDestinationToRoute(
   const destination = await createDestination({
     location: data.location,
     routeId: data.routeId,
-    days: data.days,
+    days: days, // Use the calculated days
     latitude: data.latitude,
     longitude: data.longitude,
     route_id: data.routeId,
     start_date: start_date,
-    end_date: end_date.toISOString(),
+    end_date: end_date,
     updated_at: new Date().toISOString(),
   });
 

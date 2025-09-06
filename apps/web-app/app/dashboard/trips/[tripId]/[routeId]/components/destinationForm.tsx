@@ -82,14 +82,14 @@ const DestinationForm = ({
     }
   }, [coordinates, setValue]);
 
-  // Set the number of days from the selectedDate
-  const setDurationFromDates = (dates?: DateRange) => {
-    setDateRange(dates);
-    if (dates?.from && dates?.to) {
-      const days = differenceInDays(dates.to, dates.from) + 1;
-      setValue('days', days);
+  // Handle date range selection
+  useEffect(() => {
+    if (dateRange?.from && dateRange?.to) {
+      // Both dates are selected
+      setValue('startDate', dateRange.from);
+      setValue('endDate', dateRange.to);
     }
-  };
+  }, [dateRange, setValue]);
 
   const startDateSelection = previousDestination
     ? new Date(previousDestination.end_date)
@@ -141,40 +141,47 @@ const DestinationForm = ({
         )}
       />
 
-      <FormField
-        control={control}
-        name='days'
-        render={({ field }) => (
-          <FormItem>
-            <DateRangeInput
-              className='mb-4'
-              dates={field.value !== 0 ? dateRange : undefined}
-              onSelect={setDurationFromDates}
-              label='Dates'
-              calendarProps={{
-                disabled: {
-                  before: startDateSelection
-                },
-                startMonth: startDateSelection,
-              }}
-            />
-            <FormControl>
-              <DaysSlider
-                value={field.value}
-                onChange={field.onChange}
-                min={0}
-                max={30}
-                step={1}
-                label='Duration'
-              />
-            </FormControl>
-            <FormDescription>
-              Select how many days you'll stay at this destination
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="grid grid-cols-1 gap-4">
+        <FormField
+          control={control}
+          name='startDate'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Start Date</FormLabel>
+              <FormControl>
+                <DateRangeInput
+                  className='mb-2'
+                  dates={dateRange}
+                  onSelect={(dates) => {
+                    setDateRange(dates);
+                    // Update start date when from is selected
+                    if (dates?.from) {
+                      field.onChange(dates.from);
+                      setValue('startDate', dates.from);
+                    }
+                    // Update end date when to is selected
+                    if (dates?.to) {
+                      setValue('endDate', dates.to);
+                    }
+                  }}
+                  label='Trip Dates'
+                  calendarProps={{
+                    disabled: {
+                      before: startDateSelection
+                    },
+                    startMonth: startDateSelection,
+                    mode: "range"
+                  }}
+                />
+              </FormControl>
+              <FormDescription>
+                Select the start and end dates for your stay
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <FormField
         control={control}
