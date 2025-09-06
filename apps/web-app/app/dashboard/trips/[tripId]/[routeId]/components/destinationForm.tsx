@@ -30,41 +30,45 @@ const DestinationForm = ({
   route,
   previousDestination,
 }: DestinationFormProps) => {
-  const { setValue, control, watch } = useFormContext();
+  const {
+    setValue,
+    control,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   const address = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
 
   useEffect(() => {
-    console.log('Previous destination:', previousDestination);
     if (previousDestination) {
       // Start date should be the end date of the last destination
       setValue('startDate', new Date(previousDestination.end_date));
     } else {
-      console.log('Route start date:', route.date_from);
       // set from to be the route start date
       setValue('startDate', new Date(route.date_from!));
     }
   }, [previousDestination?.end_date, route.date_from]);
 
-  const [debouncedValue] = useDebouncedValue(address, {
+  const [debouncedAddressValue] = useDebouncedValue<string>(address, {
     wait: 1000,
   });
-  const { suggestions } = useAddressAutocomplete(debouncedValue);
-  const { data: coordinates, refetch } = useGetAddressCoordinates(
-    debouncedValue,
-    { enabled: false }
+  const { suggestions } = useAddressAutocomplete(address);
+  const { data: coordinates } = useGetAddressCoordinates(
+    debouncedAddressValue,
+    { enabled: debouncedAddressValue.trim().length > 0 }
   );
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
 
   useEffect(() => {
-    if (debouncedValue && debouncedValue.trim().length > 0) {
-      console.log('Refetching coordinates for:', debouncedValue);
-      refetch();
+    // reset lat/lng if address changes
+    if (debouncedAddressValue && debouncedAddressValue.trim().length > 0 && debouncedAddressValue !== address) {
+      setValue('latitude', null);
+      setValue('longitude', null);
     }
-  }, [debouncedValue, refetch]);
+  }, [debouncedAddressValue, address]);
 
   useEffect(() => {
     if (coordinates) {
@@ -84,6 +88,17 @@ const DestinationForm = ({
 
   return (
     <div className='space-y-6 py-2'>
+      {errors && (
+        <div className='rounded-md bg-red-50 p-4'>
+          <div className='flex'>
+            <div className='ml-3'>
+              <h3 className='text-sm font-medium text-red-800'>
+                {JSON.stringify(errors)}
+              </h3>
+            </div>
+          </div>
+        </div>
+      )}
       <FormField
         control={control}
         name='location'
