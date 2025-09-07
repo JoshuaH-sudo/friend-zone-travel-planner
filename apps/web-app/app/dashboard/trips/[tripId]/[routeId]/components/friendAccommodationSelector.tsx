@@ -88,7 +88,7 @@ const FriendAccommodationSelector: FC<FriendAccommodationSelectorProps> = ({
   }
 
   return (
-    <ScrollArea className='h-[300px] pr-4'>
+    <ScrollArea className='w-full'>
       <div className='space-y-2'>
         <h3 className='mb-2 text-sm font-medium'>
           Select a friend to stay with:

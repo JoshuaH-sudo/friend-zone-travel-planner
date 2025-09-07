@@ -32,7 +32,6 @@ const DestinationForm = ({
     setValue,
     control,
     watch,
-    formState: { errors },
   } = useFormContext();
   const address = watch('location');
   const startDate = watch('startDate');
@@ -86,17 +85,6 @@ const DestinationForm = ({
 
   return (
     <div className='space-y-6 py-2'>
-      {errors && (
-        <div className='rounded-md bg-red-50 p-4'>
-          <div className='flex'>
-            <div className='ml-3'>
-              <h3 className='text-sm font-medium text-red-800'>
-                {JSON.stringify(errors)}
-              </h3>
-            </div>
-          </div>
-        </div>
-      )}
       <FormField
         control={control}
         name='location'

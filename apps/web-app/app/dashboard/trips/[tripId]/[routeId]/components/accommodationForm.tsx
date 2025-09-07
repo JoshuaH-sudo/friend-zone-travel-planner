@@ -131,7 +131,7 @@ const AccommodationForm: FC = () => {
                   <FormLabel>Accommodation Type</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>

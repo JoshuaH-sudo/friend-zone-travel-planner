@@ -105,7 +105,7 @@ export type DestinationForm = z.infer<typeof schema>;
 export interface AddDestinationWorkflowProps {
   route: GetRouteByIdResponse;
   previousDestination?: Omit<FullDestination, 'routes'>;
-  destinationToEdit?: DestinationForm
+  destinationToEdit?: DestinationForm;
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
@@ -145,48 +145,21 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   }, [destinationToEdit]);
 
   const { control, handleSubmit, reset, watch, setValue, formState } = form;
-  const { isValid } = formState;
+  const { isValid, errors, validatingFields } = formState;
+  console.log('form errors', errors, validatingFields);
 
   const location = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
-  const selectedAccommodation = watch('accommodation');
   const latitude = watch('latitude');
   const longitude = watch('longitude');
 
-  // Handle staying with friend toggle
-  useEffect(() => {
-    if (stayingWithFriend) {
-      // Clear any selected accommodation when switching to staying with friend
-      setValue('accommodation', undefined);
-    } else {
-      // Clear selected friend when switching to regular accommodation
-      setValue('selectedFriendId', undefined);
-
-      // Clear friend accommodation when switching back
-      if (selectedAccommodation?.type === 'friend') {
-        setValue('accommodation', undefined);
-      }
-    }
-  }, [stayingWithFriend, setValue, selectedAccommodation]);
-
   // Handle friend selection for accommodation
-  const handleFriendSelect = (
-    friendId: string,
-    name: string,
-    address: string
-  ) => {
+  const handleFriendSelect = (friendId: string) => {
     setValue('selectedFriendId', friendId);
-    setValue('accommodation', {
-      name: `Staying with ${name}`,
-      address: address,
-      cost: 0,
-      currency: 'USD',
-      type: 'friend',
-      friendId: friendId,
-    });
+    setValue('accommodation', undefined);
   };
 
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
@@ -291,28 +264,26 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           </TabsContent>
 
           <TabsContent value='accommodation' className='mt-2 space-y-4'>
-            <div className='mb-4 flex items-center space-x-2'>
-              <FormField
-                control={control}
-                name='stayingWithFriend'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
-                    <div className='space-y-0.5'>
-                      <FormLabel>Staying with a friend?</FormLabel>
-                      <FormDescription>
-                        Toggle this if you'll be staying at a friend's place
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={control}
+              name='stayingWithFriend'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
+                  <div className='space-y-0.5'>
+                    <FormLabel>Staying with a friend?</FormLabel>
+                    <FormDescription>
+                      Toggle this if you'll be staying at a friend's place
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             {stayingWithFriend ? (
               <FriendAccommodationSelector
