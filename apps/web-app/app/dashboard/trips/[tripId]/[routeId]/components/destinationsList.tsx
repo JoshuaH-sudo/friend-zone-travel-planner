@@ -1,6 +1,8 @@
 'use client';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId';
+import useGetDestinationsByRouteId, {
+  FullDestination,
+} from '@/lib/hooks/useGetDestinationsByRouteId';
 import { ChevronDown, Trash2 } from 'lucide-react';
 import { FC } from 'react';
 import { Button } from '@/components/ui/button';
@@ -11,9 +13,13 @@ import { format } from 'date-fns';
 
 export interface DestinationListProps {
   route: GetRouteByIdResponse;
+  onDestinationSelect: (destination: FullDestination) => void;
 }
 
-const DestinationList: FC<DestinationListProps> = ({ route }) => {
+const DestinationList: FC<DestinationListProps> = ({
+  route,
+  onDestinationSelect,
+}) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(route.id);
   const queryClient = useQueryClient();
 
@@ -40,7 +46,10 @@ const DestinationList: FC<DestinationListProps> = ({ route }) => {
               {destination.order}
             </div>
 
-            <div className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
+            <div
+              className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'
+              onClick={() => onDestinationSelect(destination)}
+            >
               <p className='flex-1'>{destination.location}</p>
               <p>
                 {format(destination.start_date, 'MMM d')} -{' '}

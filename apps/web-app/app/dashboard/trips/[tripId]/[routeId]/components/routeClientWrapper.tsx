@@ -1,11 +1,12 @@
 'use client';
 
-import { FC } from 'react';
-import AddDestinationWorkflow from './addDestinationWorkflow';
+import { FC, useState } from 'react';
+import AddDestinationWorkflow, { NewDestinationForm } from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
 import LocationMap from './locationMap';
 import RouteNameInput from './routeNameInput';
 import useGetRouteById from '../../hooks/useGetRouteById';
+import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
 export interface RouteClientWrapperProps {
   tripId: string;
@@ -16,6 +17,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
   const { data: route } = useGetRouteById({
     routeId,
   });
+  const [destinationToEdit, setDestinationToEdit] = useState<FullDestination>();
 
   if (!route) {
     return <div>Loading...</div>;
@@ -45,7 +47,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           <RouteNameInput route={route} initialName={route.name} />
 
           <div id='route-list' className='bg-card grow rounded-lg border p-2'>
-            <DestinationList route={route} />
+            <DestinationList route={route} onDestinationSelect={setDestinationToEdit} />
           </div>
         </div>
 
@@ -56,6 +58,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           <AddDestinationWorkflow
             route={route}
             previousDestination={previousDestination}
+            destinationToEdit={destinationToEdit}
           />
         </div>
 

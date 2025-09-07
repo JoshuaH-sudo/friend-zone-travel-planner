@@ -60,6 +60,28 @@ export async function getDestinationsByRouteId(routeId: string) {
           id,
           user_id
         )
+      ),
+      accommodations (
+        id,
+        name,
+        address,
+        cost,
+        currency,
+        href,
+        type,
+        friend_id
+      ),
+      transports (
+        id,
+        name,
+        address,
+        cost,
+        currency,
+        href,
+        type,
+        departure_at,
+        arrival_at,
+        duration
       )
     `
     )

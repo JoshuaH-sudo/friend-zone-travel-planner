@@ -26,6 +26,7 @@ import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
 import { Database } from '@/lib/supabase/database.types';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
+import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
 export interface NewDestination {
   routeId: string;
@@ -64,8 +65,8 @@ const schema = z.object({
   routeId: z.string(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
-  startDate: z.date({ required_error: "Start date is required" }),
-  endDate: z.date({ required_error: "End date is required" }),
+  startDate: z.date({ required_error: 'Start date is required' }),
+  endDate: z.date({ required_error: 'End date is required' }),
   days: z.number().optional(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
@@ -101,29 +102,34 @@ export type NewDestinationForm = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
   route: GetRouteByIdResponse;
-  previousDestination?: Database['public']['Tables']['destinations']['Row'];
+  previousDestination?: Omit<FullDestination, 'routes'>;
+  destinationToEdit?: Omit<FullDestination, 'routes'>;
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   route,
   previousDestination,
+  destinationToEdit = {},
 }) => {
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState<string>('destination');
+  const defaultNewDestination = {
+    routeId: route.id,
+    location: '',
+    friendIds: [],
+    stayingWithFriend: false,
+    startDate: previousDestination
+      ? new Date(previousDestination.end_date)
+      : route.date_from
+        ? new Date(route.date_from)
+        : new Date(),
+  };
 
   const form = useForm<NewDestination>({
     defaultValues: {
-      routeId: route.id,
-      location: '',
-      friendIds: [],
-      stayingWithFriend: false,
-      startDate: previousDestination 
-        ? new Date(previousDestination.end_date) 
-        : route.date_from ? new Date(route.date_from) : new Date(),
-      endDate: previousDestination 
-        ? new Date(previousDestination.end_date) 
-        : route.date_from ? new Date(route.date_from) : new Date(),
+      ...defaultNewDestination,
+      ...destinationToEdit,
     },
     resolver: zodResolver(schema),
   });
@@ -190,7 +196,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const onSubmit = async (data: NewDestination) => {
     // Calculate days based on startDate and endDate
     const days = differenceInDays(data.endDate, data.startDate) + 1;
-    
+
     // Transform the form data to match the API expected format
     const transformedData: AddDestinationToRouteProps = {
       routeId: data.routeId,
@@ -250,7 +256,10 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
               {isStartDestination ? 'Starting Point' : 'Details'}
             </TabsTrigger>
             {previousDestination && (
-              <TabsTrigger value='accommodation' disabled={!location || !startDate || !endDate}>
+              <TabsTrigger
+                value='accommodation'
+                disabled={!location || !startDate || !endDate}
+              >
                 Accommodation
               </TabsTrigger>
             )}
