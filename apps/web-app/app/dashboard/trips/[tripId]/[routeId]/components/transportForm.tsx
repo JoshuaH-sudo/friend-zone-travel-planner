@@ -21,10 +21,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { NewDestinationForm } from './addDestinationWorkflow';
+import { DestinationForm } from './addDestinationWorkflow';
 
 const TransportForm: FC = () => {
-  const form = useFormContext<NewDestinationForm>();
+  const form = useFormContext<DestinationForm>();
 
   return (
     <Card>

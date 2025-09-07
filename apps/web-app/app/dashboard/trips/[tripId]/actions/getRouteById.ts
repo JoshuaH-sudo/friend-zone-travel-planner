@@ -40,7 +40,8 @@ export async function getRouteById({ routeId }: GetRouteByIdParams) {
         end_date,
         friends (
           id,
-          name
+          name,
+          location
         ),
         accommodations (
           id,

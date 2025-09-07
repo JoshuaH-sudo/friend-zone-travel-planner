@@ -61,6 +61,11 @@ export async function getDestinationsByRouteId(routeId: string) {
           user_id
         )
       ),
+      friends (
+        id,
+        name,
+        location
+      ),
       accommodations (
         id,
         name,

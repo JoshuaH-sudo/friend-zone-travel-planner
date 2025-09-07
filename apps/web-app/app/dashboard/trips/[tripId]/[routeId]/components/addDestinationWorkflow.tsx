@@ -62,7 +62,9 @@ export interface NewDestination {
 }
 
 const schema = z.object({
+  id: z.string().optional(),
   routeId: z.string(),
+  order: z.number().optional(),
   location: z.string().min(1, 'Location is required'),
   friendIds: z.array(z.string()),
   startDate: z.date({ required_error: 'Start date is required' }),
@@ -98,12 +100,12 @@ const schema = z.object({
     .optional(),
 });
 
-export type NewDestinationForm = z.infer<typeof schema>;
+export type DestinationForm = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
   route: GetRouteByIdResponse;
   previousDestination?: Omit<FullDestination, 'routes'>;
-  destinationToEdit?: Omit<FullDestination, 'routes'>;
+  destinationToEdit?: DestinationForm
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
@@ -274,7 +276,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             {previousDestination && (
               <TabsTrigger
                 value='transport'
-                disabled={!location || !previousDestination}
+                disabled={!location || !startDate || !endDate}
               >
                 Transport
               </TabsTrigger>

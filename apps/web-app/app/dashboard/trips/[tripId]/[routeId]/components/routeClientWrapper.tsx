@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import AddDestinationWorkflow, { NewDestinationForm } from './addDestinationWorkflow';
+import AddDestinationWorkflow, { DestinationForm } from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
 import LocationMap from './locationMap';
 import RouteNameInput from './routeNameInput';
@@ -17,7 +17,26 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
   const { data: route } = useGetRouteById({
     routeId,
   });
-  const [destinationToEdit, setDestinationToEdit] = useState<FullDestination>();
+  const [destinationToEdit, setDestinationToEdit] = useState<DestinationForm>();
+  const onDestinationSelect = (destination: FullDestination) => {
+    setDestinationToEdit({
+      id: destination.id,
+      routeId: destination.route_id,
+      location: destination.location,
+      latitude: destination.latitude,
+      longitude: destination.longitude,
+      startDate: new Date(destination.start_date),
+      endDate: new Date(destination.end_date),
+      days: destination.days,
+      order: destination.order,
+      stayingWithFriend: destination.friends.length > 0,
+      friendIds: destination.friends.map((friend) => friend.id),
+      //@ts-expect-error - accommodation type is checked in the DB schema
+      accommodation: destination.accommodations[0] || undefined,
+      //@ts-expect-error - transport type is checked in the DB schema
+      transport: destination.transports[0] || undefined,
+    });
+  };
 
   if (!route) {
     return <div>Loading...</div>;
@@ -51,7 +70,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           <RouteNameInput route={route} initialName={route.name} />
 
           <div id='route-list' className='bg-card grow rounded-lg border p-2'>
-            <DestinationList route={route} onDestinationSelect={setDestinationToEdit} />
+            <DestinationList route={route} onDestinationSelect={onDestinationSelect} />
           </div>
         </div>
 
