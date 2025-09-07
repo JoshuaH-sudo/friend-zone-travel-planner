@@ -32,10 +32,14 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
   }));
 
   // Get the most recent destination to use as previous destination for transport
-  const previousDestination =
-    route.destinations.length > 0
-      ? route.destinations[route.destinations.length - 1]
-      : undefined;
+  // If editing an existing destination, use the destination that comes before it in the route
+  // If adding a new destination, use the last destination in the route
+  // If no destinations exist, return undefined
+  const previousDestination = destinationToEdit
+    ? route.destinations[route.destinations.findIndex(d => d.id === destinationToEdit.id) - 1]
+    : route.destinations.length > 0
+    ? route.destinations[route.destinations.length - 1]
+    : undefined;
 
   return (
     <div className='min-h-screen sm:h-[600px]'>

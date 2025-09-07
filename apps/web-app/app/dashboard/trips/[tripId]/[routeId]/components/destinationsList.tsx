@@ -38,7 +38,7 @@ const DestinationList: FC<DestinationListProps> = ({
   });
 
   return (
-    <ScrollArea className='h-full'>
+    <ScrollArea className='h-full py-2'>
       {destinations.map((destination, index) => (
         <div key={destination.id} className='flex flex-col items-center'>
           <div className='flex w-full flex-row items-center gap-2'>
