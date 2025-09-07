@@ -1,6 +1,5 @@
 import { Autocomplete } from '@/components/ui/autocomplete';
 import { Combobox } from '@/components/ui/combo-box';
-import { DaysSlider } from '@/components/ui/daysSlider';
 import {
   FormField,
   FormItem,
@@ -10,14 +9,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
 import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { differenceInDays, set } from 'date-fns';
 import { Database } from '@/lib/supabase/database.types';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 

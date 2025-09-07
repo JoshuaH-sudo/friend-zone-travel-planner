@@ -115,6 +115,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const form = useForm<NewDestination>({
     defaultValues: {
       routeId: route.id,
+      location: '',
       friendIds: [],
       stayingWithFriend: false,
       startDate: previousDestination 
