@@ -109,7 +109,7 @@ export interface AddDestinationWorkflowProps {
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   route,
   previousDestination,
-  destinationToEdit = {},
+  destinationToEdit,
 }) => {
   const queryClient = useQueryClient();
 
@@ -129,10 +129,18 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const form = useForm<NewDestination>({
     defaultValues: {
       ...defaultNewDestination,
-      ...destinationToEdit,
     },
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    if (destinationToEdit && destinationToEdit.id) {
+      // If editing an existing destination, populate the form with its data
+      form.reset({
+        ...destinationToEdit,
+      });
+    }
+  }, [destinationToEdit]);
 
   const { control, handleSubmit, reset, watch, setValue, formState } = form;
   const { isValid } = formState;

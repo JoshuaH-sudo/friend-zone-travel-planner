@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import useGetDestinationsByRouteId, {
   FullDestination,
 } from '@/lib/hooks/useGetDestinationsByRouteId';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -46,10 +46,7 @@ const DestinationList: FC<DestinationListProps> = ({
               {destination.order}
             </div>
 
-            <div
-              className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'
-              onClick={() => onDestinationSelect(destination)}
-            >
+            <div className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
               <p className='flex-1'>{destination.location}</p>
               <p>
                 {format(destination.start_date, 'MMM d')} -{' '}
@@ -59,6 +56,15 @@ const DestinationList: FC<DestinationListProps> = ({
             </div>
 
             <div className='text-sm text-gray-500'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8'
+                onClick={() => onDestinationSelect(destination)}
+                title='Edit destination'
+              >
+                <Edit className='text-muted-foreground h-4 w-4' />
+              </Button>
               <Button
                 variant='ghost'
                 size='icon'
