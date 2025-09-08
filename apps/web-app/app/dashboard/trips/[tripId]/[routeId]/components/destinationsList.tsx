@@ -46,7 +46,10 @@ const DestinationList: FC<DestinationListProps> = ({
               {destination.order}
             </div>
 
-            <div className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-red-400'>
+            <div
+              className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-blue-400'
+              onClick={() => onDestinationSelect(destination)}
+            >
               <p className='flex-1'>{destination.location}</p>
               <p>
                 {format(destination.start_date, 'MMM d')} -{' '}

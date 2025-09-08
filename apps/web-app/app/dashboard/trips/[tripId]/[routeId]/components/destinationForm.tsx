@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
 import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
 import { useDebouncedValue } from '@tanstack/react-pacer';
@@ -18,24 +18,31 @@ import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 import { Database } from '@/lib/supabase/database.types';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
+import { useDebounce } from '@uidotdev/usehooks';
 
 interface DestinationFormProps {
   route: GetRouteByIdResponse;
   previousDestination?: Database['public']['Tables']['destinations']['Row'];
+  disabledInitialLoad?: boolean;
 }
 
 const DestinationForm = ({
   route,
   previousDestination,
+  disabledInitialLoad = false,
 }: DestinationFormProps) => {
-  const {
-    setValue,
-    control,
-    watch,
-  } = useFormContext();
+  const [enableApiCalls, setEnableApiCalls] = useState(!disabledInitialLoad);
+  const { setValue, control, watch } = useFormContext();
   const address = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
+
+  // Enable API calls after initial load if disabled
+  useEffect(() => {
+    if (disabledInitialLoad) {
+      setEnableApiCalls(true);
+    }
+  }, [disabledInitialLoad]);
 
   useEffect(() => {
     if (previousDestination) {
@@ -47,21 +54,36 @@ const DestinationForm = ({
     }
   }, [previousDestination?.end_date, route.date_from]);
 
+  const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
+    wait: 300,
+    enabled: enableApiCalls,
+  });
+  console.log('debouncedAutocompleteInput', debouncedAutocompleteInput);
+  const { suggestions, isLoading } = useAddressAutocomplete(debouncedAutocompleteInput, {
+    enabled: debouncedAutocompleteInput.trim().length > 0 && enableApiCalls,
+  });
+  console.log('loading', isLoading);
+
   const [debouncedAddressValue] = useDebouncedValue<string>(address, {
     wait: 1000,
+    enabled: enableApiCalls,
   });
-  const { suggestions } = useAddressAutocomplete(address);
   const { data: coordinates } = useGetAddressCoordinates(
     debouncedAddressValue,
-    { enabled: debouncedAddressValue.trim().length > 0 }
+    { enabled: debouncedAddressValue.trim().length > 0 && enableApiCalls }
   );
+
   const { data: friends } = useGetFriendsByGeoLocation(
     coordinates?.geometry?.location
   );
 
   useEffect(() => {
     // reset lat/lng if address changes
-    if (debouncedAddressValue && debouncedAddressValue.trim().length > 0 && debouncedAddressValue !== address) {
+    if (
+      debouncedAddressValue &&
+      debouncedAddressValue.trim().length > 0 &&
+      debouncedAddressValue !== address
+    ) {
       setValue('latitude', null);
       setValue('longitude', null);
     }

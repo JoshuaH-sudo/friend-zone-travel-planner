@@ -24,7 +24,6 @@ import ManualTransportForm from './transportForm';
 import { Button } from '@/components/ui/button';
 import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
-import { Database } from '@/lib/supabase/database.types';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
@@ -260,6 +259,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             <DestinationForm
               route={route}
               previousDestination={previousDestination}
+              disabledInitialLoad={!!destinationToEdit}
             />
           </TabsContent>
 
