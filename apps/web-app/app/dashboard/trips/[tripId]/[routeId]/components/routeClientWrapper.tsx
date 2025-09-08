@@ -82,6 +82,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
             route={route}
             previousDestination={previousDestination}
             destinationToEdit={destinationToEdit}
+            onEditComplete={() => setDestinationToEdit(undefined)}
           />
         </div>
 

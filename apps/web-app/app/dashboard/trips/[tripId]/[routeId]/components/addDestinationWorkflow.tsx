@@ -3,6 +3,7 @@
 import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
+import useEditDestination from '../hooks/useEditDestination';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -105,12 +106,14 @@ export interface AddDestinationWorkflowProps {
   route: GetRouteByIdResponse;
   previousDestination?: Omit<FullDestination, 'routes'>;
   destinationToEdit?: DestinationForm;
+  onEditComplete: () => void;
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   route,
   previousDestination,
   destinationToEdit,
+  onEditComplete,
 }) => {
   const queryClient = useQueryClient();
 
@@ -120,11 +123,18 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     location: '',
     friendIds: [],
     stayingWithFriend: false,
+    latitude: 0,
+    longitude: 0,
     startDate: previousDestination
       ? new Date(previousDestination.end_date)
       : route.date_from
         ? new Date(route.date_from)
         : new Date(),
+    endDate: previousDestination
+      ? new Date(new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000) // Add one day
+      : route.date_from
+        ? new Date(new Date(route.date_from).getTime() + 24 * 60 * 60 * 1000) // Add one day
+        : new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // Add one day
   };
 
   const form = useForm<NewDestination>({
@@ -174,6 +184,25 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       console.error('Error adding destination:', error);
     },
   });
+  
+  const { mutateAsync: editDestination } = useEditDestination({
+    onSuccess: async () => {
+      reset(defaultNewDestination);
+      setActiveTab('destination');
+      await queryClient.invalidateQueries({
+        queryKey: ['destinations', route.id],
+      });
+      await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
+      
+      // Call the onEditComplete callback if provided to reset the editing state
+      if (onEditComplete) {
+        onEditComplete();
+      }
+    },
+    onError: (error) => {
+      console.error('Error editing destination:', error);
+    },
+  });
 
   const onSubmit = async (data: NewDestination) => {
     // Calculate days based on startDate and endDate
@@ -201,7 +230,16 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       transformedData.transport = data.transport;
     }
 
-    await addDestinationToRoute(transformedData);
+    if (destinationToEdit && destinationToEdit.id) {
+      // We're editing an existing destination
+      await editDestination({
+        ...transformedData,
+        id: destinationToEdit.id,
+      });
+    } else {
+      // We're creating a new destination
+      await addDestinationToRoute(transformedData);
+    }
   };
 
   let tabs = [
@@ -235,14 +273,18 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             )}
           >
             <TabsTrigger value='destination'>
-              {isStartDestination ? 'Starting Point' : 'Details'}
+              {destinationToEdit && destinationToEdit.id 
+                ? 'Edit Details' 
+                : isStartDestination 
+                  ? 'Starting Point' 
+                  : 'Details'}
             </TabsTrigger>
             {previousDestination && (
               <TabsTrigger
                 value='accommodation'
                 disabled={!location || !startDate || !endDate}
               >
-                Accommodation
+                {destinationToEdit && destinationToEdit.id ? 'Edit Accommodation' : 'Accommodation'}
               </TabsTrigger>
             )}
             {previousDestination && (
@@ -250,7 +292,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
                 value='transport'
                 disabled={!location || !startDate || !endDate}
               >
-                Transport
+                {destinationToEdit && destinationToEdit.id ? 'Edit Transport' : 'Transport'}
               </TabsTrigger>
             )}
           </TabsList>
@@ -312,13 +354,29 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           >
             Back
           </Button>
+          
+          {destinationToEdit && destinationToEdit.id && (
+            <Button
+              type='button'
+              className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
+              onClick={() => {
+                reset(defaultNewDestination);
+                setActiveTab('destination');
+                if (onEditComplete) {
+                  onEditComplete();
+                }
+              }}
+            >
+              Cancel Edit
+            </Button>
+          )}
 
           <Button
             type='submit'
             className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
             hidden={!isValid}
           >
-            Submit
+            {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
           </Button>
 
           <Button
