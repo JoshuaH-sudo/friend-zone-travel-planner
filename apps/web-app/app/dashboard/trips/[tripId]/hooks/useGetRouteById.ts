@@ -11,7 +11,7 @@ interface UseGetRouteByIdProps {
 
 const useGetRouteById = ({ routeId, enabled = true }: UseGetRouteByIdProps) => {
   return useQuery({
-    queryKey: ['route', routeId],
+    queryKey: ['routes', routeId],
     queryFn: async () => getRouteById({ routeId }),
     enabled: !!routeId && enabled,
   });

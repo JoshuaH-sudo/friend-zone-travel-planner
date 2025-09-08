@@ -15,7 +15,7 @@ const useUpdateTrip = ({ onSuccess, onError }: UseUpdateTripProps = {}) => {
     mutationFn: updateTrip,
     onSuccess: async (_, variables) => {
       // Invalidate relevant queries
-      await queryClient.invalidateQueries({ queryKey: ['trip', variables.tripId] });
+      await queryClient.invalidateQueries({ queryKey: ['trips', variables.tripId] });
       await queryClient.invalidateQueries({ queryKey: ['trips'] });
       
       if (onSuccess) {

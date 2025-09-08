@@ -13,11 +13,11 @@ const useDeleteRouteById = ({ onSuccess, onError }: UseDeleteRouteByIdProps = {}
 
   return useMutation({
     mutationFn: deleteRoute,
-    onSuccess: async (_, { tripId }) => {
+    onSuccess: async (_, { tripId, routeId }) => {
       // Invalidate any relevant queries
-      await queryClient.invalidateQueries({ queryKey: ['routes', tripId] });
-      await queryClient.invalidateQueries({ queryKey: ['trips'] });
-      
+      await queryClient.invalidateQueries({ queryKey: ['routes', routeId] });
+      await queryClient.invalidateQueries({ queryKey: ['trips', tripId] });
+
       if (onSuccess) {
         onSuccess();
       }

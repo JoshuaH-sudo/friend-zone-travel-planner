@@ -11,7 +11,7 @@ interface UseGetTripByIdProps {
 
 const useGetTripById = ({ tripId, enabled = true }: UseGetTripByIdProps) => {
   return useQuery({
-    queryKey: ['trip', tripId],
+    queryKey: ['trips', tripId],
     queryFn: async () => getTripById({ tripId }),
     enabled: !!tripId && enabled,
   });
