@@ -259,7 +259,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             <DestinationForm
               route={route}
               previousDestination={previousDestination}
-              disabledInitialLoad={!!destinationToEdit}
+              disabledInitialLoad={!destinationToEdit}
             />
           </TabsContent>
 

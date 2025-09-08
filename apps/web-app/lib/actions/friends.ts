@@ -108,6 +108,8 @@ export interface GetFriendsByGeoLocationProps {
   lng: number;
 }
 
+export type GetFriendsByGeoLocationResponse = Awaited<ReturnType<typeof getFriendsByGeoLocation>>;
+
 export async function getFriendsByGeoLocation({
   lat,
   lng,
