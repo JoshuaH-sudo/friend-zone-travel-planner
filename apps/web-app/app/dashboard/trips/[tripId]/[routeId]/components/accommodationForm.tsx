@@ -24,6 +24,12 @@ import { DestinationForm } from './addDestinationWorkflow';
 
 const AccommodationForm: FC = () => {
   const form = useFormContext<DestinationForm>();
+  const { formState } = form;
+  const { errors } = formState;
+
+  if (errors.accommodation) {
+    console.error(errors.accommodation);
+  }
 
   return (
     <Card>

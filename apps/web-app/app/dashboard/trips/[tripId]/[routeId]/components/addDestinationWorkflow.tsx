@@ -131,7 +131,9 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         ? new Date(route.date_from)
         : new Date(),
     endDate: previousDestination
-      ? new Date(new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000) // Add one day
+      ? new Date(
+          new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000
+        ) // Add one day
       : route.date_from
         ? new Date(new Date(route.date_from).getTime() + 24 * 60 * 60 * 1000) // Add one day
         : new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // Add one day
@@ -154,8 +156,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   }, [destinationToEdit]);
 
   const { control, handleSubmit, reset, watch, setValue, formState } = form;
-  const { isValid, errors, validatingFields } = formState;
-  console.log('form errors', errors, validatingFields);
+  const { isValid } = formState;
 
   const location = watch('location');
   const startDate = watch('startDate');
@@ -184,7 +185,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       console.error('Error adding destination:', error);
     },
   });
-  
+
   const { mutateAsync: editDestination } = useEditDestination({
     onSuccess: async () => {
       reset(defaultNewDestination);
@@ -193,7 +194,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         queryKey: ['destinations', route.id],
       });
       await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
-      
+
       // Call the onEditComplete callback if provided to reset the editing state
       if (onEditComplete) {
         onEditComplete();
@@ -236,6 +237,11 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         ...transformedData,
         id: destinationToEdit.id,
       });
+      reset(defaultNewDestination);
+      setActiveTab('destination');
+      if (onEditComplete) {
+        onEditComplete();
+      }
     } else {
       // We're creating a new destination
       await addDestinationToRoute(transformedData);
@@ -273,18 +279,14 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             )}
           >
             <TabsTrigger value='destination'>
-              {destinationToEdit && destinationToEdit.id 
-                ? 'Edit Details' 
-                : isStartDestination 
-                  ? 'Starting Point' 
-                  : 'Details'}
+              {isStartDestination ? 'Starting Point' : 'Details'}
             </TabsTrigger>
             {previousDestination && (
               <TabsTrigger
                 value='accommodation'
                 disabled={!location || !startDate || !endDate}
               >
-                {destinationToEdit && destinationToEdit.id ? 'Edit Accommodation' : 'Accommodation'}
+                Accommodation
               </TabsTrigger>
             )}
             {previousDestination && (
@@ -292,7 +294,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
                 value='transport'
                 disabled={!location || !startDate || !endDate}
               >
-                {destinationToEdit && destinationToEdit.id ? 'Edit Transport' : 'Transport'}
+                Transport
               </TabsTrigger>
             )}
           </TabsList>
@@ -354,18 +356,11 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
           >
             Back
           </Button>
-          
+
           {destinationToEdit && destinationToEdit.id && (
             <Button
-              type='button'
-              className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
-              onClick={() => {
-                reset(defaultNewDestination);
-                setActiveTab('destination');
-                if (onEditComplete) {
-                  onEditComplete();
-                }
-              }}
+              type='submit'
+              className='ml-auto rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
             >
               Cancel Edit
             </Button>
