@@ -46,8 +46,6 @@ const DestinationForm = ({
     }
   }, [previousDestination?.end_date, route.date_from]);
 
-  console.log('enableApiCalls', enableApiCalls);
-  console.log('disabledInitialLoad', disabledInitialLoad);
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
     wait: 300,
   });

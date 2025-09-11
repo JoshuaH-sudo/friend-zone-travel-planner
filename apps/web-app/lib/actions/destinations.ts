@@ -189,7 +189,7 @@ export interface AddDestinationToRouteProps {
   endDate: Date;
   accommodation?: {
     name: string;
-    address: string;
+    address?: string;
     cost: number;
     currency: string;
     href?: string;
@@ -198,7 +198,7 @@ export interface AddDestinationToRouteProps {
   };
   transport?: {
     name: string;
-    address: string;
+    address?: string;
     cost: number;
     currency: string;
     href?: string;

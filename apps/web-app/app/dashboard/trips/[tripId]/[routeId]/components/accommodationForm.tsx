@@ -135,10 +135,7 @@ const AccommodationForm: FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Accommodation Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder='Select type' />

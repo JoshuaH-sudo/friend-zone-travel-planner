@@ -32,8 +32,8 @@ const TransportForm: FC = () => {
         <CardTitle className='text-lg'>Add Transport Details</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form className='space-y-4'>
+        <div className='space-y-4'>
+          <Form {...form}>
             <FormField
               control={form.control}
               name='transport.name'
@@ -152,56 +152,8 @@ const TransportForm: FC = () => {
                 </FormItem>
               )}
             />
-
-            <div className='grid grid-cols-3 gap-4'>
-              <FormField
-                control={form.control}
-                name='transport.departureAt'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Departure Time</FormLabel>
-                    <FormControl>
-                      <Input type='time' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='transport.arrivalAt'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Arrival Time</FormLabel>
-                    <FormControl>
-                      <Input type='time' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='transport.duration'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duration (hours)</FormLabel>
-                    <FormControl>
-                      <Input type='number' min='0' step='0.5' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Button type='submit' className='w-full'>
-              Add Transport
-            </Button>
-          </form>
-        </Form>
+          </Form>
+        </div>
       </CardContent>
     </Card>
   );

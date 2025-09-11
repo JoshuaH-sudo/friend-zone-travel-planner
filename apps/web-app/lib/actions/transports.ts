@@ -6,7 +6,6 @@ import { revalidatePath } from 'next/cache';
 
 export interface CreateTransportData {
   destinationId: string;
-  name: string;
   address: string;
   cost: number;
   currency: string;

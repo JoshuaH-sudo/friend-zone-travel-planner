@@ -4,15 +4,23 @@ import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
+export enum AccommodationType {
+  Hotel = 'hotel',
+  Motel = 'motel',
+  Hostel = 'hostel',
+  Friend = 'friend',
+  Airbnb = 'airbnb',
+  Other = 'other',
+}
 export interface CreateAccommodationData {
   destinationId: string;
   name: string;
   address: string;
   cost: number;
   currency: string;
-  href?: string;
-  type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
-  friendId?: string;
+  href: string | null;
+  type: AccommodationType;
+  friendId: string | null;
 }
 
 export interface AccommodationData {
@@ -22,9 +30,9 @@ export interface AccommodationData {
   address: string;
   cost: number;
   currency: string;
-  href?: string;
-  type: string;
-  friendId?: string;
+  href: string | null;
+  type: AccommodationType;
+  friendId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -89,7 +97,7 @@ export async function createAccommodation(data: CreateAccommodationData): Promis
     cost: accommodation.cost,
     currency: accommodation.currency,
     href: accommodation.href,
-    type: accommodation.type,
+    type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
     createdAt: new Date(accommodation.created_at),
     updatedAt: new Date(accommodation.updated_at),
@@ -143,7 +151,7 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
     cost: accommodation.cost,
     currency: accommodation.currency,
     href: accommodation.href,
-    type: accommodation.type,
+    type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
     createdAt: new Date(accommodation.created_at),
     updatedAt: new Date(accommodation.updated_at),

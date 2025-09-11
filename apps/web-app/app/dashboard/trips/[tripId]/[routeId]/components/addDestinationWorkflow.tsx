@@ -27,6 +27,7 @@ import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
+import { ErrorMessage } from '@hookform/error-message';
 
 export interface NewDestination {
   routeId: string;
@@ -41,7 +42,7 @@ export interface NewDestination {
   selectedFriendId?: string;
   accommodation?: {
     name: string;
-    address: string;
+    address?: string;
     cost: number;
     currency: string;
     href?: string;
@@ -50,14 +51,14 @@ export interface NewDestination {
   };
   transport?: {
     name: string;
-    address: string;
+    address?: string;
     cost: number;
     currency: string;
     href?: string;
     type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt?: Date;
-    arrivalAt?: Date;
-    duration?: number;
+    // departureAt?: Date;
+    // arrivalAt?: Date;
+    // duration?: number;
   };
 }
 
@@ -77,7 +78,7 @@ const schema = z.object({
   accommodation: z
     .object({
       name: z.string(),
-      address: z.string(),
+      address: z.string().optional(),
       cost: z.number(),
       currency: z.string(),
       href: z.string().optional(),
@@ -88,14 +89,14 @@ const schema = z.object({
   transport: z
     .object({
       name: z.string(),
-      address: z.string(),
+      address: z.string().optional(),
       cost: z.number(),
       currency: z.string(),
       href: z.string().optional(),
       type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-      departureAt: z.date().optional(),
-      arrivalAt: z.date().optional(),
-      duration: z.number().optional(),
+      // departureAt: z.date().optional(),
+      // arrivalAt: z.date().optional(),
+      // duration: z.number().optional(),
     })
     .optional(),
 });
@@ -155,8 +156,15 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     }
   }, [destinationToEdit]);
 
-  const { control, handleSubmit, reset, watch, setValue, formState } = form;
-  const { isValid } = formState;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState,
+  } = form;
+  const { isValid, errors } = formState;
 
   const location = watch('location');
   const startDate = watch('startDate');
