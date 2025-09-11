@@ -23,11 +23,11 @@ export interface TransportData {
   address: string;
   cost: number;
   currency: string;
-  href?: string;
+  href: string | null;
   type: string;
-  departureAt?: Date;
-  arrivalAt?: Date;
-  duration?: number;
+  departureAt: Date | null;
+  arrivalAt: Date | null;
+  duration: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,10 +45,12 @@ export async function createTransport(data: CreateTransportData): Promise<Transp
     .from('destinations')
     .select(`
       id,
+      location,
       routes!inner (
         id,
         trips!inner (
           id,
+          name,
           user_id
         )
       )
@@ -65,8 +67,8 @@ export async function createTransport(data: CreateTransportData): Promise<Transp
   const { data: transport, error } = await supabase
     .from('transports')
     .insert({
+      name: `${data.type} to ${destination.location}`,
       destination_id: data.destinationId,
-      name: data.name,
       address: data.address,
       cost: data.cost,
       currency: data.currency,
@@ -95,8 +97,8 @@ export async function createTransport(data: CreateTransportData): Promise<Transp
     currency: transport.currency,
     href: transport.href,
     type: transport.type,
-    departureAt: transport.departure_at ? new Date(transport.departure_at) : undefined,
-    arrivalAt: transport.arrival_at ? new Date(transport.arrival_at) : undefined,
+    departureAt: transport.departure_at ? new Date(transport.departure_at) : null,
+    arrivalAt: transport.arrival_at ? new Date(transport.arrival_at) : null,
     duration: transport.duration,
     createdAt: new Date(transport.created_at),
     updatedAt: new Date(transport.updated_at),
@@ -151,8 +153,8 @@ export async function getTransportByDestinationId(destinationId: string): Promis
     currency: transport.currency,
     href: transport.href,
     type: transport.type,
-    departureAt: transport.departure_at ? new Date(transport.departure_at) : undefined,
-    arrivalAt: transport.arrival_at ? new Date(transport.arrival_at) : undefined,
+    departureAt: transport.departure_at ? new Date(transport.departure_at) : null,
+    arrivalAt: transport.arrival_at ? new Date(transport.arrival_at) : null,
     duration: transport.duration,
     createdAt: new Date(transport.created_at),
     updatedAt: new Date(transport.updated_at),

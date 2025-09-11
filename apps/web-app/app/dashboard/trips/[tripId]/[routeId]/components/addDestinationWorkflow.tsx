@@ -27,7 +27,6 @@ import DestinationForm from './destinationForm';
 import { cn } from '@/lib/utils';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
-import { ErrorMessage } from '@hookform/error-message';
 
 export interface NewDestination {
   routeId: string;
@@ -42,23 +41,22 @@ export interface NewDestination {
   selectedFriendId?: string;
   accommodation?: {
     name: string;
-    address?: string;
+    address: string;
     cost: number;
     currency: string;
-    href?: string;
+    href: string | null;
     type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
-    friendId?: string;
+    friendId: string | null;
   };
   transport?: {
     name: string;
-    address?: string;
+    address: string;
     cost: number;
     currency: string;
-    href?: string;
+    href: string | null;
     type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    // departureAt?: Date;
-    // arrivalAt?: Date;
-    // duration?: number;
+    departureAt: Date;
+    arrivalAt: Date;
   };
 }
 
@@ -94,9 +92,8 @@ const schema = z.object({
       currency: z.string(),
       href: z.string().optional(),
       type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-      // departureAt: z.date().optional(),
-      // arrivalAt: z.date().optional(),
-      // duration: z.number().optional(),
+      departureAt: z.date(),
+      arrivalAt: z.date(),
     })
     .optional(),
 });
@@ -164,7 +161,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     setValue,
     formState,
   } = form;
-  const { isValid, errors } = formState;
+  const { isValid } = formState;
 
   const location = watch('location');
   const startDate = watch('startDate');

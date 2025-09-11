@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { Database } from '../supabase/database.types';
-import { createAccommodation } from './accommodations';
+import { AccommodationType, createAccommodation } from './accommodations';
 import { createTransport } from './transports';
 
 export async function getDestinations() {
@@ -189,23 +189,21 @@ export interface AddDestinationToRouteProps {
   endDate: Date;
   accommodation?: {
     name: string;
-    address?: string;
+    address: string | null;
     cost: number;
     currency: string;
-    href?: string;
+    href: string | null;
     type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
-    friendId?: string;
+    friendId: string | null;
   };
   transport?: {
-    name: string;
-    address?: string;
+    address: string | null;
     cost: number;
     currency: string;
-    href?: string;
+    href: string | null;
     type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt?: Date;
-    arrivalAt?: Date;
-    duration?: number;
+    departureAt: Date;
+    arrivalAt: Date;
   };
 }
 
@@ -218,50 +216,6 @@ export interface AddDestinationToRouteResponse {
   order: number;
   accommodationId?: string;
   transportId?: string;
-}
-
-// Helper function to update route date range based on its destinations
-async function updateRouteDateRange(
-  routeId: string,
-  existingDestinations: any[] | null,
-  newStartDate: string,
-  newEndDate: string
-) {
-  const supabase = await createClient();
-  
-  let earliestDate = new Date(newStartDate);
-  let latestDate = new Date(newEndDate);
-  
-  // Check existing destinations to find the earliest start_date and latest end_date
-  if (existingDestinations && existingDestinations.length > 0) {
-    existingDestinations.forEach(dest => {
-      const destStart = new Date(dest.start_date);
-      const destEnd = new Date(dest.end_date);
-      
-      if (destStart < earliestDate) {
-        earliestDate = destStart;
-      }
-      
-      if (destEnd > latestDate) {
-        latestDate = destEnd;
-      }
-    });
-  }
-  
-  // Update the route with the calculated date range
-  const { error } = await supabase
-    .from('routes')
-    .update({
-      date_from: earliestDate.toISOString(),
-      date_to: latestDate.toISOString(),
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', routeId);
-    
-  if (error) {
-    console.error('Error updating route date range:', error);
-    // Don't throw here as this is a secondary operation
-  }
 }
 
 export interface EditDestinationProps extends AddDestinationToRouteProps {
@@ -347,7 +301,7 @@ export async function editDestination(
         .from('accommodations')
         .update({
           name: data.accommodation.name,
-          address: data.accommodation.address,
+          address: data.accommodation.address ?? "",
           cost: data.accommodation.cost,
           currency: data.accommodation.currency,
           href: data.accommodation.href,
@@ -369,11 +323,11 @@ export async function editDestination(
       const accommodation = await createAccommodation({
         destinationId: data.id,
         name: data.accommodation.name,
-        address: data.accommodation.address,
+        address: data.accommodation.address ?? "",
         cost: data.accommodation.cost,
         currency: data.accommodation.currency,
         href: data.accommodation.href,
-        type: data.accommodation.type,
+        type: data.accommodation.type as AccommodationType,
         friendId: data.accommodation.friendId,
       });
       accommodationId = accommodation.id;
@@ -394,15 +348,13 @@ export async function editDestination(
       const { data: updatedTransport, error: transportError } = await supabase
         .from('transports')
         .update({
-          name: data.transport.name,
-          address: data.transport.address,
+          address: data.transport.address ?? "",
           cost: data.transport.cost,
           currency: data.transport.currency,
           href: data.transport.href,
           type: data.transport.type,
           departure_at: data.transport.departureAt ? data.transport.departureAt.toISOString() : undefined,
           arrival_at: data.transport.arrivalAt ? data.transport.arrivalAt.toISOString() : undefined,
-          duration: data.transport.duration,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingTransport.id)
@@ -418,15 +370,13 @@ export async function editDestination(
       // Create new transport
       const transport = await createTransport({
         destinationId: data.id,
-        name: data.transport.name,
-        address: data.transport.address,
+        address: data.transport.address ?? "",
         cost: data.transport.cost,
         currency: data.transport.currency,
-        href: data.transport.href,
+        href: data.transport.href ?? "",
         type: data.transport.type,
         departureAt: data.transport.departureAt,
         arrivalAt: data.transport.arrivalAt,
-        duration: data.transport.duration,
       });
       transportId = transport.id;
     }
@@ -521,11 +471,11 @@ export async function addDestinationToRoute(
     const accommodation = await createAccommodation({
       destinationId: destination.id,
       name: data.accommodation.name,
-      address: data.accommodation.address,
+      address: data.accommodation.address || "",
       cost: data.accommodation.cost,
       currency: data.accommodation.currency,
-      href: data.accommodation.href,
-      type: data.accommodation.type,
+      href: data.accommodation.href || "",
+      type: data.accommodation.type as AccommodationType,
       friendId: data.accommodation.friendId,
     });
     accommodationId = accommodation.id;
@@ -535,15 +485,13 @@ export async function addDestinationToRoute(
   if (data.transport) {
     const transport = await createTransport({
       destinationId: destination.id,
-      name: data.transport.name,
-      address: data.transport.address,
+      address: data.transport.address || "",
       cost: data.transport.cost,
       currency: data.transport.currency,
-      href: data.transport.href,
+      href: data.transport.href || "",
       type: data.transport.type,
       departureAt: data.transport.departureAt,
       arrivalAt: data.transport.arrivalAt,
-      duration: data.transport.duration,
     });
     transportId = transport.id;
   }
