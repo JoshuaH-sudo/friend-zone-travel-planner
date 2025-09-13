@@ -258,6 +258,24 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1'
       >
+        <div className='mb-4 flex items-end justify-between'>
+          <Button
+            type='submit'
+            className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
+            hidden={!destinationToEdit}
+          >
+            Cancel Edit
+          </Button>
+
+          <Button
+            type='submit'
+            className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50 ml-auto'
+            disabled={!isValid && isDirty}
+          >
+            {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
+          </Button>
+        </div>
+
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -325,25 +343,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             <ManualTransportForm />
           </TabsContent>
         </Tabs>
-
-        <div className='mt-4 flex justify-between'>
-          {destinationToEdit && destinationToEdit.id && (
-            <Button
-              type='submit'
-              className='ml-auto rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
-            >
-              Cancel Edit
-            </Button>
-          )}
-
-          <Button
-            type='submit'
-            className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
-            disabled={!isValid && isDirty}
-          >
-            {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
-          </Button>
-        </div>
       </form>
     </Form>
   );
