@@ -28,37 +28,7 @@ import { cn } from '@/lib/utils';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
-export interface NewDestination {
-  routeId: string;
-  location: string;
-  friendIds: string[];
-  startDate: Date;
-  endDate: Date;
-  days?: number;
-  latitude: number;
-  longitude: number;
-  stayingWithFriend: boolean;
-  selectedFriendId?: string;
-  accommodation?: {
-    name: string;
-    address: string;
-    cost: number;
-    currency: string;
-    href: string | null;
-    type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
-    friendId: string | null;
-  };
-  transport?: {
-    name: string;
-    address: string;
-    cost: number;
-    currency: string;
-    href: string | null;
-    type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt: Date;
-    arrivalAt: Date;
-  };
-}
+// We'll just use the DestinationForm type, which comes from the zod schema
 
 const schema = z.object({
   id: z.string().optional(),
@@ -79,21 +49,21 @@ const schema = z.object({
       address: z.string().optional(),
       cost: z.number(),
       currency: z.string(),
-      href: z.string().optional(),
+      href: z.string().optional().nullable(),
       type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
-      friendId: z.string().optional(),
+      friendId: z.string().optional().nullable(),
     })
     .optional(),
   transport: z
     .object({
       name: z.string(),
-      address: z.string().optional(),
+      address: z.string().optional().nullable(),
       cost: z.number(),
       currency: z.string(),
-      href: z.string().optional(),
+      href: z.string().optional().nullable(),
       type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-      departureAt: z.date(),
-      arrivalAt: z.date(),
+      departureAt: z.date().optional().default(() => new Date()),
+      arrivalAt: z.date().optional().default(() => new Date()),
     })
     .optional(),
 });
@@ -135,9 +105,23 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       : route.date_from
         ? new Date(new Date(route.date_from).getTime() + 24 * 60 * 60 * 1000) // Add one day
         : new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // Add one day
+    transport: {
+      name: '',
+      address: '',
+      cost: 0,
+      currency: 'USD',
+      href: '',
+      type: 'airplane' as const,
+      departureAt: previousDestination
+        ? new Date(previousDestination.end_date)
+        : new Date(),
+      arrivalAt: previousDestination
+        ? new Date(new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000)
+        : new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    },
   };
 
-  const form = useForm<NewDestination>({
+  const form = useForm<DestinationForm>({
     defaultValues: {
       ...defaultNewDestination,
     },
@@ -210,7 +194,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     },
   });
 
-  const onSubmit = async (data: NewDestination) => {
+  const onSubmit = async (data: DestinationForm) => {
     // Calculate days based on startDate and endDate
     const days = differenceInDays(data.endDate, data.startDate) + 1;
 
@@ -228,12 +212,21 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
 
     // Add accommodation data if selected
     if (data.accommodation) {
-      transformedData.accommodation = data.accommodation;
+      transformedData.accommodation = {
+        ...data.accommodation,
+        address: data.accommodation.address || null,
+        href: data.accommodation.href || null,
+        friendId: data.accommodation.friendId || null
+      };
     }
 
     // Add transport data if selected
     if (data.transport) {
-      transformedData.transport = data.transport;
+      transformedData.transport = {
+        ...data.transport,
+        address: data.transport.address || null,
+        href: data.transport.href || null
+      };
     }
 
     if (destinationToEdit && destinationToEdit.id) {

@@ -22,6 +22,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { DestinationForm } from './addDestinationWorkflow';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 
 const TransportForm: FC = () => {
   const form = useFormContext<DestinationForm>();
@@ -152,6 +156,79 @@ const TransportForm: FC = () => {
                 </FormItem>
               )}
             />
+            
+            <div className='grid grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='transport.departureAt'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Departure Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={`pl-3 text-left font-normal ${!field.value ? 'text-muted-foreground' : ''}`}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='transport.arrivalAt'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Arrival Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={`pl-3 text-left font-normal ${!field.value ? 'text-muted-foreground' : ''}`}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </Form>
         </div>
       </CardContent>
