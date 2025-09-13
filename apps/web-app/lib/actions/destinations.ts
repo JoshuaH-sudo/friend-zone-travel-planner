@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { Database } from '../supabase/database.types';
-import { AccommodationType, createAccommodation } from './accommodations';
 import { createTransport } from './transports';
+import { createAccommodation } from './accommodations';
+import { AccommodationType } from '../types';
 
 export async function getDestinations() {
   const supabase = await createClient();

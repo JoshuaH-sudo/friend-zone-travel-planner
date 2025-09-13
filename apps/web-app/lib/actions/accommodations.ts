@@ -3,41 +3,15 @@
 import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import {
+  AccommodationData,
+  AccommodationType,
+  CreateAccommodationData,
+} from '../types';
 
-export enum AccommodationType {
-  Hotel = 'hotel',
-  Motel = 'motel',
-  Hostel = 'hostel',
-  Friend = 'friend',
-  Airbnb = 'airbnb',
-  Other = 'other',
-}
-export interface CreateAccommodationData {
-  destinationId: string;
-  name: string;
-  address: string;
-  cost: number;
-  currency: string;
-  href: string | null;
-  type: AccommodationType;
-  friendId: string | null;
-}
-
-export interface AccommodationData {
-  id: string;
-  destinationId: string;
-  name: string;
-  address: string;
-  cost: number;
-  currency: string;
-  href: string | null;
-  type: AccommodationType;
-  friendId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export async function createAccommodation(data: CreateAccommodationData): Promise<AccommodationData> {
+export async function createAccommodation(
+  data: CreateAccommodationData
+): Promise<AccommodationData> {
   const supabase = await createClient();
   const user = await getUser();
 
@@ -48,7 +22,8 @@ export async function createAccommodation(data: CreateAccommodationData): Promis
   // Verify the destination belongs to a route in a trip owned by the user
   const { data: destination, error: destinationError } = await supabase
     .from('destinations')
-    .select(`
+    .select(
+      `
       id,
       routes!inner (
         id,
@@ -57,7 +32,8 @@ export async function createAccommodation(data: CreateAccommodationData): Promis
           user_id
         )
       )
-    `)
+    `
+    )
     .eq('id', data.destinationId)
     .eq('routes.trips.user_id', user.id)
     .single();
@@ -87,7 +63,9 @@ export async function createAccommodation(data: CreateAccommodationData): Promis
     throw new Error('Failed to create accommodation');
   }
 
-  revalidatePath(`/dashboard/trips/${destination.routes.trips.id}/${destination.routes.id}`);
+  revalidatePath(
+    `/dashboard/trips/${destination.routes.trips.id}/${destination.routes.id}`
+  );
 
   return {
     id: accommodation.id,
@@ -104,7 +82,9 @@ export async function createAccommodation(data: CreateAccommodationData): Promis
   };
 }
 
-export async function getAccommodationByDestinationId(destinationId: string): Promise<AccommodationData | null> {
+export async function getAccommodationByDestinationId(
+  destinationId: string
+): Promise<AccommodationData | null> {
   const supabase = await createClient();
   const user = await getUser();
 
@@ -115,7 +95,8 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
   // Verify the destination belongs to a route in a trip owned by the user and get accommodation
   const { data: accommodations, error } = await supabase
     .from('accommodations')
-    .select(`
+    .select(
+      `
       *,
       destinations!inner (
         id,
@@ -127,7 +108,8 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
           )
         )
       )
-    `)
+    `
+    )
     .eq('destination_id', destinationId)
     .eq('destinations.routes.trips.user_id', user.id)
     .limit(1);
@@ -142,7 +124,7 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
   }
 
   const accommodation = accommodations[0];
-  
+
   return {
     id: accommodation.id,
     destinationId: accommodation.destination_id,
@@ -157,4 +139,3 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
     updatedAt: new Date(accommodation.updated_at),
   };
 }
-

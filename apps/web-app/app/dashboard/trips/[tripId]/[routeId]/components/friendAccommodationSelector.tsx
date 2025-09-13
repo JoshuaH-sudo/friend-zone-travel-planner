@@ -39,7 +39,7 @@ const FriendAccommodationSelector: FC<FriendAccommodationSelectorProps> = ({
     isLoading,
     error,
     refetch,
-  } = useGetFriendsByGeoLocation(coordinates);
+  } = useGetFriendsByGeoLocation({ coordinates });
 
   if (isLoading) {
     return (

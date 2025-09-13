@@ -41,14 +41,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
     return <div>Loading...</div>;
   }
 
-  const locations = route.destinations.map((destination) => ({
-    key: destination.id,
-    location: {
-      lat: destination.latitude,
-      lng: destination.longitude,
-    },
-  }));
-
   // Get the most recent destination to use as previous destination for transport
   // If editing an existing destination, use the destination that comes before it in the route
   // If adding a new destination, use the last destination in the route

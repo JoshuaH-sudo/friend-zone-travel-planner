@@ -64,7 +64,7 @@ const CreateTripDialog = ({ buttonText = 'Create New Trip', className }: CreateT
           </div>
           <div className="grid gap-2">
             <DateRangeInput
-              dates={dateRange || {}}
+              dates={dateRange}
               onSelect={setDateRange}
               label="Trip Duration"
             />
