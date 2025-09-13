@@ -429,27 +429,12 @@ export async function addDestinationToRoute(
     throw new Error('Route not found or access denied');
   }
   
-  // Get previous destinations in order
-  const { data: destinations, error: destinationsError } = await supabase
-    .from('destinations')
-    .select('id, start_date, end_date, days')
-    .eq('route_id', data.routeId)
-    .order('order', { ascending: true });
-    
-  if (destinationsError) {
-    console.error('Error fetching destinations:', destinationsError);
-    throw new Error('Failed to fetch destinations');
-  }
-  
   // Use the provided start and end dates
   const start_date = data.startDate.toISOString();
   const end_date = data.endDate.toISOString();
   
   // Calculate days based on start and end dates
   const days = Math.round((new Date(end_date).getTime() - new Date(start_date).getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  
-  // Update route date_from and date_to based on destinations
-  // await updateRouteDateRange(data.routeId, destinations, start_date, end_date.toISOString());
   
   const destination = await createDestination({
     location: data.location,
