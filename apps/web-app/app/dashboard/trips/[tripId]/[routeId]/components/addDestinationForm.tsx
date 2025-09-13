@@ -4,6 +4,7 @@ import { DaysSlider } from '@/components/ui/daysSlider';
 import { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useAddDestinationToRoute from '../hooks/useAddDestinationToRoute';
+import useUpdateDestination from '../hooks/useUpdateDestination';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -70,19 +71,19 @@ const schema = z.object({
   stayingWithFriend: z.boolean().default(false),
   selectedFriendId: z.string().optional(),
   accommodation: z.object({
-    name: z.string(),
-    address: z.string(),
-    cost: z.number(),
-    currency: z.string(),
+    name: z.string().min(1, 'Accommodation name is required'),
+    address: z.string().min(1, 'Address is required'),
+    cost: z.number().min(0, 'Cost must be positive'),
+    currency: z.string().min(1, 'Currency is required'),
     href: z.string().optional(),
     type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
     friendId: z.string().optional(),
   }).optional(),
   transport: z.object({
-    name: z.string(),
-    address: z.string(),
-    cost: z.number(),
-    currency: z.string(),
+    name: z.string().min(1, 'Transport name is required'),
+    address: z.string().min(1, 'Address is required'),
+    cost: z.number().min(0, 'Cost must be positive'),
+    currency: z.string().min(1, 'Currency is required'),
     href: z.string().optional(),
     type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
     departureAt: z.date().optional(),
@@ -103,12 +104,16 @@ export interface AddDestinationFormProps {
     latitude: number;
     longitude: number;
   };
+  editingDestination?: any;
+  onCancelEdit?: () => void;
 }
 
 const AddDestinationForm: FC<AddDestinationFormProps> = ({ 
   routeId, 
   onDestinationChange,
-  previousDestination
+  previousDestination,
+  editingDestination,
+  onCancelEdit
 }) => {
   const queryClient = useQueryClient();
   const [addressSearchInput, setAddressSearchInput] = useState<string>('');
@@ -124,6 +129,34 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     },
     resolver: zodResolver(schema),
   });
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editingDestination) {
+      setAddressSearchInput(editingDestination.location || '');
+      form.reset({
+        routeId,
+        location: editingDestination.location || '',
+        friendIds: [], // TODO: Load friend IDs if available
+        days: editingDestination.days || 3,
+        latitude: editingDestination.latitude || 0,
+        longitude: editingDestination.longitude || 0,
+        stayingWithFriend: false, // TODO: Determine from accommodation data
+        selectedFriendId: undefined,
+        accommodation: undefined, // TODO: Load accommodation data
+        transport: undefined, // TODO: Load transport data
+      });
+    } else {
+      // Reset form when not editing
+      form.reset({
+        routeId,
+        friendIds: [],
+        days: 3,
+        stayingWithFriend: false,
+      });
+      setAddressSearchInput('');
+    }
+  }, [editingDestination, routeId, form]);
 
   const {
     control,
@@ -243,28 +276,58 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
     },
   });
 
+  const { mutateAsync: updateDestinationMutation } = useUpdateDestination({
+    onSuccess: () => {
+      reset();
+      setActiveTab('details');
+      onCancelEdit?.();
+      queryClient.invalidateQueries({
+        queryKey: ['destinations', routeId],
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating destination:', error);
+    },
+  });
+
   const onSubmit = async (data: NewDestination) => {
-    // Transform the form data to match the API expected format
-    const transformedData: AddDestinationToRouteProps = {
-      routeId: data.routeId,
-      location: data.location,
-      friendIds: data.friendIds,
-      days: data.days,
-      latitude: data.latitude,
-      longitude: data.longitude,
-    };
+    if (editingDestination) {
+      // Update existing destination
+      const updateData = {
+        destinationId: editingDestination.id,
+        location: data.location,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        days: data.days,
+        friendIds: data.friendIds,
+        accommodation: data.accommodation,
+        transport: data.transport,
+      };
 
-    // Add accommodation data if selected
-    if (data.accommodation) {
-      transformedData.accommodation = data.accommodation;
+      await updateDestinationMutation(updateData);
+    } else {
+      // Create new destination
+      const transformedData: AddDestinationToRouteProps = {
+        routeId: data.routeId,
+        location: data.location,
+        friendIds: data.friendIds,
+        days: data.days,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      };
+
+      // Add accommodation data if selected
+      if (data.accommodation) {
+        transformedData.accommodation = data.accommodation;
+      }
+
+      // Add transport data if selected
+      if (data.transport) {
+        transformedData.transport = data.transport;
+      }
+
+      await addDestinationToRoute(transformedData);
     }
-
-    // Add transport data if selected
-    if (data.transport) {
-      transformedData.transport = data.transport;
-    }
-
-    await addDestinationToRoute(transformedData);
   };
 
   return (
@@ -451,15 +514,27 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
         </Tabs>
 
         <div className="flex justify-between mt-4">
-          {activeTab !== "details" && (
-            <button
-              type="button"
-              className="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
-              onClick={() => setActiveTab(activeTab === "accommodation" ? "details" : "accommodation")}
-            >
-              Back
-            </button>
-          )}
+          <div className="flex gap-2">
+            {activeTab !== "details" && (
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300"
+                onClick={() => setActiveTab(activeTab === "accommodation" ? "details" : "accommodation")}
+              >
+                Back
+              </button>
+            )}
+            
+            {editingDestination && (
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-500 rounded-md text-white hover:bg-gray-600"
+                onClick={onCancelEdit}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
           
           {activeTab !== "transport" ? (
             <button
@@ -483,7 +558,7 @@ const AddDestinationForm: FC<AddDestinationFormProps> = ({
               type='submit'
               disabled={!isValid}
             >
-              Add Destination
+              {editingDestination ? 'Update Destination' : 'Add Destination'}
             </button>
           )}
         </div>

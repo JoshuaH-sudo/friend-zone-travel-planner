@@ -1,7 +1,7 @@
 'use client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronDown, Trash2, Edit } from 'lucide-react';
 import { FC } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,9 +10,10 @@ import deleteDestination from '../actions/deleteDestination';
 export interface DestinationListProps {
   routeId: string;
   tripId: string;
+  onEditDestination?: (destination: any) => void;
 }
 
-const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
+const DestinationList: FC<DestinationListProps> = ({ routeId, tripId, onEditDestination }) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(routeId);
   const queryClient = useQueryClient();
 
@@ -47,7 +48,18 @@ const DestinationList: FC<DestinationListProps> = ({ routeId, tripId }) => {
                 <p>{destination.endDate.toLocaleDateString()}</p>
               </div>
 
-              <div className='text-sm text-gray-500'>
+              <div className='flex gap-1 text-sm text-gray-500'>
+                {onEditDestination && (
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-8 w-8'
+                    onClick={() => onEditDestination(destination)}
+                    title='Edit destination'
+                  >
+                    <Edit className='text-muted-foreground h-4 w-4 hover:text-blue-600' />
+                  </Button>
+                )}
                 <Button
                   variant='ghost'
                   size='icon'

@@ -150,3 +150,85 @@ export async function getAccommodationByDestinationId(destinationId: string): Pr
   };
 }
 
+export interface UpdateAccommodationData {
+  accommodationId: string;
+  name?: string;
+  address?: string;
+  cost?: number;
+  currency?: string;
+  href?: string;
+  type?: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
+  friendId?: string;
+}
+
+export async function updateAccommodation(data: UpdateAccommodationData): Promise<AccommodationData> {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the accommodation belongs to a destination in a route in a trip owned by the user
+  const { data: accommodation, error: accommodationError } = await supabase
+    .from('accommodations')
+    .select(`
+      *,
+      destinations!inner (
+        id,
+        routes!inner (
+          id,
+          trips!inner (
+            id,
+            user_id
+          )
+        )
+      )
+    `)
+    .eq('id', data.accommodationId)
+    .eq('destinations.routes.trips.user_id', user.id)
+    .single();
+
+  if (accommodationError || !accommodation) {
+    throw new Error('Accommodation not found or access denied');
+  }
+
+  // Prepare update data
+  const updateData: any = {};
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.address !== undefined) updateData.address = data.address;
+  if (data.cost !== undefined) updateData.cost = data.cost;
+  if (data.currency !== undefined) updateData.currency = data.currency;
+  if (data.href !== undefined) updateData.href = data.href;
+  if (data.type !== undefined) updateData.type = data.type;
+  if (data.friendId !== undefined) updateData.friend_id = data.friendId;
+
+  // Update the accommodation
+  const { data: updatedAccommodation, error: updateError } = await supabase
+    .from('accommodations')
+    .update(updateData)
+    .eq('id', data.accommodationId)
+    .select()
+    .single();
+
+  if (updateError) {
+    console.error('Error updating accommodation:', updateError);
+    throw new Error('Failed to update accommodation');
+  }
+
+  revalidatePath(`/dashboard/trips/${accommodation.destinations.routes.trips.id}/${accommodation.destinations.routes.id}`);
+
+  return {
+    id: updatedAccommodation.id,
+    destinationId: updatedAccommodation.destination_id,
+    name: updatedAccommodation.name,
+    address: updatedAccommodation.address,
+    cost: updatedAccommodation.cost,
+    currency: updatedAccommodation.currency,
+    href: updatedAccommodation.href,
+    type: updatedAccommodation.type,
+    friendId: updatedAccommodation.friend_id,
+    createdAt: new Date(updatedAccommodation.created_at),
+    updatedAt: new Date(updatedAccommodation.updated_at),
+  };
+}

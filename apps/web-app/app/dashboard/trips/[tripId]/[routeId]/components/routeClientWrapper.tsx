@@ -33,6 +33,17 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
     checkOutDate?: string;
   }>({});
 
+  // State for editing destinations
+  const [editingDestination, setEditingDestination] = useState<any>(null);
+
+  const handleEditDestination = (destination: any) => {
+    setEditingDestination(destination);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingDestination(null);
+  };
+
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
@@ -51,7 +62,11 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
           id='route-list'
           className='bg-card rounded-lg border p-2'
         >
-          <DestinationList routeId={routeId} tripId={tripId} />
+          <DestinationList 
+            routeId={routeId} 
+            tripId={tripId} 
+            onEditDestination={handleEditDestination}
+          />
         </div>
 
         <div
@@ -62,6 +77,8 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({
             routeId={routeId} 
             onDestinationChange={setCurrentDestination}
             previousDestination={previousDestination}
+            editingDestination={editingDestination}
+            onCancelEdit={handleCancelEdit}
           />
         </div>
 
