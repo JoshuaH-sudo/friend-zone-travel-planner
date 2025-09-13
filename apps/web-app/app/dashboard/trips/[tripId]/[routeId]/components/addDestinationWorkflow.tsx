@@ -144,9 +144,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const { control, handleSubmit, reset, watch, setValue, formState } = form;
   const { isValid, isDirty } = formState;
 
-  const location = watch('location');
-  const startDate = watch('startDate');
-  const endDate = watch('endDate');
   const stayingWithFriend = watch('stayingWithFriend');
   const selectedFriendId = watch('selectedFriendId');
   const latitude = watch('latitude');
@@ -256,9 +253,15 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className='flex h-full flex-col gap-1'
+        className='flex h-full flex-col gap-1 p-2'
       >
         <div className='mb-4 flex items-end justify-between'>
+          <h6 className='text-lg font-medium'>
+            {destinationToEdit
+              ? 'Edit Destination'
+              : 'Add New Destination'}
+          </h6>
+        <div className='flex gap-2'>
           <Button
             type='submit'
             className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
@@ -269,11 +272,12 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
 
           <Button
             type='submit'
-            className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50 ml-auto'
+            className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
             disabled={!isValid && isDirty}
           >
             {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
           </Button>
+        </div>
         </div>
 
         <Tabs
