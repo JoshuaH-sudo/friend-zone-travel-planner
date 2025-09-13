@@ -11,8 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import deleteRoute from '../actions/deleteRoute';
+import useDeleteRouteById from '../hooks/useDeleteRouteById';
 
 interface DeleteRouteDialogProps {
   route: { id: string; name?: string } | null;
@@ -27,26 +26,15 @@ const DeleteRouteDialog = ({
   open,
   onOpenChange,
 }: DeleteRouteDialogProps) => {
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isPending, error } = useMutation({
-    mutationFn: async () => {
-      if (!route) throw new Error('No route to delete');
-      return deleteRoute(route.id, tripId);
-    },
-    onSuccess: async () => {
-      // Invalidate any relevant queries
-      await queryClient.invalidateQueries({ queryKey: ['routes', tripId] });
-      await queryClient.invalidateQueries({ queryKey: ['trips'] });
+  const { mutateAsync, isPending, error } = useDeleteRouteById({
+    onSuccess: () => {
       onOpenChange(false);
-    },
-    onError: (error) => {
-      console.error('Error deleting route:', error);
-    },
+    }
   });
 
   const handleDelete = async () => {
-    await mutateAsync();
+    if (!route) return;
+    await mutateAsync({ routeId: route.id, tripId });
   };
 
   return (

@@ -1,5 +1,4 @@
 'use client';
-import useGetDestinationsByRouteId from '@/lib/hooks/useGetDestinationsByRouteId';
 import {
   AdvancedMarker,
   APIProvider,

@@ -2,13 +2,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTrips } from '@/app/dashboard/trips/actions/getTrips';
 
-export type TripWithRoutes = Awaited<ReturnType<typeof getTrips>>[0];
+export type TripsResponse = Awaited<ReturnType<typeof getTrips>>;
+export type Trip = TripsResponse[number];
 
-const useGetTripsWithRoutes = () => {
+const useGetTrips = () => {
   return useQuery({
     queryKey: ['trips'],
     queryFn: async () => getTrips(),
   });
 };
 
-export default useGetTripsWithRoutes;
+export default useGetTrips;

@@ -1,31 +1,25 @@
+'use server';
+
 import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
-import TripOverviewClient from './components/tripOverviewClient';
 import { getUser } from '@/lib/auth';
 
-export type TripRouteParams = {
-  locale: string;
+interface GetTripByIdParams {
   tripId: string;
-};
+}
 
-export type TripPageProps = {
-  params: Promise<TripRouteParams>;
-};
-
-export default async function TripDetails({
-  params,
-}: {
-  params: Promise<TripRouteParams>;
-}) {
-  const { tripId } = await params;
+export async function getTripById({ tripId }: GetTripByIdParams) {
   const supabase = await createClient();
   const user = await getUser();
 
-  // Fetch trip with verification that it belongs to the user
-  const { data: trip, error: tripError } = await supabase
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the trip belongs to the user
+  const { data: trip, error } = await supabase
     .from('trips')
-    .select(
-      `id,
+    .select(`
+      id,
       name,
       user_id,
       created_at,
@@ -80,21 +74,20 @@ export default async function TripDetails({
             updated_at
           )
         )
-      )`
-    )
+      )
+    `)
     .eq('id', tripId)
     .eq('user_id', user.id)
     .single();
 
-  if (tripError || !trip) {
-    notFound();
+  if (error) {
+    console.error('Error fetching trip:', error);
+    throw new Error('Failed to fetch trip');
   }
 
-  return (
-    <TripOverviewClient
-      trip={trip}
-      routes={trip.routes || []}
-      tripId={tripId}
-    />
-  );
+  if (!trip) {
+    throw new Error('Trip not found or access denied');
+  }
+
+  return trip;
 }

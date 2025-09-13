@@ -26,7 +26,7 @@ const aj = arcjet({
   ],
 });
 
-export const getAddressCoordinates = async (address: string) => {
+export async function getAddressCoordinates(address: string) {
   const decisionResponse = await decisionHandler();
 
   if (decisionResponse.error) {
@@ -62,7 +62,7 @@ export type Coordinates = {
   lng: number;
 };
 
-export const getTimezoneInformation = async (coordinates: Coordinates) => {
+export async function getTimezoneInformation(coordinates: Coordinates) {
   const { lat, lng } = coordinates;
   const decisionResponse = await decisionHandler();
 
@@ -88,7 +88,7 @@ export const getTimezoneInformation = async (coordinates: Coordinates) => {
   };
 };
 
-export const getPlaceAutocomplete = async (input: string) => {
+export async function getPlaceAutocomplete(input: string) {
   const decisionResponse = await decisionHandler();
 
   if (decisionResponse.error) {
@@ -101,6 +101,13 @@ export const getPlaceAutocomplete = async (input: string) => {
 
   const result = await placesClient.autocompletePlaces({
     input,
+    includedPrimaryTypes: [
+      'geocode',
+      'street_address',
+      'locality',
+    ],
+  },{
+
   });
 
   return {
@@ -109,7 +116,7 @@ export const getPlaceAutocomplete = async (input: string) => {
   };
 };
 
-export const decisionHandler = async () => {
+export async function decisionHandler() {
   const req = await request();
   const decision = await aj.protect(req);
   if (decision.isDenied()) {
@@ -130,4 +137,4 @@ export const decisionHandler = async () => {
   return {
     error: null,
   };
-};
+}

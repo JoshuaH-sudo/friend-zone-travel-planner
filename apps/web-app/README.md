@@ -48,3 +48,6 @@ npm run sb:start
 - DB URL: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
 - Studio URL: [http://127.0.0.1:54323](http://127.0.0.1:54323)
 - Inbucket URL: [http://127.0.0.1:54324](http://127.0.0.1:54324)
+
+Create Migrations
+https://supabase.com/docs/guides/local-development/overview

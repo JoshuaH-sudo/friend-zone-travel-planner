@@ -4,7 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
-async function deleteRoute(routeId: string, tripId: string) {
+export type DeleteRouteProps = {
+  routeId: string
+  tripId: string
+}
+
+async function deleteRoute({ routeId, tripId }: DeleteRouteProps) {
   const supabase = await createClient()
   const user = await getUser()
 

@@ -10,11 +10,11 @@ export function DashboardLayoutContent({
 }) {
   const pathname = usePathname();
   return (
-    <main className='flex-1 px-4 py-6'>
+    <main className='flex-1 px-4 py-6 '>
       <Link
         // go back one level in the dashboard
         href={`${pathname?.endsWith('/dashboard') ? '' : pathname?.slice(0, pathname.lastIndexOf('/'))}`}
-        className='flex items-center space-x-2'
+        className='flex items-center space-x-2 w-16 hover:underline text-muted-foreground'
         style={{
           visibility: pathname?.endsWith('/dashboard') ? 'hidden' : 'visible',
           display: pathname?.endsWith('/dashboard') ? 'none' : 'flex',

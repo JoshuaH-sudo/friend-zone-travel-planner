@@ -26,10 +26,9 @@ export async function getTrips() {
           latitude,
           longitude,
           order,
-          start_date,
-          end_date,
           created_at,
           updated_at,
+          days,
           friends (
             id,
             name

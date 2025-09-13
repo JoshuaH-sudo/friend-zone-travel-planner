@@ -1,6 +1,5 @@
 import { getPlaceAutocomplete } from '@/lib/actions/google';
-import { useQuery } from '@tanstack/react-query';
-import { useDebounce } from '@uidotdev/usehooks';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { useState } from 'react';
 
 type TextMatch = {
@@ -27,40 +26,41 @@ type PlacePrediction = {
   distanceMeters: number;
 };
 
-type PlaceResponse = {
-  placePrediction: PlacePrediction;
-  kind: string;
-};
-
 export type AddressSuggestion = {
   label: string; // Will use text.text from the API response
   value: PlacePrediction; // Will use text.text from the API response
 };
-
-export function useAddressAutocomplete(input: string) {
+type Options = Omit<
+  UseQueryOptions<AddressSuggestion[], Error>,
+  'queryKey' | 'queryFn'
+>;
+export function useAddressAutocomplete(input: string, options?: Options) {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
-  const debouncedInput = useDebounce(input, 300);
 
   const { isLoading, error } = useQuery({
-    enabled: !!debouncedInput,
-    queryKey: ['addressAutocomplete', debouncedInput],
+    enabled: !!input && options?.enabled,
+    queryKey: ['addressAutocomplete', input],
     queryFn: async () => {
-      const response = await getPlaceAutocomplete(debouncedInput);
+      const response = await getPlaceAutocomplete(input);
 
       if (response.status === 'ERROR') {
         throw new Error(response.message);
       }
 
+      if (!response.suggestions) {
+        return [];
+      }
+
       try {
-        const newSuggestions: AddressSuggestion[] = response.suggestions.map(
-          (item: PlaceResponse) => {
-            console.log(item);
+        const newSuggestions: AddressSuggestion[] = response.suggestions
+          .map((item) => {
             return {
-              label: item.placePrediction.text.text,
-              value: item.placePrediction
+              label: item.placePrediction?.text?.text,
+              value: item.placePrediction,
             };
-          }
-        );
+          })
+          // Filter out undefined labels or values
+          .filter((s): s is AddressSuggestion => !!s.label && !!s.value);
 
         setSuggestions(newSuggestions);
         return newSuggestions;
@@ -69,6 +69,7 @@ export function useAddressAutocomplete(input: string) {
         throw new Error('Failed to process address suggestions');
       }
     },
+    ...options,
   });
 
   return {

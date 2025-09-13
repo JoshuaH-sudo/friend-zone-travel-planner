@@ -7,16 +7,23 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Check, X, Edit, Loader2 } from 'lucide-react';
 import useUpdateRouteName from '../hooks/useUpdateRouteName';
+import { DateRange } from 'react-day-picker';
+import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
+import { DateRangeInput } from '@/components/ui/dateRangeInput';
 
 interface RouteNameInputProps {
-  routeId: string;
+  route: GetRouteByIdResponse;
   initialName: string;
 }
 
-const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
+const RouteNameInput = ({ route, initialName }: RouteNameInputProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(initialName);
   const [tempName, setTempName] = useState(initialName);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: route?.date_from ? new Date(route.date_from) : new Date(),
+    to: route?.date_to ? new Date(route.date_to) : undefined,
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const params = useParams();
   const tripId = params.tripId as string;
@@ -40,7 +47,7 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
     }
 
     updateRouteMutation.mutate({
-      routeId,
+      routeId: route.id,
       name: tempName.trim(),
       tripId,
     });
@@ -62,7 +69,10 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   // Handle click outside to exit edit mode
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         if (isEditing && !updateRouteMutation.isPending) {
           handleCancel();
         }
@@ -79,69 +89,75 @@ const RouteNameInput = ({ routeId, initialName }: RouteNameInputProps) => {
   }, [isEditing, updateRouteMutation.isPending]);
 
   return (
-    <div className='grow space-y-2'>
-      <Label htmlFor='route-name'>Route Name</Label>
-      <div ref={containerRef} className='flex items-center gap-2'>
-        {isEditing ? (
-          <>
-            <Input
-              id='route-name'
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder='Enter route name'
-              className='max-w-md'
-              autoFocus
-              disabled={updateRouteMutation.isPending}
-            />
-            <div className='flex gap-1 animate-in slide-in-from-left-3 duration-300 ease-out'>
+    <div className='flex flex-col gap-2'>
+      <div>
+        <Label htmlFor='route-name'>Route Name</Label>
+        <div ref={containerRef} className='flex items-center gap-2'>
+          {isEditing ? (
+            <>
+              <Input
+                id='route-name'
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder='Enter route name'
+                className='max-w-md'
+                autoFocus
+                disabled={updateRouteMutation.isPending}
+              />
+              <div className='animate-in slide-in-from-left-3 flex gap-1 duration-300 ease-out'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleSave}
+                  disabled={updateRouteMutation.isPending}
+                  className='transition-all duration-200 hover:scale-105'
+                >
+                  {updateRouteMutation.isPending ? (
+                    <Loader2 className='h-4 w-4 animate-spin' />
+                  ) : (
+                    <Check className='h-4 w-4' />
+                  )}
+                </Button>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleCancel}
+                  disabled={updateRouteMutation.isPending}
+                  className='transition-all duration-200 hover:scale-105'
+                >
+                  <X className='h-4 w-4' />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Input
+                id='route-name'
+                value={name}
+                readOnly
+                className='max-w-md cursor-pointer'
+                onClick={() => setIsEditing(true)}
+              />
               <Button
                 size='sm'
                 variant='outline'
-                onClick={handleSave}
-                disabled={updateRouteMutation.isPending}
+                onClick={() => setIsEditing(true)}
                 className='transition-all duration-200 hover:scale-105'
               >
-                {updateRouteMutation.isPending ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
-                ) : (
-                  <Check className='h-4 w-4' />
-                )}
+                <Edit className='h-4 w-4' />
               </Button>
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={handleCancel}
-                disabled={updateRouteMutation.isPending}
-                className='transition-all duration-200 hover:scale-105'
-              >
-                <X className='h-4 w-4' />
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <Input
-              id='route-name'
-              value={name}
-              readOnly
-              className='max-w-md cursor-pointer'
-              onClick={() => setIsEditing(true)}
-            />
-            <Button
-              size='sm'
-              variant='outline'
-              onClick={() => setIsEditing(true)}
-              className='transition-all duration-200 hover:scale-105'
-            >
-              <Edit className='h-4 w-4' />
-            </Button>
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
+      <DateRangeInput
+        dates={dateRange}
+        onSelect={setDateRange}
+        label='Route Duration'
+      />
     </div>
   );
 };
 
 export default RouteNameInput;
-
