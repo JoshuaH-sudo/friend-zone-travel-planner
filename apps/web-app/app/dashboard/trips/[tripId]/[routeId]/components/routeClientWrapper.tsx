@@ -3,7 +3,6 @@
 import { FC, useState } from 'react';
 import AddDestinationWorkflow, { DestinationForm } from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
-import LocationMap from './locationMap';
 import RouteNameInput from './routeNameInput';
 import useGetRouteById from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
@@ -85,10 +84,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
             onEditComplete={() => setDestinationToEdit(undefined)}
           />
         </div>
-{/* 
-        <div id='map-overview' className='bg-card rounded-lg border'>
-          <LocationMap locations={locations} />
-        </div> */}
       </div>
     </div>
   );
