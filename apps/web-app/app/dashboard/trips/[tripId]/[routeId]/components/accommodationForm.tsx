@@ -24,12 +24,6 @@ import { DestinationForm } from './addDestinationWorkflow';
 
 const AccommodationForm: FC = () => {
   const form = useFormContext<DestinationForm>();
-  const { formState } = form;
-  const { errors } = formState;
-
-  if (errors.accommodation) {
-    console.error(errors.accommodation);
-  }
 
   return (
     <Card>
@@ -75,7 +69,7 @@ const AccommodationForm: FC = () => {
                   <FormItem>
                     <FormLabel>Cost per night</FormLabel>
                     <FormControl>
-                      <Input type='number' min='0' step='0.01' {...field} />
+                      <Input type='number' min='0' step='0.01' {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,7 +113,7 @@ const AccommodationForm: FC = () => {
                 <FormItem>
                   <FormLabel>Website URL (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder='https://example.com' {...field} />
+                    <Input placeholder='https://example.com' {...field} value={field.value || ''} />
                   </FormControl>
                   <FormDescription>
                     Link to booking website or more information

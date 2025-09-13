@@ -45,25 +45,35 @@ const schema = z.object({
   selectedFriendId: z.string().optional(),
   accommodation: z
     .object({
-      name: z.string(),
-      address: z.string().optional(),
-      cost: z.number(),
-      currency: z.string(),
-      href: z.string().optional().nullable(),
-      type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']),
+      name: z.string().default(''),
+      address: z.string().optional().default(''),
+      cost: z.number().default(0),
+      currency: z.string().default('USD'),
+      href: z.string().optional().nullable().default(''),
+      type: z
+        .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
+        .default('hotel'),
       friendId: z.string().optional().nullable(),
     })
     .optional(),
   transport: z
     .object({
-      name: z.string(),
-      address: z.string().optional().nullable(),
-      cost: z.number(),
-      currency: z.string(),
-      href: z.string().optional().nullable(),
-      type: z.enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other']),
-      departureAt: z.date().optional().default(() => new Date()),
-      arrivalAt: z.date().optional().default(() => new Date()),
+      name: z.string().default(''),
+      address: z.string().optional().nullable().default(''),
+      cost: z.number().default(0),
+      currency: z.string().default('USD'),
+      href: z.string().optional().nullable().default(''),
+      type: z
+        .enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other'])
+        .default('airplane'),
+      departureAt: z
+        .date()
+        .optional()
+        .default(() => new Date()),
+      arrivalAt: z
+        .date()
+        .optional()
+        .default(() => new Date()),
     })
     .optional(),
 });
@@ -105,20 +115,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       : route.date_from
         ? new Date(new Date(route.date_from).getTime() + 24 * 60 * 60 * 1000) // Add one day
         : new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // Add one day
-    transport: {
-      name: '',
-      address: '',
-      cost: 0,
-      currency: 'USD',
-      href: '',
-      type: 'airplane' as const,
-      departureAt: previousDestination
-        ? new Date(previousDestination.end_date)
-        : new Date(),
-      arrivalAt: previousDestination
-        ? new Date(new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000)
-        : new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    },
+    // No default transport - it's optional
   };
 
   const form = useForm<DestinationForm>({
@@ -126,26 +123,26 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       ...defaultNewDestination,
     },
     resolver: zodResolver(schema),
+    mode: 'onChange',
+    criteriaMode: 'all',
+    // This makes the form a bit more lenient - we'll manually validate before submission
+    reValidateMode: 'onChange',
   });
 
   useEffect(() => {
     if (destinationToEdit && destinationToEdit.id) {
       // If editing an existing destination, populate the form with its data
-      form.reset({
-        ...destinationToEdit,
-      });
+      const formData = { ...destinationToEdit };
+
+      // Don't auto-create transport or accommodation if they don't exist
+      // This allows destinations to not have transport/accommodation
+
+      form.reset(formData);
     }
   }, [destinationToEdit]);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
-    formState,
-  } = form;
-  const { isValid } = formState;
+  const { control, handleSubmit, reset, watch, setValue, formState } = form;
+  const { isValid, isDirty } = formState;
 
   const location = watch('location');
   const startDate = watch('startDate');
@@ -210,23 +207,29 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       endDate: data.endDate,
     };
 
-    // Add accommodation data if selected
+    // Add accommodation data if provided and has required fields
     if (data.accommodation) {
       transformedData.accommodation = {
         ...data.accommodation,
         address: data.accommodation.address || null,
         href: data.accommodation.href || null,
-        friendId: data.accommodation.friendId || null
+        friendId: data.accommodation.friendId || null,
       };
+    } else {
+      // Explicitly set to undefined to ensure it's not included in the API call
+      transformedData.accommodation = undefined;
     }
 
-    // Add transport data if selected
+    // Add transport data if provided and has required fields
     if (data.transport) {
       transformedData.transport = {
         ...data.transport,
         address: data.transport.address || null,
-        href: data.transport.href || null
+        href: data.transport.href || null,
       };
+    } else {
+      // Explicitly set to undefined to ensure it's not included in the API call
+      transformedData.transport = undefined;
     }
 
     if (destinationToEdit && destinationToEdit.id) {
@@ -246,18 +249,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     }
   };
 
-  let tabs = [
-    { value: 'destination', label: 'Details' },
-    { value: 'accommodation', label: 'Accommodation' },
-    { value: 'transport', label: 'Transport' },
-  ];
-
   // Don't need transport and stuff when it is the starting point.
-  const currentTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
   const isStartDestination = !previousDestination;
-  const showBackButton = currentTabIndex > 0;
-  const showNextButton =
-    currentTabIndex < tabs.length - 1 && !isStartDestination;
 
   return (
     <Form {...form}>
@@ -280,20 +273,10 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
               {isStartDestination ? 'Starting Point' : 'Details'}
             </TabsTrigger>
             {previousDestination && (
-              <TabsTrigger
-                value='accommodation'
-                disabled={!location || !startDate || !endDate}
-              >
-                Accommodation
-              </TabsTrigger>
+              <TabsTrigger value='accommodation'>Accommodation</TabsTrigger>
             )}
             {previousDestination && (
-              <TabsTrigger
-                value='transport'
-                disabled={!location || !startDate || !endDate}
-              >
-                Transport
-              </TabsTrigger>
+              <TabsTrigger value='transport'>Transport</TabsTrigger>
             )}
           </TabsList>
 
@@ -344,17 +327,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         </Tabs>
 
         <div className='mt-4 flex justify-between'>
-          <Button
-            type='button'
-            className={cn(
-              'rounded-md bg-gray-200 px-4 py-2 text-gray-700 hover:bg-gray-300',
-              { invisible: !showBackButton }
-            )}
-            onClick={() => setActiveTab(tabs[currentTabIndex - 1]?.value)}
-          >
-            Back
-          </Button>
-
           {destinationToEdit && destinationToEdit.id && (
             <Button
               type='submit'
@@ -366,23 +338,10 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
 
           <Button
             type='submit'
-            className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600'
-            hidden={!isValid}
+            className='ml-auto rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
+            disabled={!isValid && isDirty}
           >
             {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
-          </Button>
-
-          <Button
-            type='button'
-            className={cn(
-              'ml-auto rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600',
-              { invisible: !showNextButton }
-            )}
-            onClick={() => {
-              setActiveTab(tabs[currentTabIndex + 1]?.value);
-            }}
-          >
-            Next
           </Button>
         </div>
       </form>

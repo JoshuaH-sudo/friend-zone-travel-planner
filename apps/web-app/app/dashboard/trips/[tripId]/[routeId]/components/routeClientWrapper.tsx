@@ -76,7 +76,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
 
         <div
           id='destination-details'
-          className='bg-card flex flex-col gap-4 rounded-lg border p-2'
+          className='bg-card flex flex-col gap-4 rounded-lg border p-2 col-span-2'
         >
           <AddDestinationWorkflow
             route={route}
@@ -85,10 +85,10 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
             onEditComplete={() => setDestinationToEdit(undefined)}
           />
         </div>
-
+{/* 
         <div id='map-overview' className='bg-card rounded-lg border'>
           <LocationMap locations={locations} />
-        </div>
+        </div> */}
       </div>
     </div>
   );

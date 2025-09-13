@@ -57,9 +57,9 @@ const TransportForm: FC = () => {
               name='transport.address'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Route</FormLabel>
+                  <FormLabel>Station Address</FormLabel>
                   <FormControl>
-                    <Input placeholder='From → To' {...field} />
+                    <Input placeholder='BER Airport' {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,7 +118,7 @@ const TransportForm: FC = () => {
                 <FormItem>
                   <FormLabel>Website URL (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder='https://example.com' {...field} />
+                    <Input placeholder='https://example.com' {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormDescription>
                     Link to booking website or more information
