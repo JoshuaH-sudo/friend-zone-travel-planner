@@ -26,19 +26,16 @@ type PlacePrediction = {
   distanceMeters: number;
 };
 
-type PlaceResponse = {
-  placePrediction: PlacePrediction;
-  kind: string;
-};
-
 export type AddressSuggestion = {
   label: string; // Will use text.text from the API response
   value: PlacePrediction; // Will use text.text from the API response
 };
-type Options = Omit<UseQueryOptions<AddressSuggestion[], Error>, 'queryKey' | 'queryFn'>;
+type Options = Omit<
+  UseQueryOptions<AddressSuggestion[], Error>,
+  'queryKey' | 'queryFn'
+>;
 export function useAddressAutocomplete(input: string, options?: Options) {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
-  
 
   const { isLoading, error } = useQuery({
     enabled: !!input && options?.enabled,
@@ -55,15 +52,15 @@ export function useAddressAutocomplete(input: string, options?: Options) {
       }
 
       try {
-        const newSuggestions: AddressSuggestion[] = response.suggestions.map(
-          (item: PlaceResponse) => {
-            console.log(item);
+        const newSuggestions: AddressSuggestion[] = response.suggestions
+          .map((item) => {
             return {
-              label: item.placePrediction.text.text,
-              value: item.placePrediction
+              label: item.placePrediction?.text?.text,
+              value: item.placePrediction,
             };
-          }
-        );
+          })
+          // Filter out undefined labels or values
+          .filter((s): s is AddressSuggestion => !!s.label && !!s.value);
 
         setSuggestions(newSuggestions);
         return newSuggestions;

@@ -3,20 +3,20 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import useGetTrips, { TripsResponse } from '@/app/dashboard/trips/hooks/useGetTrips';
+import useGetTrips, { Trip } from '@/app/dashboard/trips/hooks/useGetTrips';
 import TripCard from './components/TripCard';
 import TripMapView from './components/TripMapView';
 import DeleteTripDialog from './components/DeleteTripDialog';
 import CreateTripDialog from './components/createTripDialog';
 
 const TripsPage = () => {
-  const [selectedTrip, setSelectedTrip] = useState<TripsResponse | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const router = useRouter();
   const [deletingTrip, setDeletingTrip] = useState<{ id: string; name: string } | null>(null);
   const { data: trips = [], isLoading, error } = useGetTrips();
 
-  const handleViewMap = (trip: TripsResponse) => {
+  const handleViewMap = (trip: Trip) => {
     if (selectedTrip?.id === trip.id) {
       setSelectedTrip(null);
       setSelectedRouteId(null);
@@ -29,7 +29,7 @@ const TripsPage = () => {
     }
   };
 
-  const handleRouteSelect = (trip: TripsResponse, routeId: string) => {
+  const handleRouteSelect = (trip: Trip, routeId: string) => {
     setSelectedTrip(trip);
     setSelectedRouteId(routeId);
   };

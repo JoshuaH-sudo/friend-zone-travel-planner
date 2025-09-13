@@ -19,7 +19,7 @@ interface DatePickerWithRangeProps {
   className?: string;
   dates?: DateRange;
   onSelect: (dates?: DateRange) => void;
-  calendarProps?: DayPickerProps
+  calendarProps?: DayPickerProps;
 }
 
 export function DatePickerWithRange({
@@ -63,6 +63,7 @@ export function DatePickerWithRange({
           align='start'
           data-slot='popover-content'
         >
+          {/* @ts-expect-error - Calendar component expects Date but we're using DateRange for 'range' mode */}
           <Calendar
             initialFocus
             mode='range'
