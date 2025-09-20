@@ -71,7 +71,9 @@ export interface CostSummary {
  * @param route Route object with destinations, accommodations, and transports
  * @returns Array of cost summaries grouped by currency
  */
-export function calculateRouteCosts(route: RouteWithDestinations): CostSummary[] {
+export function calculateRouteCosts(
+  route: RouteWithDestinations
+): CostSummary[] {
   const costMap = new Map<string, number>();
 
   // Iterate through all destinations in the route
@@ -80,7 +82,10 @@ export function calculateRouteCosts(route: RouteWithDestinations): CostSummary[]
     destination.accommodations?.forEach((accommodation) => {
       const currency = accommodation.currency;
       const cost = accommodation.cost;
-      costMap.set(currency, (costMap.get(currency) || 0) + cost);
+      // Default to 1 night if days is not specified
+      const numberOfNights = destination.days || 1;
+      const totalCost = cost * numberOfNights;
+      costMap.set(currency, (costMap.get(currency) || 0) + totalCost);
     });
 
     // Add transport costs
@@ -112,7 +117,7 @@ export function calculateRouteCosts(route: RouteWithDestinations): CostSummary[]
  */
 export function formatCost(amount: number, currency: string): string {
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
-  
+
   // Handle different currency formatting
   switch (currency) {
     case 'JPY':
@@ -130,8 +135,11 @@ export function formatCost(amount: number, currency: string): string {
  * @returns True if the route has any costs, false otherwise
  */
 export function routeHasCosts(route: RouteWithDestinations): boolean {
-  return route.destinations?.some((destination) => 
-    (destination.accommodations && destination.accommodations.length > 0) || 
-    (destination.transports && destination.transports.length > 0)
-  ) || false;
+  return (
+    route.destinations?.some(
+      (destination) =>
+        (destination.accommodations && destination.accommodations.length > 0) ||
+        (destination.transports && destination.transports.length > 0)
+    ) || false
+  );
 }
