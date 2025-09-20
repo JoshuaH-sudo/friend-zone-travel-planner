@@ -93,5 +93,8 @@ function LoadingArea() {
   if (!isFetching) {
     return null;
   }
-  return <Progress indeterminate />;
+  // Positioning fixed to not take up space in layout and push content
+  return <Progress indeterminate style={{
+    position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 1
+  }} />;
 }
