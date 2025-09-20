@@ -1,17 +1,63 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Route as RouteIcon, ArrowRight, MapPin, Trash2 } from 'lucide-react';
+import { Route as RouteIcon, ArrowRight, MapPin, Trash2, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { calculateRouteCosts, formatCost, routeHasCosts } from '@/lib/route-utils';
 import Link from 'next/link';
+import { Database } from '@/lib/supabase/database.types';
 
-interface Route {
+// Custom types that match the actual query result structure
+type AccommodationQueryResult = {
   id: string;
   name: string;
-}
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  friend_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type TransportQueryResult = {
+  id: string;
+  name: string;
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  departure_at: string | null;
+  arrival_at: string | null;
+  duration: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+// Updated Route interface to include destinations with accommodations and transports
+type RouteWithDestinations = Database['public']['Tables']['routes']['Row'] & {
+  destinations?: {
+    id: string;
+    location: string;
+    latitude: number;
+    longitude: number;
+    order: number;
+    created_at: string | null;
+    updated_at: string | null;
+    days: number;
+    friends?: {
+      id: string;
+      name: string;
+    }[];
+    accommodations?: AccommodationQueryResult[];
+    transports?: TransportQueryResult[];
+  }[];
+};
 
 interface RouteCardProps {
-  route: Route;
+  route: RouteWithDestinations;
   tripId: string;
   isSelected?: boolean;
   onSelect?: () => void;
@@ -25,6 +71,10 @@ const RouteCard = ({
   onSelect,
   onDelete,
 }: RouteCardProps) => {
+  // Calculate route costs
+  const routeCosts = calculateRouteCosts(route);
+  const hasCosts = routeHasCosts(route);
+
   return (
     <Card
       className={cn(
@@ -97,6 +147,29 @@ const RouteCard = ({
             </Button>
           </Link>
         </div>
+
+        {/* Cost Summary Section */}
+        {hasCosts && routeCosts.length > 0 && (
+          <div className='mt-3 pt-3 border-t border-border'>
+            <div className='flex items-center gap-2 text-sm'>
+              <DollarSign className='h-4 w-4 text-muted-foreground' />
+              <span className='text-muted-foreground font-medium'>Total Cost:</span>
+              <div className='flex items-center gap-2 flex-wrap'>
+                {routeCosts.map((cost, index) => (
+                  <span
+                    key={cost.currency}
+                    className='text-foreground font-semibold'
+                  >
+                    {formatCost(cost.total, cost.currency)}
+                    {index < routeCosts.length - 1 && (
+                      <span className='text-muted-foreground ml-1'>•</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

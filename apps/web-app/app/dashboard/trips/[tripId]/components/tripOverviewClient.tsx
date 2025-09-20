@@ -9,9 +9,58 @@ import DeleteRouteDialog from './DeleteRouteDialog';
 import { Database } from '@/lib/supabase/database.types';
 import { TripByIdResponse } from '../../hooks/useGetTripById';
 
+// Custom types that match the actual query result structure
+type AccommodationQueryResult = {
+  id: string;
+  name: string;
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  friend_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type TransportQueryResult = {
+  id: string;
+  name: string;
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  departure_at: string | null;
+  arrival_at: string | null;
+  duration: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+// Type for routes with nested destinations, accommodations, and transports
+type RouteWithDestinations = Database['public']['Tables']['routes']['Row'] & {
+  destinations?: {
+    id: string;
+    location: string;
+    latitude: number;
+    longitude: number;
+    order: number;
+    created_at: string | null;
+    updated_at: string | null;
+    days: number;
+    friends?: {
+      id: string;
+      name: string;
+    }[];
+    accommodations?: AccommodationQueryResult[];
+    transports?: TransportQueryResult[];
+  }[];
+};
+
 interface TripOverviewClientProps {
   trip: TripByIdResponse;
-  routes: Database['public']['Tables']['routes']['Row'][];
+  routes: RouteWithDestinations[];
   tripId: string;
 }
 
