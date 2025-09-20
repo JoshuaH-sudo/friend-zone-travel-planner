@@ -22,19 +22,23 @@ import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 interface DestinationFormProps {
   route: GetRouteByIdResponse;
   previousDestination?: Omit<FullDestination, 'routes'>;
-  disabledInitialLoad?: boolean;
+  enableInitialLoad?: boolean;
 }
 
 const DestinationForm = ({
   route,
   previousDestination,
-  disabledInitialLoad = false,
+  enableInitialLoad = true,
 }: DestinationFormProps) => {
-  const [enableApiCalls, setEnableApiCalls] = useState(!disabledInitialLoad);
+  const [enableApiCalls, setEnableApiCalls] = useState(enableInitialLoad);
   const { setValue, control, watch } = useFormContext();
   const address = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
+
+  useEffect(() => {
+    setEnableApiCalls(enableInitialLoad);
+  }, [enableInitialLoad]);
 
   useEffect(() => {
     if (previousDestination) {

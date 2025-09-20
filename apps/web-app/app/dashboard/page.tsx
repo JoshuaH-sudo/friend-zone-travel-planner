@@ -53,8 +53,8 @@ export default function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant='outline' className='w-full' disabled>
-              Coming Soon
+            <Button asChild className='w-full'>
+              <Link href='dashboard/friends'>View Friends</Link>
             </Button>
           </CardContent>
         </Card>

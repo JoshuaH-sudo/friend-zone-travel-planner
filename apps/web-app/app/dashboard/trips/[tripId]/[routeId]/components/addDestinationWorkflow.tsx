@@ -138,6 +138,11 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       // This allows destinations to not have transport/accommodation
 
       form.reset(formData);
+
+      // Reset to the first tab when only defining the starting point
+      if (destinationToEdit.order === 1) {
+        setActiveTab('destination');
+      }
     }
   }, [destinationToEdit]);
 
@@ -249,6 +254,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   // Don't need transport and stuff when it is the starting point.
   const isStartDestination = !previousDestination;
 
+  console.log('edit destination', !destinationToEdit);
   return (
     <Form {...form}>
       <form
@@ -306,7 +312,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
             <DestinationForm
               route={route}
               previousDestination={previousDestination}
-              disabledInitialLoad={!destinationToEdit}
+              enableInitialLoad={!destinationToEdit}
             />
           </TabsContent>
 
