@@ -54,6 +54,8 @@ const schema = z.object({
         .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
         .default('hotel'),
       friendId: z.string().optional().nullable(),
+      check_in: z.date().optional(),
+      check_out: z.date().optional(),
     })
     .optional(),
   transport: z

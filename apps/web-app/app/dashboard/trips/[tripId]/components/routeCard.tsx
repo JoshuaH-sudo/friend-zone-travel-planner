@@ -8,34 +8,6 @@ import Link from 'next/link';
 import { Database } from '@/lib/supabase/database.types';
 
 // Custom types that match the actual query result structure
-type AccommodationQueryResult = {
-  id: string;
-  name: string;
-  address: string;
-  cost: number;
-  currency: string;
-  href: string | null;
-  type: string;
-  friend_id: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-type TransportQueryResult = {
-  id: string;
-  name: string;
-  address: string;
-  cost: number;
-  currency: string;
-  href: string | null;
-  type: string;
-  departure_at: string | null;
-  arrival_at: string | null;
-  duration: number | null;
-  created_at: string;
-  updated_at: string;
-};
-
 // Updated Route interface to include destinations with accommodations and transports
 type RouteWithDestinations = Database['public']['Tables']['routes']['Row'] & {
   destinations?: {
@@ -51,8 +23,8 @@ type RouteWithDestinations = Database['public']['Tables']['routes']['Row'] & {
       id: string;
       name: string;
     }[];
-    accommodations?: AccommodationQueryResult[];
-    transports?: TransportQueryResult[];
+    accommodations?: Database['public']['Tables']['accommodations']['Row'][];
+    transports?: Database['public']['Tables']['transports']['Row'][];
   }[];
 };
 

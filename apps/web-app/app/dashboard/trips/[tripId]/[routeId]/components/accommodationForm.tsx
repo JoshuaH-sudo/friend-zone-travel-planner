@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,9 +21,38 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { DestinationForm } from './addDestinationWorkflow';
+import { DateRangeInput } from '@/components/ui/dateRangeInput';
+import { DateRange } from 'react-day-picker';
 
 const AccommodationForm: FC = () => {
   const form = useFormContext<DestinationForm>();
+  const startDate = form.watch('startDate');
+  const endDate = form.watch('endDate');
+  
+  // Create accommodation object with defaults if it doesn't exist
+  useEffect(() => {
+    if (!form.getValues('accommodation')) {
+      form.setValue('accommodation', {
+        name: '',
+        address: '',
+        cost: 0,
+        currency: 'USD',
+        href: '',
+        type: 'hotel',
+        check_in: startDate,
+        check_out: endDate
+      });
+    }
+  }, [form, startDate, endDate]);
+
+  // Get current check-in/check-out values
+  const accommodation = form.watch('accommodation');
+
+  // Set up date range object for the picker
+  const dateRange: DateRange = {
+    from: accommodation?.check_in || startDate,
+    to: accommodation?.check_out || endDate,
+  };
 
   return (
     <Card>
@@ -60,6 +89,35 @@ const AccommodationForm: FC = () => {
                 </FormItem>
               )}
             />
+
+            <FormItem>
+              <FormLabel>Check-in / Check-out Dates</FormLabel>
+              <FormControl>
+                <DateRangeInput
+                  className='mb-2'
+                  dates={dateRange}
+                  onSelect={(dates) => {
+                    if (dates?.from) {
+                      form.setValue('accommodation.check_in', dates.from);
+                    }
+                    if (dates?.to) {
+                      form.setValue('accommodation.check_out', dates.to);
+                    }
+                  }}
+                  calendarProps={{
+                    disabled: { 
+                      before: startDate,
+                    },
+                    startMonth: startDate,
+                    mode: 'range',
+                  }}
+                />
+              </FormControl>
+              <FormDescription>
+                Select the check-in and check-out dates for your accommodation
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
 
             <div className='grid grid-cols-2 gap-4'>
               <FormField
