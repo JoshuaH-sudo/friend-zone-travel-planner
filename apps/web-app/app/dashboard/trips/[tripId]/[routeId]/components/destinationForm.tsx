@@ -50,6 +50,7 @@ const DestinationForm = ({
     }
   }, [previousDestination?.end_date, route.date_from]);
 
+  // Get address suggestions as the user types
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
     wait: 300,
   });
@@ -57,6 +58,7 @@ const DestinationForm = ({
     enabled: debouncedAutocompleteInput.trim().length > 0 && enableApiCalls,
   });
 
+  // Get coordinates when an address is selected
   const [debouncedAddressValue] = useDebouncedValue<string>(address, {
     wait: 1000,
   });
@@ -65,6 +67,7 @@ const DestinationForm = ({
     { enabled: debouncedAddressValue.trim().length > 0 && enableApiCalls }
   );
 
+  // Get friends near the selected coordinates
   const { data: friends } = useGetFriendsByGeoLocation({
     coordinates: coordinates?.geometry?.location,
     enabled: !!coordinates && enableApiCalls,
