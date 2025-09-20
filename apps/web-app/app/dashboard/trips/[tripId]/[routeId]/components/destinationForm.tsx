@@ -40,8 +40,11 @@ const DestinationForm = ({
     setEnableApiCalls(enableInitialLoad);
   }, [enableInitialLoad]);
 
+
   useEffect(() => {
     if (previousDestination) {
+      // Prevent or enable initial API calls when destination changes
+      setEnableApiCalls(enableInitialLoad)
       // Start date should be the end date of the last destination
       setValue('startDate', new Date(previousDestination.end_date));
     } else {
