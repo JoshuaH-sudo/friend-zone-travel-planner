@@ -95,33 +95,31 @@ export function Autocomplete<T>({
             onClick={handleClear}
           />
         </div>
-        <ScrollArea
-          className='h-32'
-          style={{
-            display: open ? 'block' : 'none',
-          }}
-        >
-          <CommandEmpty
-            style={{
-              display: open ? 'block' : 'none',
-            }}
-          >
-            {emptyMessage}
-          </CommandEmpty>
-          <CommandGroup>
-            {options.map((option) => (
-              <CommandItem
-                key={option.label}
-                // @ts-expect-error TypeScript doesn't know about the value prop
-                value={option.value}
-                onSelect={handleSelect}
-              >
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </ScrollArea>
       </Command>
+      
+      {open && (
+        <div className='absolute top-full left-0 right-0 z-50 bg-background border rounded-b-lg shadow-md'>
+          <Command>
+            <ScrollArea className='h-32'>
+              <CommandEmpty>
+                {emptyMessage}
+              </CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.label}
+                    // @ts-expect-error TypeScript doesn't know about the value prop
+                    value={option.value}
+                    onSelect={handleSelect}
+                  >
+                    {option.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
+          </Command>
+        </div>
+      )}
     </div>
   );
 }
