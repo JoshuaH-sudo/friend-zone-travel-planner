@@ -14,7 +14,7 @@
     "sb:start": "supabase start",
     "sb:stop": "supabase stop",
     "sb:restart": "supabase stop && supabase start",
-    "sb:db-diff": "supabase db diff --use-migrations"
+    "sb:db-diff": "supabase db diff --use-migra" 
   },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.5",

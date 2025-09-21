@@ -1,17 +1,24 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Route as RouteIcon, ArrowRight, MapPin, Trash2 } from 'lucide-react';
+import {
+  Route as RouteIcon,
+  ArrowRight,
+  MapPin,
+  Trash2,
+  DollarSign,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  calculateRouteCosts,
+  formatCost,
+  routeHasCosts,
+} from '@/lib/route-utils';
 import Link from 'next/link';
-
-interface Route {
-  id: string;
-  name: string;
-}
+import { TripByIdResponse } from '../../actions/getTripById';
 
 interface RouteCardProps {
-  route: Route;
+  route: TripByIdResponse['routes'][0];
   tripId: string;
   isSelected?: boolean;
   onSelect?: () => void;
@@ -25,6 +32,10 @@ const RouteCard = ({
   onSelect,
   onDelete,
 }: RouteCardProps) => {
+  // Calculate route costs
+  const routeCosts = calculateRouteCosts(route);
+  const hasCosts = routeHasCosts(route);
+
   return (
     <Card
       className={cn(
@@ -72,7 +83,7 @@ const RouteCard = ({
               }}
               title='Delete route'
             >
-              <Trash2 className='h-4 w-4 text-muted-foreground hover:text-red-600' />
+              <Trash2 className='text-muted-foreground h-4 w-4 hover:text-red-600' />
             </Button>
           </div>
         </div>
@@ -97,6 +108,31 @@ const RouteCard = ({
             </Button>
           </Link>
         </div>
+
+        {/* Cost Summary Section */}
+        {hasCosts && routeCosts.length > 0 && (
+          <div className='border-border mt-3 border-t pt-3'>
+            <div className='flex items-center gap-2 text-sm'>
+              <DollarSign className='text-muted-foreground h-4 w-4' />
+              <span className='text-muted-foreground font-medium'>
+                Total Cost:
+              </span>
+              <div className='flex flex-wrap items-center gap-2'>
+                {routeCosts.map((cost, index) => (
+                  <span
+                    key={cost.currency}
+                    className='text-foreground font-semibold'
+                  >
+                    {formatCost(cost.total, cost.currency)}
+                    {index < routeCosts.length - 1 && (
+                      <span className='text-muted-foreground ml-1'>•</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -54,6 +54,8 @@ const schema = z.object({
         .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
         .default('hotel'),
       friendId: z.string().optional().nullable(),
+      check_in: z.date().optional(),
+      check_out: z.date().optional(),
     })
     .optional(),
   transport: z
@@ -216,6 +218,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         address: data.accommodation.address || null,
         href: data.accommodation.href || null,
         friendId: data.accommodation.friendId || null,
+        check_in: data.accommodation.check_in,
+        check_out: data.accommodation.check_out,
       };
     } else {
       // Explicitly set to undefined to ensure it's not included in the API call
@@ -254,7 +258,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   // Don't need transport and stuff when it is the starting point.
   const isStartDestination = !previousDestination;
 
-  console.log('edit destination', !destinationToEdit);
   return (
     <Form {...form}>
       <form

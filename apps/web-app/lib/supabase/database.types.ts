@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json
+          variables?: Json
           operationName?: string
           query?: string
-          variables?: Json
+          extensions?: Json
         }
         Returns: Json
       }
@@ -37,6 +37,8 @@ export type Database = {
       accommodations: {
         Row: {
           address: string
+          check_in: string | null
+          check_out: string | null
           cost: number
           created_at: string
           currency: string
@@ -50,6 +52,8 @@ export type Database = {
         }
         Insert: {
           address: string
+          check_in?: string | null
+          check_out?: string | null
           cost: number
           created_at?: string
           currency: string
@@ -63,6 +67,8 @@ export type Database = {
         }
         Update: {
           address?: string
+          check_in?: string | null
+          check_out?: string | null
           cost?: number
           created_at?: string
           currency?: string

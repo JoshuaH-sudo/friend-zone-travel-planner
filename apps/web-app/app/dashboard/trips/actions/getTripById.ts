@@ -7,6 +7,8 @@ interface GetTripByIdParams {
   tripId: string;
 }
 
+export type TripByIdResponse = Awaited<ReturnType<typeof getTripById>>;
+
 export async function getTripById({ tripId }: GetTripByIdParams) {
   const supabase = await createClient();
   const user = await getUser();
@@ -18,7 +20,8 @@ export async function getTripById({ tripId }: GetTripByIdParams) {
   // Verify the trip belongs to the user
   const { data: trip, error } = await supabase
     .from('trips')
-    .select(`
+    .select(
+      `
       id,
       name,
       user_id,
@@ -56,6 +59,8 @@ export async function getTripById({ tripId }: GetTripByIdParams) {
             href,
             type,
             friend_id,
+            check_in,
+            check_out,
             created_at,
             updated_at
           ),
@@ -75,7 +80,8 @@ export async function getTripById({ tripId }: GetTripByIdParams) {
           )
         )
       )
-    `)
+    `
+    )
     .eq('id', tripId)
     .eq('user_id', user.id)
     .single();
