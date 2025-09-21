@@ -75,7 +75,9 @@ export async function getDestinationsByRouteId(routeId: string) {
         currency,
         href,
         type,
-        friend_id
+        friend_id,
+        check_in,
+        check_out
       ),
       transports (
         id,
@@ -196,6 +198,8 @@ export interface AddDestinationToRouteProps {
     href: string | null;
     type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
     friendId: string | null;
+    check_in?: Date;
+    check_out?: Date;
   };
   transport?: {
     address: string | null;
@@ -308,6 +312,8 @@ export async function editDestination(
           href: data.accommodation.href,
           type: data.accommodation.type,
           friend_id: data.accommodation.friendId,
+          check_in: data.accommodation.check_in ? data.accommodation.check_in.toISOString() : null, 
+          check_out: data.accommodation.check_out ? data.accommodation.check_out.toISOString() : null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingAccommodation.id)
@@ -330,6 +336,8 @@ export async function editDestination(
         href: data.accommodation.href,
         type: data.accommodation.type as AccommodationType,
         friendId: data.accommodation.friendId,
+        checkIn: data.accommodation.check_in,
+        checkOut: data.accommodation.check_out,
       });
       accommodationId = accommodation.id;
     }
@@ -463,6 +471,8 @@ export async function addDestinationToRoute(
       href: data.accommodation.href || "",
       type: data.accommodation.type as AccommodationType,
       friendId: data.accommodation.friendId,
+      checkIn: data.accommodation.check_in,
+      checkOut: data.accommodation.check_out,
     });
     accommodationId = accommodation.id;
   }

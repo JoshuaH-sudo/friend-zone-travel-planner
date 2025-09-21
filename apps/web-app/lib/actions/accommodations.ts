@@ -54,6 +54,8 @@ export async function createAccommodation(
       href: data.href || null,
       type: data.type,
       friend_id: data.friendId || null,
+      check_in: data.checkIn ? data.checkIn.toISOString() : null,
+      check_out: data.checkOut ? data.checkOut.toISOString() : null,
     })
     .select()
     .single();
@@ -77,6 +79,8 @@ export async function createAccommodation(
     href: accommodation.href,
     type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
+    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : undefined,
+    checkOut: accommodation.check_out ? new Date(accommodation.check_out) : undefined,
     createdAt: new Date(accommodation.created_at),
     updatedAt: new Date(accommodation.updated_at),
   };
@@ -135,6 +139,8 @@ export async function getAccommodationByDestinationId(
     href: accommodation.href,
     type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
+    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : undefined,
+    checkOut: accommodation.check_out ? new Date(accommodation.check_out) : undefined,
     createdAt: new Date(accommodation.created_at),
     updatedAt: new Date(accommodation.updated_at),
   };
