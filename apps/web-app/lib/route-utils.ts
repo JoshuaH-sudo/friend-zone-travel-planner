@@ -1,25 +1,5 @@
-import { Database } from '@/lib/supabase/database.types';
+import { TripByIdResponse } from '@/app/dashboard/trips/actions/getTripById';
 import { differenceInDays } from 'date-fns';
-
-// Type definitions for route data with nested relationships based on actual query
-type RouteWithDestinations = Database['public']['Tables']['routes']['Row'] & {
-  destinations?: {
-    id: string;
-    location: string;
-    latitude: number;
-    longitude: number;
-    order: number;
-    created_at: string | null;
-    updated_at: string | null;
-    days: number;
-    friends?: {
-      id: string;
-      name: string;
-    }[];
-    accommodations?: Database['public']['Tables']['accommodations']['Row'][];
-    transports?: Database['public']['Tables']['transports']['Row'][];
-  }[];
-};
 
 // Currency symbols mapping
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -44,16 +24,18 @@ export interface CostSummary {
  * @returns Array of cost summaries grouped by currency
  */
 export function calculateRouteCosts(
-  route: RouteWithDestinations
+  route: TripByIdResponse['routes'][0]
 ): CostSummary[] {
   const costMap = new Map<string, number>();
 
   // Iterate through all destinations in the route
   route.destinations?.forEach((destination) => {
-    // Add accommodation costs
     destination.accommodations?.forEach((accommodation) => {
       const currency = accommodation.currency;
       const cost = accommodation.cost;
+
+      if (cost <= 0 || !cost) return;
+
       // Default to 1 night if days is not specified
       const { check_in, check_out } = accommodation;
       const numberOfNights =
@@ -110,7 +92,7 @@ export function formatCost(amount: number, currency: string): string {
  * @param route Route object with destinations, accommodations, and transports
  * @returns True if the route has any costs, false otherwise
  */
-export function routeHasCosts(route: RouteWithDestinations): boolean {
+export function routeHasCosts(route: TripByIdResponse['routes'][0]): boolean {
   return (
     route.destinations?.some(
       (destination) =>

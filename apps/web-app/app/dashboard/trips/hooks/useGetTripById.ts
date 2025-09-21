@@ -2,8 +2,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTripById } from '@/app/dashboard/trips/actions/getTripById';
 
-export type TripByIdResponse = Awaited<ReturnType<typeof getTripById>>;
-
 interface UseGetTripByIdProps {
   tripId: string;
   enabled?: boolean;

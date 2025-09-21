@@ -258,7 +258,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   // Don't need transport and stuff when it is the starting point.
   const isStartDestination = !previousDestination;
 
-  console.log('edit destination', !destinationToEdit);
   return (
     <Form {...form}>
       <form
