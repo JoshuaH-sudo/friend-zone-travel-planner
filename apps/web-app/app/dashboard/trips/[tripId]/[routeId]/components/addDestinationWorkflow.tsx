@@ -20,10 +20,10 @@ import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import FriendAccommodationSelector from './friendAccommodationSelector';
-import AccommodationForm from './accommodationForm';
-import ManualTransportForm from './transportForm';
+import AccommodationForm from './forms/accommodationForm';
+import ManualTransportForm from './forms/transportForm';
 import { Button } from '@/components/ui/button';
-import DestinationForm from './destinationForm';
+import DestinationForm from './forms/destinationForm';
 import { cn } from '@/lib/utils';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
@@ -45,6 +45,7 @@ const schema = z.object({
   selectedFriendId: z.string().optional(),
   accommodation: z
     .object({
+      id: z.string().optional(),
       name: z.string().default(''),
       address: z.string().optional().default(''),
       cost: z.number().default(0),
@@ -60,6 +61,7 @@ const schema = z.object({
     .optional(),
   transport: z
     .object({
+      id: z.string().optional(),
       name: z.string().default(''),
       address: z.string().optional().nullable().default(''),
       cost: z.number().default(0),
@@ -70,12 +72,12 @@ const schema = z.object({
         .default('airplane'),
       departureAt: z
         .date()
-        .optional()
-        .default(() => new Date()),
+        .nullable()
+        .default(null),
       arrivalAt: z
         .date()
-        .optional()
-        .default(() => new Date()),
+        .nullable()
+        .default(null)
     })
     .optional(),
 });

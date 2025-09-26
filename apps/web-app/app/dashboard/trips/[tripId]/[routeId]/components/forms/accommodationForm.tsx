@@ -20,7 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationForm } from './addDestinationWorkflow';
+import { DestinationForm } from '../addDestinationWorkflow';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 

@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/form';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import { useEffect, useState } from 'react';
-import useGetAddressCoordinates from '../hooks/useGetAddressCoordinates';
-import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
+import useGetAddressCoordinates from '../../hooks/useGetAddressCoordinates';
+import useGetFriendsByGeoLocation from '../../hooks/useGetFriendsByGeoLocation';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
+import { GetRouteByIdResponse } from '../../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
 interface DestinationFormProps {
