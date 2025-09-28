@@ -8,24 +8,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { addDays, differenceInDays } from 'date-fns';
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import FriendAccommodationSelector from './friendAccommodationSelector';
-import AccommodationForm from './forms/accommodationForm';
-import ManualTransportForm from './forms/transportForm';
-import { Button } from '@/components/ui/button';
 import DestinationForm from './forms/destinationForm';
-import { cn } from '@/lib/utils';
-import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
+import { TripByIdResponse } from '../../../actions/getTripById';
 
 // We'll just use the DestinationForm type, which comes from the zod schema
 
@@ -78,20 +64,20 @@ const schema = z.object({
 export type DestinationFormType = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
-  route: GetRouteByIdResponse;
-  previousDestination?: DestinationFormType;
+  route: TripByIdResponse['routes'][0];
   destinationToEdit?: DestinationFormType;
   onEditComplete: () => void;
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   route,
-  previousDestination,
   destinationToEdit,
   onEditComplete,
 }) => {
   const queryClient = useQueryClient();
-
+  const previousDestination = route.destinations
+    .sort((a, b) => a.order - b.order)
+    .slice(-1)[0];
   const [activeTab, setActiveTab] = useState<string>('destination');
   const defaultNewDestination = {
     routeId: route.id,
@@ -101,16 +87,16 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     latitude: 0,
     longitude: 0,
     startDate: previousDestination
-      ? new Date(previousDestination.endDate)
+      ? new Date(previousDestination.end_date)
       : route.date_from
         ? new Date(route.date_from)
         : new Date(),
     endDate: previousDestination
-    // End date should default to the day after the start date
-    ? addDays(new Date(previousDestination.endDate), 1)
+      ? // End date should default to the day after the start date
+        addDays(new Date(previousDestination.end_date), 1)
       : route.date_from
-      ? addDays(new Date(route.date_from), 1)
-      : addDays(new Date(), 1),
+        ? addDays(new Date(route.date_from), 1)
+        : addDays(new Date(), 1),
   };
 
   const form = useForm<DestinationFormType>({
@@ -141,19 +127,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     }
   }, [destinationToEdit]);
 
-  const { control, handleSubmit, reset, watch, setValue, formState } = form;
-  const { isValid, isDirty } = formState;
-
-  const stayingWithFriend = watch('stayingWithFriend');
-  const selectedFriendId = watch('selectedFriendId');
-  const latitude = watch('latitude');
-  const longitude = watch('longitude');
-
-  // Handle friend selection for accommodation
-  const handleFriendSelect = (friendId: string) => {
-    setValue('selectedFriendId', friendId);
-    setValue('accommodation', undefined);
-  };
+  const { handleSubmit, reset } = form;
 
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: async () => {
@@ -248,105 +222,13 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     }
   };
 
-  // Don't need transport and stuff when it is the starting point.
-  const isStartDestination = !previousDestination;
-
   return (
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1 p-2'
       >
-        <div className='mb-4 flex items-end justify-between'>
-          <h6 className='text-lg font-medium'>
-            {destinationToEdit ? 'Edit Destination' : 'Add New Destination'}
-          </h6>
-          <div className='flex gap-2'>
-            <Button
-              type='submit'
-              className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
-              hidden={!destinationToEdit}
-            >
-              Cancel Edit
-            </Button>
-
-            <Button
-              type='submit'
-              className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
-              disabled={!isValid && isDirty}
-            >
-              {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
-            </Button>
-          </div>
-        </div>
-
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className='h-full w-full'
-        >
-          <TabsList
-            className={cn(
-              'grid w-full',
-              previousDestination ? 'grid-cols-3' : 'grid-cols-1'
-            )}
-          >
-            <TabsTrigger value='destination'>
-              {isStartDestination ? 'Starting Point' : 'Details'}
-            </TabsTrigger>
-            {previousDestination && (
-              <TabsTrigger value='accommodation'>Accommodation</TabsTrigger>
-            )}
-            {previousDestination && (
-              <TabsTrigger value='transport'>Transport</TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value='destination' className='mt-2 space-y-4'>
-            <DestinationForm
-              route={route}
-              previousDestination={previousDestination}
-              enableInitialLoad={!destinationToEdit}
-            />
-          </TabsContent>
-
-          <TabsContent value='accommodation' className='mt-2 space-y-4'>
-            <FormField
-              control={control}
-              name='stayingWithFriend'
-              render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
-                  <div className='space-y-0.5'>
-                    <FormLabel>Staying with a friend?</FormLabel>
-                    <FormDescription>
-                      Toggle this if you'll be staying at a friend's place
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            {stayingWithFriend ? (
-              <FriendAccommodationSelector
-                selectedFriendId={selectedFriendId || null}
-                coordinates={{ lat: latitude, lng: longitude }}
-                onSelectFriend={handleFriendSelect}
-              />
-            ) : (
-              <AccommodationForm />
-            )}
-          </TabsContent>
-
-          <TabsContent value='transport' className='mt-2 space-y-4'>
-            <ManualTransportForm />
-          </TabsContent>
-        </Tabs>
+        <DestinationForm route={route} enableInitialLoad={!destinationToEdit} />
       </form>
     </Form>
   );

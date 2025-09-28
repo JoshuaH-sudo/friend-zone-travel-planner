@@ -16,18 +16,16 @@ import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { GetRouteByIdResponse } from '../../../hooks/useGetRouteById';
 import type { DestinationFormType } from '../addDestinationWorkflow';
+import { TripByIdResponse } from '@/app/dashboard/trips/actions/getTripById';
 
 interface DestinationFormProps {
-  route: GetRouteByIdResponse;
-  previousDestination?: DestinationFormType;
+  route: TripByIdResponse['routes'][0];
   enableInitialLoad?: boolean;
 }
 
 const DestinationFormType = ({
   route,
-  previousDestination,
   enableInitialLoad = true,
 }: DestinationFormProps) => {
   const [enableApiCalls, setEnableApiCalls] = useState(enableInitialLoad);
@@ -35,6 +33,9 @@ const DestinationFormType = ({
   const address = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
+  const previousDestination = route.destinations
+    .sort((a, b) => a.order - b.order)
+    .slice(-1)[0];
 
   useEffect(() => {
     setEnableApiCalls(enableInitialLoad);
@@ -45,12 +46,12 @@ const DestinationFormType = ({
       // Prevent or enable initial API calls when destination changes
       setEnableApiCalls(enableInitialLoad);
       // Start date should be the end date of the last destination
-      setValue('startDate', new Date(previousDestination.endDate));
+      setValue('startDate', new Date(previousDestination.end_date));
     } else {
       // set from to be the route start date
       setValue('startDate', new Date(route.date_from!));
     }
-  }, [previousDestination?.endDate, route.date_from]);
+  }, [previousDestination?.end_date, route.date_from]);
 
   // Get address suggestions as the user types
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
@@ -95,7 +96,7 @@ const DestinationFormType = ({
   }, [coordinates, setValue]);
 
   const startDateSelection = previousDestination
-    ? new Date(previousDestination.endDate)
+    ? new Date(previousDestination.end_date)
     : new Date(route.date_from!);
 
   const dateRange: DateRange = {

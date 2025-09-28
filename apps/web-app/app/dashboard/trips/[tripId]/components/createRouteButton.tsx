@@ -5,12 +5,18 @@ import { redirect } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { createRoute } from '../actions/createRoute';
 import { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
-import { TripByIdResponse } from '../../hooks/useGetTripById';
+import { TripByIdResponse } from '../../actions/getTripById';
 
 export interface CreateRouteButtonProps {
   trip: TripByIdResponse;
@@ -24,19 +30,19 @@ const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
   useEffect(() => {
     setDateRange({
       from: new Date(trip.start_date),
-      to: new Date(trip.end_date)
+      to: new Date(trip.end_date),
     });
   }, [trip]);
 
   const createRouteHandler = async () => {
-    const newRoute = await createRoute({
+    await createRoute({
       name: routeName,
       tripId: trip.id,
       dateFrom: dateRange?.from,
       dateTo: dateRange?.to,
     });
     setOpen(false);
-    redirect(`./${trip.id}/${newRoute.id}`);
+    redirect(`./${trip.id}`);
   };
 
   return (
@@ -51,24 +57,24 @@ const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
         <DialogHeader>
           <DialogTitle>Create New Route</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="route-name">Route Name</Label>
+        <div className='grid gap-4 py-4'>
+          <div className='grid gap-2'>
+            <Label htmlFor='route-name'>Route Name</Label>
             <Input
-              id="route-name"
+              id='route-name'
               value={routeName}
               onChange={(e) => setRouteName(e.target.value)}
-              placeholder="Enter route name"
+              placeholder='Enter route name'
             />
           </div>
-          <div className="grid gap-2">
+          <div className='grid gap-2'>
             <DateRangeInput
               dates={dateRange}
               onSelect={setDateRange}
-              label="Route Duration"
+              label='Route Duration'
             />
           </div>
-          <Button onClick={createRouteHandler} className="w-full">
+          <Button onClick={createRouteHandler} className='w-full'>
             Create Route
           </Button>
         </div>
@@ -78,4 +84,3 @@ const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
 };
 
 export default CreateRouteButton;
-

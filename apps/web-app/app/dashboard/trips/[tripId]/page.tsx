@@ -29,7 +29,6 @@ export default async function TripDetails({
     return (
       <TripOverviewClient
         trip={trip}
-        routes={trip.routes || []}
         tripId={tripId}
       />
     );
