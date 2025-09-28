@@ -14,7 +14,7 @@
     "sb:start": "supabase start",
     "sb:stop": "supabase stop",
     "sb:restart": "supabase stop && supabase start",
-    "sb:db-diff": "supabase db diff --use-migra" 
+    "sb:db-diff": "supabase db diff --use-migra"
   },
   "dependencies": {
     "@arcjet/next": "^1.0.0-beta.5",
@@ -86,7 +86,7 @@
     "postcss": "^8",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.13",
-    "supabase": "^2.31.8",
+    "supabase": "^2.45.5",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
     "typescript": "^5",
