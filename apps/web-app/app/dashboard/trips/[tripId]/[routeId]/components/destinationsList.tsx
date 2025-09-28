@@ -13,11 +13,13 @@ import { format } from 'date-fns';
 
 export interface DestinationListProps {
   route: GetRouteByIdResponse;
+  selectedDestinationId?: string;
   onDestinationSelect: (destination: FullDestination) => void;
 }
 
 const DestinationList: FC<DestinationListProps> = ({
   route,
+  selectedDestinationId,
   onDestinationSelect,
 }) => {
   const { data: destinations = [] } = useGetDestinationsByRouteId(route.id);
@@ -47,7 +49,13 @@ const DestinationList: FC<DestinationListProps> = ({
             </div>
 
             <div
-              className='flex flex-1 cursor-pointer flex-row gap-2 rounded-lg bg-gray-200 p-2 px-4 text-sm text-black transition-colors duration-200 hover:bg-blue-400'
+              className={`flex flex-1 cursor-pointer flex-row gap-2 rounded-lg p-2 px-4 text-sm transition-colors duration-200 ${
+                selectedDestinationId === destination.id
+                  ? 'bg-blue-500 text-white shadow-lg'
+                  : selectedDestinationId
+                  ? 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                  : 'bg-gray-200 text-black hover:bg-blue-400'
+              }`}
               onClick={() => onDestinationSelect(destination)}
             >
               <p className='flex-1'>{destination.location}</p>

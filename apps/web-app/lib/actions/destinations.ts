@@ -77,7 +77,9 @@ export async function getDestinationsByRouteId(routeId: string) {
         type,
         friend_id,
         check_in,
-        check_out
+        check_out,
+        created_at,
+        updated_at
       ),
       transports (
         id,
@@ -89,7 +91,9 @@ export async function getDestinationsByRouteId(routeId: string) {
         type,
         departure_at,
         arrival_at,
-        duration
+        duration,
+        created_at,
+        updated_at
       )
     `
     )
@@ -198,8 +202,8 @@ export interface AddDestinationToRouteProps {
     href: string | null;
     type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
     friendId: string | null;
-    check_in?: Date;
-    check_out?: Date;
+    checkIn: Date | null;
+    checkOut: Date | null;
   };
   transport?: {
     address: string | null;
@@ -207,8 +211,8 @@ export interface AddDestinationToRouteProps {
     currency: string;
     href: string | null;
     type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt: Date;
-    arrivalAt: Date;
+    departureAt: Date | null;
+    arrivalAt: Date | null;
   };
 }
 
@@ -312,8 +316,8 @@ export async function editDestination(
           href: data.accommodation.href,
           type: data.accommodation.type,
           friend_id: data.accommodation.friendId,
-          check_in: data.accommodation.check_in ? data.accommodation.check_in.toISOString() : null, 
-          check_out: data.accommodation.check_out ? data.accommodation.check_out.toISOString() : null,
+          check_in: data.accommodation.checkIn ? data.accommodation.checkIn.toISOString() : null,
+          check_out: data.accommodation.checkOut ? data.accommodation.checkOut.toISOString() : null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingAccommodation.id)
@@ -336,8 +340,8 @@ export async function editDestination(
         href: data.accommodation.href,
         type: data.accommodation.type as AccommodationType,
         friendId: data.accommodation.friendId,
-        checkIn: data.accommodation.check_in,
-        checkOut: data.accommodation.check_out,
+        checkIn: data.accommodation.checkIn,
+        checkOut: data.accommodation.checkOut,
       });
       accommodationId = accommodation.id;
     }
@@ -384,8 +388,8 @@ export async function editDestination(
         currency: data.transport.currency,
         href: data.transport.href ?? "",
         type: data.transport.type,
-        departureAt: data.transport.departureAt,
-        arrivalAt: data.transport.arrivalAt,
+        departureAt: data.transport.departureAt ?? undefined,
+        arrivalAt: data.transport.arrivalAt ?? undefined,
       });
       transportId = transport.id;
     }
@@ -471,8 +475,8 @@ export async function addDestinationToRoute(
       href: data.accommodation.href || "",
       type: data.accommodation.type as AccommodationType,
       friendId: data.accommodation.friendId,
-      checkIn: data.accommodation.check_in,
-      checkOut: data.accommodation.check_out,
+      checkIn: data.accommodation.checkIn,
+      checkOut: data.accommodation.checkOut,
     });
     accommodationId = accommodation.id;
   }
@@ -486,8 +490,8 @@ export async function addDestinationToRoute(
       currency: data.transport.currency,
       href: data.transport.href || "",
       type: data.transport.type,
-      departureAt: data.transport.departureAt,
-      arrivalAt: data.transport.arrivalAt,
+      departureAt: data.transport.departureAt ?? undefined,
+      arrivalAt: data.transport.arrivalAt ?? undefined,
     });
     transportId = transport.id;
   }

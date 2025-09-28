@@ -21,14 +21,30 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationForm } from './addDestinationWorkflow';
+import { DestinationFormType } from '../addDestinationWorkflow';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 const TransportForm: FC = () => {
-  const form = useFormContext<DestinationForm>();
+  const form = useFormContext<DestinationFormType>();
+  const { watch } = form;
+  const destinationStartDate = watch('startDate');
+  const departureAt = watch('transport.departureAt');
+
+  const numberInputTransform = {
+    input: (value: number) =>
+      isNaN(value) || value === 0 ? '' : value.toString(),
+    output: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const output = parseInt(e.target.value, 10);
+      return isNaN(output) ? 0 : output;
+    },
+  };
 
   return (
     <Card>
@@ -59,14 +75,18 @@ const TransportForm: FC = () => {
                 <FormItem>
                   <FormLabel>Station Address</FormLabel>
                   <FormControl>
-                    <Input placeholder='BER Airport' {...field} value={field.value ?? ''} />
+                    <Input
+                      placeholder='BER Airport'
+                      {...field}
+                      value={field.value ?? ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='flex flex-row gap-1'>
               <FormField
                 control={form.control}
                 name='transport.cost'
@@ -74,18 +94,26 @@ const TransportForm: FC = () => {
                   <FormItem>
                     <FormLabel>Cost</FormLabel>
                     <FormControl>
-                      <Input type='number' min='0' step='0.01' {...field} />
+                      <Input
+                        type='number'
+                        min='0'
+                        step='0.01'
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(numberInputTransform.output(e))
+                        }
+                        value={numberInputTransform.input(field.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name='transport.currency'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className=''>
                     <FormLabel>Currency</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -93,7 +121,7 @@ const TransportForm: FC = () => {
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder='Select currency' />
+                          <SelectValue placeholder='USD ($)' />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -118,7 +146,11 @@ const TransportForm: FC = () => {
                 <FormItem>
                   <FormLabel>Website URL (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder='https://example.com' {...field} value={field.value ?? ''} />
+                    <Input
+                      placeholder='https://example.com'
+                      {...field}
+                      value={field.value ?? ''}
+                    />
                   </FormControl>
                   <FormDescription>
                     Link to booking website or more information
@@ -156,7 +188,7 @@ const TransportForm: FC = () => {
                 </FormItem>
               )}
             />
-            
+
             <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
@@ -168,7 +200,7 @@ const TransportForm: FC = () => {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="outline"
+                            variant='outline'
                             className={`pl-3 text-left font-normal ${!field.value ? 'text-muted-foreground' : ''}`}
                           >
                             {field.value ? (
@@ -176,15 +208,23 @@ const TransportForm: FC = () => {
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className='w-auto p-0' align='start'>
                         <Calendar
-                          mode="single"
-                          selected={field.value}
+                          mode='single'
+                          selected={field.value ?? undefined}
                           onSelect={field.onChange}
+                          {...field}
+                          disabled={(date) => {
+                            if (destinationStartDate) {
+                              return date < destinationStartDate;
+                            }
+                            return false;
+                          }}
+                          defaultMonth={field.value || destinationStartDate || undefined}
                           initialFocus
                         />
                       </PopoverContent>
@@ -203,7 +243,7 @@ const TransportForm: FC = () => {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="outline"
+                            variant='outline'
                             className={`pl-3 text-left font-normal ${!field.value ? 'text-muted-foreground' : ''}`}
                           >
                             {field.value ? (
@@ -211,15 +251,22 @@ const TransportForm: FC = () => {
                             ) : (
                               <span>Pick a date</span>
                             )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className='w-auto p-0' align='start'>
                         <Calendar
-                          mode="single"
-                          selected={field.value}
+                          mode='single'
+                          selected={field.value ?? undefined}
                           onSelect={field.onChange}
+                          disabled={(date) => {
+                            if (departureAt) {
+                              return date < departureAt;
+                            }
+                            return false;
+                          }}
+                          defaultMonth={departureAt || destinationStartDate || undefined}
                           initialFocus
                         />
                       </PopoverContent>
