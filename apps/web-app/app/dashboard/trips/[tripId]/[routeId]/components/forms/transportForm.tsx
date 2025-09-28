@@ -33,6 +33,10 @@ import { CalendarIcon } from 'lucide-react';
 
 const TransportForm: FC = () => {
   const form = useFormContext<DestinationForm>();
+  const { watch } = form;
+  const destinationStartDate = watch('startDate');
+  const departureAt = watch('transport.departureAt');
+  const arrivalAt = watch('transport.arrivalAt');
 
   const numberInputTransform = {
     input: (value: number) =>
@@ -212,9 +216,19 @@ const TransportForm: FC = () => {
                       <PopoverContent className='w-auto p-0' align='start'>
                         <Calendar
                           mode='single'
-                          selected={field.value}
+                          selected={field.value ?? undefined}
                           onSelect={field.onChange}
                           {...field}
+                          disabled={(date) => {
+                            // if (arrivalAt) {
+                            //   return date > arrivalAt;
+                            // }
+                            if (destinationStartDate) {
+                              return date < destinationStartDate;
+                            }
+                            return false;
+                          }}
+                          defaultMonth={field.value || destinationStartDate || undefined}
                           initialFocus
                         />
                       </PopoverContent>
@@ -248,8 +262,15 @@ const TransportForm: FC = () => {
                       <PopoverContent className='w-auto p-0' align='start'>
                         <Calendar
                           mode='single'
-                          selected={field.value}
+                          selected={field.value ?? undefined}
                           onSelect={field.onChange}
+                          disabled={(date) => {
+                            if (departureAt) {
+                              return date < departureAt;
+                            }
+                            return false;
+                          }}
+                          defaultMonth={departureAt || destinationStartDate || undefined}
                           initialFocus
                         />
                       </PopoverContent>

@@ -207,8 +207,8 @@ export interface AddDestinationToRouteProps {
     currency: string;
     href: string | null;
     type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
-    departureAt: Date;
-    arrivalAt: Date;
+    departureAt: Date | null;
+    arrivalAt: Date | null;
   };
 }
 
@@ -384,8 +384,8 @@ export async function editDestination(
         currency: data.transport.currency,
         href: data.transport.href ?? "",
         type: data.transport.type,
-        departureAt: data.transport.departureAt,
-        arrivalAt: data.transport.arrivalAt,
+        departureAt: data.transport.departureAt ?? undefined,
+        arrivalAt: data.transport.arrivalAt ?? undefined,
       });
       transportId = transport.id;
     }
@@ -486,8 +486,8 @@ export async function addDestinationToRoute(
       currency: data.transport.currency,
       href: data.transport.href || "",
       type: data.transport.type,
-      departureAt: data.transport.departureAt,
-      arrivalAt: data.transport.arrivalAt,
+      departureAt: data.transport.departureAt ?? undefined,
+      arrivalAt: data.transport.arrivalAt ?? undefined,
     });
     transportId = transport.id;
   }
