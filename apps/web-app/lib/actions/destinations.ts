@@ -77,7 +77,9 @@ export async function getDestinationsByRouteId(routeId: string) {
         type,
         friend_id,
         check_in,
-        check_out
+        check_out,
+        created_at,
+        updated_at
       ),
       transports (
         id,
@@ -89,7 +91,9 @@ export async function getDestinationsByRouteId(routeId: string) {
         type,
         departure_at,
         arrival_at,
-        duration
+        duration,
+        created_at,
+        updated_at
       )
     `
     )
