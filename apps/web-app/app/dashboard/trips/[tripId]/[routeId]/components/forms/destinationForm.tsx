@@ -17,15 +17,15 @@ import { useFormContext } from 'react-hook-form';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 import { GetRouteByIdResponse } from '../../../hooks/useGetRouteById';
-import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
+import type { DestinationFormType } from '../addDestinationWorkflow';
 
 interface DestinationFormProps {
   route: GetRouteByIdResponse;
-  previousDestination?: Omit<FullDestination, 'routes'>;
+  previousDestination?: DestinationFormType;
   enableInitialLoad?: boolean;
 }
 
-const DestinationForm = ({
+const DestinationFormType = ({
   route,
   previousDestination,
   enableInitialLoad = true,
@@ -40,18 +40,17 @@ const DestinationForm = ({
     setEnableApiCalls(enableInitialLoad);
   }, [enableInitialLoad]);
 
-
   useEffect(() => {
     if (previousDestination) {
       // Prevent or enable initial API calls when destination changes
-      setEnableApiCalls(enableInitialLoad)
+      setEnableApiCalls(enableInitialLoad);
       // Start date should be the end date of the last destination
-      setValue('startDate', new Date(previousDestination.end_date));
+      setValue('startDate', new Date(previousDestination.endDate));
     } else {
       // set from to be the route start date
       setValue('startDate', new Date(route.date_from!));
     }
-  }, [previousDestination?.end_date, route.date_from]);
+  }, [previousDestination?.endDate, route.date_from]);
 
   // Get address suggestions as the user types
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
@@ -96,7 +95,7 @@ const DestinationForm = ({
   }, [coordinates, setValue]);
 
   const startDateSelection = previousDestination
-    ? new Date(previousDestination.end_date)
+    ? new Date(previousDestination.endDate)
     : new Date(route.date_from!);
 
   const dateRange: DateRange = {
@@ -200,4 +199,4 @@ const DestinationForm = ({
   );
 };
 
-export default DestinationForm;
+export default DestinationFormType;

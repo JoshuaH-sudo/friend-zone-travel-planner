@@ -7,7 +7,7 @@ import useEditDestination from '../hooks/useEditDestination';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { differenceInDays } from 'date-fns';
+import { addDays, differenceInDays } from 'date-fns';
 import {
   Form,
   FormField,
@@ -26,7 +26,6 @@ import { Button } from '@/components/ui/button';
 import DestinationForm from './forms/destinationForm';
 import { cn } from '@/lib/utils';
 import { GetRouteByIdResponse } from '../../hooks/useGetRouteById';
-import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
 
 // We'll just use the DestinationForm type, which comes from the zod schema
 
@@ -55,8 +54,8 @@ const schema = z.object({
         .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
         .default('hotel'),
       friendId: z.string().optional().nullable(),
-      check_in: z.date().optional(),
-      check_out: z.date().optional(),
+      checkIn: z.date().nullable(),
+      checkOut: z.date().nullable(),
     })
     .optional(),
   transport: z
@@ -70,24 +69,18 @@ const schema = z.object({
       type: z
         .enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other'])
         .default('airplane'),
-      departureAt: z
-        .date()
-        .nullable()
-        .default(null),
-      arrivalAt: z
-        .date()
-        .nullable()
-        .default(null)
+      departureAt: z.date().nullable().default(null),
+      arrivalAt: z.date().nullable().default(null),
     })
     .optional(),
 });
 
-export type DestinationForm = z.infer<typeof schema>;
+export type DestinationFormType = z.infer<typeof schema>;
 
 export interface AddDestinationWorkflowProps {
   route: GetRouteByIdResponse;
-  previousDestination?: Omit<FullDestination, 'routes'>;
-  destinationToEdit?: DestinationForm;
+  previousDestination?: DestinationFormType;
+  destinationToEdit?: DestinationFormType;
   onEditComplete: () => void;
 }
 
@@ -108,21 +101,19 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     latitude: 0,
     longitude: 0,
     startDate: previousDestination
-      ? new Date(previousDestination.end_date)
+      ? new Date(previousDestination.endDate)
       : route.date_from
         ? new Date(route.date_from)
         : new Date(),
     endDate: previousDestination
-      ? new Date(
-          new Date(previousDestination.end_date).getTime() + 24 * 60 * 60 * 1000
-        ) // Add one day
+    // End date should default to the day after the start date
+    ? addDays(new Date(previousDestination.endDate), 1)
       : route.date_from
-        ? new Date(new Date(route.date_from).getTime() + 24 * 60 * 60 * 1000) // Add one day
-        : new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // Add one day
-    // No default transport - it's optional
+      ? addDays(new Date(route.date_from), 1)
+      : addDays(new Date(), 1),
   };
 
-  const form = useForm<DestinationForm>({
+  const form = useForm<DestinationFormType>({
     defaultValues: {
       ...defaultNewDestination,
     },
@@ -197,7 +188,7 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
     },
   });
 
-  const onSubmit = async (data: DestinationForm) => {
+  const onSubmit = async (data: DestinationFormType) => {
     // Calculate days based on startDate and endDate
     const days = differenceInDays(data.endDate, data.startDate) + 1;
 
@@ -220,8 +211,8 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         address: data.accommodation.address || null,
         href: data.accommodation.href || null,
         friendId: data.accommodation.friendId || null,
-        check_in: data.accommodation.check_in,
-        check_out: data.accommodation.check_out,
+        checkIn: data.accommodation.checkIn,
+        checkOut: data.accommodation.checkOut,
       };
     } else {
       // Explicitly set to undefined to ensure it's not included in the API call
@@ -268,27 +259,25 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       >
         <div className='mb-4 flex items-end justify-between'>
           <h6 className='text-lg font-medium'>
-            {destinationToEdit
-              ? 'Edit Destination'
-              : 'Add New Destination'}
+            {destinationToEdit ? 'Edit Destination' : 'Add New Destination'}
           </h6>
-        <div className='flex gap-2'>
-          <Button
-            type='submit'
-            className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
-            hidden={!destinationToEdit}
-          >
-            Cancel Edit
-          </Button>
+          <div className='flex gap-2'>
+            <Button
+              type='submit'
+              className='rounded-md bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400'
+              hidden={!destinationToEdit}
+            >
+              Cancel Edit
+            </Button>
 
-          <Button
-            type='submit'
-            className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
-            disabled={!isValid && isDirty}
-          >
-            {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
-          </Button>
-        </div>
+            <Button
+              type='submit'
+              className='rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 disabled:opacity-50'
+              disabled={!isValid && isDirty}
+            >
+              {destinationToEdit && destinationToEdit.id ? 'Update' : 'Submit'}
+            </Button>
+          </div>
         </div>
 
         <Tabs

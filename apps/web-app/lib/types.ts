@@ -7,8 +7,8 @@ export interface CreateAccommodationData {
   href: string | null;
   type: AccommodationType;
   friendId: string | null;
-  checkIn?: Date;
-  checkOut?: Date;
+  checkIn: Date | null;
+  checkOut: Date | null;
 }
 
 export interface AccommodationData {
@@ -21,10 +21,8 @@ export interface AccommodationData {
   href: string | null;
   type: AccommodationType;
   friendId: string | null;
-  checkIn?: Date;
-  checkOut?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  checkIn: Date | null;
+  checkOut: Date | null;
 }
 
 export enum AccommodationType {

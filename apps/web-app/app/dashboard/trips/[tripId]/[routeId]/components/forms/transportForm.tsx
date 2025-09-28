@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationForm } from '../addDestinationWorkflow';
+import { DestinationFormType } from '../addDestinationWorkflow';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -32,7 +32,7 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 const TransportForm: FC = () => {
-  const form = useFormContext<DestinationForm>();
+  const form = useFormContext<DestinationFormType>();
   const { watch } = form;
   const destinationStartDate = watch('startDate');
   const departureAt = watch('transport.departureAt');

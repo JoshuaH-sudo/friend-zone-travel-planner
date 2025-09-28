@@ -79,10 +79,10 @@ export async function createAccommodation(
     href: accommodation.href,
     type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
-    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : undefined,
-    checkOut: accommodation.check_out ? new Date(accommodation.check_out) : undefined,
-    createdAt: new Date(accommodation.created_at),
-    updatedAt: new Date(accommodation.updated_at),
+    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : null,
+    checkOut: accommodation.check_out
+      ? new Date(accommodation.check_out)
+      : null,
   };
 }
 
@@ -139,9 +139,9 @@ export async function getAccommodationByDestinationId(
     href: accommodation.href,
     type: accommodation.type as AccommodationType,
     friendId: accommodation.friend_id,
-    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : undefined,
-    checkOut: accommodation.check_out ? new Date(accommodation.check_out) : undefined,
-    createdAt: new Date(accommodation.created_at),
-    updatedAt: new Date(accommodation.updated_at),
+    checkIn: accommodation.check_in ? new Date(accommodation.check_in) : null,
+    checkOut: accommodation.check_out
+      ? new Date(accommodation.check_out)
+      : null,
   };
 }

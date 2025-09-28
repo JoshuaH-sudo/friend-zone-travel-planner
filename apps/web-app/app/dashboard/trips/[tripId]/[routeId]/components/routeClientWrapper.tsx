@@ -2,7 +2,7 @@
 
 import { FC, useState } from 'react';
 import AddDestinationWorkflow, {
-  DestinationForm,
+  DestinationFormType,
 } from './addDestinationWorkflow';
 import DestinationList from './destinationsList';
 import RouteNameInput from './routeNameInput';
@@ -16,7 +16,7 @@ export interface RouteClientWrapperProps {
 
 const parseTransport = (
   transportData: FullDestination['transports'][0]
-): DestinationForm['transport'] => {
+): DestinationFormType['transport'] => {
   return {
     id: transportData.id,
     name: transportData.name,
@@ -32,12 +32,18 @@ const parseTransport = (
     currency: transportData.currency,
     address: transportData.address,
     href: transportData.href,
+    createdAt: transportData.created_at
+      ? new Date(transportData.created_at)
+      : null,
+    updatedAt: transportData.updated_at
+      ? new Date(transportData.updated_at)
+      : null,
   };
 };
 
 const parseAccommodation = (
   accommodationData: FullDestination['accommodations'][0]
-): DestinationForm['accommodation'] => {
+): DestinationFormType['accommodation'] => {
   return {
     id: accommodationData.id,
     name: accommodationData.name,
@@ -47,12 +53,38 @@ const parseAccommodation = (
     cost: accommodationData.cost,
     currency: accommodationData.currency,
     href: accommodationData.href,
-    check_in: accommodationData.check_in
+    checkIn: accommodationData.check_in
       ? new Date(accommodationData.check_in)
-      : undefined,
-    check_out: accommodationData.check_out
+      : null,
+    checkOut: accommodationData.check_out
       ? new Date(accommodationData.check_out)
+      : null,
+    createdAt: accommodationData.created_at
+      ? new Date(accommodationData.created_at)
       : undefined,
+    updatedAt: accommodationData.updated_at
+      ? new Date(accommodationData.updated_at)
+      : undefined,
+  };
+};
+
+const parseDestination = (
+  destination: Omit<FullDestination, 'routes'>
+): DestinationFormType => {
+  return {
+    id: destination.id,
+    routeId: destination.route_id,
+    location: destination.location,
+    latitude: destination.latitude,
+    longitude: destination.longitude,
+    startDate: new Date(destination.start_date),
+    endDate: new Date(destination.end_date),
+    days: destination.days,
+    order: destination.order,
+    stayingWithFriend: destination.friends.length > 0,
+    friendIds: destination.friends.map((friend) => friend.id),
+    accommodation: parseAccommodation(destination.accommodations[0]),
+    transport: parseTransport(destination.transports[0]),
   };
 };
 
@@ -60,22 +92,11 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
   const { data: route } = useGetRouteById({
     routeId,
   });
-  const [destinationToEdit, setDestinationToEdit] = useState<DestinationForm>();
+  const [destinationToEdit, setDestinationToEdit] =
+    useState<DestinationFormType>();
   const onDestinationSelect = (destination: FullDestination) => {
     setDestinationToEdit({
-      id: destination.id,
-      routeId: destination.route_id,
-      location: destination.location,
-      latitude: destination.latitude,
-      longitude: destination.longitude,
-      startDate: new Date(destination.start_date),
-      endDate: new Date(destination.end_date),
-      days: destination.days,
-      order: destination.order,
-      stayingWithFriend: destination.friends.length > 0,
-      friendIds: destination.friends.map((friend) => friend.id),
-      accommodation: parseAccommodation(destination.accommodations[0]),
-      transport: parseTransport(destination.transports[0]),
+      ...parseDestination(destination),
     });
   };
 
@@ -95,6 +116,9 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
       ? route.destinations[route.destinations.length - 1]
       : undefined;
 
+  const parsedPreviousDestination = previousDestination
+    ? parseDestination(previousDestination)
+    : undefined;
   return (
     <div className='min-h-screen sm:h-[600px]'>
       <div
@@ -119,7 +143,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
         >
           <AddDestinationWorkflow
             route={route}
-            previousDestination={previousDestination}
+            previousDestination={parsedPreviousDestination}
             destinationToEdit={destinationToEdit}
             onEditComplete={() => setDestinationToEdit(undefined)}
           />

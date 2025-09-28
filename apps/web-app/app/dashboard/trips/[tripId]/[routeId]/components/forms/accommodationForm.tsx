@@ -20,12 +20,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationForm } from '../addDestinationWorkflow';
+import { DestinationFormType } from '../addDestinationWorkflow';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 
 const AccommodationForm: FC = () => {
-  const form = useFormContext<DestinationForm>();
+  const form = useFormContext<DestinationFormType>();
   const startDate = form.watch('startDate');
   const endDate = form.watch('endDate');
   
