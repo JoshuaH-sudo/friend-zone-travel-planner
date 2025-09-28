@@ -52,6 +52,8 @@ export async function getRouteById({ routeId }: GetRouteByIdParams) {
           href,
           type,
           friend_id,
+          check_in,
+          check_out,
           created_at,
           updated_at
         ),

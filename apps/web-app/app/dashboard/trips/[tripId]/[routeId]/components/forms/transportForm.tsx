@@ -36,7 +36,6 @@ const TransportForm: FC = () => {
   const { watch } = form;
   const destinationStartDate = watch('startDate');
   const departureAt = watch('transport.departureAt');
-  const arrivalAt = watch('transport.arrivalAt');
 
   const numberInputTransform = {
     input: (value: number) =>
@@ -220,9 +219,6 @@ const TransportForm: FC = () => {
                           onSelect={field.onChange}
                           {...field}
                           disabled={(date) => {
-                            // if (arrivalAt) {
-                            //   return date > arrivalAt;
-                            // }
                             if (destinationStartDate) {
                               return date < destinationStartDate;
                             }
