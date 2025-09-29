@@ -50,28 +50,24 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
           className='col-span-1 flex h-full flex-col gap-2 border p-4'
         >
           <h4 className='mb-1 text-lg font-medium'>Routes</h4>
-          <div>
-            {trip.routes.map((route) => (
-              <RouteCard
-                key={route.id}
-                tripId={tripId}
-                route={route}
-                isSelected={selectedRouteId === route.id}
-                onSelect={() => handleRouteSelect(route.id)}
-                onDelete={() =>
-                  handleDeleteRoute({ id: route.id, name: route.name })
-                }
-              />
-            ))}
-          </div>
+          {trip.routes.map((route) => (
+            <RouteCard
+              key={route.id}
+              tripId={tripId}
+              route={route}
+              isSelected={selectedRouteId === route.id}
+              onSelect={() => handleRouteSelect(route.id)}
+              onDelete={() =>
+                handleDeleteRoute({ id: route.id, name: route.name })
+              }
+            />
+          ))}
           <CreateRouteButton trip={trip} />
         </div>
         {route && (
           <div id='destinations-list' className='col-span-1 border p-4'>
             <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
-            <div>
-              <DestinationList route={route} />
-            </div>
+            <DestinationList route={route} />
           </div>
         )}
         {route && (

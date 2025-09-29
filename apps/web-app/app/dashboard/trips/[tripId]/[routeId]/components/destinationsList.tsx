@@ -37,13 +37,14 @@ const DestinationList: FC<DestinationListProps> = ({
     <ScrollArea className='h-full py-2'>
       {route.destinations.map((destination, index) => (
         <div key={destination.id} className='flex flex-col items-center'>
-          <div className='flex w-full flex-row items-center gap-2'>
+          <div className='group relative flex w-full flex-row items-center gap-2'>
             <div className='flex size-8 items-center justify-center rounded-full bg-gray-200 text-black'>
               {destination.order}
             </div>
 
             <div
-              className={`flex flex-1 cursor-pointer flex-row gap-2 rounded-lg p-2 px-4 text-sm transition-colors duration-200 ${
+              id='destination-card'
+              className={`flex flex-1 cursor-pointer flex-row gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
                 selectedDestinationId === destination.id
                   ? 'bg-blue-500 text-white shadow-lg'
                   : selectedDestinationId
@@ -59,23 +60,26 @@ const DestinationList: FC<DestinationListProps> = ({
               <p className='font-bold'>{destination.days} days</p>
             </div>
 
-            <div className='text-sm text-gray-500'>
+            <div
+              id='action-buttons'
+              className='absolute right-1 flex gap-1 opacity-0 transition-all duration-300 ease-in-out group-hover:opacity-100'
+            >
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-8 w-8'
+                className='h-8 w-8 bg-white shadow-sm hover:bg-blue-400'
                 title='Edit destination'
               >
-                <Edit className='text-muted-foreground h-4 w-4' />
+                <Edit className='h-4 w-4 text-gray-600' />
               </Button>
               <Button
                 variant='ghost'
                 size='icon'
-                className='h-8 w-8'
+                className='h-8 w-8 bg-white shadow-sm hover:bg-blue-400'
                 onClick={() => mutateAsync(destination.id)}
                 title='Delete destination'
               >
-                <Trash2 className='text-muted-foreground h-4 w-4 hover:text-red-600' />
+                <Trash2 className='h-4 w-4 text-gray-600 hover:text-red-600' />
               </Button>
             </div>
           </div>
