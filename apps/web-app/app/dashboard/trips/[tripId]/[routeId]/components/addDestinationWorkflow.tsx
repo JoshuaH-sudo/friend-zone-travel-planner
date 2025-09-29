@@ -12,6 +12,7 @@ import { Form } from '@/components/ui/form';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
 import DestinationForm from './forms/destinationForm';
 import { TripByIdResponse } from '../../../actions/getTripById';
+import { Button } from '@/components/ui/button';
 
 // We'll just use the DestinationForm type, which comes from the zod schema
 
@@ -66,19 +67,16 @@ export type DestinationFormType = z.infer<typeof schema>;
 export interface AddDestinationWorkflowProps {
   route: TripByIdResponse['routes'][0];
   destinationToEdit?: DestinationFormType;
-  onEditComplete: () => void;
 }
 
 const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   route,
   destinationToEdit,
-  onEditComplete,
 }) => {
   const queryClient = useQueryClient();
   const previousDestination = route.destinations
     .sort((a, b) => a.order - b.order)
     .slice(-1)[0];
-  const [activeTab, setActiveTab] = useState<string>('destination');
   const defaultNewDestination = {
     routeId: route.id,
     location: '',
@@ -119,11 +117,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
       // This allows destinations to not have transport/accommodation
 
       form.reset(formData);
-
-      // Reset to the first tab when only defining the starting point
-      if (destinationToEdit.order === 1) {
-        setActiveTab('destination');
-      }
     }
   }, [destinationToEdit]);
 
@@ -132,7 +125,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const { mutateAsync: addDestinationToRoute } = useAddDestinationToRoute({
     onSuccess: async () => {
       reset();
-      setActiveTab('destination');
       await queryClient.invalidateQueries({
         queryKey: ['destinations', route.id],
       });
@@ -146,16 +138,10 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
   const { mutateAsync: editDestination } = useEditDestination({
     onSuccess: async () => {
       reset(defaultNewDestination);
-      setActiveTab('destination');
       await queryClient.invalidateQueries({
         queryKey: ['destinations', route.id],
       });
       await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
-
-      // Call the onEditComplete callback if provided to reset the editing state
-      if (onEditComplete) {
-        onEditComplete();
-      }
     },
     onError: (error) => {
       console.error('Error editing destination:', error);
@@ -212,10 +198,6 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         id: destinationToEdit.id,
       });
       reset(defaultNewDestination);
-      setActiveTab('destination');
-      if (onEditComplete) {
-        onEditComplete();
-      }
     } else {
       // We're creating a new destination
       await addDestinationToRoute(transformedData);
@@ -229,6 +211,15 @@ const AddDestinationWorkflow: FC<AddDestinationWorkflowProps> = ({
         className='flex h-full flex-col gap-1 p-2'
       >
         <DestinationForm route={route} enableInitialLoad={!destinationToEdit} />
+        <Button
+          type='submit'
+          className='mt-2 w-full'
+          disabled={!form.formState.isValid}
+        >
+          {destinationToEdit && destinationToEdit.id
+            ? 'Save Changes'
+            : 'Add Destination'}
+        </Button>
       </form>
     </Form>
   );

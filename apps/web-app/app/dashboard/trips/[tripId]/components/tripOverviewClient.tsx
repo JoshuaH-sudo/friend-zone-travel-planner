@@ -6,7 +6,8 @@ import RouteCard from './routeCard';
 import DeleteRouteDialog from './DeleteRouteDialog';
 import { TripByIdResponse } from '../../actions/getTripById';
 import DestinationList from '../[routeId]/components/destinationsList';
-import DestinationForm from '../[routeId]/components/forms/destinationForm';
+import AddDestinationWorkflow from '../[routeId]/components/addDestinationWorkflow';
+import LocationMap, { Poi } from '../[routeId]/components/locationMap';
 
 interface TripOverviewClientProps {
   trip: TripByIdResponse;
@@ -30,10 +31,20 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
     setDeletingRoute(route);
   };
 
+  const locations: Poi[] = trip.routes.flatMap((route) =>
+    route.destinations.map((dest) => ({
+      key: dest.id,
+      location: {
+        lat: dest.latitude,
+        lng: dest.longitude,
+      },
+    }))
+  );
+
   return (
     <main className='bg-background min-h-screen'>
       {/* Main Content */}
-      <div className='grid h-[600px] grid-cols-3 grid-rows-1'>
+      <div className='grid h-full grid-cols-4 grid-rows-1'>
         <div
           id='routes-list'
           className='col-span-1 flex h-full flex-col gap-2 border p-4'
@@ -65,7 +76,13 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
         )}
         {route && (
           <div id='destinations-list' className='col-span-1 border p-4'>
-            <DestinationForm route={route} />
+            <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
+            <AddDestinationWorkflow route={route} />
+          </div>
+        )}
+        {route && (
+          <div className='col-span-1 border'>
+            <LocationMap locations={locations} />
           </div>
         )}
       </div>

@@ -43,9 +43,9 @@ export default async function DashboardLayout({
         </header>
 
         {/* Main Content */}
-        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+        {/* <DashboardLayoutContent>{children}</DashboardLayoutContent> */}
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );
 }
-
