@@ -7,7 +7,7 @@ import DeleteRouteDialog from './DeleteRouteDialog';
 import { TripByIdResponse } from '../../actions/getTripById';
 import DestinationList from './destinationsList';
 import DestinationForm from './forms/destinationForm';
-import LocationMap, { Poi } from '../[routeId]/components/locationMap';
+import LocationMap, { Poi } from './locationMap';
 
 interface TripOverviewClientProps {
   trip: TripByIdResponse;

@@ -4,7 +4,7 @@ import {
   addDestinationToRoute,
   AddDestinationToRouteProps,
   AddDestinationToRouteResponse,
-} from '../../../../../../lib/actions/destinations';
+} from '@/lib/actions/destinations';
 
 export type UseAddDestinationToRoute = UseMutationOptions<
   AddDestinationToRouteResponse,

@@ -14,10 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import { FC, useEffect, useState } from 'react';
-import useGetAddressCoordinates from '../../[routeId]/hooks/useGetAddressCoordinates';
-import useGetFriendsByGeoLocation from '../../[routeId]/hooks/useGetFriendsByGeoLocation';
-import useAddDestinationToRoute from '../../[routeId]/hooks/useAddDestinationToRoute';
-import useEditDestination from '../../[routeId]/hooks/useEditDestination';
+import useGetAddressCoordinates from '../../hooks/useGetAddressCoordinates';
+import useGetFriendsByGeoLocation from '../../hooks/useGetFriendsByGeoLocation';
+import useAddDestinationToRoute from '../../hooks/useAddDestinationToRoute';
+import useEditDestination from '../../hooks/useEditDestination';
 import { useDebouncedValue } from '@tanstack/react-pacer';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -80,7 +80,7 @@ export type DestinationFormType = z.infer<typeof schema>;
 
 export interface DestinationFormProps {
   route: TripByIdResponse['routes'][0];
-  destinationToEdit?: DestinationFormType;
+  destinationToEdit?:  TripByIdResponse['routes'][0]['destinations'][0] | null;
 }
 
 const DestinationForm: FC<DestinationFormProps> = ({

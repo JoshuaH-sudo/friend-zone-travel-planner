@@ -4,7 +4,7 @@ import { ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import deleteDestination from '../[routeId]/actions/deleteDestination';
+import deleteDestination from '../actions/deleteDestination';
 import { format } from 'date-fns';
 import { TripByIdResponse } from '../../actions/getTripById';
 

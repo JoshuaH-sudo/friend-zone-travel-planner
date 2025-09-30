@@ -13,7 +13,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import updateFriend from '../actions/updateFriend';
 import { Friend } from '../../hooks/useGetFriends';
 import MapView, { Poi } from '../../new-friend/components/MapView';
-import useGetAddressCoordinates from '@/app/dashboard/trips/[tripId]/[routeId]/hooks/useGetAddressCoordinates';
+import useGetAddressCoordinates from '@/app/dashboard/trips/[tripId]/hooks/useGetAddressCoordinates';
 
 interface EditFriendFormProps {
   friend: Friend;

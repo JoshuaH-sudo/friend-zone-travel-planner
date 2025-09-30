@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAddressAutocomplete } from '@/hooks/useAddressAutocomplete';
 import createFriend from '../actions/createFriend';
 import MapView, { Poi } from './MapView';
-import useGetAddressCoordinates from '@/app/dashboard/trips/[tripId]/[routeId]/hooks/useGetAddressCoordinates';
+import useGetAddressCoordinates from '@/app/dashboard/trips/[tripId]/hooks/useGetAddressCoordinates';
 
 interface AddFriendFormProps {
   onSuccess?: () => void;
