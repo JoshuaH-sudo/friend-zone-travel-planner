@@ -1,8 +1,9 @@
 'use client';
 
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -10,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Form,
   FormControl,
@@ -20,114 +22,148 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationFormType } from './destinationForm';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import useAddAccommodationToDestination from '../../hooks/useAddAccommodationToDestination';
+import useEditAccommodation from '../../hooks/useEditAccommodation';
 
-const AccommodationForm: FC = () => {
-  const form = useFormContext<DestinationFormType>();
-  const startDate = form.watch('startDate');
-  const endDate = form.watch('endDate');
+// Accommodation form schema
+const accommodationSchema = z.object({
+  id: z.string().optional(),
+  destinationId: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  address: z.string().default(''),
+  cost: z.number().min(0, 'Cost must be positive').default(0),
+  currency: z.string().default('USD'),
+  href: z.string().optional().nullable(),
+  type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']).default('hotel'),
+  friendId: z.string().optional().nullable(),
+  checkIn: z.date().nullable(),
+  checkOut: z.date().nullable(),
+});
+
+export type AccommodationFormType = z.infer<typeof accommodationSchema>;
+
+export interface AccommodationFormProps {
+  destinationId: string;
+  routeId: string;
+  initialData?: Partial<AccommodationFormType>;
+  startDate: Date;
+  endDate: Date;
+  onSuccess?: () => void;
+}
+
+const AccommodationForm: FC<AccommodationFormProps> = ({
+  destinationId,
+  routeId: _routeId,
+  initialData,
+  startDate,
+  endDate,
+  onSuccess,
+}) => {
+  const queryClient = useQueryClient();
   
-  // Create accommodation object with defaults if it doesn't exist
-  useEffect(() => {
-    if (!form.getValues('accommodation')) {
-      form.setValue('accommodation', {
-        name: '',
-        address: '',
-        cost: 0,
-        currency: 'USD',
-        href: '',
-        type: 'hotel',
-        checkIn: startDate,
-        checkOut: endDate
-      });
-    }
-  }, [form, startDate, endDate]);
+  const defaultValues: AccommodationFormType = {
+    destinationId,
+    name: '',
+    address: '',
+    cost: 0,
+    currency: 'USD',
+    href: null,
+    type: 'hotel',
+    friendId: null,
+    checkIn: startDate,
+    checkOut: endDate,
+    ...initialData,
+  };
 
-  // Get current check-in/check-out values
-  const accommodation = form.watch('accommodation');
-
+  const form = useForm<AccommodationFormType>({
+    resolver: zodResolver(accommodationSchema),
+    defaultValues,
+    mode: 'onChange',
+  });
+  
+  const { watch, handleSubmit } = form;
+  
+  const checkInDate = watch('checkIn');
+  const checkOutDate = watch('checkOut');
+  
   // Set up date range object for the picker
   const dateRange: DateRange = {
-    from: accommodation?.checkIn || startDate,
-    to: accommodation?.checkOut || endDate,
+    from: checkInDate || startDate,
+    to: checkOutDate || endDate,
+  };
+
+  // Mutation hooks
+  const { mutateAsync: addAccommodation } = useAddAccommodationToDestination({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['destinations', destinationId],
+      });
+      onSuccess?.();
+    },
+    onError: (error) => {
+      console.error('Error adding accommodation:', error);
+    },
+  });
+
+  const { mutateAsync: editAccommodationMutation } = useEditAccommodation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['destinations', destinationId],
+      });
+      onSuccess?.();
+    },
+    onError: (error) => {
+      console.error('Error updating accommodation:', error);
+    },
+  });
+
+  const onSubmit = async (data: AccommodationFormType) => {
+    try {
+      if (data.id) {
+        // Edit existing accommodation
+        await editAccommodationMutation({
+          ...data,
+          id: data.id,
+          href: data.href ?? null,
+          friendId: data.friendId ?? null,
+        });
+      } else {
+        // Create new accommodation  
+        const { id: _id, ...createData } = data;
+        await addAccommodation({
+          ...createData,
+          href: createData.href ?? null,
+          friendId: createData.friendId ?? null,
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='text-lg'>Add Accommodation Details</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className='space-y-4'>
-          <Form {...form}>
-            <FormField
-              control={form.control}
-              name='accommodation.name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Hotel name' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='accommodation.address'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Address' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormItem>
-              <FormLabel>Check-in / Check-out Dates</FormLabel>
-              <FormControl>
-                <DateRangeInput
-                  className='mb-2'
-                  dates={dateRange}
-                  onSelect={(dates) => {
-                    if (dates?.from) {
-                      form.setValue('accommodation.checkIn', dates.from);
-                    }
-                    if (dates?.to) {
-                      form.setValue('accommodation.checkOut', dates.to);
-                    }
-                  }}
-                  calendarProps={{
-                    disabled: { 
-                      before: startDate,
-                    },
-                    startMonth: startDate,
-                    mode: 'range',
-                  }}
-                />
-              </FormControl>
-              <FormDescription>
-                Select the check-in and check-out dates for your accommodation
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-
-            <div className='grid grid-cols-2 gap-4'>
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className='text-lg'>
+              {initialData?.id ? 'Edit Accommodation Details' : 'Add Accommodation Details'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
               <FormField
                 control={form.control}
-                name='accommodation.cost'
+                name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cost per night</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input type='number' min='0' step='0.01' {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                      <Input placeholder='Hotel name' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -136,26 +172,134 @@ const AccommodationForm: FC = () => {
 
               <FormField
                 control={form.control}
-                name='accommodation.currency'
+                name='address'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Address' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormItem>
+                <FormLabel>Check-in / Check-out Dates</FormLabel>
+                <FormControl>
+                  <DateRangeInput
+                    className='mb-2'
+                    dates={dateRange}
+                    onSelect={(dates) => {
+                      if (dates?.from) {
+                        form.setValue('checkIn', dates.from);
+                      }
+                      if (dates?.to) {
+                        form.setValue('checkOut', dates.to);
+                      }
+                    }}
+                    calendarProps={{
+                      disabled: { 
+                        before: startDate,
+                      },
+                      startMonth: startDate,
+                      mode: 'range',
+                    }}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Select the check-in and check-out dates for your accommodation
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='cost'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cost per night</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type='number' 
+                          min='0' 
+                          step='0.01' 
+                          {...field} 
+                          onChange={(e) => field.onChange(Number(e.target.value))} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='currency'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select currency' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='USD'>USD ($)</SelectItem>
+                          <SelectItem value='EUR'>EUR (€)</SelectItem>
+                          <SelectItem value='GBP'>GBP (£)</SelectItem>
+                          <SelectItem value='JPY'>JPY (¥)</SelectItem>
+                          <SelectItem value='AUD'>AUD (A$)</SelectItem>
+                          <SelectItem value='CAD'>CAD (C$)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name='href'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website URL (optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder='https://example.com' {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormDescription>
+                      Link to booking website or more information
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='type'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Accommodation Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder='Select currency' />
+                          <SelectValue placeholder='Select type' />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value='USD'>USD ($)</SelectItem>
-                        <SelectItem value='EUR'>EUR (€)</SelectItem>
-                        <SelectItem value='GBP'>GBP (£)</SelectItem>
-                        <SelectItem value='JPY'>JPY (¥)</SelectItem>
-                        <SelectItem value='AUD'>AUD (A$)</SelectItem>
-                        <SelectItem value='CAD'>CAD (C$)</SelectItem>
+                        <SelectItem value='hotel'>Hotel</SelectItem>
+                        <SelectItem value='motel'>Motel</SelectItem>
+                        <SelectItem value='hostel'>Hostel</SelectItem>
+                        <SelectItem value='airbnb'>Airbnb</SelectItem>
+                        <SelectItem value='friend'>Friend's Place</SelectItem>
+                        <SelectItem value='other'>Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -163,53 +307,14 @@ const AccommodationForm: FC = () => {
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name='accommodation.href'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website URL (optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder='https://example.com' {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormDescription>
-                    Link to booking website or more information
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='accommodation.type'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Accommodation Type</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select type' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='hotel'>Hotel</SelectItem>
-                      <SelectItem value='motel'>Motel</SelectItem>
-                      <SelectItem value='hostel'>Hostel</SelectItem>
-                      <SelectItem value='airbnb'>Airbnb</SelectItem>
-                      <SelectItem value='friend'>Friend's Place</SelectItem>
-                      <SelectItem value='other'>Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </Form>
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+        
+        <Button type="submit" className="w-full">
+          {initialData?.id ? 'Update Accommodation' : 'Add Accommodation'}
+        </Button>
+      </form>
+    </Form>
   );
 };
 

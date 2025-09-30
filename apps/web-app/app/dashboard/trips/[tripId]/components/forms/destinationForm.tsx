@@ -29,7 +29,7 @@ import { z } from 'zod';
 import { addDays, differenceInDays } from 'date-fns';
 import { AddDestinationToRouteProps } from '@/lib/actions/destinations';
 
-// Zod schema for form validation
+// Simplified Zod schema for destination form only
 const schema = z.object({
   id: z.string().optional(),
   routeId: z.string(),
@@ -43,37 +43,6 @@ const schema = z.object({
   longitude: z.number().min(-180).max(180),
   stayingWithFriend: z.boolean().default(false),
   selectedFriendId: z.string().optional(),
-  accommodation: z
-    .object({
-      id: z.string().optional(),
-      name: z.string().default(''),
-      address: z.string().optional().default(''),
-      cost: z.number().default(0),
-      currency: z.string().default('USD'),
-      href: z.string().optional().nullable().default(''),
-      type: z
-        .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
-        .default('hotel'),
-      friendId: z.string().optional().nullable(),
-      checkIn: z.date().nullable(),
-      checkOut: z.date().nullable(),
-    })
-    .optional(),
-  transport: z
-    .object({
-      id: z.string().optional(),
-      name: z.string().default(''),
-      address: z.string().optional().nullable().default(''),
-      cost: z.number().default(0),
-      currency: z.string().default('USD'),
-      href: z.string().optional().nullable().default(''),
-      type: z
-        .enum(['airplane', 'bus', 'car', 'train', 'ferry', 'other'])
-        .default('airplane'),
-      departureAt: z.date().nullable().default(null),
-      arrivalAt: z.date().nullable().default(null),
-    })
-    .optional(),
 });
 
 export type DestinationFormType = z.infer<typeof schema>;
@@ -240,32 +209,7 @@ const DestinationForm: FC<DestinationFormProps> = ({
       endDate: data.endDate,
     };
 
-    // Add accommodation data if provided and has required fields
-    if (data.accommodation) {
-      transformedData.accommodation = {
-        ...data.accommodation,
-        address: data.accommodation.address || null,
-        href: data.accommodation.href || null,
-        friendId: data.accommodation.friendId || null,
-        checkIn: data.accommodation.checkIn,
-        checkOut: data.accommodation.checkOut,
-      };
-    } else {
-      // Explicitly set to undefined to ensure it's not included in the API call
-      transformedData.accommodation = undefined;
-    }
-
-    // Add transport data if provided and has required fields
-    if (data.transport) {
-      transformedData.transport = {
-        ...data.transport,
-        address: data.transport.address || null,
-        href: data.transport.href || null,
-      };
-    } else {
-      // Explicitly set to undefined to ensure it's not included in the API call
-      transformedData.transport = undefined;
-    }
+    // Accommodation and transport are now handled by separate forms
 
     if (destinationToEdit && destinationToEdit.id) {
       // We're editing an existing destination

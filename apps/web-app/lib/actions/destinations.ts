@@ -231,6 +231,66 @@ export interface EditDestinationProps extends AddDestinationToRouteProps {
   id: string;
 }
 
+// Accommodation specific types and actions
+export interface AddAccommodationToDestinationProps {
+  destinationId: string;
+  name: string;
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: 'hotel' | 'motel' | 'hostel' | 'friend' | 'airbnb' | 'other';
+  friendId: string | null;
+  checkIn: Date | null;
+  checkOut: Date | null;
+}
+
+export interface EditAccommodationProps extends AddAccommodationToDestinationProps {
+  id: string;
+}
+
+export interface AccommodationResponse {
+  id: string;
+  name: string;
+  address: string;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  friendId: string | null;
+  checkIn: Date | null;
+  checkOut: Date | null;
+}
+
+// Transport specific types and actions
+export interface AddTransportToDestinationProps {
+  destinationId: string;
+  address: string | null;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: 'airplane' | 'bus' | 'car' | 'train' | 'ferry' | 'other';
+  departureAt: Date | null;
+  arrivalAt: Date | null;
+}
+
+export interface EditTransportProps extends AddTransportToDestinationProps {
+  id: string;
+  name: string;
+}
+
+export interface TransportResponse {
+  id: string;
+  name: string;
+  address: string | null;
+  cost: number;
+  currency: string;
+  href: string | null;
+  type: string;
+  departureAt: Date | null;
+  arrivalAt: Date | null;
+}
+
 export async function editDestination(
   data: EditDestinationProps
 ): Promise<AddDestinationToRouteResponse> {
@@ -406,6 +466,283 @@ export async function editDestination(
     days: updatedDestination.days,
     accommodationId,
     transportId,
+  };
+}
+
+// Accommodation actions
+export async function addAccommodationToDestination(
+  data: AddAccommodationToDestinationProps
+): Promise<AccommodationResponse> {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the destination belongs to a route of a trip owned by the user
+  const { data: destination, error: destError } = await supabase
+    .from('destinations')
+    .select(
+      `
+      id,
+      route_id,
+      routes!inner (
+        id,
+        trips!inner (
+          id,
+          user_id
+        )
+      )
+    `
+    )
+    .eq('id', data.destinationId)
+    .eq('routes.trips.user_id', user.id)
+    .single();
+
+  if (destError || !destination) {
+    throw new Error('Destination not found or access denied');
+  }
+
+  const accommodation = await createAccommodation({
+    destinationId: data.destinationId,
+    name: data.name,
+    address: data.address,
+    cost: data.cost,
+    currency: data.currency,
+    href: data.href,
+    type: data.type as AccommodationType,
+    friendId: data.friendId,
+    checkIn: data.checkIn,
+    checkOut: data.checkOut,
+  });
+
+  revalidatePath(`/dashboard/trips/${destination.routes.trips.id}/${destination.route_id}`);
+
+  return {
+    id: accommodation.id,
+    name: accommodation.name,
+    address: accommodation.address,
+    cost: accommodation.cost,
+    currency: accommodation.currency,
+    href: accommodation.href,
+    type: accommodation.type,
+    friendId: accommodation.friendId,
+    checkIn: accommodation.checkIn,
+    checkOut: accommodation.checkOut,
+  };
+}
+
+export async function editAccommodation(
+  data: EditAccommodationProps
+): Promise<AccommodationResponse> {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the accommodation belongs to a destination of a route of a trip owned by the user
+  const { data: existingAccommodation, error: accomError } = await supabase
+    .from('accommodations')
+    .select(
+      `
+      id,
+      destination_id,
+      destinations!inner (
+        id,
+        route_id,
+        routes!inner (
+          id,
+          trips!inner (
+            id,
+            user_id
+          )
+        )
+      )
+    `
+    )
+    .eq('id', data.id)
+    .eq('destinations.routes.trips.user_id', user.id)
+    .single();
+
+  if (accomError || !existingAccommodation) {
+    throw new Error('Accommodation not found or access denied');
+  }
+
+  const { data: updatedAccommodation, error } = await supabase
+    .from('accommodations')
+    .update({
+      name: data.name,
+      address: data.address,
+      cost: data.cost,
+      currency: data.currency,
+      href: data.href,
+      type: data.type,
+      friend_id: data.friendId,
+      check_in: data.checkIn ? data.checkIn.toISOString() : null,
+      check_out: data.checkOut ? data.checkOut.toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', data.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating accommodation:', error);
+    throw new Error('Failed to update accommodation');
+  }
+
+  revalidatePath(`/dashboard/trips/${existingAccommodation.destinations.routes.trips.id}/${existingAccommodation.destinations.route_id}`);
+
+  return {
+    id: updatedAccommodation.id,
+    name: updatedAccommodation.name,
+    address: updatedAccommodation.address,
+    cost: updatedAccommodation.cost,
+    currency: updatedAccommodation.currency,
+    href: updatedAccommodation.href,
+    type: updatedAccommodation.type,
+    friendId: updatedAccommodation.friend_id,
+    checkIn: updatedAccommodation.check_in ? new Date(updatedAccommodation.check_in) : null,
+    checkOut: updatedAccommodation.check_out ? new Date(updatedAccommodation.check_out) : null,
+  };
+}
+
+// Transport actions
+export async function addTransportToDestination(
+  data: AddTransportToDestinationProps
+): Promise<TransportResponse> {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the destination belongs to a route of a trip owned by the user
+  const { data: destination, error: destError } = await supabase
+    .from('destinations')
+    .select(
+      `
+      id,
+      route_id,
+      routes!inner (
+        id,
+        trips!inner (
+          id,
+          user_id
+        )
+      )
+    `
+    )
+    .eq('id', data.destinationId)
+    .eq('routes.trips.user_id', user.id)
+    .single();
+
+  if (destError || !destination) {
+    throw new Error('Destination not found or access denied');
+  }
+
+  const transport = await createTransport({
+    destinationId: data.destinationId,
+    address: data.address ?? '',
+    cost: data.cost,
+    currency: data.currency,
+    href: data.href ?? undefined,
+    type: data.type,
+    departureAt: data.departureAt ?? undefined,
+    arrivalAt: data.arrivalAt ?? undefined,
+  });
+
+  revalidatePath(`/dashboard/trips/${destination.routes.trips.id}/${destination.route_id}`);
+
+  return {
+    id: transport.id,
+    name: transport.name,
+    address: transport.address,
+    cost: transport.cost,
+    currency: transport.currency,
+    href: transport.href,
+    type: transport.type,
+    departureAt: transport.departureAt,
+    arrivalAt: transport.arrivalAt,
+  };
+}
+
+export async function editTransport(
+  data: EditTransportProps
+): Promise<TransportResponse> {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  // Verify the transport belongs to a destination of a route of a trip owned by the user
+  const { data: existingTransport, error: transportError } = await supabase
+    .from('transports')
+    .select(
+      `
+      id,
+      destination_id,
+      destinations!inner (
+        id,
+        route_id,
+        routes!inner (
+          id,
+          trips!inner (
+            id,
+            user_id
+          )
+        )
+      )
+    `
+    )
+    .eq('id', data.id)
+    .eq('destinations.routes.trips.user_id', user.id)
+    .single();
+
+  if (transportError || !existingTransport) {
+    throw new Error('Transport not found or access denied');
+  }
+
+  const { data: updatedTransport, error } = await supabase
+    .from('transports')
+    .update({
+      name: data.name,
+      address: data.address ?? '',
+      cost: data.cost,
+      currency: data.currency,
+      href: data.href,
+      type: data.type,
+      departure_at: data.departureAt ? data.departureAt.toISOString() : null,
+      arrival_at: data.arrivalAt ? data.arrivalAt.toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', data.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating transport:', error);
+    throw new Error('Failed to update transport');
+  }
+
+  revalidatePath(`/dashboard/trips/${existingTransport.destinations.routes.trips.id}/${existingTransport.destinations.route_id}`);
+
+  return {
+    id: updatedTransport.id,
+    name: updatedTransport.name,
+    address: updatedTransport.address,
+    cost: updatedTransport.cost,
+    currency: updatedTransport.currency,
+    href: updatedTransport.href,
+    type: updatedTransport.type,
+    departureAt: updatedTransport.departure_at ? new Date(updatedTransport.departure_at) : null,
+    arrivalAt: updatedTransport.arrival_at ? new Date(updatedTransport.arrival_at) : null,
   };
 }
 
