@@ -81,22 +81,18 @@ export type DestinationFormType = z.infer<typeof schema>;
 export interface DestinationFormProps {
   route: TripByIdResponse['routes'][0];
   destinationToEdit?: DestinationFormType;
-  previousDestination?: any; // For compatibility
-  onEditComplete?: () => void; // For compatibility
 }
 
 const DestinationForm: FC<DestinationFormProps> = ({
   route,
   destinationToEdit,
-  previousDestination: _externalPreviousDestination,
-  onEditComplete,
 }) => {
   const queryClient = useQueryClient();
   const [enableApiCalls, setEnableApiCalls] = useState(!destinationToEdit);
   const previousDestination = route.destinations
     .sort((a, b) => a.order - b.order)
     .slice(-1)[0];
-  
+
   const defaultNewDestination = {
     routeId: route.id,
     location: '',
@@ -151,7 +147,12 @@ const DestinationForm: FC<DestinationFormProps> = ({
       // set from to be the route start date
       setValue('startDate', new Date(route.date_from!));
     }
-  }, [previousDestination?.end_date, route.date_from, destinationToEdit, setValue]);
+  }, [
+    previousDestination?.end_date,
+    route.date_from,
+    destinationToEdit,
+    setValue,
+  ]);
 
   // Get address suggestions as the user types
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
@@ -203,7 +204,6 @@ const DestinationForm: FC<DestinationFormProps> = ({
         queryKey: ['destinations', route.id],
       });
       await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
-      onEditComplete?.();
     },
     onError: (error) => {
       console.error('Error adding destination:', error);
@@ -217,7 +217,6 @@ const DestinationForm: FC<DestinationFormProps> = ({
         queryKey: ['destinations', route.id],
       });
       await queryClient.invalidateQueries({ queryKey: ['routes', route.id] });
-      onEditComplete?.();
     },
     onError: (error) => {
       console.error('Error editing destination:', error);
@@ -382,13 +381,15 @@ const DestinationForm: FC<DestinationFormProps> = ({
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>Which friends are you going see</FormDescription>
+                <FormDescription>
+                  Which friends are you going see
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        
+
         <Button
           type='submit'
           className='mt-2 w-full'

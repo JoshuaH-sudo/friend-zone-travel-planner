@@ -5,8 +5,8 @@ import CreateRouteButton from './createRouteButton';
 import RouteCard from './routeCard';
 import DeleteRouteDialog from './DeleteRouteDialog';
 import { TripByIdResponse } from '../../actions/getTripById';
-import DestinationList from '../[routeId]/components/destinationsList';
-import AddDestinationWorkflow from '../[routeId]/components/addDestinationWorkflow';
+import DestinationList from './destinationsList';
+import DestinationForm from './forms/destinationForm';
 import LocationMap, { Poi } from '../[routeId]/components/locationMap';
 
 interface TripOverviewClientProps {
@@ -14,8 +14,16 @@ interface TripOverviewClientProps {
   tripId: string;
 }
 
+type Destination = TripByIdResponse['routes'][0]['destinations'][0];
+
+type CurrentForm = 'destination' | 'accommodation' | 'transportation' | null;
+
 const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [currentForm, setCurrentForm] = useState<CurrentForm>(null);
+  const [selectedDestination, setSelectedDestination] =
+    useState<Destination | null>(null);
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [deletingRoute, setDeletingRoute] = useState<{
     id: string;
     name?: string;
@@ -29,6 +37,12 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
 
   const handleDeleteRoute = (route: { id: string; name?: string }) => {
     setDeletingRoute(route);
+  };
+
+  const onDestinationSelect = (destination: Destination) => {
+    setCurrentForm('destination');
+    setFormMode('edit');
+    setSelectedDestination(destination);
   };
 
   const locations: Poi[] = trip.routes.flatMap((route) =>
@@ -67,13 +81,16 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
         {route && (
           <div id='destinations-list' className='col-span-1 border p-4'>
             <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
-            <DestinationList route={route} />
+            <DestinationList
+              route={route}
+              onDestinationSelect={onDestinationSelect}
+            />
           </div>
         )}
-        {route && (
+        {route && currentForm === 'destination' && (
           <div id='destinations-list' className='col-span-1 border p-4'>
             <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
-            <AddDestinationWorkflow route={route} />
+            <DestinationForm route={route} destinationToEdit={selectedDestination} />
           </div>
         )}
         {route && (

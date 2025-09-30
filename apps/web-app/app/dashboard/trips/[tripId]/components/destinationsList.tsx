@@ -1,23 +1,28 @@
 'use client';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronDown, Edit, Trash2 } from 'lucide-react';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import deleteDestination from '../actions/deleteDestination';
+import deleteDestination from '../[routeId]/actions/deleteDestination';
 import { format } from 'date-fns';
-import { TripByIdResponse } from '../../../actions/getTripById';
+import { TripByIdResponse } from '../../actions/getTripById';
 
 export interface DestinationListProps {
   route: TripByIdResponse['routes'][0];
-  selectedDestinationId?: string;
+  onDestinationSelect: (
+    destinationId: TripByIdResponse['routes'][0]['destinations'][0]
+  ) => void;
 }
 
 const DestinationList: FC<DestinationListProps> = ({
   route,
-  selectedDestinationId,
+  onDestinationSelect,
 }) => {
   const queryClient = useQueryClient();
+  const [selectedDestinationId, setSelectedDestinationId] = useState<
+    string | null
+  >(null);
 
   const { mutateAsync } = useMutation({
     mutationFn: async (destinationId: string) => {
@@ -33,11 +38,23 @@ const DestinationList: FC<DestinationListProps> = ({
     },
   });
 
+  const onItemClick = (
+    destination: TripByIdResponse['routes'][0]['destinations'][0]
+  ) => {
+    setSelectedDestinationId(
+      destination.id === selectedDestinationId ? null : destination.id
+    );
+    onDestinationSelect(destination);
+  };
+
   return (
     <ScrollArea className='h-full py-2'>
       {route.destinations.map((destination, index) => (
         <div key={destination.id} className='flex flex-col items-center'>
-          <div className='group relative flex w-full flex-row items-center gap-2'>
+          <div
+            className='group relative flex w-full flex-row items-center gap-2'
+            onClick={() => onItemClick(destination)}
+          >
             <div className='flex size-8 items-center justify-center rounded-full bg-gray-200 text-black'>
               {destination.order}
             </div>

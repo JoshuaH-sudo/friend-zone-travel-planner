@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, AlertCircle, Home, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import useGetFriendsByGeoLocation from '../hooks/useGetFriendsByGeoLocation';
+import useGetFriendsByGeoLocation from '../[routeId]/hooks/useGetFriendsByGeoLocation';
 
 export interface Friend {
   id: string;

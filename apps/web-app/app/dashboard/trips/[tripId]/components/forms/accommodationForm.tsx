@@ -20,7 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationFormType } from '../addDestinationWorkflow';
+import { DestinationFormType } from './destinationForm';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { DateRange } from 'react-day-picker';
 
@@ -39,8 +39,8 @@ const AccommodationForm: FC = () => {
         currency: 'USD',
         href: '',
         type: 'hotel',
-        check_in: startDate,
-        check_out: endDate
+        checkIn: startDate,
+        checkOut: endDate
       });
     }
   }, [form, startDate, endDate]);
@@ -50,8 +50,8 @@ const AccommodationForm: FC = () => {
 
   // Set up date range object for the picker
   const dateRange: DateRange = {
-    from: accommodation?.check_in || startDate,
-    to: accommodation?.check_out || endDate,
+    from: accommodation?.checkIn || startDate,
+    to: accommodation?.checkOut || endDate,
   };
 
   return (
@@ -98,10 +98,10 @@ const AccommodationForm: FC = () => {
                   dates={dateRange}
                   onSelect={(dates) => {
                     if (dates?.from) {
-                      form.setValue('accommodation.check_in', dates.from);
+                      form.setValue('accommodation.checkIn', dates.from);
                     }
                     if (dates?.to) {
-                      form.setValue('accommodation.check_out', dates.to);
+                      form.setValue('accommodation.checkOut', dates.to);
                     }
                   }}
                   calendarProps={{

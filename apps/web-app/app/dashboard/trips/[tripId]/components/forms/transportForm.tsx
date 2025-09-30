@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DestinationFormType } from '../addDestinationWorkflow';
+import { DestinationFormType } from './destinationForm';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,

@@ -1,10 +1,10 @@
 'use client';
 
 import { FC, useState } from 'react';
-import AddDestinationWorkflow, {
+import DestinationForm, {
   DestinationFormType,
-} from './addDestinationWorkflow';
-import DestinationList from './destinationsList';
+} from '../../components/forms/destinationForm';
+import DestinationList from '../../components/destinationsList';
 import RouteNameInput from './routeNameInput';
 import useGetRouteById from '../../hooks/useGetRouteById';
 import { FullDestination } from '@/lib/hooks/useGetDestinationsByRouteId';
@@ -131,7 +131,6 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           <div id='route-list' className='bg-card grow rounded-lg border p-2'>
             <DestinationList
               route={route}
-              selectedDestinationId={destinationToEdit?.id}
               onDestinationSelect={onDestinationSelect}
             />
           </div>
@@ -141,7 +140,7 @@ const RouteClientWrapper: FC<RouteClientWrapperProps> = ({ routeId }) => {
           id='destination-details'
           className='bg-card col-span-2 flex flex-col gap-4 rounded-lg border p-2'
         >
-          <AddDestinationWorkflow
+          <DestinationForm
             route={route}
             previousDestination={parsedPreviousDestination}
             destinationToEdit={destinationToEdit}
