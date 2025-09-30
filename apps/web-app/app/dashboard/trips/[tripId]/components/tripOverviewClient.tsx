@@ -8,6 +8,7 @@ import { TripByIdResponse } from '../../actions/getTripById';
 import DestinationList from './destinationsList';
 import DestinationForm from './forms/destinationForm';
 import LocationMap, { Poi } from './locationMap';
+import { cn } from '@/lib/utils';
 
 interface TripOverviewClientProps {
   trip: TripByIdResponse;
@@ -39,7 +40,13 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
     setDeletingRoute(route);
   };
 
-  const onDestinationSelect = (destination: Destination) => {
+  const onDestinationSelect = (destination: Destination | null) => {
+    if (!destination) {
+      setCurrentForm(null);
+      setFormMode('add');
+      setSelectedDestination(null);
+      return;
+    }
     setCurrentForm('destination');
     setFormMode('edit');
     setSelectedDestination(destination);
@@ -90,11 +97,19 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
         {route && currentForm === 'destination' && (
           <div id='destinations-list' className='col-span-1 border p-4'>
             <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
-            <DestinationForm route={route} destinationToEdit={selectedDestination} />
+            <DestinationForm
+              route={route}
+              destinationToEdit={selectedDestination}
+            />
           </div>
         )}
         {route && (
-          <div className='col-span-1 border'>
+          <div
+            className={cn(
+              'col-span-1 border',
+              selectedDestination ? '' : 'col-span-2'
+            )}
+          >
             <LocationMap locations={locations} />
           </div>
         )}

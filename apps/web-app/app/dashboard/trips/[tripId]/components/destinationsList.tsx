@@ -11,7 +11,7 @@ import { TripByIdResponse } from '../../actions/getTripById';
 export interface DestinationListProps {
   route: TripByIdResponse['routes'][0];
   onDestinationSelect: (
-    destinationId: TripByIdResponse['routes'][0]['destinations'][0]
+    destinationId: TripByIdResponse['routes'][0]['destinations'][0] | null
   ) => void;
 }
 
@@ -41,9 +41,13 @@ const DestinationList: FC<DestinationListProps> = ({
   const onItemClick = (
     destination: TripByIdResponse['routes'][0]['destinations'][0]
   ) => {
-    setSelectedDestinationId(
-      destination.id === selectedDestinationId ? null : destination.id
-    );
+    if (selectedDestinationId === destination.id) {
+      setSelectedDestinationId(null);
+      onDestinationSelect(null);
+      return;
+    }
+
+    setSelectedDestinationId(destination.id);
     onDestinationSelect(destination);
   };
 
