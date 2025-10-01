@@ -39,6 +39,13 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
     setSelectedDestination(destination);
   };
 
+  const onRouteSelect = (route: TripByIdResponse['routes'][0] | null) => {
+    setSelectedRoute(route);
+    setCurrentForm(null);
+    setFormMode('add');
+    setSelectedDestination(null);
+  };
+
   const onAddDestinationClick = () => {
     setCurrentForm('destination');
     setFormMode('add');
@@ -56,26 +63,31 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
   );
 
   return (
-    <main className='bg-background min-h-screen'>
+    <main className='bg-background h-full'>
       {/* Main Content */}
       <div className='grid h-full grid-cols-4 grid-rows-1'>
         <div
           id='routes-list'
-          className='col-span-1 flex h-full flex-col gap-2 border p-4'
+          className='col-span-1 flex h-full flex-col gap-1 border p-4'
         >
-          <h4 className='mb-1 text-lg font-medium'>Routes</h4>
+          <div className='mb-4 flex items-center justify-between'>
+            <h4 className='mb-1 text-lg font-medium'>Routes</h4>
+            <CreateRouteButton trip={trip} />
+          </div>
           <RoutesList
             routes={trip.routes}
             selectedRoute={selectedRoute}
-            onRouteSelect={(route) => setSelectedRoute(route)}
+            onRouteSelect={onRouteSelect}
           />
-          <CreateRouteButton trip={trip} />
         </div>
         {selectedRoute && (
-          <div id='destinations-list' className='col-span-1 border p-4'>
+          <div
+            id='destinations-list'
+            className='col-span-1 flex h-full flex-col gap-1 border p-4'
+          >
             <div className='mb-4 flex items-center justify-between'>
               <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
-              <Button onClick={onAddDestinationClick}>Add</Button>
+              <Button onClick={onAddDestinationClick}>+ Add Destination</Button>
             </div>
             <DestinationList
               route={selectedRoute}
@@ -84,7 +96,10 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
           </div>
         )}
         {selectedRoute && currentForm === 'destination' && (
-          <div id='destinations-list' className='col-span-1 border p-4'>
+          <div
+            id='destinations-list'
+            className='col-span-1 flex h-full flex-col gap-1 border p-4'
+          >
             <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
             <DestinationForm
               route={selectedRoute}

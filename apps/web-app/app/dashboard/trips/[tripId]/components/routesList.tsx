@@ -3,10 +3,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { TripByIdResponse } from '../../actions/getTripById';
-import deleteRoute from '../actions/deleteRoute';
 import DeleteRouteDialog from './DeleteRouteDialog';
 
 type Route = TripByIdResponse['routes'][0];
@@ -58,6 +56,7 @@ const RoutesList: FC<RoutesListProps> = ({ routes, onRouteSelect }) => {
                       : 'bg-gray-200 text-black hover:bg-blue-400'
                 }`}
               >
+                <p className='flex-1 font-medium'>{route.name}</p>
                 <p>
                   {format(route.date_from!, 'MMM d')} -{' '}
                   {format(route.date_to!, 'MMM d')}
