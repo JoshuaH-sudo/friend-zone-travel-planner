@@ -12,29 +12,28 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
 import useDeleteRouteById from '../hooks/useDeleteRouteById';
+import { TripByIdResponse } from '../../actions/getTripById';
 
 interface DeleteRouteDialogProps {
-  route: { id: string; name?: string } | null;
-  tripId: string;
+  route: TripByIdResponse['routes'][0] | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const DeleteRouteDialog = ({
   route,
-  tripId,
   open,
   onOpenChange,
 }: DeleteRouteDialogProps) => {
   const { mutateAsync, isPending, error } = useDeleteRouteById({
     onSuccess: () => {
       onOpenChange(false);
-    }
+    },
   });
 
   const handleDelete = async () => {
     if (!route) return;
-    await mutateAsync({ routeId: route.id, tripId });
+    await mutateAsync({ routeId: route.id, tripId: route.trip_id });
   };
 
   return (

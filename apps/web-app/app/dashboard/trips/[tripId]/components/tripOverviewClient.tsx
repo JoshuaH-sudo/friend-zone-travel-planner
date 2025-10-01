@@ -2,43 +2,30 @@
 
 import { useState } from 'react';
 import CreateRouteButton from './createRouteButton';
-import RouteCard from './routeCard';
-import DeleteRouteDialog from './DeleteRouteDialog';
 import { TripByIdResponse } from '../../actions/getTripById';
 import DestinationList from './destinationsList';
 import DestinationForm from './forms/destinationForm';
 import LocationMap, { Poi } from './locationMap';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import RoutesList from './routesList';
 
 interface TripOverviewClientProps {
   trip: TripByIdResponse;
-  tripId: string;
 }
 
 type Destination = TripByIdResponse['routes'][0]['destinations'][0];
 
 type CurrentForm = 'destination' | 'accommodation' | 'transportation' | null;
 
-const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
   const [currentForm, setCurrentForm] = useState<CurrentForm>(null);
   const [selectedDestination, setSelectedDestination] =
     useState<Destination | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<
+    TripByIdResponse['routes'][0] | null
+  >(null);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
-  const [deletingRoute, setDeletingRoute] = useState<{
-    id: string;
-    name?: string;
-  } | null>(null);
-
-  const route = trip.routes.find((r) => r.id === selectedRouteId) || null;
-
-  const handleRouteSelect = (routeId: string) => {
-    setSelectedRouteId(selectedRouteId === routeId ? null : routeId);
-  };
-
-  const handleDeleteRoute = (route: { id: string; name?: string }) => {
-    setDeletingRoute(route);
-  };
 
   const onDestinationSelect = (destination: Destination | null) => {
     if (!destination) {
@@ -50,6 +37,12 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
     setCurrentForm('destination');
     setFormMode('edit');
     setSelectedDestination(destination);
+  };
+
+  const onAddDestinationClick = () => {
+    setCurrentForm('destination');
+    setFormMode('add');
+    setSelectedDestination(null);
   };
 
   const locations: Poi[] = trip.routes.flatMap((route) =>
@@ -71,55 +64,47 @@ const TripOverviewClient = ({ trip, tripId }: TripOverviewClientProps) => {
           className='col-span-1 flex h-full flex-col gap-2 border p-4'
         >
           <h4 className='mb-1 text-lg font-medium'>Routes</h4>
-          {trip.routes.map((route) => (
-            <RouteCard
-              key={route.id}
-              tripId={tripId}
-              route={route}
-              isSelected={selectedRouteId === route.id}
-              onSelect={() => handleRouteSelect(route.id)}
-              onDelete={() =>
-                handleDeleteRoute({ id: route.id, name: route.name })
-              }
-            />
-          ))}
+          <RoutesList
+            routes={trip.routes}
+            selectedRoute={selectedRoute}
+            onRouteSelect={(route) => setSelectedRoute(route)}
+          />
           <CreateRouteButton trip={trip} />
         </div>
-        {route && (
+        {selectedRoute && (
           <div id='destinations-list' className='col-span-1 border p-4'>
-            <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
+            <div className='mb-4 flex items-center justify-between'>
+              <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
+              <Button onClick={onAddDestinationClick}>Add</Button>
+            </div>
             <DestinationList
-              route={route}
+              route={selectedRoute}
               onDestinationSelect={onDestinationSelect}
             />
           </div>
         )}
-        {route && currentForm === 'destination' && (
+        {selectedRoute && currentForm === 'destination' && (
           <div id='destinations-list' className='col-span-1 border p-4'>
             <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
             <DestinationForm
-              route={route}
+              route={selectedRoute}
               destinationToEdit={selectedDestination}
             />
           </div>
         )}
-        {route && (
+        {selectedRoute && (
           <div
             className={cn(
-              'col-span-1 border',
-              selectedDestination ? '' : 'col-span-2'
+              'border',
+              selectedDestination || currentForm === 'destination'
+                ? 'col-span-1'
+                : 'col-span-2'
             )}
           >
             <LocationMap locations={locations} />
           </div>
         )}
       </div>
-      <DeleteRouteDialog
-        route={deletingRoute}
-        tripId={tripId}
-        open={!!deletingRoute}
-        onOpenChange={(open) => !open && setDeletingRoute(null)}
-      />
     </main>
   );
 };
