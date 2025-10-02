@@ -1,6 +1,6 @@
 'use client';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, Edit, Trash2 } from 'lucide-react';
+import { ChevronDown, Edit, Hotel, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -11,13 +11,17 @@ import { TripByIdResponse } from '../../actions/getTripById';
 export interface DestinationListProps {
   route: TripByIdResponse['routes'][0];
   onDestinationSelect: (
-    destinationId: TripByIdResponse['routes'][0]['destinations'][0] | null
+    destination: TripByIdResponse['routes'][0]['destinations'][0] | null
+  ) => void;
+  onAddAccommodationClick: (
+    destination: TripByIdResponse['routes'][0]['destinations'][0]
   ) => void;
 }
 
 const DestinationList: FC<DestinationListProps> = ({
   route,
   onDestinationSelect,
+  onAddAccommodationClick,
 }) => {
   const queryClient = useQueryClient();
   const [selectedDestinationId, setSelectedDestinationId] = useState<
@@ -55,17 +59,15 @@ const DestinationList: FC<DestinationListProps> = ({
     <ScrollArea className='h-full py-2'>
       {route.destinations.map((destination, index) => (
         <div key={destination.id} className='flex flex-col items-center'>
-          <div
-            className='group relative flex w-full flex-row items-center gap-2'
-            onClick={() => onItemClick(destination)}
-          >
+          <div className='group relative flex w-full flex-row items-center gap-2'>
             <div className='flex size-8 items-center justify-center rounded-full bg-gray-200 text-black'>
               {destination.order}
             </div>
 
             <div
               id='destination-card'
-              className={`flex flex-1 cursor-pointer flex-col gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
+              onClick={() => onItemClick(destination)}
+              className={`flex flex-1 cursor-pointer flex-col gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out ${
                 selectedDestinationId === destination.id
                   ? 'bg-blue-500 text-white shadow-lg'
                   : selectedDestinationId
@@ -83,8 +85,17 @@ const DestinationList: FC<DestinationListProps> = ({
 
             <div
               id='action-buttons'
-              className='absolute right-1 flex gap-1 opacity-0 transition-all duration-300 ease-in-out group-hover:opacity-100'
+              className='flex w-0 gap-1 opacity-0 transition-all duration-300 ease-in-out group-hover:w-auto group-hover:opacity-100'
             >
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-8 w-8 bg-lime-500 shadow-sm hover:bg-blue-400'
+                title='Add accommodation'
+                onClick={() => onAddAccommodationClick(destination)}
+              >
+                <Hotel className='h-4 w-4 text-gray-600' />
+              </Button>
               <Button
                 variant='ghost'
                 size='icon'

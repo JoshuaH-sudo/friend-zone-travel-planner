@@ -8,12 +8,13 @@ import DestinationForm from './forms/destinationForm';
 import LocationMap, { Poi } from './locationMap';
 import { Button } from '@/components/ui/button';
 import RoutesList from './routesList';
+import AccommodationForm from './forms/accommodationForm';
 
 interface TripOverviewClientProps {
   trip: TripByIdResponse;
 }
 
-type Destination = TripByIdResponse['routes'][0]['destinations'][0];
+export type Destination = TripByIdResponse['routes'][0]['destinations'][0];
 
 type CurrentForm = 'destination' | 'accommodation' | 'transportation' | null;
 
@@ -51,6 +52,12 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
     setSelectedDestination(null);
   };
 
+  const onAddAccommodationClick = (destination: Destination) => {
+    setCurrentForm('accommodation');
+    setFormMode('add');
+    setSelectedDestination(destination);
+  };
+
   const locations: Poi[] = trip.routes.flatMap((route) =>
     route.destinations.map((dest) => ({
       key: dest.id,
@@ -63,7 +70,6 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
 
   return (
     <main className='bg-background h-full'>
-      {/* Main Content */}
       <div className='flex h-full flex-row'>
         <div
           id='routes-list'
@@ -96,12 +102,13 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
               <DestinationList
                 route={selectedRoute}
                 onDestinationSelect={onDestinationSelect}
+                onAddAccommodationClick={onAddAccommodationClick}
               />
             </>
           )}
         </div>
         <div
-          id='destinations-list'
+          id='form-container'
           //@ts-expect-error the attribute will still be set
           open={selectedRoute && currentForm === 'destination'}
           className='data=[open=true] flex h-full flex-col gap-1 border transition-all duration-300 ease-in-out not-open:w-0 open:w-xs open:p-4'
@@ -113,6 +120,12 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
                 route={selectedRoute}
                 destinationToEdit={selectedDestination}
               />
+            </>
+          )}
+          {selectedDestination && currentForm === 'accommodation' && (
+            <>
+              <h4 className='mb-1 text-lg font-medium'>New Accommodation</h4>
+              <AccommodationForm destination={selectedDestination} />
             </>
           )}
         </div>

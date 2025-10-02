@@ -28,6 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import useAddAccommodationToDestination from '../../hooks/useAddAccommodationToDestination';
 import useEditAccommodation from '../../hooks/useEditAccommodation';
+import { Destination } from '../tripOverviewClient';
 
 // Accommodation form schema
 const accommodationSchema = z.object({
@@ -38,7 +39,9 @@ const accommodationSchema = z.object({
   cost: z.number().min(0, 'Cost must be positive').default(0),
   currency: z.string().default('USD'),
   href: z.string().optional().nullable(),
-  type: z.enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other']).default('hotel'),
+  type: z
+    .enum(['hotel', 'motel', 'hostel', 'friend', 'airbnb', 'other'])
+    .default('hotel'),
   friendId: z.string().optional().nullable(),
   checkIn: z.date().nullable(),
   checkOut: z.date().nullable(),
@@ -47,24 +50,21 @@ const accommodationSchema = z.object({
 export type AccommodationFormType = z.infer<typeof accommodationSchema>;
 
 export interface AccommodationFormProps {
-  destinationId: string;
-  routeId: string;
+  destination: Destination;
   initialData?: Partial<AccommodationFormType>;
-  startDate: Date;
-  endDate: Date;
   onSuccess?: () => void;
 }
 
 const AccommodationForm: FC<AccommodationFormProps> = ({
-  destinationId,
-  routeId: _routeId,
+  destination,
   initialData,
-  startDate,
-  endDate,
   onSuccess,
 }) => {
   const queryClient = useQueryClient();
-  
+  const { id: destinationId, start_date, end_date } = destination;
+  const startDate = new Date(start_date);
+  const endDate = new Date(end_date);
+
   const defaultValues: AccommodationFormType = {
     destinationId,
     name: '',
@@ -74,8 +74,8 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
     href: null,
     type: 'hotel',
     friendId: null,
-    checkIn: startDate,
-    checkOut: endDate,
+    checkIn: new Date(startDate),
+    checkOut: new Date(endDate),
     ...initialData,
   };
 
@@ -84,12 +84,12 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
     defaultValues,
     mode: 'onChange',
   });
-  
+
   const { watch, handleSubmit } = form;
-  
+
   const checkInDate = watch('checkIn');
   const checkOutDate = watch('checkOut');
-  
+
   // Set up date range object for the picker
   const dateRange: DateRange = {
     from: checkInDate || startDate,
@@ -132,7 +132,7 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
           friendId: data.friendId ?? null,
         });
       } else {
-        // Create new accommodation  
+        // Create new accommodation
         const { id: _id, ...createData } = data;
         await addAccommodation({
           ...createData,
@@ -147,11 +147,16 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className='flex h-full flex-col gap-1 p-2'
+      >
         <Card>
           <CardHeader>
             <CardTitle className='text-lg'>
-              {initialData?.id ? 'Edit Accommodation Details' : 'Add Accommodation Details'}
+              {initialData?.id
+                ? 'Edit Accommodation Details'
+                : 'Add Accommodation Details'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -199,7 +204,7 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
                       }
                     }}
                     calendarProps={{
-                      disabled: { 
+                      disabled: {
                         before: startDate,
                       },
                       startMonth: startDate,
@@ -221,12 +226,14 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
                     <FormItem>
                       <FormLabel>Cost per night</FormLabel>
                       <FormControl>
-                        <Input 
-                          type='number' 
-                          min='0' 
-                          step='0.01' 
-                          {...field} 
-                          onChange={(e) => field.onChange(Number(e.target.value))} 
+                        <Input
+                          type='number'
+                          min='0'
+                          step='0.01'
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -271,7 +278,11 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
                   <FormItem>
                     <FormLabel>Website URL (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder='https://example.com' {...field} value={field.value || ''} />
+                      <Input
+                        placeholder='https://example.com'
+                        {...field}
+                        value={field.value || ''}
+                      />
                     </FormControl>
                     <FormDescription>
                       Link to booking website or more information
@@ -309,8 +320,8 @@ const AccommodationForm: FC<AccommodationFormProps> = ({
             </div>
           </CardContent>
         </Card>
-        
-        <Button type="submit" className="w-full">
+
+        <Button type='submit' className='w-full'>
           {initialData?.id ? 'Update Accommodation' : 'Add Accommodation'}
         </Button>
       </form>
