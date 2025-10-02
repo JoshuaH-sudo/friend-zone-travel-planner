@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <div className='space-y-8'>
+    <div className='space-y-8 px-4 py-6'>
       {/* Welcome Section */}
       <div className='space-y-4 text-center'>
         <h1 className='text-4xl font-bold tracking-tight'>

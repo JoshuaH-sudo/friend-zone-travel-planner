@@ -8,7 +8,6 @@ import {
 import Link from 'next/link';
 import { ThemeToggle } from '../../components/theme-toggle';
 import { LanguageSwitcher } from '../../components/language-switcher';
-import { DashboardLayoutContent } from './dashboard-layout-content';
 
 export default async function DashboardLayout({
   children,
@@ -43,7 +42,6 @@ export default async function DashboardLayout({
         </header>
 
         {/* Main Content */}
-        {/* <DashboardLayoutContent>{children}</DashboardLayoutContent> */}
         {children}
       </SidebarInset>
     </SidebarProvider>
