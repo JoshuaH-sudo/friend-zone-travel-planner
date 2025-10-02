@@ -72,7 +72,7 @@ const TripsPage = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
