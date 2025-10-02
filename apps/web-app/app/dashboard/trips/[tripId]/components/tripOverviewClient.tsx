@@ -110,7 +110,7 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
         <div
           id='form-container'
           //@ts-expect-error the attribute will still be set
-          open={selectedRoute && currentForm === 'destination'}
+          open={selectedRoute && currentForm !== null}
           className='data=[open=true] flex h-full flex-col gap-1 border transition-all duration-300 ease-in-out not-open:w-0 open:w-xs open:p-4'
         >
           {selectedRoute && currentForm === 'destination' && (

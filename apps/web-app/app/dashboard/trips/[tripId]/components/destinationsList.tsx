@@ -96,7 +96,7 @@ const DestinationList: FC<DestinationListProps> = ({
               >
                 <Hotel className='h-4 w-4 text-gray-600' />
               </Button>
-              <Button
+              {/* <Button
                 variant='ghost'
                 size='icon'
                 className='h-8 w-8 bg-white shadow-sm hover:bg-blue-400'
@@ -112,13 +112,13 @@ const DestinationList: FC<DestinationListProps> = ({
                 title='Delete destination'
               >
                 <Trash2 className='h-4 w-4 text-gray-600 hover:text-red-600' />
-              </Button>
+              </Button> */}
             </div>
           </div>
           {index < route.destinations.length - 1 && (
             <ChevronDown
               key={`dot-${index}`}
-              className='mx-auto size-6 text-black'
+              className='mx-auto size-6 text-foreground'
             />
           )}
         </div>
