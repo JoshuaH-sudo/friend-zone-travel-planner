@@ -48,7 +48,7 @@ const RoutesList: FC<RoutesListProps> = ({ routes, onRouteSelect }) => {
 
               <div
                 id='destination-card'
-                className={`flex flex-1 cursor-pointer flex-row gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
+                className={`flex flex-1 cursor-pointer flex-col gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
                   selectedRouteId === route.id
                     ? 'bg-blue-500 text-white shadow-lg'
                     : selectedRouteId
@@ -56,8 +56,8 @@ const RoutesList: FC<RoutesListProps> = ({ routes, onRouteSelect }) => {
                       : 'bg-gray-200 text-black hover:bg-blue-400'
                 }`}
               >
-                <p className='flex-1 font-medium'>{route.name}</p>
-                <p>
+                <p className='line-clamp-1 flex-1 font-medium'>{route.name}</p>
+                <p className='flex items-center justify-end gap-2 text-xs'>
                   {format(route.date_from!, 'MMM d')} -{' '}
                   {format(route.date_to!, 'MMM d')}
                 </p>

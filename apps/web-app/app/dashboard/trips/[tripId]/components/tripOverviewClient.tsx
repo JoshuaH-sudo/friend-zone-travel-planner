@@ -6,7 +6,6 @@ import { TripByIdResponse } from '../../actions/getTripById';
 import DestinationList from './destinationsList';
 import DestinationForm from './forms/destinationForm';
 import LocationMap, { Poi } from './locationMap';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import RoutesList from './routesList';
 
@@ -65,10 +64,10 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
   return (
     <main className='bg-background h-full'>
       {/* Main Content */}
-      <div className='grid h-full grid-cols-4 grid-rows-1'>
+      <div className='flex h-full flex-row'>
         <div
           id='routes-list'
-          className='col-span-1 flex h-full flex-col gap-1 border p-4'
+          className='flex h-full w-xs flex-col gap-1 border p-4'
         >
           <div className='mb-4 flex items-center justify-between'>
             <h4 className='mb-1 text-lg font-medium'>Routes</h4>
@@ -80,45 +79,46 @@ const TripOverviewClient = ({ trip }: TripOverviewClientProps) => {
             onRouteSelect={onRouteSelect}
           />
         </div>
-        {selectedRoute && (
-          <div
-            id='destinations-list'
-            className='col-span-1 flex h-full flex-col gap-1 border p-4'
-          >
-            <div className='mb-4 flex items-center justify-between'>
-              <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
-              <Button onClick={onAddDestinationClick}>+ Add Destination</Button>
-            </div>
-            <DestinationList
-              route={selectedRoute}
-              onDestinationSelect={onDestinationSelect}
-            />
-          </div>
-        )}
-        {selectedRoute && currentForm === 'destination' && (
-          <div
-            id='destinations-list'
-            className='col-span-1 flex h-full flex-col gap-1 border p-4'
-          >
-            <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
-            <DestinationForm
-              route={selectedRoute}
-              destinationToEdit={selectedDestination}
-            />
-          </div>
-        )}
-        {selectedRoute && (
-          <div
-            className={cn(
-              'border',
-              selectedDestination || currentForm === 'destination'
-                ? 'col-span-1'
-                : 'col-span-2'
-            )}
-          >
-            <LocationMap locations={locations} />
-          </div>
-        )}
+        <div
+          id='destinations-list'
+          //@ts-expect-error the attribute will still be set
+          open={selectedRoute ? true : false}
+          className='data=[open=true] flex h-full flex-col gap-1 border transition-all duration-300 ease-in-out not-open:w-0 open:w-xs open:p-4'
+        >
+          {selectedRoute && (
+            <>
+              <div className='mb-4 flex items-center justify-between'>
+                <h4 className='mb-1 text-lg font-medium'>Destinations</h4>
+                <Button onClick={onAddDestinationClick}>
+                  + Add Destination
+                </Button>
+              </div>
+              <DestinationList
+                route={selectedRoute}
+                onDestinationSelect={onDestinationSelect}
+              />
+            </>
+          )}
+        </div>
+        <div
+          id='destinations-list'
+          //@ts-expect-error the attribute will still be set
+          open={selectedRoute && currentForm === 'destination'}
+          className='data=[open=true] flex h-full flex-col gap-1 border transition-all duration-300 ease-in-out not-open:w-0 open:w-xs open:p-4'
+        >
+          {selectedRoute && currentForm === 'destination' && (
+            <>
+              <h4 className='mb-1 text-lg font-medium'>New Destination</h4>
+              <DestinationForm
+                route={selectedRoute}
+                destinationToEdit={selectedDestination}
+              />
+            </>
+          )}
+        </div>
+        <div className='flex-1'>
+          <LocationMap locations={locations} />
+        </div>
       </div>
     </main>
   );

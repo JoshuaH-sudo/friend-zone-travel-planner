@@ -65,7 +65,7 @@ const DestinationList: FC<DestinationListProps> = ({
 
             <div
               id='destination-card'
-              className={`flex flex-1 cursor-pointer flex-row gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
+              className={`flex flex-1 cursor-pointer flex-col gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
                 selectedDestinationId === destination.id
                   ? 'bg-blue-500 text-white shadow-lg'
                   : selectedDestinationId
@@ -73,12 +73,12 @@ const DestinationList: FC<DestinationListProps> = ({
                     : 'bg-gray-200 text-black hover:bg-blue-400'
               }`}
             >
-              <p className='flex-1'>{destination.location}</p>
-              <p>
+              <p className='line-clamp-1 flex-1'>{destination.location}</p>
+              <p className='flex items-center justify-end gap-2 text-xs'>
                 {format(destination.start_date, 'MMM d')} -{' '}
                 {format(destination.end_date, 'MMM d')}
+                <p className='font-bold'>{destination.days} days</p>
               </p>
-              <p className='font-bold'>{destination.days} days</p>
             </div>
 
             <div
