@@ -1,6 +1,6 @@
 'use client';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { updateRoute } from '../../actions/updateRoute';
+import { updateRoute } from '../actions/updateRoute';
 
 export interface UpdateRouteNameProps {
   routeId: string;
@@ -30,11 +30,10 @@ const useUpdateRouteName = (props?: UseUpdateRouteNameOptions) =>
       return await updateRoute({
         id: routeId,
         name,
-        tripId
+        tripId,
       });
     },
     ...props,
   });
 
 export default useUpdateRouteName;
-

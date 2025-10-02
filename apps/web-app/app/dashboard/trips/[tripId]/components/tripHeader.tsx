@@ -1,5 +1,4 @@
 import { MapPin } from 'lucide-react';
-import { TripByIdResponse } from '../../hooks/useGetTripById';
 import { DateRangeInput } from '@/components/ui/dateRangeInput';
 import { useState, useRef, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -7,6 +6,7 @@ import useUpdateTrip from '../../hooks/useUpdateTrip';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, X, Edit, Loader2 } from 'lucide-react';
+import { TripByIdResponse } from '../../actions/getTripById';
 
 interface TripHeaderProps {
   trip: TripByIdResponse;

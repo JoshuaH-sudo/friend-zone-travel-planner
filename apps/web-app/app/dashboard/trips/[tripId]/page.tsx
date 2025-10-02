@@ -26,12 +26,7 @@ export default async function TripDetails({
       notFound();
     }
 
-    return (
-      <TripOverviewClient
-        trip={trip}
-        tripId={tripId}
-      />
-    );
+    return <TripOverviewClient trip={trip} />;
   } catch (error) {
     console.error('Error fetching trip:', error);
     notFound();
