@@ -58,8 +58,8 @@ const RoutesList: FC<RoutesListProps> = ({ routes, onRouteSelect }) => {
               >
                 <p className='line-clamp-1 flex-1 font-medium'>{route.name}</p>
                 <p className='flex items-center justify-end gap-2 text-xs'>
-                  {format(route.date_from!, 'MMM d')} -{' '}
-                  {format(route.date_to!, 'MMM d')}
+                  {format(route.destinations[0]?.start_date, 'MMM d')} -{' '}
+                  {format(route.destinations[route.destinations.length - 1]?.end_date, 'MMM d')}
                 </p>
               </div>
 

@@ -108,7 +108,7 @@ const DestinationForm: FC<DestinationFormProps> = ({
       setEnableApiCalls(!destinationToEdit);
       // Start date should be the end date of the last destination
       setValue('startDate', new Date(previousDestination.end_date));
-    } else {
+    } else if (!destinationToEdit) {
       // set from to to now if no previous destination.
       setValue('startDate', new Date());
     }
