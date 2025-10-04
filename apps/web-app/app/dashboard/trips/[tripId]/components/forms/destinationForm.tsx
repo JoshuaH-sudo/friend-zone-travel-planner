@@ -49,7 +49,7 @@ export type DestinationFormType = z.infer<typeof schema>;
 
 export interface DestinationFormProps {
   route: TripByIdResponse['routes'][0];
-  destinationToEdit?:  TripByIdResponse['routes'][0]['destinations'][0] | null;
+  destinationToEdit?: TripByIdResponse['routes'][0]['destinations'][0] | null;
 }
 
 const DestinationForm: FC<DestinationFormProps> = ({
@@ -71,15 +71,11 @@ const DestinationForm: FC<DestinationFormProps> = ({
     longitude: 0,
     startDate: previousDestination
       ? new Date(previousDestination.end_date)
-      : route.date_from
-        ? new Date(route.date_from)
-        : new Date(),
+      : new Date(),
     endDate: previousDestination
       ? // End date should default to the day after the start date
         addDays(new Date(previousDestination.end_date), 1)
-      : route.date_from
-        ? addDays(new Date(route.date_from), 1)
-        : addDays(new Date(), 1),
+      : addDays(new Date(), 1),
   };
 
   const form = useForm<DestinationFormType>({
@@ -113,15 +109,10 @@ const DestinationForm: FC<DestinationFormProps> = ({
       // Start date should be the end date of the last destination
       setValue('startDate', new Date(previousDestination.end_date));
     } else {
-      // set from to be the route start date
-      setValue('startDate', new Date(route.date_from!));
+      // set from to to now if no previous destination.
+      setValue('startDate', new Date());
     }
-  }, [
-    previousDestination?.end_date,
-    route.date_from,
-    destinationToEdit,
-    setValue,
-  ]);
+  }, [previousDestination?.end_date, destinationToEdit, setValue]);
 
   // Get address suggestions as the user types
   const [debouncedAutocompleteInput] = useDebouncedValue<string>(address, {
@@ -226,7 +217,7 @@ const DestinationForm: FC<DestinationFormProps> = ({
 
   const startDateSelection = previousDestination
     ? new Date(previousDestination.end_date)
-    : new Date(route.date_from!);
+    : new Date();
 
   const dateRange: DateRange = {
     from: startDate,
