@@ -27,16 +27,12 @@ export async function getTripById({ tripId }: GetTripByIdParams) {
       user_id,
       created_at,
       updated_at,
-      start_date,
-      end_date,
       routes (
         id,
         name,
         trip_id,
         created_at,
         updated_at,
-        date_from,
-        date_to,
         destinations (
           id,
           route_id,

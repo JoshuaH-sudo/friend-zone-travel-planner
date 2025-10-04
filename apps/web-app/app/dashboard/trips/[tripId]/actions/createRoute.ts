@@ -5,12 +5,7 @@ import { getUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache'
 import { Database } from '@/lib/supabase/database.types';
 
-interface CreateRouteData {
-  name: string
-  tripId: string
-  dateFrom?: Date
-  dateTo?: Date
-}
+type CreateRouteData = Omit<Database['public']['Tables']['routes']['Insert'], 'user_id'>;
 
 export async function createRoute(data: CreateRouteData) {
   const supabase = await createClient()
@@ -24,7 +19,7 @@ export async function createRoute(data: CreateRouteData) {
   const { data: trip, error: tripError } = await supabase
     .from('trips')
     .select('id, start_date, end_date')
-    .eq('id', data.tripId)
+    .eq('id', data.trip_id)
     .eq('user_id', user.id)
     .single()
 
@@ -34,19 +29,9 @@ export async function createRoute(data: CreateRouteData) {
 
   const routeData: Database['public']['Tables']['routes']['Insert'] = {
     name: data.name,
-    trip_id: data.tripId,
-    // Should share the same date range as the trip initially
-    date_from: trip.start_date,
-    date_to: trip.end_date,
+    trip_id: data.trip_id,
   };
 
-  // Add date range if provided
-  if (data.dateFrom) {
-    routeData.date_from = data.dateFrom.toISOString();
-  }
-  if (data.dateTo) {
-    routeData.date_to = data.dateTo.toISOString();
-  }
 
   const { data: route, error } = await supabase
     .from('routes')
@@ -59,6 +44,6 @@ export async function createRoute(data: CreateRouteData) {
     throw new Error('Failed to create route')
   }
 
-  revalidatePath(`/dashboard/trips/${data.tripId}`)
+  revalidatePath(`/dashboard/trips/${data.trip_id}`)
   return route
 }

@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
-          variables?: Json
+          extensions?: Json
           operationName?: string
           query?: string
-          extensions?: Json
+          variables?: Json
         }
         Returns: Json
       }
@@ -194,8 +194,6 @@ export type Database = {
       routes: {
         Row: {
           created_at: string | null
-          date_from: string | null
-          date_to: string | null
           id: string
           name: string
           trip_id: string
@@ -203,8 +201,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          date_from?: string | null
-          date_to?: string | null
           id?: string
           name: string
           trip_id: string
@@ -212,8 +208,6 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          date_from?: string | null
-          date_to?: string | null
           id?: string
           name?: string
           trip_id?: string
@@ -288,34 +282,22 @@ export type Database = {
       trips: {
         Row: {
           created_at: string | null
-          date_from: string | null
-          date_to: string | null
-          end_date: string
           id: string
           name: string
-          start_date: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          date_from?: string | null
-          date_to?: string | null
-          end_date: string
           id?: string
           name: string
-          start_date: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          date_from?: string | null
-          date_to?: string | null
-          end_date?: string
           id?: string
           name?: string
-          start_date?: string
           updated_at?: string | null
           user_id?: string
         }

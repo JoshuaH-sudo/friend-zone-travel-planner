@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { redirect } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { createRoute } from '../actions/createRoute';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,8 +14,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DateRangeInput } from '@/components/ui/dateRangeInput';
-import { DateRange } from 'react-day-picker';
 import { TripByIdResponse } from '../../actions/getTripById';
 
 export interface CreateRouteButtonProps {
@@ -25,21 +23,11 @@ export interface CreateRouteButtonProps {
 const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
   const [open, setOpen] = useState(false);
   const [routeName, setRouteName] = useState('New Route');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
-  useEffect(() => {
-    setDateRange({
-      from: new Date(trip.start_date),
-      to: new Date(trip.end_date),
-    });
-  }, [trip]);
 
   const createRouteHandler = async () => {
     await createRoute({
       name: routeName,
-      tripId: trip.id,
-      dateFrom: dateRange?.from,
-      dateTo: dateRange?.to,
+      trip_id: trip.id,
     });
     setOpen(false);
     redirect(`./${trip.id}`);
@@ -65,13 +53,6 @@ const CreateRouteButton = ({ trip }: CreateRouteButtonProps) => {
               value={routeName}
               onChange={(e) => setRouteName(e.target.value)}
               placeholder='Enter route name'
-            />
-          </div>
-          <div className='grid gap-2'>
-            <DateRangeInput
-              dates={dateRange}
-              onSelect={setDateRange}
-              label='Route Duration'
             />
           </div>
           <Button onClick={createRouteHandler} className='w-full'>
