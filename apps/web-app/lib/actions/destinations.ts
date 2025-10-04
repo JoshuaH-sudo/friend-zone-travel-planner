@@ -731,7 +731,7 @@ export async function editTransport(
     throw new Error('Failed to update transport');
   }
 
-  revalidatePath(`/dashboard/trips/${existingTransport.destinations.routes.trips.id}/${existingTransport.destinations.route_id}`);
+  revalidatePath(`/dashboard/trips/${existingTransport.destinations.routes.trips.id}`);
 
   return {
     id: updatedTransport.id,
@@ -762,12 +762,8 @@ export async function addDestinationToRoute(
     .from('routes')
     .select(`
       id,
-      date_from,
-      date_to,
       trips!inner (
         id,
-        start_date,
-        end_date,
         user_id
       )
     `)

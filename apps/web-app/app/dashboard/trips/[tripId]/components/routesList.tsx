@@ -42,24 +42,26 @@ const RoutesList: FC<RoutesListProps> = ({ routes, onRouteSelect }) => {
               className='group relative flex w-full flex-row items-center gap-2'
               onClick={() => onItemClick(route)}
             >
-              <div className='flex size-8 items-center justify-center rounded-full bg-gray-200 text-black'>
-                {index + 1}
-              </div>
-
               <div
                 id='destination-card'
                 className={`flex flex-1 cursor-pointer flex-col gap-2 rounded-lg p-2 px-4 text-sm transition-all duration-300 ease-in-out group-hover:mr-20 ${
                   selectedRouteId === route.id
                     ? 'bg-blue-500 text-white shadow-lg'
-                    : selectedRouteId
-                      ? 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                      : 'bg-gray-200 text-black hover:bg-blue-400'
+                    : 'bg-gray-200 text-black hover:bg-blue-400'
                 }`}
               >
-                <p className='line-clamp-1 flex-1 font-medium'>{route.name}</p>
+                <span className='flex items-center gap-2'>
+                  <p>{index + 1}</p>
+                  <p className='line-clamp-1 flex-1 font-medium'>
+                    {route.name}
+                  </p>
+                </span>
                 <p className='flex items-center justify-end gap-2 text-xs'>
                   {format(route.destinations[0]?.start_date, 'MMM d')} -{' '}
-                  {format(route.destinations[route.destinations.length - 1]?.end_date, 'MMM d')}
+                  {format(
+                    route.destinations[route.destinations.length - 1]?.end_date,
+                    'MMM d'
+                  )}
                 </p>
               </div>
 
