@@ -81,6 +81,7 @@ const DestinationForm: FC<DestinationFormProps> = ({
   const form = useForm<DestinationFormType>({
     defaultValues: {
       ...defaultNewDestination,
+      ...destinationToEdit
     },
     resolver: zodResolver(schema),
     mode: 'onChange',
@@ -93,14 +94,6 @@ const DestinationForm: FC<DestinationFormProps> = ({
   const address = watch('location');
   const startDate = watch('startDate');
   const endDate = watch('endDate');
-
-  useEffect(() => {
-    if (destinationToEdit && destinationToEdit.id) {
-      // If editing an existing destination, populate the form with its data
-      const formData = { ...destinationToEdit };
-      form.reset(formData);
-    }
-  }, [destinationToEdit, form]);
 
   useEffect(() => {
     if (previousDestination) {
@@ -225,7 +218,7 @@ const DestinationForm: FC<DestinationFormProps> = ({
   };
 
   return (
-    <Form {...form}>
+    <Form {...form} >
       <form
         onSubmit={handleSubmit(onSubmit)}
         className='flex h-full flex-col gap-1 p-2'
