@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+
 const DUMMY_TRIP = {
   id: "1",
   name: "Japan Trip",
