@@ -27,6 +27,15 @@ const DUMMY_TRIP = {
           checkOut: "2024-01-05",
         },
       ],
+      transport: [
+        {
+          id: "1",
+          name: "Flight to Tokyo",
+          type: "flight",
+          price: 500,
+          currency: "USD",
+        },
+      ],
     },
     {
       id: "2",
@@ -40,6 +49,15 @@ const DUMMY_TRIP = {
           currency: "USD",
           checkIn: "2024-01-05",
           checkOut: "2024-01-10",
+        },
+      ],
+      transport: [
+        {
+          id: "2",
+          name: "Train to Kyoto",
+          type: "bus",
+          price: 150,
+          currency: "USD",
         },
       ],
     },
@@ -57,6 +75,7 @@ const DUMMY_TRIP = {
           checkOut: "2024-01-15",
         },
       ],
+      transport: [],
     },
   ],
 };
@@ -66,7 +85,6 @@ const Stop = ({
   stop: { id, name, date },
   onNameChange,
   onDateChange,
-  onShowAddAccommodation,
 }: {
   isSelected: boolean;
   stop: {
@@ -76,7 +94,6 @@ const Stop = ({
   };
   onNameChange: (value: string) => void;
   onDateChange: (value: string) => void;
-  onShowAddAccommodation: (stopId: string) => void;
 }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDate, setIsEditingDate] = useState(false);
@@ -131,14 +148,6 @@ const Stop = ({
           </p>
         </div>
       )}
-      <div className="w-full">
-        <button
-          className="mt-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
-          onClick={() => onShowAddAccommodation(id)}
-        >
-          Add Accommodation
-        </button>
-      </div>
     </div>
   );
 };
@@ -267,6 +276,114 @@ const Accommodation = ({
   );
 };
 
+const Transport = ({
+  transport,
+  onUpdate,
+}: {
+  transport: {
+    id: string;
+    name: string;
+    type: string;
+    price: number;
+    currency: string;
+  };
+  onUpdate: (field: string, value: string | number) => void;
+}) => {
+  const { name, type, price, currency } = transport;
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingType, setIsEditingType] = useState(false);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [isEditingCurrency, setIsEditingCurrency] = useState(false);
+
+  return (
+    <div className="rounded-lg border p-4">
+      {isEditingName ? (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => onUpdate("name", e.target.value)}
+          onBlur={() => setIsEditingName(false)}
+          autoFocus
+          className="w-full rounded border px-2 py-1 text-lg font-semibold"
+        />
+      ) : (
+        <h4
+          className="cursor-pointer text-lg font-semibold hover:text-blue-600"
+          onClick={() => setIsEditingName(true)}
+        >
+          {name}
+        </h4>
+      )}
+      <div className="mt-2 flex items-center gap-2">
+        {isEditingType ? (
+          <select
+            value={type}
+            onChange={(e) => {
+              onUpdate("type", e.target.value);
+              setIsEditingType(false);
+            }}
+            onBlur={() => setIsEditingType(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          >
+            <option value="flight">Flight</option>
+            <option value="bus">Bus</option>
+            <option value="car">Car</option>
+          </select>
+        ) : (
+          <span
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingType(true)}
+          >
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </span>
+        )}
+        <span className="text-gray-400">•</span>
+        {isEditingPrice ? (
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => onUpdate("price", Number(e.target.value))}
+            onBlur={() => setIsEditingPrice(false)}
+            autoFocus
+            className="w-24 rounded border px-2 py-1 text-gray-600"
+          />
+        ) : (
+          <span
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingPrice(true)}
+          >
+            {price}
+          </span>
+        )}
+        {isEditingCurrency ? (
+          <select
+            value={currency}
+            onChange={(e) => {
+              onUpdate("currency", e.target.value);
+              setIsEditingCurrency(false);
+            }}
+            onBlur={() => setIsEditingCurrency(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="JPY">JPY</option>
+          </select>
+        ) : (
+          <span
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingCurrency(true)}
+          >
+            {currency}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [trip, setTrip] = useState(DUMMY_TRIP);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
@@ -320,12 +437,56 @@ export default function Home() {
     });
   };
 
+  const onAddTransport = (stopId: string) => {
+    const id = (Math.random() * 100000).toFixed(0);
+    const newTransport = {
+      id,
+      name: "New Transport",
+      type: "flight",
+      price: 0,
+      currency: "USD",
+    };
+    setTrip({
+      ...trip,
+      stops: trip.stops.map((stop) =>
+        stop.id === stopId
+          ? {
+              ...stop,
+              transport: [...stop.transport, newTransport],
+            }
+          : stop,
+      ),
+    });
+  };
+
+  const onUpdateTransport = (
+    stopId: string,
+    transportId: string,
+    field: string,
+    value: string | number,
+  ) => {
+    setTrip({
+      ...trip,
+      stops: trip.stops.map((stop) =>
+        stop.id === stopId
+          ? {
+              ...stop,
+              transport: stop.transport.map((trans) =>
+                trans.id === transportId ? { ...trans, [field]: value } : trans,
+              ),
+            }
+          : stop,
+      ),
+    });
+  };
+
   const addStop = () => {
     const newStop = {
       id: (trip.stops.length + 1).toString(),
       name: `New Stop ${trip.stops.length + 1}`,
       date: new Date().toISOString().split("T")[0],
       accommodations: [],
+      transport: [],
     };
     setTrip({
       ...trip,
@@ -333,27 +494,22 @@ export default function Home() {
     });
   };
 
-  const updateStopName = (stopId: string, newName: string) => {
+  const updateStop = (
+    stopId: string,
+    field: string,
+    value: string | number,
+  ) => {
     setTrip({
       ...trip,
       stops: trip.stops.map((stop) =>
-        stop.id === stopId ? { ...stop, name: newName } : stop,
+        stop.id === stopId ? { ...stop, [field]: value } : stop,
       ),
     });
   };
 
-  const updateStopDate = (stopId: string, newDate: string) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId ? { ...stop, date: newDate } : stop,
-      ),
-    });
-  };
-
-  const accommodations = trip.stops.find(
-    (stop) => stop.id === selectedStopId,
-  )?.accommodations;
+  const selectedStop = trip.stops.find((stop) => stop.id === selectedStopId);
+  const accommodations = selectedStop?.accommodations;
+  const transport = selectedStop?.transport;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -361,7 +517,7 @@ export default function Home() {
         <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:text-white">
           {trip.name}
         </h1>
-        <div className="flex w-full flex-row items-start gap-10">
+        <div className="flex w-full flex-row items-start gap-6">
           <section
             id="stops-section"
             className="mt-10 w-full rounded-xl border p-6 text-left"
@@ -378,10 +534,11 @@ export default function Home() {
                     key={stop.id}
                     isSelected={selectedStopId === stop.id}
                     stop={stop}
-                    onNameChange={(newName) => updateStopName(stop.id, newName)}
-                    onDateChange={(newDate) => updateStopDate(stop.id, newDate)}
-                    onShowAddAccommodation={(stopId) =>
-                      onAddAccommodation(stopId)
+                    onNameChange={(newName) =>
+                      updateStop(stop.id, "name", newName)
+                    }
+                    onDateChange={(newDate) =>
+                      updateStop(stop.id, "date", newDate)
                     }
                   />
                 </li>
@@ -394,29 +551,70 @@ export default function Home() {
               Add Stop
             </button>
           </section>
-          {accommodations && accommodations.length > 0 && (
+          {selectedStopId && (
             <section
               id="accommodations-section"
               className="mt-10 w-full rounded-xl border p-6 text-left"
             >
               <h2 className="mb-4 text-2xl font-bold">Accommodations</h2>
-              <ul className="space-y-4">
-                {accommodations?.map((accommodation) => (
-                  <li key={accommodation.id} className="py-1">
-                    <Accommodation
-                      accommodation={accommodation}
-                      onUpdate={(field, value) =>
-                        onUpdateAccommodation(
-                          selectedStopId!,
-                          accommodation.id,
-                          field,
-                          value,
-                        )
-                      }
-                    />
-                  </li>
-                ))}
-              </ul>
+              {accommodations && accommodations.length > 0 && (
+                <ul className="space-y-4">
+                  {accommodations.map((accommodation) => (
+                    <li key={accommodation.id} className="py-1">
+                      <Accommodation
+                        accommodation={accommodation}
+                        onUpdate={(field, value) =>
+                          onUpdateAccommodation(
+                            selectedStopId!,
+                            accommodation.id,
+                            field,
+                            value,
+                          )
+                        }
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                className="mt-6 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+                onClick={() => onAddAccommodation(selectedStopId)}
+              >
+                Add Accommodation
+              </button>
+            </section>
+          )}
+          {selectedStopId && (
+            <section
+              id="transport-section"
+              className="mt-10 w-full rounded-xl border p-6 text-left"
+            >
+              <h2 className="mb-4 text-2xl font-bold">Transport</h2>
+              {transport && transport.length > 0 && (
+                <ul className="space-y-4">
+                  {transport.map((trans) => (
+                    <li key={trans.id} className="py-1">
+                      <Transport
+                        transport={trans}
+                        onUpdate={(field, value) =>
+                          onUpdateTransport(
+                            selectedStopId!,
+                            trans.id,
+                            field,
+                            value,
+                          )
+                        }
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                className="mt-6 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+                onClick={() => onAddTransport(selectedStopId)}
+              >
+                Add Transport
+              </button>
             </section>
           )}
         </div>
