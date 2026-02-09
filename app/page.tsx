@@ -81,12 +81,10 @@ const DUMMY_TRIP = {
 };
 
 const Stop = ({
-  isSelected,
   stop: { id, name, date },
   onNameChange,
   onDateChange,
 }: {
-  isSelected: boolean;
   stop: {
     id: string;
     name: string;
@@ -107,9 +105,7 @@ const Stop = ({
   };
 
   return (
-    <div
-      className={`rounded-lg border p-4 ${isSelected ? "border-blue-500" : ""}`}
-    >
+    <div className="rounded-lg border p-4">
       <div className="flex items-center justify-between gap-2">
         {isEditingName ? (
           <input
@@ -404,11 +400,6 @@ const Transport = ({
 
 export default function Home() {
   const [trip, setTrip] = useState(DUMMY_TRIP);
-  const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
-
-  const onSelectStop = (stopId: string | null) => {
-    setSelectedStopId(stopId);
-  };
 
   const onAddAccommodation = (stopId: string) => {
     const stop = trip.stops.find((s) => s.id === stopId);
@@ -557,126 +548,107 @@ export default function Home() {
     });
   };
 
-  const selectedStop = trip.stops.find((stop) => stop.id === selectedStopId);
-  const accommodations = selectedStop?.accommodations;
-  const transport = selectedStop?.transport;
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-4xl flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
         <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:text-white">
           {trip.name}
         </h1>
-        <div className="flex w-full flex-row items-start gap-6">
-          <section
-            id="stops-section"
-            className="mt-10 w-full rounded-xl border p-6 text-left"
+        <section
+          id="stops-section"
+          className="mt-10 w-full rounded-xl border p-6 text-left"
+        >
+          <h2 className="mb-4 text-2xl font-bold">Stops</h2>
+          <ul className="space-y-8">
+            {trip.stops.map((stop) => (
+              <li key={stop.id}>
+                <Stop
+                  stop={stop}
+                  onNameChange={(newName) =>
+                    updateStop(stop.id, "name", newName)
+                  }
+                  onDateChange={(newDate) =>
+                    updateStop(stop.id, "date", newDate)
+                  }
+                />
+                <div className="mt-4 ml-6 space-y-6">
+                  <div>
+                    <h3 className="mb-3 text-lg font-semibold text-gray-700">
+                      Accommodations
+                    </h3>
+                    {stop.accommodations.length > 0 && (
+                      <ul className="space-y-3">
+                        {stop.accommodations.map((accommodation) => (
+                          <li key={accommodation.id}>
+                            <Accommodation
+                              accommodation={accommodation}
+                              onUpdate={(field, value) =>
+                                onUpdateAccommodation(
+                                  stop.id,
+                                  accommodation.id,
+                                  field,
+                                  value,
+                                )
+                              }
+                              onDelete={() =>
+                                onDeleteAccommodation(stop.id, accommodation.id)
+                              }
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <button
+                      className="mt-3 rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                      onClick={() => onAddAccommodation(stop.id)}
+                    >
+                      Add Accommodation
+                    </button>
+                  </div>
+                  <div>
+                    <h3 className="mb-3 text-lg font-semibold text-gray-700">
+                      Transport
+                    </h3>
+                    {stop.transport.length > 0 && (
+                      <ul className="space-y-3">
+                        {stop.transport.map((trans) => (
+                          <li key={trans.id}>
+                            <Transport
+                              transport={trans}
+                              onUpdate={(field, value) =>
+                                onUpdateTransport(
+                                  stop.id,
+                                  trans.id,
+                                  field,
+                                  value,
+                                )
+                              }
+                              onDelete={() =>
+                                onDeleteTransport(stop.id, trans.id)
+                              }
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <button
+                      className="mt-3 rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                      onClick={() => onAddTransport(stop.id)}
+                    >
+                      Add Transport
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button
+            className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            onClick={addStop}
           >
-            <h2 className="mb-4 text-2xl font-bold">Stops</h2>
-            <ul className="space-y-4">
-              {trip.stops.map((stop) => (
-                <li
-                  key={stop.id}
-                  className="py-1"
-                  onClick={() => onSelectStop(stop.id)}
-                >
-                  <Stop
-                    key={stop.id}
-                    isSelected={selectedStopId === stop.id}
-                    stop={stop}
-                    onNameChange={(newName) =>
-                      updateStop(stop.id, "name", newName)
-                    }
-                    onDateChange={(newDate) =>
-                      updateStop(stop.id, "date", newDate)
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-            <button
-              className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-              onClick={addStop}
-            >
-              Add Stop
-            </button>
-          </section>
-          {selectedStopId && (
-            <section
-              id="accommodations-section"
-              className="mt-10 w-full rounded-xl border p-6 text-left"
-            >
-              <h2 className="mb-4 text-2xl font-bold">Accommodations</h2>
-              {accommodations && accommodations.length > 0 && (
-                <ul className="space-y-4">
-                  {accommodations.map((accommodation) => (
-                    <li key={accommodation.id} className="py-1">
-                      <Accommodation
-                        accommodation={accommodation}
-                        onUpdate={(field, value) =>
-                          onUpdateAccommodation(
-                            selectedStopId!,
-                            accommodation.id,
-                            field,
-                            value,
-                          )
-                        }
-                        onDelete={() =>
-                          onDeleteAccommodation(
-                            selectedStopId!,
-                            accommodation.id,
-                          )
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button
-                className="mt-6 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
-                onClick={() => onAddAccommodation(selectedStopId)}
-              >
-                Add Accommodation
-              </button>
-            </section>
-          )}
-          {selectedStopId && (
-            <section
-              id="transport-section"
-              className="mt-10 w-full rounded-xl border p-6 text-left"
-            >
-              <h2 className="mb-4 text-2xl font-bold">Transport</h2>
-              {transport && transport.length > 0 && (
-                <ul className="space-y-4">
-                  {transport.map((trans) => (
-                    <li key={trans.id} className="py-1">
-                      <Transport
-                        transport={trans}
-                        onUpdate={(field, value) =>
-                          onUpdateTransport(
-                            selectedStopId!,
-                            trans.id,
-                            field,
-                            value,
-                          )
-                        }
-                        onDelete={() =>
-                          onDeleteTransport(selectedStopId!, trans.id)
-                        }
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button
-                className="mt-6 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
-                onClick={() => onAddTransport(selectedStopId)}
-              >
-                Add Transport
-              </button>
-            </section>
-          )}
-        </div>
+            Add Stop
+          </button>
+        </section>
       </main>
     </div>
   );
