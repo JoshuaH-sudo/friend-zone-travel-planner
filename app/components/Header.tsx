@@ -11,7 +11,7 @@ function Header() {
         id="back"
         className="rounded-md bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800"
         style={{
-          display: pathname === "/" ? "none" : "flex",
+          visibility: pathname === "/" ? "hidden" : "visible",
         }}
         href=".."
       >

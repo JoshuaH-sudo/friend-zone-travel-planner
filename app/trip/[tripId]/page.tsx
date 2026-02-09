@@ -400,6 +400,14 @@ const Transport = ({
 
 function TripDetails() {
   const [trip, setTrip] = useState(DUMMY_TRIP);
+  const [isEditingTripName, setIsEditingTripName] = useState(false);
+
+  const updateTripName = (newName: string) => {
+    setTrip({
+      ...trip,
+      name: newName,
+    });
+  };
 
   const onAddAccommodation = (stopId: string) => {
     const stop = trip.stops.find((s) => s.id === stopId);
@@ -550,10 +558,24 @@ function TripDetails() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center justify-between bg-white px-6 py-20 sm:items-start dark:bg-black">
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:text-white">
-          {trip.name}
-        </h1>
+      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center justify-between bg-white px-6 py-10 sm:items-start dark:bg-black">
+        {isEditingTripName ? (
+          <input
+            type="text"
+            value={trip.name}
+            onChange={(e) => updateTripName(e.target.value)}
+            onBlur={() => setIsEditingTripName(false)}
+            autoFocus
+            className="w-full rounded border px-2 py-1 text-5xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
+          />
+        ) : (
+          <h1
+            className="cursor-pointer text-5xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
+            onClick={() => setIsEditingTripName(true)}
+          >
+            {trip.name}
+          </h1>
+        )}
         <section
           id="stops-section"
           className="mt-10 w-full rounded-xl border p-6 text-left"
