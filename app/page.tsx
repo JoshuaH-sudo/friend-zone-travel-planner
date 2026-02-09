@@ -145,157 +145,179 @@ const Stop = ({
 
 const Accommodation = ({
   accommodation,
+  onUpdate,
 }: {
   accommodation: {
+    id: string;
     name: string;
     price: number;
     currency: string;
     checkIn: string;
     checkOut: string;
   };
+  onUpdate: (field: string, value: string | number) => void;
 }) => {
   const { name, price, currency, checkIn, checkOut } = accommodation;
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
+  const [isEditingCurrency, setIsEditingCurrency] = useState(false);
+  const [isEditingCheckIn, setIsEditingCheckIn] = useState(false);
+  const [isEditingCheckOut, setIsEditingCheckOut] = useState(false);
+
   return (
     <div className="rounded-lg border p-4">
-      <h4 className="text-lg font-semibold">{name}</h4>
-      <p className="text-gray-600">
-        {price} {currency}
-      </p>
-      <p className="text-gray-600">
-        Check-in: {new Date(checkIn).toLocaleDateString()}
-      </p>
-      <p className="text-gray-600">
-        Check-out: {new Date(checkOut).toLocaleDateString()}
-      </p>
+      {isEditingName ? (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => onUpdate("name", e.target.value)}
+          onBlur={() => setIsEditingName(false)}
+          autoFocus
+          className="w-full rounded border px-2 py-1 text-lg font-semibold"
+        />
+      ) : (
+        <h4
+          className="cursor-pointer text-lg font-semibold hover:text-blue-600"
+          onClick={() => setIsEditingName(true)}
+        >
+          {name}
+        </h4>
+      )}
+      <div className="mt-2 flex items-center gap-2">
+        {isEditingPrice ? (
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => onUpdate("price", Number(e.target.value))}
+            onBlur={() => setIsEditingPrice(false)}
+            autoFocus
+            className="w-24 rounded border px-2 py-1 text-gray-600"
+          />
+        ) : (
+          <span
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingPrice(true)}
+          >
+            {price}
+          </span>
+        )}
+        {isEditingCurrency ? (
+          <select
+            value={currency}
+            onChange={(e) => {
+              onUpdate("currency", e.target.value);
+              setIsEditingCurrency(false);
+            }}
+            onBlur={() => setIsEditingCurrency(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          >
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="JPY">JPY</option>
+          </select>
+        ) : (
+          <span
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingCurrency(true)}
+          >
+            {currency}
+          </span>
+        )}
+      </div>
+      <div className="mt-2">
+        {isEditingCheckIn ? (
+          <input
+            type="date"
+            value={checkIn}
+            onChange={(e) => onUpdate("checkIn", e.target.value)}
+            onBlur={() => setIsEditingCheckIn(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          />
+        ) : (
+          <p
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingCheckIn(true)}
+          >
+            Check-in: {new Date(checkIn).toLocaleDateString()}
+          </p>
+        )}
+      </div>
+      <div className="mt-1">
+        {isEditingCheckOut ? (
+          <input
+            type="date"
+            value={checkOut}
+            onChange={(e) => onUpdate("checkOut", e.target.value)}
+            onBlur={() => setIsEditingCheckOut(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          />
+        ) : (
+          <p
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingCheckOut(true)}
+          >
+            Check-out: {new Date(checkOut).toLocaleDateString()}
+          </p>
+        )}
+      </div>
     </div>
-  );
-};
-
-const AddAccommodationForm = ({
-  stopId,
-  onAddAccommodation,
-}: {
-  stopId: string;
-  onAddAccommodation: (
-    stopId: string,
-    accommodation: {
-      name: string;
-      price: number;
-      currency: string;
-      checkIn: string;
-      checkOut: string;
-    },
-  ) => void;
-}) => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [currency, setCurrency] = useState("USD");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAddAccommodation(stopId, { name, price, currency, checkIn, checkOut });
-    setName("");
-    setPrice(0);
-    setCurrency("USD");
-    setCheckIn("");
-    setCheckOut("");
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="mt-4 rounded-lg border p-4">
-      <h4 className="mb-2 text-lg font-semibold">Add Accommodation</h4>
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="mb-2 w-full rounded border px-2 py-1"
-        required
-      />
-      <input
-        type="number"
-        placeholder="Price"
-        value={price}
-        onChange={(e) => setPrice(Number(e.target.value))}
-        className="mb-2 w-full rounded border px-2 py-1"
-        required
-      />
-      <select
-        value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
-        className="mb-2 w-full rounded border px-2 py-1"
-      >
-        <option value="USD">USD</option>
-        <option value="EUR">EUR</option>
-        <option value="JPY">JPY</option>
-      </select>
-      <input
-        type="date"
-        value={checkIn}
-        onChange={(e) => setCheckIn(e.target.value)}
-        className="mb-2 w-full rounded border px-2 py-1"
-        required
-      />
-      <input
-        type="date"
-        value={checkOut}
-        onChange={(e) => setCheckOut(e.target.value)}
-        className="mb-2 w-full rounded border px-2 py-1"
-        required
-      />
-      <button
-        type="submit"
-        className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-      >
-        Add Accommodation
-      </button>
-    </form>
   );
 };
 
 export default function Home() {
   const [trip, setTrip] = useState(DUMMY_TRIP);
-  const [showAddAccommodation, setShowAddAccommodation] = useState<
-    string | null
-  >(null);
   const [selectedStopId, setSelectedStopId] = useState<string | null>(null);
 
   const onSelectStop = (stopId: string | null) => {
     setSelectedStopId(stopId);
   };
 
-  const onShowAddAccommodation = (stopId: string) => {
-    setShowAddAccommodation(stopId);
-  };
-
-  const onAddAccommodation = (
-    stopId: string,
-    accommodation: {
-      name: string;
-      price: number;
-      currency: string;
-      checkIn: string;
-      checkOut: string;
-    },
-  ) => {
+  const onAddAccommodation = (stopId: string) => {
+    const stop = trip.stops.find((s) => s.id === stopId);
     const id = (Math.random() * 100000).toFixed(0);
+    const newAccommodation = {
+      id,
+      name: "New Accommodation",
+      price: 0,
+      currency: "USD",
+      checkIn: stop?.date || new Date().toISOString().split("T")[0],
+      checkOut: stop?.date || new Date().toISOString().split("T")[0],
+    };
     setTrip({
       ...trip,
       stops: trip.stops.map((stop) =>
         stop.id === stopId
           ? {
               ...stop,
-              accommodations: [
-                ...stop.accommodations,
-                { ...accommodation, id },
-              ],
+              accommodations: [...stop.accommodations, newAccommodation],
             }
           : stop,
       ),
     });
-    setShowAddAccommodation(null);
+  };
+
+  const onUpdateAccommodation = (
+    stopId: string,
+    accommodationId: string,
+    field: string,
+    value: string | number,
+  ) => {
+    setTrip({
+      ...trip,
+      stops: trip.stops.map((stop) =>
+        stop.id === stopId
+          ? {
+              ...stop,
+              accommodations: stop.accommodations.map((acc) =>
+                acc.id === accommodationId ? { ...acc, [field]: value } : acc,
+              ),
+            }
+          : stop,
+      ),
+    });
   };
 
   const addStop = () => {
@@ -359,7 +381,7 @@ export default function Home() {
                     onNameChange={(newName) => updateStopName(stop.id, newName)}
                     onDateChange={(newDate) => updateStopDate(stop.id, newDate)}
                     onShowAddAccommodation={(stopId) =>
-                      onShowAddAccommodation(stopId)
+                      onAddAccommodation(stopId)
                     }
                   />
                 </li>
@@ -381,23 +403,23 @@ export default function Home() {
               <ul className="space-y-4">
                 {accommodations?.map((accommodation) => (
                   <li key={accommodation.id} className="py-1">
-                    <Accommodation accommodation={accommodation} />
+                    <Accommodation
+                      accommodation={accommodation}
+                      onUpdate={(field, value) =>
+                        onUpdateAccommodation(
+                          selectedStopId!,
+                          accommodation.id,
+                          field,
+                          value,
+                        )
+                      }
+                    />
                   </li>
                 ))}
               </ul>
             </section>
           )}
         </div>
-        <dialog
-          open={showAddAccommodation !== null}
-          className="fixed top-1/2 left-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-lg border bg-gray-800 p-0 dark:bg-white"
-          onClose={() => setShowAddAccommodation(null)}
-        >
-          <AddAccommodationForm
-            stopId={showAddAccommodation!}
-            onAddAccommodation={onAddAccommodation}
-          />
-        </dialog>
       </main>
     </div>
   );
