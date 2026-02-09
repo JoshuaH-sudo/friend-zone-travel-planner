@@ -84,6 +84,7 @@ const Stop = ({
   stop: { id, name, date },
   onNameChange,
   onDateChange,
+  onDelete,
 }: {
   stop: {
     id: string;
@@ -92,6 +93,7 @@ const Stop = ({
   };
   onNameChange: (value: string) => void;
   onDateChange: (value: string) => void;
+  onDelete: () => void;
 }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDate, setIsEditingDate] = useState(false);
@@ -105,7 +107,14 @@ const Stop = ({
   };
 
   return (
-    <div className="rounded-lg border p-4">
+    <div className="relative rounded-lg border p-4">
+      <button
+        onClick={onDelete}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        aria-label="Delete stop"
+      >
+        ✕
+      </button>
       <div className="flex items-center justify-between gap-2">
         {isEditingName ? (
           <input
@@ -556,6 +565,13 @@ function TripDetails() {
     });
   };
 
+  const deleteStop = (stopId: string) => {
+    setTrip({
+      ...trip,
+      stops: trip.stops.filter((stop) => stop.id !== stopId),
+    });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-4xl flex-col items-center justify-between bg-white px-6 py-10 sm:items-start dark:bg-black">
@@ -591,6 +607,7 @@ function TripDetails() {
                   onDateChange={(newDate) =>
                     updateStop(stop.id, "date", newDate)
                   }
+                  onDelete={() => deleteStop(stop.id)}
                 />
                 <div className="mt-4 ml-6 space-y-6">
                   <div>
