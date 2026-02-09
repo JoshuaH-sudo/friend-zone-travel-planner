@@ -155,6 +155,7 @@ const Stop = ({
 const Accommodation = ({
   accommodation,
   onUpdate,
+  onDelete,
 }: {
   accommodation: {
     id: string;
@@ -165,6 +166,7 @@ const Accommodation = ({
     checkOut: string;
   };
   onUpdate: (field: string, value: string | number) => void;
+  onDelete: () => void;
 }) => {
   const { name, price, currency, checkIn, checkOut } = accommodation;
   const [isEditingName, setIsEditingName] = useState(false);
@@ -174,7 +176,14 @@ const Accommodation = ({
   const [isEditingCheckOut, setIsEditingCheckOut] = useState(false);
 
   return (
-    <div className="rounded-lg border p-4">
+    <div className="relative rounded-lg border p-4">
+      <button
+        onClick={onDelete}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        aria-label="Delete accommodation"
+      >
+        ✕
+      </button>
       {isEditingName ? (
         <input
           type="text"
@@ -279,6 +288,7 @@ const Accommodation = ({
 const Transport = ({
   transport,
   onUpdate,
+  onDelete,
 }: {
   transport: {
     id: string;
@@ -288,6 +298,7 @@ const Transport = ({
     currency: string;
   };
   onUpdate: (field: string, value: string | number) => void;
+  onDelete: () => void;
 }) => {
   const { name, type, price, currency } = transport;
   const [isEditingName, setIsEditingName] = useState(false);
@@ -296,7 +307,14 @@ const Transport = ({
   const [isEditingCurrency, setIsEditingCurrency] = useState(false);
 
   return (
-    <div className="rounded-lg border p-4">
+    <div className="relative rounded-lg border p-4">
+      <button
+        onClick={onDelete}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        aria-label="Delete transport"
+      >
+        ✕
+      </button>
       {isEditingName ? (
         <input
           type="text"
@@ -437,6 +455,22 @@ export default function Home() {
     });
   };
 
+  const onDeleteAccommodation = (stopId: string, accommodationId: string) => {
+    setTrip({
+      ...trip,
+      stops: trip.stops.map((stop) =>
+        stop.id === stopId
+          ? {
+              ...stop,
+              accommodations: stop.accommodations.filter(
+                (acc) => acc.id !== accommodationId,
+              ),
+            }
+          : stop,
+      ),
+    });
+  };
+
   const onAddTransport = (stopId: string) => {
     const id = (Math.random() * 100000).toFixed(0);
     const newTransport = {
@@ -473,6 +507,22 @@ export default function Home() {
               ...stop,
               transport: stop.transport.map((trans) =>
                 trans.id === transportId ? { ...trans, [field]: value } : trans,
+              ),
+            }
+          : stop,
+      ),
+    });
+  };
+
+  const onDeleteTransport = (stopId: string, transportId: string) => {
+    setTrip({
+      ...trip,
+      stops: trip.stops.map((stop) =>
+        stop.id === stopId
+          ? {
+              ...stop,
+              transport: stop.transport.filter(
+                (trans) => trans.id !== transportId,
               ),
             }
           : stop,
@@ -571,6 +621,12 @@ export default function Home() {
                             value,
                           )
                         }
+                        onDelete={() =>
+                          onDeleteAccommodation(
+                            selectedStopId!,
+                            accommodation.id,
+                          )
+                        }
                       />
                     </li>
                   ))}
@@ -603,6 +659,9 @@ export default function Home() {
                             field,
                             value,
                           )
+                        }
+                        onDelete={() =>
+                          onDeleteTransport(selectedStopId!, trans.id)
                         }
                       />
                     </li>
