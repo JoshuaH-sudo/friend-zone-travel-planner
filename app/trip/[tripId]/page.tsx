@@ -34,6 +34,7 @@ const DUMMY_TRIP = {
           type: "flight",
           price: 500,
           currency: "USD",
+          date: "2024-01-01",
         },
       ],
     },
@@ -58,6 +59,7 @@ const DUMMY_TRIP = {
           type: "bus",
           price: 150,
           currency: "USD",
+          date: "2024-01-05",
         },
       ],
     },
@@ -301,15 +303,17 @@ const Transport = ({
     type: string;
     price: number;
     currency: string;
+    date: string;
   };
   onUpdate: (field: string, value: string | number) => void;
   onDelete: () => void;
 }) => {
-  const { name, type, price, currency } = transport;
+  const { name, type, price, currency, date } = transport;
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingType, setIsEditingType] = useState(false);
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [isEditingCurrency, setIsEditingCurrency] = useState(false);
+  const [isEditingDate, setIsEditingDate] = useState(false);
 
   return (
     <div className="relative rounded-lg border p-4">
@@ -403,6 +407,25 @@ const Transport = ({
           </span>
         )}
       </div>
+      <div className="mt-2">
+        {isEditingDate ? (
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => onUpdate("date", e.target.value)}
+            onBlur={() => setIsEditingDate(false)}
+            autoFocus
+            className="rounded border px-2 py-1 text-gray-600"
+          />
+        ) : (
+          <p
+            className="cursor-pointer text-gray-600 hover:text-blue-600"
+            onClick={() => setIsEditingDate(true)}
+          >
+            Date: {new Date(date).toLocaleDateString()}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
@@ -480,6 +503,7 @@ function TripDetails() {
   };
 
   const onAddTransport = (stopId: string) => {
+    const stop = trip.stops.find((s) => s.id === stopId);
     const id = (Math.random() * 100000).toFixed(0);
     const newTransport = {
       id,
@@ -487,6 +511,7 @@ function TripDetails() {
       type: "flight",
       price: 0,
       currency: "USD",
+      date: stop?.date || new Date().toISOString().split("T")[0],
     };
     setTrip({
       ...trip,
@@ -609,73 +634,83 @@ function TripDetails() {
                   }
                   onDelete={() => deleteStop(stop.id)}
                 />
-                <div className="mt-4 ml-6 space-y-6">
-                  <div>
-                    <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                      Accommodations
-                    </h3>
-                    {stop.accommodations.length > 0 && (
-                      <ul className="space-y-3">
-                        {stop.accommodations.map((accommodation) => (
-                          <li key={accommodation.id}>
-                            <Accommodation
-                              accommodation={accommodation}
-                              onUpdate={(field, value) =>
-                                onUpdateAccommodation(
-                                  stop.id,
-                                  accommodation.id,
-                                  field,
-                                  value,
-                                )
-                              }
-                              onDelete={() =>
-                                onDeleteAccommodation(stop.id, accommodation.id)
-                              }
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <button
-                      className="mt-3 rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                      onClick={() => onAddAccommodation(stop.id)}
-                    >
-                      Add Accommodation
-                    </button>
-                  </div>
-                  <div>
-                    <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                      Transport
-                    </h3>
-                    {stop.transport.length > 0 && (
-                      <ul className="space-y-3">
-                        {stop.transport.map((trans) => (
-                          <li key={trans.id}>
-                            <Transport
-                              transport={trans}
-                              onUpdate={(field, value) =>
-                                onUpdateTransport(
-                                  stop.id,
-                                  trans.id,
-                                  field,
-                                  value,
-                                )
-                              }
-                              onDelete={() =>
-                                onDeleteTransport(stop.id, trans.id)
-                              }
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <button
-                      className="mt-3 rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                      onClick={() => onAddTransport(stop.id)}
-                    >
-                      Add Transport
-                    </button>
-                  </div>
+                <div className="mt-4 ml-6 space-y-3">
+                  {(() => {
+                    const items = [
+                      ...stop.accommodations.map((acc) => ({
+                        ...acc,
+                        type: "accommodation" as const,
+                        date: acc.checkIn,
+                      })),
+                      ...stop.transport.map((trans) => ({
+                        ...trans,
+                        type: "transport" as const,
+                      })),
+                    ].sort(
+                      (a, b) =>
+                        new Date(a.date).getTime() - new Date(b.date).getTime(),
+                    );
+
+                    return (
+                      <>
+                        {items.length > 0 && (
+                          <ul className="space-y-3">
+                            {items.map((item) =>
+                              item.type === "accommodation" ? (
+                                <li key={item.id}>
+                                  <Accommodation
+                                    accommodation={item}
+                                    onUpdate={(field, value) =>
+                                      onUpdateAccommodation(
+                                        stop.id,
+                                        item.id,
+                                        field,
+                                        value,
+                                      )
+                                    }
+                                    onDelete={() =>
+                                      onDeleteAccommodation(stop.id, item.id)
+                                    }
+                                  />
+                                </li>
+                              ) : (
+                                <li key={item.id}>
+                                  <Transport
+                                    transport={item}
+                                    onUpdate={(field, value) =>
+                                      onUpdateTransport(
+                                        stop.id,
+                                        item.id,
+                                        field,
+                                        value,
+                                      )
+                                    }
+                                    onDelete={() =>
+                                      onDeleteTransport(stop.id, item.id)
+                                    }
+                                  />
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        )}
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                            onClick={() => onAddAccommodation(stop.id)}
+                          >
+                            Add Accommodation
+                          </button>
+                          <button
+                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                            onClick={() => onAddTransport(stop.id)}
+                          >
+                            Add Transport
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </li>
             ))}
