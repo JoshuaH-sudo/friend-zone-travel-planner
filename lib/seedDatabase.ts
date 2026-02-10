@@ -1,110 +1,153 @@
-import { database } from "./database";
+import { getDatabase, generateId } from "./rxdb-database";
 
 export async function seedDatabase() {
   try {
+    const database = await getDatabase();
+
     // Check if there are already trips
-    const trips = await database.get("trips").query().fetch();
-    if (trips.length > 0) {
+    const existingTrips = await database.trips.find().exec();
+    if (existingTrips.length > 0) {
       console.log("Database already has data");
       return;
     }
 
-    await database.write(async () => {
-      // Create first trip
-      const trip1 = await database.get("trips").create((trip: any) => {
-        trip.name = "Japan Trip";
-      });
+    // Create first trip
+    const trip1Id = generateId();
+    await database.trips.insert({
+      id: trip1Id,
+      name: "Japan Trip",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create stops for Japan Trip
-      const tokyoStop = await database.get("stops").create((stop: any) => {
-        stop.name = "Tokyo";
-        stop.date = "2024-01-01";
-        stop.tripId = trip1.id;
-      });
+    // Create stops for Japan Trip
+    const tokyoStopId = generateId();
+    await database.stops.insert({
+      id: tokyoStopId,
+      name: "Tokyo",
+      date: "2024-01-01",
+      tripId: trip1Id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      const kyotoStop = await database.get("stops").create((stop: any) => {
-        stop.name = "Kyoto";
-        stop.date = "2024-01-05";
-        stop.tripId = trip1.id;
-      });
+    const kyotoStopId = generateId();
+    await database.stops.insert({
+      id: kyotoStopId,
+      name: "Kyoto",
+      date: "2024-01-05",
+      tripId: trip1Id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      const osakaStop = await database.get("stops").create((stop: any) => {
-        stop.name = "Osaka";
-        stop.date = "2024-01-10";
-        stop.tripId = trip1.id;
-      });
+    const osakaStopId = generateId();
+    await database.stops.insert({
+      id: osakaStopId,
+      name: "Osaka",
+      date: "2024-01-10",
+      tripId: trip1Id,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create accommodations for Tokyo
-      await database.get("accommodations").create((acc: any) => {
-        acc.name = "Hotel Tokyo";
-        acc.price = 100;
-        acc.currency = "USD";
-        acc.checkIn = "2024-01-01";
-        acc.checkOut = "2024-01-05";
-        acc.stopId = tokyoStop.id;
-      });
+    // Create accommodations for Tokyo
+    await database.accommodations.insert({
+      id: generateId(),
+      name: "Hotel Tokyo",
+      price: 100,
+      currency: "USD",
+      checkIn: "2024-01-01",
+      checkOut: "2024-01-05",
+      stopId: tokyoStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      await database.get("accommodations").create((acc: any) => {
-        acc.name = "Tokyo Hostel";
-        acc.price = 50;
-        acc.currency = "USD";
-        acc.checkIn = "2024-01-01";
-        acc.checkOut = "2024-01-05";
-        acc.stopId = tokyoStop.id;
-      });
+    await database.accommodations.insert({
+      id: generateId(),
+      name: "Tokyo Hostel",
+      price: 50,
+      currency: "USD",
+      checkIn: "2024-01-01",
+      checkOut: "2024-01-05",
+      stopId: tokyoStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create transport for Tokyo
-      await database.get("transports").create((trans: any) => {
-        trans.name = "Flight to Tokyo";
-        trans.type = "flight";
-        trans.price = 500;
-        trans.currency = "USD";
-        trans.date = "2024-01-01";
-        trans.stopId = tokyoStop.id;
-      });
+    // Create transport for Tokyo
+    await database.transports.insert({
+      id: generateId(),
+      name: "Flight to Tokyo",
+      type: "flight",
+      price: 500,
+      currency: "USD",
+      date: "2024-01-01",
+      stopId: tokyoStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create accommodations for Kyoto
-      await database.get("accommodations").create((acc: any) => {
-        acc.name = "Kyoto Inn";
-        acc.price = 80;
-        acc.currency = "USD";
-        acc.checkIn = "2024-01-05";
-        acc.checkOut = "2024-01-10";
-        acc.stopId = kyotoStop.id;
-      });
+    // Create accommodations for Kyoto
+    await database.accommodations.insert({
+      id: generateId(),
+      name: "Kyoto Inn",
+      price: 80,
+      currency: "USD",
+      checkIn: "2024-01-05",
+      checkOut: "2024-01-10",
+      stopId: kyotoStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create transport for Kyoto
-      await database.get("transports").create((trans: any) => {
-        trans.name = "Train to Kyoto";
-        trans.type = "bus";
-        trans.price = 150;
-        trans.currency = "USD";
-        trans.date = "2024-01-05";
-        trans.stopId = kyotoStop.id;
-      });
+    // Create transport for Kyoto
+    await database.transports.insert({
+      id: generateId(),
+      name: "Train to Kyoto",
+      type: "bus",
+      price: 150,
+      currency: "USD",
+      date: "2024-01-05",
+      stopId: kyotoStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create accommodations for Osaka
-      await database.get("accommodations").create((acc: any) => {
-        acc.name = "Osaka Hotel";
-        acc.price = 90;
-        acc.currency = "USD";
-        acc.checkIn = "2024-01-10";
-        acc.checkOut = "2024-01-15";
-        acc.stopId = osakaStop.id;
-      });
+    // Create accommodations for Osaka
+    await database.accommodations.insert({
+      id: generateId(),
+      name: "Osaka Hotel",
+      price: 90,
+      currency: "USD",
+      checkIn: "2024-01-10",
+      checkOut: "2024-01-15",
+      stopId: osakaStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      // Create other sample trips
-      await database.get("trips").create((trip: any) => {
-        trip.name = "Trip to Paris";
-      });
+    // Create other sample trips
+    await database.trips.insert({
+      id: generateId(),
+      name: "Trip to Paris",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      await database.get("trips").create((trip: any) => {
-        trip.name = "Weekend in New York";
-      });
+    await database.trips.insert({
+      id: generateId(),
+      name: "Weekend in New York",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
 
-      await database.get("trips").create((trip: any) => {
-        trip.name = "Beach Vacation in Hawaii";
-      });
+    await database.trips.insert({
+      id: generateId(),
+      name: "Beach Vacation in Hawaii",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
 
     console.log("Database seeded successfully!");

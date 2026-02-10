@@ -15,8 +15,7 @@ function TripList() {
   }, [database]);
 
   const loadTrips = async () => {
-    const tripsCollection = database.get("trips");
-    const allTrips = await tripsCollection.query().fetch();
+    const allTrips = await database.trips.find().exec();
     setTrips(allTrips);
     setLoading(false);
   };

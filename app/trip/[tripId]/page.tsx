@@ -28,16 +28,12 @@ function TripDetails() {
 
   const loadTripData = async () => {
     try {
-      const tripRecord = await database.get("trips").find(tripId);
+      const tripRecord = await database.trips.findOne(tripId).exec();
       setTrip(tripRecord);
 
-      const stopsRecords = await database
-        .get("stops")
-        .query()
-        .fetch()
-        .then((allStops: any[]) =>
-          allStops.filter((s: any) => s.tripId === tripId),
-        );
+      const stopsRecords = await database.stops
+        .find({ selector: { tripId } })
+        .exec();
       setStops(stopsRecords);
 
       // Load accommodations and transports for each stop
@@ -45,18 +41,14 @@ function TripDetails() {
       const transMap: Record<string, any[]> = {};
 
       for (const stop of stopsRecords) {
-        const accoms = await database
-          .get("accommodations")
-          .query()
-          .fetch()
-          .then((all: any[]) => all.filter((a: any) => a.stopId === stop.id));
+        const accoms = await database.accommodations
+          .find({ selector: { stopId: stop.id } })
+          .exec();
         accomMap[stop.id] = accoms;
 
-        const trans = await database
-          .get("transports")
-          .query()
-          .fetch()
-          .then((all: any[]) => all.filter((t: any) => t.stopId === stop.id));
+        const trans = await database.transports
+          .find({ selector: { stopId: stop.id } })
+          .exec();
         transMap[stop.id] = trans;
       }
 
@@ -71,22 +63,19 @@ function TripDetails() {
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
-    await database.write(async () => {
-      await trip.update((t: any) => {
-        t.name = newName;
-      });
-    });
+    await trip.patch({ name: newName });
     setTrip({ ...trip, name: newName });
   };
 
   const addStop = async () => {
-    await database.write(async () => {
-      const stopsCollection = database.get("stops");
-      await stopsCollection.create((stop: any) => {
-        stop.name = `New Stop ${stops.length + 1}`;
-        stop.date = new Date().toISOString().split("T")[0];
-        stop.tripId = tripId;
-      });
+    const { generateId } = await import("@/lib/rxdb-database");
+    await database.stops.insert({
+      id: generateId(),
+      name: `New Stop ${stops.length + 1}`,
+      date: new Date().toISOString().split("T")[0],
+      tripId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -98,11 +87,10 @@ function TripDetails() {
     const stopRecord = stops.find((s) => s.id === stopId);
     if (!stopRecord) return;
 
-    await database.write(async () => {
-      await stopRecord.update((s: any) => {
-        s.name = data.name;
-        s.date = data.date;
-      });
+    await stopRecord.patch({
+      name: data.name,
+      date: data.date,
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -111,20 +99,18 @@ function TripDetails() {
     const stopRecord = stops.find((s) => s.id === stopId);
     if (!stopRecord) return;
 
-    await database.write(async () => {
-      // Delete related accommodations and transports first
-      const accoms = accommodationsByStop[stopId] || [];
-      const trans = transportsByStop[stopId] || [];
+    // Delete related accommodations and transports first
+    const accoms = accommodationsByStop[stopId] || [];
+    const trans = transportsByStop[stopId] || [];
 
-      for (const accom of accoms) {
-        await accom.markAsDeleted();
-      }
-      for (const transport of trans) {
-        await transport.markAsDeleted();
-      }
+    for (const accom of accoms) {
+      await accom.remove();
+    }
+    for (const transport of trans) {
+      await transport.remove();
+    }
 
-      await stopRecord.markAsDeleted();
-    });
+    await stopRecord.remove();
     await loadTripData();
   };
 
@@ -132,16 +118,17 @@ function TripDetails() {
     const stop = stops.find((s) => s.id === stopId);
     if (!stop) return;
 
-    await database.write(async () => {
-      const accommodationsCollection = database.get("accommodations");
-      await accommodationsCollection.create((acc: any) => {
-        acc.name = "New Accommodation";
-        acc.price = 0;
-        acc.currency = "USD";
-        acc.checkIn = stop.date || new Date().toISOString().split("T")[0];
-        acc.checkOut = stop.date || new Date().toISOString().split("T")[0];
-        acc.stopId = stopId;
-      });
+    const { generateId } = await import("@/lib/rxdb-database");
+    await database.accommodations.insert({
+      id: generateId(),
+      name: "New Accommodation",
+      price: 0,
+      currency: "USD",
+      checkIn: stop.date || new Date().toISOString().split("T")[0],
+      checkOut: stop.date || new Date().toISOString().split("T")[0],
+      stopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -169,14 +156,13 @@ function TripDetails() {
       return;
     }
 
-    await database.write(async () => {
-      await accomRecord.update((a: any) => {
-        a.name = data.name;
-        a.price = data.price;
-        a.currency = data.currency;
-        a.checkIn = data.checkIn;
-        a.checkOut = data.checkOut;
-      });
+    await accomRecord.patch({
+      name: data.name,
+      price: data.price,
+      currency: data.currency,
+      checkIn: data.checkIn,
+      checkOut: data.checkOut,
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -191,9 +177,7 @@ function TripDetails() {
       return;
     }
 
-    await database.write(async () => {
-      await accomRecord.markAsDeleted();
-    });
+    await accomRecord.remove();
     await loadTripData();
   };
 
@@ -201,16 +185,17 @@ function TripDetails() {
     const stop = stops.find((s) => s.id === stopId);
     if (!stop) return;
 
-    await database.write(async () => {
-      const transportsCollection = database.get("transports");
-      await transportsCollection.create((trans: any) => {
-        trans.name = "New Transport";
-        trans.type = "flight";
-        trans.price = 0;
-        trans.currency = "USD";
-        trans.date = stop.date || new Date().toISOString().split("T")[0];
-        trans.stopId = stopId;
-      });
+    const { generateId } = await import("@/lib/rxdb-database");
+    await database.transports.insert({
+      id: generateId(),
+      name: "New Transport",
+      type: "flight",
+      price: 0,
+      currency: "USD",
+      date: stop.date || new Date().toISOString().split("T")[0],
+      stopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -234,14 +219,13 @@ function TripDetails() {
       return;
     }
 
-    await database.write(async () => {
-      await transRecord.update((t: any) => {
-        t.name = data.name;
-        t.type = data.type;
-        t.price = data.price;
-        t.currency = data.currency;
-        t.date = data.date;
-      });
+    await transRecord.patch({
+      name: data.name,
+      type: data.type,
+      price: data.price,
+      currency: data.currency,
+      date: data.date,
+      updatedAt: Date.now(),
     });
     await loadTripData();
   };
@@ -253,9 +237,7 @@ function TripDetails() {
       return;
     }
 
-    await database.write(async () => {
-      await transRecord.markAsDeleted();
-    });
+    await transRecord.remove();
     await loadTripData();
   };
 
