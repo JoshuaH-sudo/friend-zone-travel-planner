@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDatabase } from "@/lib/DatabaseProvider";
+import { useParams } from "next/navigation";
 
 const DUMMY_TRIP = {
   id: "1",
@@ -83,16 +85,12 @@ const DUMMY_TRIP = {
 };
 
 const Stop = ({
-  stop: { id, name, date },
+  stop,
   onNameChange,
   onDateChange,
   onDelete,
 }: {
-  stop: {
-    id: string;
-    name: string;
-    date: string;
-  };
+  stop: any;
   onNameChange: (value: string) => void;
   onDateChange: (value: string) => void;
   onDelete: () => void;
@@ -121,7 +119,7 @@ const Stop = ({
         {isEditingName ? (
           <input
             type="text"
-            value={name}
+            value={stop.name}
             onChange={(e) => onNameChange(e.target.value)}
             onBlur={toggleEditName}
             autoFocus
@@ -132,14 +130,14 @@ const Stop = ({
             className="cursor-pointer text-xl font-semibold hover:text-blue-600"
             onClick={toggleEditName}
           >
-            {name}
+            {stop.name}
           </h3>
         )}
       </div>
       {isEditingDate ? (
         <input
           type="date"
-          value={date}
+          value={stop.date}
           onChange={(e) => onDateChange(e.target.value)}
           onBlur={toggleEditDate}
           autoFocus
@@ -151,7 +149,7 @@ const Stop = ({
             className="mt-2 cursor-pointer text-gray-600 hover:text-blue-600"
             onClick={toggleEditDate}
           >
-            {new Date(date).toLocaleDateString()}
+            {new Date(stop.date).toLocaleDateString()}
           </p>
         </div>
       )}
@@ -164,14 +162,7 @@ const Accommodation = ({
   onUpdate,
   onDelete,
 }: {
-  accommodation: {
-    id: string;
-    name: string;
-    price: number;
-    currency: string;
-    checkIn: string;
-    checkOut: string;
-  };
+  accommodation: any;
   onUpdate: (field: string, value: string | number) => void;
   onDelete: () => void;
 }) => {
@@ -297,14 +288,7 @@ const Transport = ({
   onUpdate,
   onDelete,
 }: {
-  transport: {
-    id: string;
-    name: string;
-    type: string;
-    price: number;
-    currency: string;
-    date: string;
-  };
+  transport: any;
   onUpdate: (field: string, value: string | number) => void;
   onDelete: () => void;
 }) => {
@@ -431,171 +415,241 @@ const Transport = ({
 };
 
 function TripDetails() {
-  const [trip, setTrip] = useState(DUMMY_TRIP);
+  const params = useParams();
+  const tripId = params.tripId as string;
+  const database = useDatabase();
+
+  const [trip, setTrip] = useState<any>(null);
+  const [stops, setStops] = useState<any[]>([]);
+  const [accommodationsByStop, setAccommodationsByStop] = useState<
+    Record<string, any[]>
+  >({});
+  const [transportsByStop, setTransportsByStop] = useState<
+    Record<string, any[]>
+  >({});
   const [isEditingTripName, setIsEditingTripName] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const updateTripName = (newName: string) => {
-    setTrip({
-      ...trip,
-      name: newName,
-    });
+  useEffect(() => {
+    loadTripData();
+  }, [tripId, database]);
+
+  const loadTripData = async () => {
+    try {
+      const tripRecord = await database.get("trips").find(tripId);
+      setTrip(tripRecord);
+
+      const stopsRecords = await database
+        .get("stops")
+        .query()
+        .fetch()
+        .then((allStops: any[]) =>
+          allStops.filter((s: any) => s.tripId === tripId),
+        );
+      setStops(stopsRecords);
+
+      // Load accommodations and transports for each stop
+      const accomMap: Record<string, any[]> = {};
+      const transMap: Record<string, any[]> = {};
+
+      for (const stop of stopsRecords) {
+        const accoms = await database
+          .get("accommodations")
+          .query()
+          .fetch()
+          .then((all: any[]) => all.filter((a: any) => a.stopId === stop.id));
+        accomMap[stop.id] = accoms;
+
+        const trans = await database
+          .get("transports")
+          .query()
+          .fetch()
+          .then((all: any[]) => all.filter((t: any) => t.stopId === stop.id));
+        transMap[stop.id] = trans;
+      }
+
+      setAccommodationsByStop(accomMap);
+      setTransportsByStop(transMap);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error loading trip:", error);
+      setLoading(false);
+    }
   };
 
-  const onAddAccommodation = (stopId: string) => {
-    const stop = trip.stops.find((s) => s.id === stopId);
-    const id = (Math.random() * 100000).toFixed(0);
-    const newAccommodation = {
-      id,
-      name: "New Accommodation",
-      price: 0,
-      currency: "USD",
-      checkIn: stop?.date || new Date().toISOString().split("T")[0],
-      checkOut: stop?.date || new Date().toISOString().split("T")[0],
-    };
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              accommodations: [...stop.accommodations, newAccommodation],
-            }
-          : stop,
-      ),
+  const updateTripName = async (newName: string) => {
+    if (!trip) return;
+    await database.write(async () => {
+      await trip.update((t: any) => {
+        t.name = newName;
+      });
     });
+    setTrip({ ...trip, name: newName });
   };
 
-  const onUpdateAccommodation = (
+  const addStop = async () => {
+    await database.write(async () => {
+      const stopsCollection = database.get("stops");
+      await stopsCollection.create((stop: any) => {
+        stop.name = `New Stop ${stops.length + 1}`;
+        stop.date = new Date().toISOString().split("T")[0];
+        stop.tripId = tripId;
+      });
+    });
+    await loadTripData();
+  };
+
+  const updateStop = async (stopId: string, field: string, value: string) => {
+    const stopRecord = stops.find((s) => s.id === stopId);
+    if (!stopRecord) return;
+
+    await database.write(async () => {
+      await stopRecord.update((s: any) => {
+        s[field] = value;
+      });
+    });
+    await loadTripData();
+  };
+
+  const deleteStop = async (stopId: string) => {
+    const stopRecord = stops.find((s) => s.id === stopId);
+    if (!stopRecord) return;
+
+    await database.write(async () => {
+      // Delete related accommodations and transports first
+      const accoms = accommodationsByStop[stopId] || [];
+      const trans = transportsByStop[stopId] || [];
+
+      for (const accom of accoms) {
+        await accom.markAsDeleted();
+      }
+      for (const transport of trans) {
+        await transport.markAsDeleted();
+      }
+
+      await stopRecord.markAsDeleted();
+    });
+    await loadTripData();
+  };
+
+  const onAddAccommodation = async (stopId: string) => {
+    const stop = stops.find((s) => s.id === stopId);
+    if (!stop) return;
+
+    await database.write(async () => {
+      const accommodationsCollection = database.get("accommodations");
+      await accommodationsCollection.create((acc: any) => {
+        acc.name = "New Accommodation";
+        acc.price = 0;
+        acc.currency = "USD";
+        acc.checkIn = stop.date || new Date().toISOString().split("T")[0];
+        acc.checkOut = stop.date || new Date().toISOString().split("T")[0];
+        acc.stopId = stopId;
+      });
+    });
+    await loadTripData();
+  };
+
+  const onUpdateAccommodation = async (
     stopId: string,
     accommodationId: string,
     field: string,
     value: string | number,
   ) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              accommodations: stop.accommodations.map((acc) =>
-                acc.id === accommodationId ? { ...acc, [field]: value } : acc,
-              ),
-            }
-          : stop,
-      ),
+    const accoms = accommodationsByStop[stopId] || [];
+    const accomRecord = accoms.find((a) => a.id === accommodationId);
+    if (!accomRecord) return;
+
+    await database.write(async () => {
+      await accomRecord.update((a: any) => {
+        if (field === "checkIn") {
+          a.checkIn = value;
+        } else if (field === "checkOut") {
+          a.checkOut = value;
+        } else {
+          a[field] = value;
+        }
+      });
     });
+    await loadTripData();
   };
 
-  const onDeleteAccommodation = (stopId: string, accommodationId: string) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              accommodations: stop.accommodations.filter(
-                (acc) => acc.id !== accommodationId,
-              ),
-            }
-          : stop,
-      ),
+  const onDeleteAccommodation = async (
+    stopId: string,
+    accommodationId: string,
+  ) => {
+    const accoms = accommodationsByStop[stopId] || [];
+    const accomRecord = accoms.find((a) => a.id === accommodationId);
+    if (!accomRecord) return;
+
+    await database.write(async () => {
+      await accomRecord.markAsDeleted();
     });
+    await loadTripData();
   };
 
-  const onAddTransport = (stopId: string) => {
-    const stop = trip.stops.find((s) => s.id === stopId);
-    const id = (Math.random() * 100000).toFixed(0);
-    const newTransport = {
-      id,
-      name: "New Transport",
-      type: "flight",
-      price: 0,
-      currency: "USD",
-      date: stop?.date || new Date().toISOString().split("T")[0],
-    };
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              transport: [...stop.transport, newTransport],
-            }
-          : stop,
-      ),
+  const onAddTransport = async (stopId: string) => {
+    const stop = stops.find((s) => s.id === stopId);
+    if (!stop) return;
+
+    await database.write(async () => {
+      const transportsCollection = database.get("transports");
+      await transportsCollection.create((trans: any) => {
+        trans.name = "New Transport";
+        trans.type = "flight";
+        trans.price = 0;
+        trans.currency = "USD";
+        trans.date = stop.date || new Date().toISOString().split("T")[0];
+        trans.stopId = stopId;
+      });
     });
+    await loadTripData();
   };
 
-  const onUpdateTransport = (
+  const onUpdateTransport = async (
     stopId: string,
     transportId: string,
     field: string,
     value: string | number,
   ) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              transport: stop.transport.map((trans) =>
-                trans.id === transportId ? { ...trans, [field]: value } : trans,
-              ),
-            }
-          : stop,
-      ),
+    const trans = transportsByStop[stopId] || [];
+    const transRecord = trans.find((t) => t.id === transportId);
+    if (!transRecord) return;
+
+    await database.write(async () => {
+      await transRecord.update((t: any) => {
+        t[field] = value;
+      });
     });
+    await loadTripData();
   };
 
-  const onDeleteTransport = (stopId: string, transportId: string) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId
-          ? {
-              ...stop,
-              transport: stop.transport.filter(
-                (trans) => trans.id !== transportId,
-              ),
-            }
-          : stop,
-      ),
+  const onDeleteTransport = async (stopId: string, transportId: string) => {
+    const trans = transportsByStop[stopId] || [];
+    const transRecord = trans.find((t) => t.id === transportId);
+    if (!transRecord) return;
+
+    await database.write(async () => {
+      await transRecord.markAsDeleted();
     });
+    await loadTripData();
   };
 
-  const addStop = () => {
-    const newStop = {
-      id: (trip.stops.length + 1).toString(),
-      name: `New Stop ${trip.stops.length + 1}`,
-      date: new Date().toISOString().split("T")[0],
-      accommodations: [],
-      transport: [],
-    };
-    setTrip({
-      ...trip,
-      stops: [...trip.stops, newStop],
-    });
-  };
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Loading trip...
+      </div>
+    );
+  }
 
-  const updateStop = (
-    stopId: string,
-    field: string,
-    value: string | number,
-  ) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.map((stop) =>
-        stop.id === stopId ? { ...stop, [field]: value } : stop,
-      ),
-    });
-  };
-
-  const deleteStop = (stopId: string) => {
-    setTrip({
-      ...trip,
-      stops: trip.stops.filter((stop) => stop.id !== stopId),
-    });
-  };
+  if (!trip) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        Trip not found
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -622,98 +676,104 @@ function TripDetails() {
           className="mt-10 w-full rounded-xl border p-6 text-left"
         >
           <ul className="space-y-8">
-            {trip.stops.map((stop) => (
-              <li key={stop.id}>
-                <Stop
-                  stop={stop}
-                  onNameChange={(newName) =>
-                    updateStop(stop.id, "name", newName)
-                  }
-                  onDateChange={(newDate) =>
-                    updateStop(stop.id, "date", newDate)
-                  }
-                  onDelete={() => deleteStop(stop.id)}
-                />
-                <div className="mt-4 ml-6 space-y-3">
-                  {(() => {
-                    const items = [
-                      ...stop.accommodations.map((acc) => ({
-                        ...acc,
-                        type: "accommodation" as const,
-                        date: acc.checkIn,
-                      })),
-                      ...stop.transport.map((trans) => ({
-                        ...trans,
-                        type: "transport" as const,
-                      })),
-                    ].sort(
-                      (a, b) =>
-                        new Date(a.date).getTime() - new Date(b.date).getTime(),
-                    );
+            {stops.map((stop) => {
+              const accommodations = accommodationsByStop[stop.id] || [];
+              const transports = transportsByStop[stop.id] || [];
 
-                    return (
-                      <>
-                        {items.length > 0 && (
-                          <ul className="space-y-3">
-                            {items.map((item) =>
-                              item.type === "accommodation" ? (
-                                <li key={item.id}>
-                                  <Accommodation
-                                    accommodation={item}
-                                    onUpdate={(field, value) =>
-                                      onUpdateAccommodation(
-                                        stop.id,
-                                        item.id,
-                                        field,
-                                        value,
-                                      )
-                                    }
-                                    onDelete={() =>
-                                      onDeleteAccommodation(stop.id, item.id)
-                                    }
-                                  />
-                                </li>
-                              ) : (
-                                <li key={item.id}>
-                                  <Transport
-                                    transport={item}
-                                    onUpdate={(field, value) =>
-                                      onUpdateTransport(
-                                        stop.id,
-                                        item.id,
-                                        field,
-                                        value,
-                                      )
-                                    }
-                                    onDelete={() =>
-                                      onDeleteTransport(stop.id, item.id)
-                                    }
-                                  />
-                                </li>
-                              ),
-                            )}
-                          </ul>
-                        )}
-                        <div className="mt-3 flex gap-2">
-                          <button
-                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                            onClick={() => onAddAccommodation(stop.id)}
-                          >
-                            Add Accommodation
-                          </button>
-                          <button
-                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                            onClick={() => onAddTransport(stop.id)}
-                          >
-                            Add Transport
-                          </button>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </li>
-            ))}
+              return (
+                <li key={stop.id}>
+                  <Stop
+                    stop={stop}
+                    onNameChange={(newName) =>
+                      updateStop(stop.id, "name", newName)
+                    }
+                    onDateChange={(newDate) =>
+                      updateStop(stop.id, "date", newDate)
+                    }
+                    onDelete={() => deleteStop(stop.id)}
+                  />
+                  <div className="mt-4 ml-6 space-y-3">
+                    {(() => {
+                      const items = [
+                        ...accommodations.map((acc) => ({
+                          ...acc,
+                          type: "accommodation" as const,
+                          date: acc.checkIn,
+                        })),
+                        ...transports.map((trans) => ({
+                          ...trans,
+                          type: "transport" as const,
+                        })),
+                      ].sort(
+                        (a, b) =>
+                          new Date(a.date).getTime() -
+                          new Date(b.date).getTime(),
+                      );
+
+                      return (
+                        <>
+                          {items.length > 0 && (
+                            <ul className="space-y-3">
+                              {items.map((item) =>
+                                item.type === "accommodation" ? (
+                                  <li key={item.id}>
+                                    <Accommodation
+                                      accommodation={item}
+                                      onUpdate={(field, value) =>
+                                        onUpdateAccommodation(
+                                          stop.id,
+                                          item.id,
+                                          field,
+                                          value,
+                                        )
+                                      }
+                                      onDelete={() =>
+                                        onDeleteAccommodation(stop.id, item.id)
+                                      }
+                                    />
+                                  </li>
+                                ) : (
+                                  <li key={item.id}>
+                                    <Transport
+                                      transport={item}
+                                      onUpdate={(field, value) =>
+                                        onUpdateTransport(
+                                          stop.id,
+                                          item.id,
+                                          field,
+                                          value,
+                                        )
+                                      }
+                                      onDelete={() =>
+                                        onDeleteTransport(stop.id, item.id)
+                                      }
+                                    />
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          )}
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                              onClick={() => onAddAccommodation(stop.id)}
+                            >
+                              Add Accommodation
+                            </button>
+                            <button
+                              className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                              onClick={() => onAddTransport(stop.id)}
+                            >
+                              Add Transport
+                            </button>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <button
             className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
