@@ -157,9 +157,17 @@ function TripDetails() {
       checkOut: string;
     },
   ) => {
+    console.log("onUpdateAccommodation called", {
+      stopId,
+      accommodationId,
+      data,
+    });
     const accoms = accommodationsByStop[stopId] || [];
     const accomRecord = accoms.find((a) => a.id === accommodationId);
-    if (!accomRecord) return;
+    if (!accomRecord) {
+      console.error("Accommodation record not found");
+      return;
+    }
 
     await database.write(async () => {
       await accomRecord.update((a: any) => {
@@ -177,9 +185,13 @@ function TripDetails() {
     stopId: string,
     accommodationId: string,
   ) => {
+    console.log("onDeleteAccommodation called", { stopId, accommodationId });
     const accoms = accommodationsByStop[stopId] || [];
     const accomRecord = accoms.find((a) => a.id === accommodationId);
-    if (!accomRecord) return;
+    if (!accomRecord) {
+      console.error("Accommodation record not found");
+      return;
+    }
 
     await database.write(async () => {
       await accomRecord.markAsDeleted();
@@ -216,9 +228,13 @@ function TripDetails() {
       date: string;
     },
   ) => {
+    console.log("onUpdateTransport called", { stopId, transportId, data });
     const trans = transportsByStop[stopId] || [];
     const transRecord = trans.find((t) => t.id === transportId);
-    if (!transRecord) return;
+    if (!transRecord) {
+      console.error("Transport record not found");
+      return;
+    }
 
     await database.write(async () => {
       await transRecord.update((t: any) => {
@@ -233,9 +249,13 @@ function TripDetails() {
   };
 
   const onDeleteTransport = async (stopId: string, transportId: string) => {
+    console.log("onDeleteTransport called", { stopId, transportId });
     const trans = transportsByStop[stopId] || [];
     const transRecord = trans.find((t) => t.id === transportId);
-    if (!transRecord) return;
+    if (!transRecord) {
+      console.error("Transport record not found");
+      return;
+    }
 
     await database.write(async () => {
       await transRecord.markAsDeleted();
@@ -299,13 +319,16 @@ function TripDetails() {
                     {(() => {
                       const items = [
                         ...accommodations.map((acc) => ({
-                          ...acc,
+                          model: acc,
+                          id: acc.id,
                           type: "accommodation" as const,
                           date: acc.checkIn,
                         })),
                         ...transports.map((trans) => ({
-                          ...trans,
+                          model: trans,
+                          id: trans.id,
                           type: "transport" as const,
+                          date: trans.date,
                         })),
                       ].sort(
                         (a, b) =>
@@ -321,7 +344,7 @@ function TripDetails() {
                                 item.type === "accommodation" ? (
                                   <li key={item.id}>
                                     <Accommodation
-                                      accommodation={item}
+                                      accommodation={item.model}
                                       onUpdate={(data) =>
                                         onUpdateAccommodation(
                                           stop.id,
@@ -337,7 +360,7 @@ function TripDetails() {
                                 ) : (
                                   <li key={item.id}>
                                     <Transport
-                                      transport={item}
+                                      transport={item.model}
                                       onUpdate={(data) =>
                                         onUpdateTransport(
                                           stop.id,

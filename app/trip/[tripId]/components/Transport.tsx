@@ -39,6 +39,7 @@ export const Transport = ({
   });
 
   const onSubmit = (data: TransportFormData) => {
+    console.log("Transport onSubmit called with:", data);
     onUpdate(data);
     setIsEditing(false);
   };
@@ -149,16 +150,21 @@ export const Transport = ({
   return (
     <div className="relative rounded-lg border p-4">
       <button
-        onClick={onDelete}
-        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        onClick={() => {
+          console.log("Delete transport clicked");
+          onDelete();
+        }}
+        className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete transport"
+        type="button"
       >
         ✕
       </button>
       <button
         onClick={() => setIsEditing(true)}
-        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        className="absolute top-2 right-10 z-10 cursor-pointer text-xl text-gray-400 hover:text-blue-600"
         aria-label="Edit transport"
+        type="button"
       >
         ✎
       </button>

@@ -44,6 +44,7 @@ export const Accommodation = ({
   });
 
   const onSubmit = (data: AccommodationFormData) => {
+    console.log("Accommodation onSubmit called with:", data);
     onUpdate(data);
     setIsEditing(false);
   };
@@ -102,7 +103,7 @@ export const Accommodation = ({
               )}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="space-y-2">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700">
                 Check-in
@@ -157,16 +158,21 @@ export const Accommodation = ({
   return (
     <div className="relative rounded-lg border p-4">
       <button
-        onClick={onDelete}
-        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        onClick={() => {
+          console.log("Delete accommodation clicked");
+          onDelete();
+        }}
+        className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete accommodation"
+        type="button"
       >
         ✕
       </button>
       <button
         onClick={() => setIsEditing(true)}
-        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        className="absolute top-2 right-10 z-10 cursor-pointer text-xl text-gray-400 hover:text-blue-600"
         aria-label="Edit accommodation"
+        type="button"
       >
         ✎
       </button>

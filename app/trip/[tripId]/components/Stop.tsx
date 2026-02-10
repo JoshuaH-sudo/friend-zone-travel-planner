@@ -86,15 +86,17 @@ export const Stop = ({
     <div className="relative rounded-lg border p-4">
       <button
         onClick={onDelete}
-        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
+        className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete stop"
+        type="button"
       >
         ✕
       </button>
       <button
         onClick={() => setIsEditing(true)}
-        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        className="absolute top-2 right-10 z-10 cursor-pointer text-xl text-gray-400 hover:text-blue-600"
         aria-label="Edit stop"
+        type="button"
       >
         ✎
       </button>
