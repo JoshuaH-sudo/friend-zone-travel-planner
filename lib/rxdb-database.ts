@@ -5,10 +5,6 @@ import {
   stopSchema,
   accommodationSchema,
   transportSchema,
-  TripDocument,
-  StopDocument,
-  AccommodationDocument,
-  TransportDocument,
 } from "./rxdb-schema";
 
 export type DatabaseCollections = {
@@ -39,13 +35,6 @@ async function createDatabase(): Promise<MyDatabase> {
     storage: getRxStorageDexie(),
     multiInstance: true,
     eventReduce: true,
-    cleanupPolicy: {
-      minimumDeletedTime: 1000 * 60 * 60 * 24 * 7, // 7 days
-      minimumCollectionAge: 1000 * 60, // 60 seconds
-      runEach: 1000 * 60 * 5, // 5 minutes
-      awaitReplicationsInSync: true,
-      waitForLeadership: true,
-    },
   });
 
   console.log("RxDB database created");
