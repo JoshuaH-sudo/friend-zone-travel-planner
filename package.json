@@ -17,7 +17,6 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.1",
     "rxdb": "^16.21.1",
-    "rxdb-premium": "^16.21.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
