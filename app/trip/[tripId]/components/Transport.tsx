@@ -1,5 +1,21 @@
 "use client";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const transportSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+  type: z.enum(["flight", "bus", "car"], { message: "Invalid transport type" }),
+  price: z
+    .number()
+    .min(0, "Price must be positive")
+    .max(1000000, "Price is too high"),
+  currency: z.enum(["USD", "EUR", "JPY"], { message: "Invalid currency" }),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+});
+
+type TransportFormData = z.infer<typeof transportSchema>;
 
 export const Transport = ({
   transport,
@@ -7,15 +23,128 @@ export const Transport = ({
   onDelete,
 }: {
   transport: any;
-  onUpdate: (field: string, value: string | number) => void;
+  onUpdate: (data: TransportFormData) => void;
   onDelete: () => void;
 }) => {
   const { name, type, price, currency, date } = transport;
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingType, setIsEditingType] = useState(false);
-  const [isEditingPrice, setIsEditingPrice] = useState(false);
-  const [isEditingCurrency, setIsEditingCurrency] = useState(false);
-  const [isEditingDate, setIsEditingDate] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TransportFormData>({
+    resolver: zodResolver(transportSchema),
+    defaultValues: { name, type, price, currency, date },
+  });
+
+  const onSubmit = (data: TransportFormData) => {
+    onUpdate(data);
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="relative rounded-lg border p-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <input
+              {...register("name")}
+              type="text"
+              autoFocus
+              placeholder="Transport name"
+              className="w-full rounded border px-2 py-1"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Type
+            </label>
+            <select
+              {...register("type")}
+              className="w-full rounded border px-2 py-1"
+            >
+              <option value="flight">Flight</option>
+              <option value="bus">Bus</option>
+              <option value="car">Car</option>
+            </select>
+            {errors.type && (
+              <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
+              <input
+                {...register("price", { valueAsNumber: true })}
+                type="number"
+                className="w-full rounded border px-2 py-1"
+              />
+              {errors.price && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Currency
+              </label>
+              <select
+                {...register("currency")}
+                className="rounded border px-2 py-1"
+              >
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPY</option>
+              </select>
+              {errors.currency && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.currency.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
+            <input
+              {...register("date")}
+              type="date"
+              className="w-full rounded border px-2 py-1"
+            />
+            {errors.date && (
+              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="relative rounded-lg border p-4">
@@ -26,108 +155,23 @@ export const Transport = ({
       >
         ✕
       </button>
-      {isEditingName ? (
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => onUpdate("name", e.target.value)}
-          onBlur={() => setIsEditingName(false)}
-          autoFocus
-          className="w-full rounded border px-2 py-1 text-lg font-semibold"
-        />
-      ) : (
-        <h4
-          className="cursor-pointer text-lg font-semibold hover:text-blue-600"
-          onClick={() => setIsEditingName(true)}
-        >
-          {name}
-        </h4>
-      )}
-      <div className="mt-2 flex items-center gap-2">
-        {isEditingType ? (
-          <select
-            value={type}
-            onChange={(e) => {
-              onUpdate("type", e.target.value);
-              setIsEditingType(false);
-            }}
-            onBlur={() => setIsEditingType(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          >
-            <option value="flight">Flight</option>
-            <option value="bus">Bus</option>
-            <option value="car">Car</option>
-          </select>
-        ) : (
-          <span
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingType(true)}
-          >
-            {type.charAt(0).toUpperCase() + type.slice(1)}
-          </span>
-        )}
-        <span className="text-gray-400">•</span>
-        {isEditingPrice ? (
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => onUpdate("price", Number(e.target.value))}
-            onBlur={() => setIsEditingPrice(false)}
-            autoFocus
-            className="w-24 rounded border px-2 py-1 text-gray-600"
-          />
-        ) : (
-          <span
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingPrice(true)}
-          >
-            {price}
-          </span>
-        )}
-        {isEditingCurrency ? (
-          <select
-            value={currency}
-            onChange={(e) => {
-              onUpdate("currency", e.target.value);
-              setIsEditingCurrency(false);
-            }}
-            onBlur={() => setIsEditingCurrency(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          >
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="JPY">JPY</option>
-          </select>
-        ) : (
-          <span
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingCurrency(true)}
-          >
-            {currency}
-          </span>
-        )}
+      <button
+        onClick={() => setIsEditing(true)}
+        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        aria-label="Edit transport"
+      >
+        ✎
+      </button>
+      <h4 className="text-lg font-semibold">{name}</h4>
+      <div className="mt-2 flex items-center gap-2 text-gray-600">
+        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+        <span>•</span>
+        <span>{price}</span>
+        <span>{currency}</span>
       </div>
-      <div className="mt-2">
-        {isEditingDate ? (
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => onUpdate("date", e.target.value)}
-            onBlur={() => setIsEditingDate(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          />
-        ) : (
-          <p
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingDate(true)}
-          >
-            Date: {new Date(date).toLocaleDateString()}
-          </p>
-        )}
-      </div>
+      <p className="mt-2 text-gray-600">
+        Date: {new Date(date).toLocaleDateString()}
+      </p>
     </div>
   );
 };

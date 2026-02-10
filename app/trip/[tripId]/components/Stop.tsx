@@ -1,27 +1,86 @@
 "use client";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const stopSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+});
+
+type StopFormData = z.infer<typeof stopSchema>;
 
 export const Stop = ({
   stop,
-  onNameChange,
-  onDateChange,
+  onUpdate,
   onDelete,
 }: {
   stop: any;
-  onNameChange: (value: string) => void;
-  onDateChange: (value: string) => void;
+  onUpdate: (data: StopFormData) => void;
   onDelete: () => void;
 }) => {
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingDate, setIsEditingDate] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const toggleEditName = () => {
-    setIsEditingName(!isEditingName);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<StopFormData>({
+    resolver: zodResolver(stopSchema),
+    defaultValues: { name: stop.name, date: stop.date },
+  });
+
+  const onSubmit = (data: StopFormData) => {
+    onUpdate(data);
+    setIsEditing(false);
   };
 
-  const toggleEditDate = () => {
-    setIsEditingDate(!isEditingDate);
-  };
+  if (isEditing) {
+    return (
+      <div className="relative rounded-lg border p-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <div>
+            <input
+              {...register("name")}
+              type="text"
+              autoFocus
+              placeholder="Stop name"
+              className="w-full rounded border px-2 py-1 text-xl font-semibold"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            )}
+          </div>
+          <div>
+            <input
+              {...register("date")}
+              type="date"
+              className="rounded border px-2 py-1 text-gray-600"
+            />
+            {errors.date && (
+              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="relative rounded-lg border p-4">
@@ -32,44 +91,17 @@ export const Stop = ({
       >
         ✕
       </button>
-      <div className="flex items-center justify-between gap-2">
-        {isEditingName ? (
-          <input
-            type="text"
-            value={stop.name}
-            onChange={(e) => onNameChange(e.target.value)}
-            onBlur={toggleEditName}
-            autoFocus
-            className="rounded border px-2 py-1 text-xl font-semibold"
-          />
-        ) : (
-          <h3
-            className="cursor-pointer text-xl font-semibold hover:text-blue-600"
-            onClick={toggleEditName}
-          >
-            {stop.name}
-          </h3>
-        )}
-      </div>
-      {isEditingDate ? (
-        <input
-          type="date"
-          value={stop.date}
-          onChange={(e) => onDateChange(e.target.value)}
-          onBlur={toggleEditDate}
-          autoFocus
-          className="mt-2 rounded border px-2 py-1 text-gray-600"
-        />
-      ) : (
-        <div className="w-fit">
-          <p
-            className="mt-2 cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={toggleEditDate}
-          >
-            {new Date(stop.date).toLocaleDateString()}
-          </p>
-        </div>
-      )}
+      <button
+        onClick={() => setIsEditing(true)}
+        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        aria-label="Edit stop"
+      >
+        ✎
+      </button>
+      <h3 className="text-xl font-semibold">{stop.name}</h3>
+      <p className="mt-2 text-gray-600">
+        {new Date(stop.date).toLocaleDateString()}
+      </p>
     </div>
   );
 };

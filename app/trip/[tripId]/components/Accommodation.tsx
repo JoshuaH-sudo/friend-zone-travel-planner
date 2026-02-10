@@ -1,5 +1,26 @@
 "use client";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const accommodationSchema = z
+  .object({
+    name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+    price: z
+      .number()
+      .min(0, "Price must be positive")
+      .max(1000000, "Price is too high"),
+    currency: z.enum(["USD", "EUR", "JPY"], { message: "Invalid currency" }),
+    checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+    checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  })
+  .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
+    message: "Check-out date must be after check-in date",
+    path: ["checkOut"],
+  });
+
+type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
 export const Accommodation = ({
   accommodation,
@@ -7,15 +28,131 @@ export const Accommodation = ({
   onDelete,
 }: {
   accommodation: any;
-  onUpdate: (field: string, value: string | number) => void;
+  onUpdate: (data: AccommodationFormData) => void;
   onDelete: () => void;
 }) => {
   const { name, price, currency, checkIn, checkOut } = accommodation;
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingPrice, setIsEditingPrice] = useState(false);
-  const [isEditingCurrency, setIsEditingCurrency] = useState(false);
-  const [isEditingCheckIn, setIsEditingCheckIn] = useState(false);
-  const [isEditingCheckOut, setIsEditingCheckOut] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AccommodationFormData>({
+    resolver: zodResolver(accommodationSchema),
+    defaultValues: { name, price, currency, checkIn, checkOut },
+  });
+
+  const onSubmit = (data: AccommodationFormData) => {
+    onUpdate(data);
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="relative rounded-lg border p-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <input
+              {...register("name")}
+              type="text"
+              autoFocus
+              placeholder="Accommodation name"
+              className="w-full rounded border px-2 py-1"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Price
+              </label>
+              <input
+                {...register("price", { valueAsNumber: true })}
+                type="number"
+                className="w-full rounded border px-2 py-1"
+              />
+              {errors.price && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Currency
+              </label>
+              <select
+                {...register("currency")}
+                className="rounded border px-2 py-1"
+              >
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="JPY">JPY</option>
+              </select>
+              {errors.currency && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.currency.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Check-in
+              </label>
+              <input
+                {...register("checkIn")}
+                type="date"
+                className="w-full rounded border px-2 py-1"
+              />
+              {errors.checkIn && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.checkIn.message}
+                </p>
+              )}
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Check-out
+              </label>
+              <input
+                {...register("checkOut")}
+                type="date"
+                className="w-full rounded border px-2 py-1"
+              />
+              {errors.checkOut && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.checkOut.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="relative rounded-lg border p-4">
@@ -26,103 +163,24 @@ export const Accommodation = ({
       >
         ✕
       </button>
-      {isEditingName ? (
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => onUpdate("name", e.target.value)}
-          onBlur={() => setIsEditingName(false)}
-          autoFocus
-          className="w-full rounded border px-2 py-1 text-lg font-semibold"
-        />
-      ) : (
-        <h4
-          className="cursor-pointer text-lg font-semibold hover:text-blue-600"
-          onClick={() => setIsEditingName(true)}
-        >
-          {name}
-        </h4>
-      )}
-      <div className="mt-2 flex items-center gap-2">
-        {isEditingPrice ? (
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => onUpdate("price", Number(e.target.value))}
-            onBlur={() => setIsEditingPrice(false)}
-            autoFocus
-            className="w-24 rounded border px-2 py-1 text-gray-600"
-          />
-        ) : (
-          <span
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingPrice(true)}
-          >
-            {price}
-          </span>
-        )}
-        {isEditingCurrency ? (
-          <select
-            value={currency}
-            onChange={(e) => {
-              onUpdate("currency", e.target.value);
-              setIsEditingCurrency(false);
-            }}
-            onBlur={() => setIsEditingCurrency(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          >
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="JPY">JPY</option>
-          </select>
-        ) : (
-          <span
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingCurrency(true)}
-          >
-            {currency}
-          </span>
-        )}
+      <button
+        onClick={() => setIsEditing(true)}
+        className="absolute top-2 right-8 text-gray-400 hover:text-blue-600"
+        aria-label="Edit accommodation"
+      >
+        ✎
+      </button>
+      <h4 className="text-lg font-semibold">{name}</h4>
+      <div className="mt-2 flex items-center gap-2 text-gray-600">
+        <span>{price}</span>
+        <span>{currency}</span>
       </div>
-      <div className="mt-2">
-        {isEditingCheckIn ? (
-          <input
-            type="date"
-            value={checkIn}
-            onChange={(e) => onUpdate("checkIn", e.target.value)}
-            onBlur={() => setIsEditingCheckIn(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          />
-        ) : (
-          <p
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingCheckIn(true)}
-          >
-            Check-in: {new Date(checkIn).toLocaleDateString()}
-          </p>
-        )}
-      </div>
-      <div className="mt-1">
-        {isEditingCheckOut ? (
-          <input
-            type="date"
-            value={checkOut}
-            onChange={(e) => onUpdate("checkOut", e.target.value)}
-            onBlur={() => setIsEditingCheckOut(false)}
-            autoFocus
-            className="rounded border px-2 py-1 text-gray-600"
-          />
-        ) : (
-          <p
-            className="cursor-pointer text-gray-600 hover:text-blue-600"
-            onClick={() => setIsEditingCheckOut(true)}
-          >
-            Check-out: {new Date(checkOut).toLocaleDateString()}
-          </p>
-        )}
-      </div>
+      <p className="mt-2 text-gray-600">
+        Check-in: {new Date(checkIn).toLocaleDateString()}
+      </p>
+      <p className="mt-1 text-gray-600">
+        Check-out: {new Date(checkOut).toLocaleDateString()}
+      </p>
     </div>
   );
 };

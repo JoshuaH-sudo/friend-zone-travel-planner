@@ -91,13 +91,17 @@ function TripDetails() {
     await loadTripData();
   };
 
-  const updateStop = async (stopId: string, field: string, value: string) => {
+  const updateStop = async (
+    stopId: string,
+    data: { name: string; date: string },
+  ) => {
     const stopRecord = stops.find((s) => s.id === stopId);
     if (!stopRecord) return;
 
     await database.write(async () => {
       await stopRecord.update((s: any) => {
-        s[field] = value;
+        s.name = data.name;
+        s.date = data.date;
       });
     });
     await loadTripData();
@@ -145,8 +149,13 @@ function TripDetails() {
   const onUpdateAccommodation = async (
     stopId: string,
     accommodationId: string,
-    field: string,
-    value: string | number,
+    data: {
+      name: string;
+      price: number;
+      currency: string;
+      checkIn: string;
+      checkOut: string;
+    },
   ) => {
     const accoms = accommodationsByStop[stopId] || [];
     const accomRecord = accoms.find((a) => a.id === accommodationId);
@@ -154,13 +163,11 @@ function TripDetails() {
 
     await database.write(async () => {
       await accomRecord.update((a: any) => {
-        if (field === "checkIn") {
-          a.checkIn = value;
-        } else if (field === "checkOut") {
-          a.checkOut = value;
-        } else {
-          a[field] = value;
-        }
+        a.name = data.name;
+        a.price = data.price;
+        a.currency = data.currency;
+        a.checkIn = data.checkIn;
+        a.checkOut = data.checkOut;
       });
     });
     await loadTripData();
@@ -201,8 +208,13 @@ function TripDetails() {
   const onUpdateTransport = async (
     stopId: string,
     transportId: string,
-    field: string,
-    value: string | number,
+    data: {
+      name: string;
+      type: string;
+      price: number;
+      currency: string;
+      date: string;
+    },
   ) => {
     const trans = transportsByStop[stopId] || [];
     const transRecord = trans.find((t) => t.id === transportId);
@@ -210,7 +222,11 @@ function TripDetails() {
 
     await database.write(async () => {
       await transRecord.update((t: any) => {
-        t[field] = value;
+        t.name = data.name;
+        t.type = data.type;
+        t.price = data.price;
+        t.currency = data.currency;
+        t.date = data.date;
       });
     });
     await loadTripData();
@@ -276,12 +292,7 @@ function TripDetails() {
                 <li key={stop.id}>
                   <Stop
                     stop={stop}
-                    onNameChange={(newName) =>
-                      updateStop(stop.id, "name", newName)
-                    }
-                    onDateChange={(newDate) =>
-                      updateStop(stop.id, "date", newDate)
-                    }
+                    onUpdate={(data) => updateStop(stop.id, data)}
                     onDelete={() => deleteStop(stop.id)}
                   />
                   <div className="mt-4 ml-6 space-y-3">
@@ -311,12 +322,11 @@ function TripDetails() {
                                   <li key={item.id}>
                                     <Accommodation
                                       accommodation={item}
-                                      onUpdate={(field, value) =>
+                                      onUpdate={(data) =>
                                         onUpdateAccommodation(
                                           stop.id,
                                           item.id,
-                                          field,
-                                          value,
+                                          data,
                                         )
                                       }
                                       onDelete={() =>
@@ -328,12 +338,11 @@ function TripDetails() {
                                   <li key={item.id}>
                                     <Transport
                                       transport={item}
-                                      onUpdate={(field, value) =>
+                                      onUpdate={(data) =>
                                         onUpdateTransport(
                                           stop.id,
                                           item.id,
-                                          field,
-                                          value,
+                                          data,
                                         )
                                       }
                                       onDelete={() =>
