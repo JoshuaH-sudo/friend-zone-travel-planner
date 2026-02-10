@@ -185,11 +185,9 @@ function TripDetails() {
     stopId: string,
     accommodationId: string,
   ) => {
-    console.log("onDeleteAccommodation called", { stopId, accommodationId });
     const accoms = accommodationsByStop[stopId] || [];
     const accomRecord = accoms.find((a) => a.id === accommodationId);
     if (!accomRecord) {
-      console.error("Accommodation record not found");
       return;
     }
 
@@ -249,11 +247,9 @@ function TripDetails() {
   };
 
   const onDeleteTransport = async (stopId: string, transportId: string) => {
-    console.log("onDeleteTransport called", { stopId, transportId });
     const trans = transportsByStop[stopId] || [];
     const transRecord = trans.find((t) => t.id === transportId);
     if (!transRecord) {
-      console.error("Transport record not found");
       return;
     }
 
