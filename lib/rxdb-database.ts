@@ -5,13 +5,17 @@ import {
   stopSchema,
   accommodationSchema,
   transportSchema,
+  TripCollection,
+  StopCollection,
+  AccommodationCollection,
+  TransportCollection,
 } from "./rxdb-schema";
 
 export type DatabaseCollections = {
-  trips: any;
-  stops: any;
-  accommodations: any;
-  transports: any;
+  trips: TripCollection;
+  stops: StopCollection;
+  accommodations: AccommodationCollection;
+  transports: TransportCollection;
 };
 
 export type MyDatabase = RxDatabase<DatabaseCollections>;

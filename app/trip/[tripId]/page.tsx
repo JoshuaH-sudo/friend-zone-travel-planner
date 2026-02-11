@@ -1,32 +1,34 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
 import { Transport } from "./components/Transport";
 import { Accommodation } from "./components/Accommodation";
 import { Stop } from "./components/Stop";
+import {
+  TripDocumentType,
+  StopDocumentType,
+  AccommodationDocumentType,
+  TransportDocumentType,
+} from "@/lib/rxdb-schema";
 
 function TripDetails() {
   const params = useParams();
   const tripId = params.tripId as string;
   const database = useDatabase();
 
-  const [trip, setTrip] = useState<any>(null);
-  const [stops, setStops] = useState<any[]>([]);
+  const [trip, setTrip] = useState<TripDocumentType | null>(null);
+  const [stops, setStops] = useState<StopDocumentType[]>([]);
   const [accommodationsByStop, setAccommodationsByStop] = useState<
-    Record<string, any[]>
+    Record<string, AccommodationDocumentType[]>
   >({});
   const [transportsByStop, setTransportsByStop] = useState<
-    Record<string, any[]>
+    Record<string, TransportDocumentType[]>
   >({});
   const [isEditingTripName, setIsEditingTripName] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadTripData();
-  }, [tripId, database]);
-
-  const loadTripData = async () => {
+  const loadTripData = useCallback(async () => {
     try {
       const tripRecord = await database.trips.findOne(tripId).exec();
       setTrip(tripRecord);
@@ -37,8 +39,8 @@ function TripDetails() {
       setStops(stopsRecords);
 
       // Load accommodations and transports for each stop
-      const accomMap: Record<string, any[]> = {};
-      const transMap: Record<string, any[]> = {};
+      const accomMap: Record<string, AccommodationDocumentType[]> = {};
+      const transMap: Record<string, TransportDocumentType[]> = {};
 
       for (const stop of stopsRecords) {
         const accoms = await database.accommodations
@@ -59,12 +61,16 @@ function TripDetails() {
       console.error("Error loading trip:", error);
       setLoading(false);
     }
-  };
+  }, [tripId, database]);
+
+  useEffect(() => {
+    loadTripData();
+  }, [loadTripData]);
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
     await trip.patch({ name: newName });
-    setTrip({ ...trip, name: newName });
+    await loadTripData();
   };
 
   const addStop = async () => {

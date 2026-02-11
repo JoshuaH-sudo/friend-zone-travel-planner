@@ -1,6 +1,48 @@
-import { RxJsonSchema } from "rxdb";
+import { RxJsonSchema, RxDocument, RxCollection } from "rxdb";
 
-export const tripSchema: RxJsonSchema<any> = {
+// Document types
+export type TripDocument = {
+  id: string;
+  name: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type StopDocument = {
+  id: string;
+  name: string;
+  date: string;
+  tripId: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type AccommodationDocument = {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  checkIn: string;
+  checkOut: string;
+  stopId: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type TransportDocument = {
+  id: string;
+  name: string;
+  type: string;
+  price: number;
+  currency: string;
+  date: string;
+  stopId: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+// RxDB Schemas
+export const tripSchema: RxJsonSchema<TripDocument> = {
   version: 0,
   primaryKey: "id",
   type: "object",
@@ -23,7 +65,7 @@ export const tripSchema: RxJsonSchema<any> = {
   indexes: ["createdAt"],
 };
 
-export const stopSchema: RxJsonSchema<any> = {
+export const stopSchema: RxJsonSchema<StopDocument> = {
   version: 0,
   primaryKey: "id",
   type: "object",
@@ -53,7 +95,7 @@ export const stopSchema: RxJsonSchema<any> = {
   indexes: ["tripId", "date"],
 };
 
-export const accommodationSchema: RxJsonSchema<any> = {
+export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
   version: 0,
   primaryKey: "id",
   type: "object",
@@ -102,7 +144,7 @@ export const accommodationSchema: RxJsonSchema<any> = {
   indexes: ["stopId", "checkIn"],
 };
 
-export const transportSchema: RxJsonSchema<any> = {
+export const transportSchema: RxJsonSchema<TransportDocument> = {
   version: 0,
   primaryKey: "id",
   type: "object",
@@ -151,42 +193,50 @@ export const transportSchema: RxJsonSchema<any> = {
   indexes: ["stopId", "date"],
 };
 
-export type TripDocument = {
-  id: string;
-  name: string;
-  createdAt: number;
-  updatedAt: number;
-};
+// RxDocument types
+export type TripDocMethods = Record<string, never>;
+export type TripDocumentType = RxDocument<TripDocument, TripDocMethods>;
 
-export type StopDocument = {
-  id: string;
-  name: string;
-  date: string;
-  tripId: string;
-  createdAt: number;
-  updatedAt: number;
-};
+export type StopDocMethods = Record<string, never>;
+export type StopDocumentType = RxDocument<StopDocument, StopDocMethods>;
 
-export type AccommodationDocument = {
-  id: string;
-  name: string;
-  price: number;
-  currency: string;
-  checkIn: string;
-  checkOut: string;
-  stopId: string;
-  createdAt: number;
-  updatedAt: number;
-};
+export type AccommodationDocMethods = Record<string, never>;
+export type AccommodationDocumentType = RxDocument<
+  AccommodationDocument,
+  AccommodationDocMethods
+>;
 
-export type TransportDocument = {
-  id: string;
-  name: string;
-  type: string;
-  price: number;
-  currency: string;
-  date: string;
-  stopId: string;
-  createdAt: number;
-  updatedAt: number;
-};
+export type TransportDocMethods = Record<string, never>;
+export type TransportDocumentType = RxDocument<
+  TransportDocument,
+  TransportDocMethods
+>;
+
+// RxCollection types
+export type TripCollectionMethods = Record<string, never>;
+export type TripCollection = RxCollection<
+  TripDocument,
+  TripDocMethods,
+  TripCollectionMethods
+>;
+
+export type StopCollectionMethods = Record<string, never>;
+export type StopCollection = RxCollection<
+  StopDocument,
+  StopDocMethods,
+  StopCollectionMethods
+>;
+
+export type AccommodationCollectionMethods = Record<string, never>;
+export type AccommodationCollection = RxCollection<
+  AccommodationDocument,
+  AccommodationDocMethods,
+  AccommodationCollectionMethods
+>;
+
+export type TransportCollectionMethods = Record<string, never>;
+export type TransportCollection = RxCollection<
+  TransportDocument,
+  TransportDocMethods,
+  TransportCollectionMethods
+>;
