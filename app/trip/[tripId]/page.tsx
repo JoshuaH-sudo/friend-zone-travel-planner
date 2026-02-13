@@ -291,17 +291,17 @@ function TripDetails() {
                   <div className="mt-4 ml-6 space-y-3">
                     {(() => {
                       const items = [
-                        ...accommodations.map((acc) => ({
-                          model: acc,
-                          id: acc.id,
-                          type: "accommodation" as const,
-                          date: acc.checkIn,
-                        })),
                         ...transports.map((trans) => ({
                           model: trans,
                           id: trans.id,
                           type: "transport" as const,
                           date: trans.date,
+                        })),
+                        ...accommodations.map((acc) => ({
+                          model: acc,
+                          id: acc.id,
+                          type: "accommodation" as const,
+                          date: acc.checkIn,
                         })),
                       ].sort(
                         (a, b) =>

@@ -32,6 +32,10 @@ export default function RootLayout({
         <DatabaseProvider>
           <Header />
           {children}
+          <div className="mt-12 text-center text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
+            rights reserved.
+          </div>
         </DatabaseProvider>
       </body>
     </html>
