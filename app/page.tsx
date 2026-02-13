@@ -1,58 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useDatabase } from "@/lib/DatabaseProvider";
-import { seedDatabase } from "@/lib/seedDatabase";
+import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { TripDocument } from "@/lib/rxdb-schema";
 
 function TripList() {
-  const database = useDatabase();
-  const [trips, setTrips] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [trips, setTrips] = useState<TripDocument[]>([]);
+  const [database, setDatabase] = useState<MyDatabase | null>(null);
 
   useEffect(() => {
-    loadTrips();
+    const fetchDatabase = async () => {
+      const db = await getDatabase();
+      setDatabase(db);
+    };
+    fetchDatabase();
+  }, []);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const subscription = database.trips.find().$.subscribe((newTrips) => {
+      setTrips(newTrips);
+    });
+
+    return () => subscription.unsubscribe();
   }, [database]);
 
-  const loadTrips = async () => {
-    const allTrips = await database.trips.find().exec();
-    setTrips(allTrips);
-    setLoading(false);
-  };
+  const createTrip = async () => {
+    if (!database) return;
 
-  const createSampleTrips = async () => {
-    await seedDatabase();
-    await loadTrips();
+    const newTrip = await database.trips.insert({
+      id: crypto.randomUUID(),
+      name: "New Trip",
+      createdAt: new Date().getUTCDate(),
+      updatedAt: new Date().getUTCDate(),
+    });
+    console.log("Created new trip:", newTrip);
+    router.push(`/trip/${newTrip.id}`);
   };
-
-  if (loading) {
-    return <div>Loading trips...</div>;
-  }
 
   return (
     <div>
       <h2 className="text-2xl font-bold">Your Trips</h2>
-      {trips.length === 0 ? (
-        <div className="mt-4">
-          <p className="text-gray-600 dark:text-gray-400">No trips yet.</p>
+
+      <ul className="mt-4 space-y-2">
+        {trips.map((trip) => (
+          <Link key={trip.id} href={`/trip/${trip.id}`} className="block">
+            <li className="rounded-md bg-gray-100 p-4 dark:bg-gray-800">
+              {trip.name}
+            </li>
+          </Link>
+        ))}
+
+        <li>
           <button
-            onClick={createSampleTrips}
-            className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="rounded-md bg-gray-100 p-4 dark:bg-gray-800"
+            onClick={createTrip}
           >
-            Create Sample Trips
+            Add Trip
           </button>
-        </div>
-      ) : (
-        <ul className="mt-4 space-y-2">
-          {trips.map((trip: any) => (
-            <Link key={trip.id} href={`/trip/${trip.id}`} className="block">
-              <li className="rounded-md bg-gray-100 p-4 dark:bg-gray-800">
-                {trip.name}
-              </li>
-            </Link>
-          ))}
-        </ul>
-      )}
+        </li>
+      </ul>
     </div>
   );
 }
