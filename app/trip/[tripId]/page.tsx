@@ -14,6 +14,7 @@ import {
   AccommodationDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
+import { TripStats } from "./components/TripStats";
 
 function TripDetails() {
   const params = useParams();
@@ -34,6 +35,9 @@ function TripDetails() {
   const loadTripData = useCallback(async () => {
     try {
       const tripRecord = await database.trips.findOne(tripId).exec();
+      tripRecord?.populate("stops");
+      tripRecord?.populate("accommodations");
+      tripRecord?.populate("transports");
       setTrip(tripRecord);
 
       const stopsRecords = await database.stops
@@ -274,6 +278,13 @@ function TripDetails() {
             {trip.name}
           </h1>
         )}
+        <hr className="my-6 w-full border-gray-300" />
+        <TripStats
+          trip={trip}
+          stops={stops}
+          accommodationsByStop={accommodationsByStop}
+          transportsByStop={transportsByStop}
+        />
         <hr className="my-6 w-full border-gray-300" />
         <section id="stops-section" className="w-full text-left">
           <ul className="space-y-8">
