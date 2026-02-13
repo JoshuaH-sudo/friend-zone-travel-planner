@@ -264,20 +264,18 @@ function TripDetails() {
             onChange={(e) => updateTripName(e.target.value)}
             onBlur={() => setIsEditingTripName(false)}
             autoFocus
-            className="w-full rounded border px-2 py-1 text-5xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
+            className="w-full rounded border px-2 py-1 text-3xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
           />
         ) : (
           <h1
-            className="cursor-pointer text-5xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
+            className="cursor-pointer text-3xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
             onClick={() => setIsEditingTripName(true)}
           >
             {trip.name}
           </h1>
         )}
-        <section
-          id="stops-section"
-          className="mt-10 w-full rounded-xl border p-6 text-left"
-        >
+        <hr className="my-6 w-full border-gray-300" />
+        <section id="stops-section" className="w-full text-left">
           <ul className="space-y-8">
             {stops.map((stop) => {
               const accommodations = accommodationsByStop[stop.id] || [];

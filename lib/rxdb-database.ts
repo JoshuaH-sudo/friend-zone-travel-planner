@@ -72,5 +72,5 @@ async function createDatabase(): Promise<MyDatabase> {
 
 // Helper function to generate IDs
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return crypto.randomUUID();
 }
