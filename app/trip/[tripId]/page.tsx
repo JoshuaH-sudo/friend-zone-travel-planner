@@ -2,8 +2,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
-import { Transport } from "./components/Transport";
-import { Accommodation } from "./components/Accommodation";
+import { Transport, TransportFormData } from "./components/Transport";
+import {
+  Accommodation,
+  AccommodationFormData,
+} from "./components/Accommodation";
 import { Stop } from "./components/Stop";
 import {
   TripDocumentType,
@@ -142,13 +145,7 @@ function TripDetails() {
   const onUpdateAccommodation = async (
     stopId: string,
     accommodationId: string,
-    data: {
-      name: string;
-      price: number;
-      currency: string;
-      checkIn: string;
-      checkOut: string;
-    },
+    data: AccommodationFormData,
   ) => {
     console.log("onUpdateAccommodation called", {
       stopId,
@@ -209,13 +206,7 @@ function TripDetails() {
   const onUpdateTransport = async (
     stopId: string,
     transportId: string,
-    data: {
-      name: string;
-      type: string;
-      price: number;
-      currency: string;
-      date: string;
-    },
+    data: TransportFormData,
   ) => {
     console.log("onUpdateTransport called", { stopId, transportId, data });
     const trans = transportsByStop[stopId] || [];

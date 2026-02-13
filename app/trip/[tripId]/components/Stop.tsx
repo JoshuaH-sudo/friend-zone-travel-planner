@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { StopCollection } from "@/lib/rxdb-schema";
+import { StopDocumentType } from "@/lib/rxdb-schema";
 
 const stopSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -17,7 +17,7 @@ export const Stop = ({
   onUpdate,
   onDelete,
 }: {
-  stop: StopCollection;
+  stop: StopDocumentType;
   onUpdate: (data: StopFormData) => void;
   onDelete: () => void;
 }) => {

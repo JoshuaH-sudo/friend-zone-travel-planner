@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AccommodationCollection } from "@/lib/rxdb-schema";
+import { AccommodationDocumentType } from "@/lib/rxdb-schema";
 
 const accommodationSchema = z
   .object({
@@ -23,14 +23,14 @@ const accommodationSchema = z
     path: ["checkOut"],
   });
 
-type AccommodationFormData = z.infer<typeof accommodationSchema>;
+export type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
 export const Accommodation = ({
   accommodation,
   onUpdate,
   onDelete,
 }: {
-  accommodation: AccommodationCollection;
+  accommodation: AccommodationDocumentType;
   onUpdate: (data: AccommodationFormData) => void;
   onDelete: () => void;
 }) => {

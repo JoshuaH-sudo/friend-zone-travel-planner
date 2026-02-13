@@ -1,5 +1,11 @@
 import { RxJsonSchema, RxDocument, RxCollection } from "rxdb";
 
+const Currency = ["USD", "EUR", "JPY", "AUD"] as const;
+type Currency = (typeof Currency)[number];
+
+const TransportType = ["flight", "bus", "car", "train"] as const;
+type TransportType = (typeof TransportType)[number];
+
 // Document types
 export type TripDocument = {
   id: string;
@@ -21,7 +27,7 @@ export type AccommodationDocument = {
   id: string;
   name: string;
   price: number;
-  currency: string;
+  currency: Currency;
   checkIn: string;
   checkOut: string;
   stopId: string;
@@ -32,9 +38,9 @@ export type AccommodationDocument = {
 export type TransportDocument = {
   id: string;
   name: string;
-  type: string;
+  type: TransportType;
   price: number;
-  currency: string;
+  currency: Currency;
   date: string;
   stopId: string;
   createdAt: number;
@@ -112,6 +118,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
     },
     currency: {
       type: "string",
+      enum: ["USD", "EUR", "JPY", "AUD"],
     },
     checkIn: {
       type: "string",
@@ -158,12 +165,14 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     },
     type: {
       type: "string",
+      enum: TransportType,
     },
     price: {
       type: "number",
     },
     currency: {
       type: "string",
+      enum: Currency,
     },
     date: {
       type: "string",

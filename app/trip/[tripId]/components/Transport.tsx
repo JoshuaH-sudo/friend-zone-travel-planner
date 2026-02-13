@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { TransportCollection } from "@/lib/rxdb-schema";
+import { TransportDocumentType } from "@/lib/rxdb-schema";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -20,14 +20,14 @@ const transportSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
 });
 
-type TransportFormData = z.infer<typeof transportSchema>;
+export type TransportFormData = z.infer<typeof transportSchema>;
 
 export const Transport = ({
   transport,
   onUpdate,
   onDelete,
 }: {
-  transport: TransportCollection;
+  transport: TransportDocumentType;
   onUpdate: (data: TransportFormData) => void;
   onDelete: () => void;
 }) => {
