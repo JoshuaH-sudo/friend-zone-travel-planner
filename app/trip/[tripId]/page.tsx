@@ -290,7 +290,7 @@ function TripDetails() {
   }
 
   return (
-    <main className="flex min-h-screen w-full max-w-4xl flex-col items-center bg-white sm:items-start dark:bg-black">
+    <main className="flex min-h-screen w-full max-w-4xl flex-col items-center sm:items-start">
       {isEditingTripName ? (
         <input
           type="text"

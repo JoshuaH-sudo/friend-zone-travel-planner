@@ -63,7 +63,10 @@ function TripList() {
             key={trip.id}
             className="relative flex items-center justify-between gap-4 rounded-md bg-gray-100 p-4 dark:bg-gray-800"
           >
-            <Link href={`/trip/${trip.id}`} className="block">
+            <Link
+              href={`/trip/${trip.id}`}
+              className="block hover:text-blue-400 hover:underline"
+            >
               <li className="">{trip.name}</li>
             </Link>
             <button
