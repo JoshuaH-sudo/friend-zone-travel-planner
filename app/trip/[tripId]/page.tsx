@@ -42,7 +42,9 @@ function TripDetails() {
 
       const stopsRecords = await database.stops
         .find({ selector: { tripId } })
+        .sort({ date: "asc", createdAt: "asc" })
         .exec();
+
       setStops(stopsRecords);
 
       // Load accommodations and transports for each stop
@@ -52,11 +54,13 @@ function TripDetails() {
       for (const stop of stopsRecords) {
         const accoms = await database.accommodations
           .find({ selector: { stopId: stop.id } })
+          .sort({ checkIn: "asc", createdAt: "asc" })
           .exec();
         accomMap[stop.id] = accoms;
 
         const trans = await database.transports
           .find({ selector: { stopId: stop.id } })
+          .sort({ date: "asc", createdAt: "asc" })
           .exec();
         transMap[stop.id] = trans;
       }
@@ -82,10 +86,37 @@ function TripDetails() {
 
   const addStop = async () => {
     const { generateId } = await import("@/lib/rxdb-database");
+
+    // Find the latest date from stops, accommodations, and transports
+    let latestDate = new Date().toISOString().split("T")[0];
+    const allDates: string[] = [];
+
+    // Collect all stop dates
+    stops.forEach((stop) => allDates.push(stop.date));
+
+    // Collect all accommodation checkout dates
+    Object.values(accommodationsByStop)
+      .flat()
+      .forEach((acc) => {
+        allDates.push(acc.checkOut);
+      });
+
+    // Collect all transport dates
+    Object.values(transportsByStop)
+      .flat()
+      .forEach((trans) => {
+        allDates.push(trans.date);
+      });
+
+    // Find the maximum date
+    if (allDates.length > 0) {
+      latestDate = allDates.reduce((max, date) => (date > max ? date : max));
+    }
+
     await database.stops.insert({
       id: generateId(),
       name: `New Stop ${stops.length + 1}`,
-      date: new Date().toISOString().split("T")[0],
+      date: latestDate,
       tripId,
       createdAt: Date.now(),
       updatedAt: Date.now(),

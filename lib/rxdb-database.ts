@@ -1,6 +1,7 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { wrappedValidateAjvStorage } from "rxdb/plugins/validate-ajv";
+import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
 import {
   tripSchema,
   stopSchema,
@@ -23,6 +24,8 @@ export type DatabaseCollections = {
 export type MyDatabase = RxDatabase<DatabaseCollections>;
 
 let dbPromise: Promise<MyDatabase> | null = null;
+
+addRxPlugin(RxDBQueryBuilderPlugin);
 
 if (process.env.NODE_ENV === "development") {
   console.log("Enabling RxDB Dev Mode plugin");
