@@ -12,7 +12,9 @@ const accommodationSchema = z
       .number()
       .min(0, "Price must be positive")
       .max(1000000, "Price is too high"),
-    currency: z.enum(["USD", "EUR", "JPY"], { message: "Invalid currency" }),
+    currency: z.enum(["USD", "EUR", "JPY", "AUD"], {
+      message: "Invalid currency",
+    }),
     checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
     checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
   })
@@ -95,6 +97,7 @@ export const Accommodation = ({
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
               </select>
               {errors.currency && (
                 <p className="mt-1 text-sm text-red-600">

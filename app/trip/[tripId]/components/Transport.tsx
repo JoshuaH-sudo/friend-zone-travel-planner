@@ -7,12 +7,16 @@ import { TransportCollection } from "@/lib/rxdb-schema";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
-  type: z.enum(["flight", "bus", "car"], { message: "Invalid transport type" }),
+  type: z.enum(["flight", "bus", "car", "train"], {
+    message: "Invalid transport type",
+  }),
   price: z
     .number()
     .min(0, "Price must be positive")
     .max(1000000, "Price is too high"),
-  currency: z.enum(["USD", "EUR", "JPY"], { message: "Invalid currency" }),
+  currency: z.enum(["USD", "EUR", "JPY", "AUD"], {
+    message: "Invalid currency",
+  }),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
 });
 
@@ -74,6 +78,7 @@ export const Transport = ({
               <option value="flight">Flight</option>
               <option value="bus">Bus</option>
               <option value="car">Car</option>
+              <option value="train">Train</option>
             </select>
             {errors.type && (
               <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
@@ -106,6 +111,7 @@ export const Transport = ({
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
                 <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
               </select>
               {errors.currency && (
                 <p className="mt-1 text-sm text-red-600">
