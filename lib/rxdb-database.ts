@@ -30,7 +30,6 @@ if (process.env.NODE_ENV === "development") {
 } else {
   console.log("Production mode - RxDB Dev Mode plugin not enabled");
 }
-addRxPlugin(RxDBDevModePlugin);
 
 export async function getDatabase(): Promise<MyDatabase> {
   if (dbPromise) {
