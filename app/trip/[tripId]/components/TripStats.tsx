@@ -18,10 +18,6 @@ export function TripStats({
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
 }) {
-  // Should calculate the total cost of each currency across all stops, accommodations, and transports in the trip
-  // Number of stops, accommodations, and transports
-  // Start and end date of the trip (based on the earliest and latest stop dates)
-  // This should update in real-time as the trip data changes
   const stats = useMemo(() => {
     const currencyTotals: Record<string, number> = {};
     let stopCount = 0;
@@ -29,6 +25,7 @@ export function TripStats({
     let transportCount = 0;
     let startDate: string | null = null;
     let endDate: string | null = null;
+    let totalDays = 0;
 
     if (!trip) {
       return {
@@ -64,6 +61,13 @@ export function TripStats({
       });
     });
 
+    totalDays =
+      startDate && endDate
+        ? (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+            (1000 * 60 * 60 * 24) +
+          1
+        : 0;
+
     return {
       currencyTotals,
       stopCount,
@@ -71,27 +75,38 @@ export function TripStats({
       transportCount,
       startDate,
       endDate,
+      totalDays,
     };
   }, [trip, stops, accommodationsByStop, transportsByStop]);
 
   return (
-    <div className="rounded-lg border p-4">
+    <div className="w-full space-y-2 rounded-lg border p-4">
       <h2 className="text-xl font-bold">Trip Stats</h2>
-      <p>
-        <strong>Stops:</strong> {stats.stopCount} |{" "}
-        <strong>Accommodations:</strong> {stats.accommodationCount} |{" "}
-        <strong>Transports:</strong> {stats.transportCount}
-      </p>
-      <p>
-        <strong>Start Date:</strong> {stats.startDate || "N/A"} |{" "}
-        <strong>End Date:</strong> {stats.endDate || "N/A"}
-      </p>
+      <div>
+        <p>
+          <strong>Destination:</strong> {stats.stopCount}
+        </p>
+        <p>
+          <strong>Accommodations:</strong> {stats.accommodationCount}
+        </p>
+        <p>
+          <strong>Transports:</strong> {stats.transportCount}
+        </p>
+      </div>
+      <div>
+        <p>
+          {stats.startDate || "N/A"} | {stats.endDate || "N/A"}
+        </p>
+        <p>
+          <strong>Days:</strong> {stats.totalDays}
+        </p>
+      </div>
       <div className="mt-2">
         <strong>Total Cost:</strong>
         <ul className="ml-4 list-disc">
           {Object.entries(stats.currencyTotals).map(([currency, total]) => (
             <li key={currency}>
-              {currency} {total.toFixed(2)}
+              <strong>{currency}:</strong> {total.toFixed(2)}
             </li>
           ))}
         </ul>
