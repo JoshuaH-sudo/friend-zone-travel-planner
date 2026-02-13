@@ -32,8 +32,9 @@ function TripList() {
   const createTrip = async () => {
     if (!database) return;
 
+    const { generateId } = await import("@/lib/rxdb-database");
     const newTrip = await database.trips.insert({
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: "New Trip",
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -42,17 +43,38 @@ function TripList() {
     router.push(`/trip/${newTrip.id}`);
   };
 
+  const deleteTrip = async (tripId: string) => {
+    if (!database) return;
+
+    const trip = await database.trips.findOne(tripId).exec();
+    if (trip) {
+      await trip.remove();
+      console.log("Deleted trip:", tripId);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold">Your Trips</h2>
 
       <ul className="mt-4 space-y-2">
         {trips.map((trip) => (
-          <Link key={trip.id} href={`/trip/${trip.id}`} className="block">
-            <li className="rounded-md bg-gray-100 p-4 dark:bg-gray-800">
-              {trip.name}
-            </li>
-          </Link>
+          <div
+            key={trip.id}
+            className="relative flex items-center justify-between gap-4 rounded-md bg-gray-100 p-4 dark:bg-gray-800"
+          >
+            <Link href={`/trip/${trip.id}`} className="block">
+              <li className="">{trip.name}</li>
+            </Link>
+            <button
+              onClick={() => deleteTrip(trip.id)}
+              className="text-sm text-gray-400 hover:text-red-600"
+              aria-label="Delete trip"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
         ))}
 
         <li>
