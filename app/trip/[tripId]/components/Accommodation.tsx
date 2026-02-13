@@ -11,7 +11,7 @@ const accommodationSchema = z
     price: z
       .number()
       .min(0, "Price must be positive")
-      .max(1000000, "Price is too high"),
+      .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
     currency: z.enum(["USD", "EUR", "JPY", "AUD"], {
       message: "Invalid currency",
     }),
@@ -78,6 +78,7 @@ export const Accommodation = ({
               <input
                 {...register("price", { valueAsNumber: true })}
                 type="number"
+                step="0.01"
                 className="w-full rounded border px-2 py-1"
               />
               {errors.price && (
