@@ -24,6 +24,12 @@ export type MyDatabase = RxDatabase<DatabaseCollections>;
 
 let dbPromise: Promise<MyDatabase> | null = null;
 
+if (process.env.NODE_ENV === "development") {
+  console.log("Enabling RxDB Dev Mode plugin");
+  addRxPlugin(RxDBDevModePlugin);
+} else {
+  console.log("Production mode - RxDB Dev Mode plugin not enabled");
+}
 addRxPlugin(RxDBDevModePlugin);
 
 export async function getDatabase(): Promise<MyDatabase> {
