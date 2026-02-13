@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { TransportCollection } from "@/lib/rxdb-schema";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -22,7 +23,7 @@ export const Transport = ({
   onUpdate,
   onDelete,
 }: {
-  transport: any;
+  transport: TransportCollection;
   onUpdate: (data: TransportFormData) => void;
   onDelete: () => void;
 }) => {
@@ -168,7 +169,7 @@ export const Transport = ({
       </button>
       <h4 className="text-lg font-semibold">{name}</h4>
       <div className="mt-2 flex items-center gap-2 text-gray-600">
-        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+        <span>{type}</span>
         <span>•</span>
         <span>{price}</span>
         <span>{currency}</span>

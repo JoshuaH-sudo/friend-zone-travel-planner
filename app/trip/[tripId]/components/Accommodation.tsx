@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AccommodationCollection } from "@/lib/rxdb-schema";
 
 const accommodationSchema = z
   .object({
@@ -27,7 +28,7 @@ export const Accommodation = ({
   onUpdate,
   onDelete,
 }: {
-  accommodation: any;
+  accommodation: AccommodationCollection;
   onUpdate: (data: AccommodationFormData) => void;
   onDelete: () => void;
 }) => {
