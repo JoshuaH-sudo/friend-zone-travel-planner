@@ -62,9 +62,15 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
     },
     createdAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
     updatedAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
   },
   required: ["id", "name", "createdAt", "updatedAt"],
@@ -85,16 +91,24 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
     },
     date: {
       type: "string",
+      maxLength: 100,
     },
     tripId: {
       type: "string",
+      maxLength: 100,
       ref: "trips",
     },
     createdAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
     updatedAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
   },
   required: ["id", "name", "date", "tripId", "createdAt", "updatedAt"],
@@ -115,6 +129,9 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
     },
     price: {
       type: "number",
+      multipleOf: 0.01,
+      minimum: 0,
+      maximum: 1000000,
     },
     currency: {
       type: "string",
@@ -122,19 +139,28 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
     },
     checkIn: {
       type: "string",
+      maxLength: 100,
     },
     checkOut: {
       type: "string",
+      maxLength: 100,
     },
     stopId: {
       type: "string",
+      maxLength: 100,
       ref: "stops",
     },
     createdAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
     updatedAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
   },
   required: [
@@ -169,6 +195,9 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     },
     price: {
       type: "number",
+      multipleOf: 0.01,
+      minimum: 0,
+      maximum: 1000000,
     },
     currency: {
       type: "string",
@@ -176,16 +205,24 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     },
     date: {
       type: "string",
+      maxLength: 100,
     },
     stopId: {
       type: "string",
+      maxLength: 100,
       ref: "stops",
     },
     createdAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
     updatedAt: {
       type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
     },
   },
   required: [

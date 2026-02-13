@@ -1,5 +1,6 @@
-import { createRxDatabase, RxDatabase } from "rxdb";
+import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
+import { wrappedValidateAjvStorage } from "rxdb/plugins/validate-ajv";
 import {
   tripSchema,
   stopSchema,
@@ -10,6 +11,7 @@ import {
   AccommodationCollection,
   TransportCollection,
 } from "./rxdb-schema";
+import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 
 export type DatabaseCollections = {
   trips: TripCollection;
@@ -21,6 +23,8 @@ export type DatabaseCollections = {
 export type MyDatabase = RxDatabase<DatabaseCollections>;
 
 let dbPromise: Promise<MyDatabase> | null = null;
+
+addRxPlugin(RxDBDevModePlugin);
 
 export async function getDatabase(): Promise<MyDatabase> {
   if (dbPromise) {
@@ -36,7 +40,9 @@ async function createDatabase(): Promise<MyDatabase> {
 
   const db = await createRxDatabase<DatabaseCollections>({
     name: "fzt-db",
-    storage: getRxStorageDexie(),
+    storage: wrappedValidateAjvStorage({
+      storage: getRxStorageDexie(),
+    }),
     multiInstance: true,
     eventReduce: true,
   });
