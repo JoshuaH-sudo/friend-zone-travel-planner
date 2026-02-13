@@ -35,8 +35,8 @@ function TripList() {
     const newTrip = await database.trips.insert({
       id: crypto.randomUUID(),
       name: "New Trip",
-      createdAt: new Date().getUTCDate(),
-      updatedAt: new Date().getUTCDate(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
     console.log("Created new trip:", newTrip);
     router.push(`/trip/${newTrip.id}`);
