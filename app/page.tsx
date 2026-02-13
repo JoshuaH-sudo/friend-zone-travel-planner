@@ -91,12 +91,5 @@ function TripList() {
 }
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center gap-4 bg-white px-6 py-20 sm:items-start dark:bg-black">
-        <h1 className="text-2xl font-bold">Friend Zone Travel Planner</h1>
-        <TripList />
-      </main>
-    </div>
-  );
+  return <TripList />;
 }

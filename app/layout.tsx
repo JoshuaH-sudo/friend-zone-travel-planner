@@ -28,15 +28,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable}bg-zinc-50 relative flex h-screen flex-col font-sans antialiased dark:bg-black`}
       >
         <DatabaseProvider>
           <Header />
-          {children}
-          <div className="mt-12 text-center text-sm text-gray-500">
+          <div className="flex grow">
+            <main className="w-full max-w-4xl items-center gap-4 px-6 py-10 sm:items-start">
+              {children}
+            </main>
+          </div>
+          <footer className="w-full py-2 text-center text-sm text-gray-500">
             &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
             rights reserved.
-          </div>
+          </footer>
         </DatabaseProvider>
       </body>
     </html>

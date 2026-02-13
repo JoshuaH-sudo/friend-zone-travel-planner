@@ -259,139 +259,132 @@ function TripDetails() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center bg-white px-6 py-10 sm:items-start dark:bg-black">
-        {isEditingTripName ? (
-          <input
-            type="text"
-            value={trip.name}
-            onChange={(e) => updateTripName(e.target.value)}
-            onBlur={() => setIsEditingTripName(false)}
-            autoFocus
-            className="w-full rounded border px-2 py-1 text-3xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
-          />
-        ) : (
-          <h1
-            className="cursor-pointer text-3xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
-            onClick={() => setIsEditingTripName(true)}
-          >
-            {trip.name}
-          </h1>
-        )}
-        <hr className="my-6 w-full border-gray-300" />
-        <TripStats
-          trip={trip}
-          stops={stops}
-          accommodationsByStop={accommodationsByStop}
-          transportsByStop={transportsByStop}
+    <main className="flex min-h-screen w-full max-w-4xl flex-col items-center bg-white sm:items-start dark:bg-black">
+      {isEditingTripName ? (
+        <input
+          type="text"
+          value={trip.name}
+          onChange={(e) => updateTripName(e.target.value)}
+          onBlur={() => setIsEditingTripName(false)}
+          autoFocus
+          className="w-full rounded border px-2 py-1 text-3xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
         />
-        <hr className="my-6 w-full border-gray-300" />
-        <section id="stops-section" className="w-full text-left">
-          <ul className="space-y-8">
-            {stops.map((stop) => {
-              const accommodations = accommodationsByStop[stop.id] || [];
-              const transports = transportsByStop[stop.id] || [];
+      ) : (
+        <h1
+          className="cursor-pointer text-3xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
+          onClick={() => setIsEditingTripName(true)}
+        >
+          {trip.name}
+        </h1>
+      )}
+      <hr className="my-6 w-full border-gray-300" />
+      <TripStats
+        trip={trip}
+        stops={stops}
+        accommodationsByStop={accommodationsByStop}
+        transportsByStop={transportsByStop}
+      />
+      <hr className="my-6 w-full border-gray-300" />
+      <section id="stops-section" className="w-full text-left">
+        <ul className="space-y-8">
+          {stops.map((stop) => {
+            const accommodations = accommodationsByStop[stop.id] || [];
+            const transports = transportsByStop[stop.id] || [];
 
-              return (
-                <li key={stop.id}>
-                  <Stop
-                    stop={stop}
-                    onUpdate={(data) => updateStop(stop.id, data)}
-                    onDelete={() => deleteStop(stop.id)}
-                  />
-                  <div className="mt-4 ml-6 space-y-3">
-                    {(() => {
-                      const items = [
-                        ...transports.map((trans) => ({
-                          model: trans,
-                          id: trans.id,
-                          type: "transport" as const,
-                          date: trans.date,
-                        })),
-                        ...accommodations.map((acc) => ({
-                          model: acc,
-                          id: acc.id,
-                          type: "accommodation" as const,
-                          date: acc.checkIn,
-                        })),
-                      ].sort(
-                        (a, b) =>
-                          new Date(a.date).getTime() -
-                          new Date(b.date).getTime(),
-                      );
+            return (
+              <li key={stop.id}>
+                <Stop
+                  stop={stop}
+                  onUpdate={(data) => updateStop(stop.id, data)}
+                  onDelete={() => deleteStop(stop.id)}
+                />
+                <div className="mt-4 ml-6 space-y-3">
+                  {(() => {
+                    const items = [
+                      ...transports.map((trans) => ({
+                        model: trans,
+                        id: trans.id,
+                        type: "transport" as const,
+                        date: trans.date,
+                      })),
+                      ...accommodations.map((acc) => ({
+                        model: acc,
+                        id: acc.id,
+                        type: "accommodation" as const,
+                        date: acc.checkIn,
+                      })),
+                    ].sort(
+                      (a, b) =>
+                        new Date(a.date).getTime() - new Date(b.date).getTime(),
+                    );
 
-                      return (
-                        <>
-                          {items.length > 0 && (
-                            <ul className="space-y-3">
-                              {items.map((item) =>
-                                item.type === "accommodation" ? (
-                                  <li key={item.id}>
-                                    <Accommodation
-                                      accommodation={item.model}
-                                      onUpdate={(data) =>
-                                        onUpdateAccommodation(
-                                          stop.id,
-                                          item.id,
-                                          data,
-                                        )
-                                      }
-                                      onDelete={() =>
-                                        onDeleteAccommodation(stop.id, item.id)
-                                      }
-                                    />
-                                  </li>
-                                ) : (
-                                  <li key={item.id}>
-                                    <Transport
-                                      transport={item.model}
-                                      onUpdate={(data) =>
-                                        onUpdateTransport(
-                                          stop.id,
-                                          item.id,
-                                          data,
-                                        )
-                                      }
-                                      onDelete={() =>
-                                        onDeleteTransport(stop.id, item.id)
-                                      }
-                                    />
-                                  </li>
-                                ),
-                              )}
-                            </ul>
-                          )}
-                          <div className="mt-3 flex gap-2">
-                            <button
-                              className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                              onClick={() => onAddAccommodation(stop.id)}
-                            >
-                              Add Accommodation
-                            </button>
-                            <button
-                              className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                              onClick={() => onAddTransport(stop.id)}
-                            >
-                              Add Transport
-                            </button>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          <button
-            className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            onClick={addStop}
-          >
-            Add Stop
-          </button>
-        </section>
-      </main>
-    </div>
+                    return (
+                      <>
+                        {items.length > 0 && (
+                          <ul className="space-y-3">
+                            {items.map((item) =>
+                              item.type === "accommodation" ? (
+                                <li key={item.id}>
+                                  <Accommodation
+                                    accommodation={item.model}
+                                    onUpdate={(data) =>
+                                      onUpdateAccommodation(
+                                        stop.id,
+                                        item.id,
+                                        data,
+                                      )
+                                    }
+                                    onDelete={() =>
+                                      onDeleteAccommodation(stop.id, item.id)
+                                    }
+                                  />
+                                </li>
+                              ) : (
+                                <li key={item.id}>
+                                  <Transport
+                                    transport={item.model}
+                                    onUpdate={(data) =>
+                                      onUpdateTransport(stop.id, item.id, data)
+                                    }
+                                    onDelete={() =>
+                                      onDeleteTransport(stop.id, item.id)
+                                    }
+                                  />
+                                </li>
+                              ),
+                            )}
+                          </ul>
+                        )}
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                            onClick={() => onAddAccommodation(stop.id)}
+                          >
+                            Add Accommodation
+                          </button>
+                          <button
+                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+                            onClick={() => onAddTransport(stop.id)}
+                          >
+                            Add Transport
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <button
+          className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          onClick={addStop}
+        >
+          Add Stop
+        </button>
+      </section>
+    </main>
   );
 }
 
