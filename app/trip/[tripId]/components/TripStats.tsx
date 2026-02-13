@@ -81,7 +81,6 @@ export function TripStats({
 
   return (
     <div className="w-full space-y-2 rounded-lg border p-4">
-      <h2 className="text-xl font-bold">Trip Stats</h2>
       <div>
         <p>
           <strong>Destination:</strong> {stats.stopCount}
