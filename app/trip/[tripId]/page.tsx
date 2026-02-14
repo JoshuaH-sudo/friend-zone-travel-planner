@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
 import { Stop } from "./components/Stop";
@@ -28,56 +28,71 @@ function TripDetails() {
   const [isEditingTripName, setIsEditingTripName] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const loadTripData = useCallback(async () => {
-    try {
-      const tripRecord = await database.trips.findOne(tripId).exec();
-      tripRecord?.populate("stops");
-      tripRecord?.populate("accommodations");
-      tripRecord?.populate("transports");
-      setTrip(tripRecord);
+  // Subscribe to trip changes
+  useEffect(() => {
+    const subscription = database.trips
+      .findOne(tripId)
+      .$.subscribe((tripRecord) => {
+        setTrip(tripRecord);
+        setLoading(false);
+      });
 
-      const stopsRecords = await database.stops
-        .find({ selector: { tripId } })
-        .sort({ date: "asc", createdAt: "asc" })
-        .exec();
-
-      setStops(stopsRecords);
-
-      // Load accommodations and transports for each stop
-      const accomMap: Record<string, AccommodationDocumentType[]> = {};
-      const transMap: Record<string, TransportDocumentType[]> = {};
-
-      for (const stop of stopsRecords) {
-        const accoms = await database.accommodations
-          .find({ selector: { stopId: stop.id } })
-          .sort({ checkIn: "asc", createdAt: "asc" })
-          .exec();
-        accomMap[stop.id] = accoms;
-
-        const trans = await database.transports
-          .find({ selector: { stopId: stop.id } })
-          .sort({ date: "asc", createdAt: "asc" })
-          .exec();
-        transMap[stop.id] = trans;
-      }
-
-      setAccommodationsByStop(accomMap);
-      setTransportsByStop(transMap);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error loading trip:", error);
-      setLoading(false);
-    }
+    return () => subscription.unsubscribe();
   }, [tripId, database]);
 
+  // Subscribe to stops changes
   useEffect(() => {
-    loadTripData();
-  }, [loadTripData]);
+    const subscription = database.stops
+      .find({ selector: { tripId } })
+      .sort({ date: "asc", createdAt: "asc" })
+      .$.subscribe((stopsRecords) => {
+        setStops(stopsRecords);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [tripId, database]);
+
+  // Subscribe to accommodations changes
+  useEffect(() => {
+    const subscription = database.accommodations
+      .find()
+      .sort({ checkIn: "asc", createdAt: "asc" })
+      .$.subscribe((allAccommodations) => {
+        const accomMap: Record<string, AccommodationDocumentType[]> = {};
+        allAccommodations.forEach((accom) => {
+          if (!accomMap[accom.stopId]) {
+            accomMap[accom.stopId] = [];
+          }
+          accomMap[accom.stopId].push(accom);
+        });
+        setAccommodationsByStop(accomMap);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database]);
+
+  // Subscribe to transports changes
+  useEffect(() => {
+    const subscription = database.transports
+      .find()
+      .sort({ date: "asc", createdAt: "asc" })
+      .$.subscribe((allTransports) => {
+        const transMap: Record<string, TransportDocumentType[]> = {};
+        allTransports.forEach((transport) => {
+          if (!transMap[transport.stopId]) {
+            transMap[transport.stopId] = [];
+          }
+          transMap[transport.stopId].push(transport);
+        });
+        setTransportsByStop(transMap);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database]);
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
     await trip.patch({ name: newName });
-    await loadTripData();
   };
 
   const addStop = async () => {
@@ -117,41 +132,6 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    await loadTripData();
-  };
-
-  const updateStop = async (
-    stopId: string,
-    data: { name: string; date: string },
-  ) => {
-    const stopRecord = stops.find((s) => s.id === stopId);
-    if (!stopRecord) return;
-
-    await stopRecord.patch({
-      name: data.name,
-      date: data.date,
-      updatedAt: Date.now(),
-    });
-    await loadTripData();
-  };
-
-  const deleteStop = async (stopId: string) => {
-    const stopRecord = stops.find((s) => s.id === stopId);
-    if (!stopRecord) return;
-
-    // Delete related accommodations and transports first
-    const accoms = accommodationsByStop[stopId] || [];
-    const trans = transportsByStop[stopId] || [];
-
-    for (const accom of accoms) {
-      await accom.remove();
-    }
-    for (const transport of trans) {
-      await transport.remove();
-    }
-
-    await stopRecord.remove();
-    await loadTripData();
   };
 
   const onAddAccommodation = async (stopId: string) => {
@@ -170,7 +150,6 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    await loadTripData();
   };
 
   const onAddTransport = async (stopId: string) => {
@@ -189,7 +168,6 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    await loadTripData();
   };
 
   if (loading) {
@@ -243,18 +221,14 @@ function TripDetails() {
 
             return (
               <li key={stop.id}>
-                <Stop
-                  stop={stop}
-                  onUpdate={(data) => updateStop(stop.id, data)}
-                  onDelete={() => deleteStop(stop.id)}
-                />
+                <Stop stop={stop} onStopChange={async () => {}} />
                 <StopItems
                   transports={transports}
                   accommodations={accommodations}
                   stop={stop}
                   onAddAccommodation={onAddAccommodation}
                   onAddTransport={onAddTransport}
-                  onItemsChange={loadTripData}
+                  onItemsChange={async () => {}}
                 />
               </li>
             );

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { StopDocumentType } from "@/lib/rxdb-schema";
+import { useDatabase } from "@/lib/DatabaseProvider";
 
 const stopSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -14,14 +15,13 @@ type StopFormData = z.infer<typeof stopSchema>;
 
 export const Stop = ({
   stop,
-  onUpdate,
-  onDelete,
+  onStopChange,
 }: {
   stop: StopDocumentType;
-  onUpdate: (data: StopFormData) => void;
-  onDelete: () => void;
+  onStopChange: () => Promise<void>;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const database = useDatabase();
 
   const {
     register,
@@ -32,9 +32,34 @@ export const Stop = ({
     defaultValues: { name: stop.name, date: stop.date },
   });
 
-  const onSubmit = (data: StopFormData) => {
-    onUpdate(data);
+  const onSubmit = async (data: StopFormData) => {
+    await stop.patch({
+      name: data.name,
+      date: data.date,
+      updatedAt: Date.now(),
+    });
     setIsEditing(false);
+    await onStopChange();
+  };
+
+  const handleDelete = async () => {
+    // Delete related accommodations and transports first
+    const accoms = await database.accommodations
+      .find({ selector: { stopId: stop.id } })
+      .exec();
+    const trans = await database.transports
+      .find({ selector: { stopId: stop.id } })
+      .exec();
+
+    for (const accom of accoms) {
+      await accom.remove();
+    }
+    for (const transport of trans) {
+      await transport.remove();
+    }
+
+    await stop.remove();
+    await onStopChange();
   };
 
   if (isEditing) {
@@ -86,7 +111,7 @@ export const Stop = ({
   return (
     <div className="relative rounded-lg border p-4">
       <button
-        onClick={onDelete}
+        onClick={handleDelete}
         className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete stop"
         type="button"
