@@ -3,8 +3,9 @@ import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
 import { DatabaseProvider } from "@/lib/DatabaseProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
+const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,22 +29,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang="en" className={roboto.variable} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable}bg-zinc-50 relative flex h-screen flex-col font-sans antialiased dark:bg-black`}
       >
-        <DatabaseProvider>
-          <Header />
-          <div className="flex grow">
-            <main className="w-full max-w-4xl items-center gap-4 px-6 py-10 sm:items-start">
-              {children}
-            </main>
-          </div>
-          <footer className="w-full py-2 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
-            rights reserved.
-          </footer>
-        </DatabaseProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <DatabaseProvider>
+            <Header />
+            <div className="flex grow">
+              <main className="w-full max-w-4xl items-center gap-4 px-6 py-10 sm:items-start">
+                {children}
+              </main>
+            </div>
+            <footer className="w-full py-2 text-center text-sm text-gray-500">
+              &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
+              rights reserved.
+            </footer>
+          </DatabaseProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
