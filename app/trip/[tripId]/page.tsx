@@ -221,14 +221,13 @@ function TripDetails() {
 
             return (
               <li key={stop.id}>
-                <Stop stop={stop} onStopChange={async () => {}} />
+                <Stop stop={stop} />
                 <StopItems
                   transports={transports}
                   accommodations={accommodations}
                   stop={stop}
                   onAddAccommodation={onAddAccommodation}
                   onAddTransport={onAddTransport}
-                  onItemsChange={async () => {}}
                 />
               </li>
             );

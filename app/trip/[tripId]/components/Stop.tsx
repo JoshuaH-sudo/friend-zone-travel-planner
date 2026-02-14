@@ -13,13 +13,7 @@ const stopSchema = z.object({
 
 type StopFormData = z.infer<typeof stopSchema>;
 
-export const Stop = ({
-  stop,
-  onStopChange,
-}: {
-  stop: StopDocumentType;
-  onStopChange: () => Promise<void>;
-}) => {
+export const Stop = ({ stop, onStopChange }: { stop: StopDocumentType }) => {
   const [isEditing, setIsEditing] = useState(false);
   const database = useDatabase();
 

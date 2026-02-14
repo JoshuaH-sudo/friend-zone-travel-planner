@@ -13,7 +13,6 @@ interface StopItemsProps {
   stop: StopDocumentType;
   onAddAccommodation: (stopId: string) => Promise<void>;
   onAddTransport: (stopId: string) => Promise<void>;
-  onItemsChange: () => Promise<void>;
 }
 
 export function StopItems({
@@ -22,7 +21,6 @@ export function StopItems({
   stop,
   onAddAccommodation,
   onAddTransport,
-  onItemsChange,
 }: StopItemsProps) {
   const items = [
     ...transports.map((trans) => ({
@@ -46,17 +44,11 @@ export function StopItems({
           {items.map((item) =>
             item.type === "accommodation" ? (
               <li key={item.id}>
-                <Accommodation
-                  accommodation={item.model}
-                  onItemsChange={onItemsChange}
-                />
+                <Accommodation accommodation={item.model} />
               </li>
             ) : (
               <li key={item.id}>
-                <Transport
-                  transport={item.model}
-                  onItemsChange={onItemsChange}
-                />
+                <Transport transport={item.model} />
               </li>
             ),
           )}

@@ -27,10 +27,8 @@ export type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
 export const Accommodation = ({
   accommodation,
-  onItemsChange,
 }: {
   accommodation: AccommodationDocumentType;
-  onItemsChange: () => Promise<void>;
 }) => {
   const { name, price, currency, checkIn, checkOut } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
@@ -54,12 +52,10 @@ export const Accommodation = ({
       updatedAt: Date.now(),
     });
     setIsEditing(false);
-    await onItemsChange();
   };
 
   const handleDelete = async () => {
     await accommodation.remove();
-    await onItemsChange();
   };
 
   if (isEditing) {

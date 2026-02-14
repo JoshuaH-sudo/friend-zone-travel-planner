@@ -24,10 +24,8 @@ export type TransportFormData = z.infer<typeof transportSchema>;
 
 export const Transport = ({
   transport,
-  onItemsChange,
 }: {
   transport: TransportDocumentType;
-  onItemsChange: () => Promise<void>;
 }) => {
   const { name, type, price, currency, date } = transport;
   const [isEditing, setIsEditing] = useState(false);
@@ -51,12 +49,10 @@ export const Transport = ({
       updatedAt: Date.now(),
     });
     setIsEditing(false);
-    await onItemsChange();
   };
 
   const handleDelete = async () => {
     await transport.remove();
-    await onItemsChange();
   };
 
   if (isEditing) {
