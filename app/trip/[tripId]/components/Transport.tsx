@@ -4,6 +4,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -57,138 +68,151 @@ export const Transport = ({
 
   if (isEditing) {
     return (
-      <div className="relative rounded-lg border p-4">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              {...register("name")}
-              type="text"
-              autoFocus
-              placeholder="Transport name"
-              className="w-full rounded border px-2 py-1"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Type
-            </label>
-            <select
-              {...register("type")}
-              className="w-full rounded border px-2 py-1"
-            >
-              <option value="flight">Flight</option>
-              <option value="bus">Bus</option>
-              <option value="car">Car</option>
-              <option value="train">Train</option>
-            </select>
-            {errors.type && (
-              <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Price
-              </label>
-              <input
-                {...register("price", { valueAsNumber: true })}
-                type="number"
-                step="0.01"
-                className="w-full rounded border px-2 py-1"
+      <Card>
+        <CardContent className="p-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="transport-name">Name</Label>
+              <Input
+                id="transport-name"
+                {...register("name")}
+                type="text"
+                autoFocus
+                placeholder="Transport name"
               />
-              {errors.price && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.price.message}
+              {errors.name && (
+                <p className="text-destructive text-sm">
+                  {errors.name.message}
                 </p>
               )}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Currency
-              </label>
-              <select
-                {...register("currency")}
-                className="rounded border px-2 py-1"
+            <div className="space-y-2">
+              <Label htmlFor="transport-type">Type</Label>
+              <Select
+                value={String(type)}
+                onValueChange={(value) => {
+                  const event = {
+                    target: { name: "type", value },
+                  };
+                  register("type").onChange(event);
+                }}
               >
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="JPY">JPY</option>
-                <option value="AUD">AUD</option>
-              </select>
-              {errors.currency && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.currency.message}
+                <SelectTrigger id="transport-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="flight">Flight</SelectItem>
+                  <SelectItem value="bus">Bus</SelectItem>
+                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="train">Train</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.type && (
+                <p className="text-destructive text-sm">
+                  {errors.type.message}
                 </p>
               )}
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Date
-            </label>
-            <input
-              {...register("date")}
-              type="date"
-              className="w-full rounded border px-2 py-1"
-            />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                <Label htmlFor="transport-price">Price</Label>
+                <Input
+                  id="transport-price"
+                  {...register("price", { valueAsNumber: true })}
+                  type="number"
+                  step="0.01"
+                />
+                {errors.price && (
+                  <p className="text-destructive text-sm">
+                    {errors.price.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="transport-currency">Currency</Label>
+                <Select
+                  value={String(currency)}
+                  onValueChange={(value) => {
+                    const event = {
+                      target: { name: "currency", value },
+                    };
+                    register("currency").onChange(event);
+                  }}
+                >
+                  <SelectTrigger id="transport-currency" className="w-25">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="JPY">JPY</SelectItem>
+                    <SelectItem value="AUD">AUD</SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.currency && (
+                  <p className="text-destructive text-sm">
+                    {errors.currency.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="transport-date">Date</Label>
+              <Input id="transport-date" {...register("date")} type="date" />
+              {errors.date && (
+                <p className="text-destructive text-sm">
+                  {errors.date.message}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit">Save</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="relative rounded-lg border p-4">
-      <button
-        onClick={handleDelete}
-        className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
-        aria-label="Delete transport"
-        type="button"
-      >
-        ✕
-      </button>
-      <button
-        onClick={() => setIsEditing(true)}
-        className="absolute top-2 right-10 z-10 cursor-pointer text-xl text-gray-400 hover:text-blue-600"
-        aria-label="Edit transport"
-        type="button"
-      >
-        ✎
-      </button>
-      <h4 className="text-lg font-semibold">{name}</h4>
-      <div className="mt-2 flex items-center gap-2 text-gray-600">
-        <span>{type}</span>
-        <span>•</span>
-        <span>{price}</span>
-        <span>{currency}</span>
-      </div>
-      <p className="mt-2 text-gray-600">
-        Date: {new Date(date).toLocaleDateString()}
-      </p>
-    </div>
+    <Card className="relative">
+      <CardContent className="p-4">
+        <Button
+          onClick={handleDelete}
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-2 right-2"
+          aria-label="Delete transport"
+        >
+          ✕
+        </Button>
+        <Button
+          onClick={() => setIsEditing(true)}
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-2 right-10"
+          aria-label="Edit transport"
+        >
+          ✎
+        </Button>
+        <h4 className="text-lg font-semibold">{name}</h4>
+        <div className="text-muted-foreground mt-2 flex items-center gap-2">
+          <span className="capitalize">{type}</span>
+          <span>•</span>
+          <span>{price}</span>
+          <span>{currency}</span>
+        </div>
+        <p className="text-muted-foreground mt-2">
+          Date: {new Date(date).toLocaleDateString()}
+        </p>
+      </CardContent>
+    </Card>
   );
 };

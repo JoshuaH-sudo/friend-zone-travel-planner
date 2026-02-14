@@ -6,6 +6,7 @@ import {
 } from "@/lib/rxdb-schema";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
+import { Button } from "@/components/ui/button";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
@@ -55,18 +56,20 @@ export function StopItems({
         </ul>
       )}
       <div className="mt-3 flex gap-2">
-        <button
-          className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => onAddAccommodation(stop.id)}
         >
           Add Accommodation
-        </button>
-        <button
-          className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => onAddTransport(stop.id)}
         >
           Add Transport
-        </button>
+        </Button>
       </div>
     </div>
   );

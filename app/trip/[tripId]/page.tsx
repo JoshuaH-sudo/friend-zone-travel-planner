@@ -11,6 +11,9 @@ import {
 } from "@/lib/rxdb-schema";
 import { TripStats } from "./components/TripStats";
 import { StopItems } from "./components/StopItems";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 function TripDetails() {
   const params = useParams();
@@ -189,13 +192,13 @@ function TripDetails() {
   return (
     <main className="flex min-h-screen w-full max-w-4xl flex-col items-center sm:items-start">
       {isEditingTripName ? (
-        <input
+        <Input
           type="text"
           value={trip.name}
           onChange={(e) => updateTripName(e.target.value)}
           onBlur={() => setIsEditingTripName(false)}
           autoFocus
-          className="w-full rounded border px-2 py-1 text-3xl font-bold tracking-tight text-gray-900 sm:text-[5rem] dark:bg-black dark:text-white"
+          className="w-full text-3xl font-bold tracking-tight sm:text-[5rem]"
         />
       ) : (
         <h1
@@ -205,14 +208,14 @@ function TripDetails() {
           {trip.name}
         </h1>
       )}
-      <hr className="my-6 w-full border-gray-300" />
+      <Separator className="my-6" />
       <TripStats
         trip={trip}
         stops={stops}
         accommodationsByStop={accommodationsByStop}
         transportsByStop={transportsByStop}
       />
-      <hr className="my-6 w-full border-gray-300" />
+      <Separator className="my-6" />
       <section id="stops-section" className="w-full text-left">
         <ul className="space-y-8">
           {stops.map((stop) => {
@@ -233,12 +236,9 @@ function TripDetails() {
             );
           })}
         </ul>
-        <button
-          className="mt-6 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          onClick={addStop}
-        >
+        <Button className="mt-6" onClick={addStop}>
           Add Stop
-        </button>
+        </Button>
       </section>
     </main>
   );

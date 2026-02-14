@@ -5,6 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { StopDocumentType } from "@/lib/rxdb-schema";
 import { useDatabase } from "@/lib/DatabaseProvider";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 
 const stopSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -56,72 +60,76 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
 
   if (isEditing) {
     return (
-      <div className="relative rounded-lg border p-4">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div>
-            <input
-              {...register("name")}
-              type="text"
-              autoFocus
-              placeholder="Stop name"
-              className="w-full rounded border px-2 py-1 text-xl font-semibold"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <input
-              {...register("date")}
-              type="date"
-              className="rounded border px-2 py-1 text-gray-600"
-            />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="stop-name">Stop Name</Label>
+              <Input
+                id="stop-name"
+                {...register("name")}
+                type="text"
+                autoFocus
+                placeholder="Stop name"
+                className="text-xl font-semibold"
+              />
+              {errors.name && (
+                <p className="text-destructive text-sm">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stop-date">Date</Label>
+              <Input id="stop-date" {...register("date")} type="date" />
+              {errors.date && (
+                <p className="text-destructive text-sm">
+                  {errors.date.message}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit">Save</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="relative rounded-lg border p-4">
-      <button
-        onClick={handleDelete}
-        className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
-        aria-label="Delete stop"
-        type="button"
-      >
-        ✕
-      </button>
-      <button
-        onClick={() => setIsEditing(true)}
-        className="absolute top-2 right-10 z-10 cursor-pointer text-xl text-gray-400 hover:text-blue-600"
-        aria-label="Edit stop"
-        type="button"
-      >
-        ✎
-      </button>
-      <h3 className="text-xl font-semibold">{stop.name}</h3>
-      <p className="mt-2 text-gray-600">
-        {new Date(stop.date).toLocaleDateString()}
-      </p>
-    </div>
+    <Card className="relative">
+      <CardContent className="p-4">
+        <Button
+          onClick={handleDelete}
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-2 right-2"
+          aria-label="Delete stop"
+        >
+          ✕
+        </Button>
+        <Button
+          onClick={() => setIsEditing(true)}
+          variant="ghost"
+          size="icon-sm"
+          className="absolute top-2 right-10"
+          aria-label="Edit stop"
+        >
+          ✎
+        </Button>
+        <h3 className="text-xl font-semibold">{stop.name}</h3>
+        <p className="text-muted-foreground mt-2">
+          {new Date(stop.date).toLocaleDateString()}
+        </p>
+      </CardContent>
+    </Card>
   );
 };

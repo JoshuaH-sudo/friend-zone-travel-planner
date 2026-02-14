@@ -6,6 +6,8 @@ import {
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
 import { useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export function TripStats({
   trip,
@@ -80,36 +82,60 @@ export function TripStats({
   }, [trip, stops, accommodationsByStop, transportsByStop]);
 
   return (
-    <div className="w-full space-y-2 rounded-lg border p-4">
-      <div>
-        <p>
-          <strong>Destination:</strong> {stats.stopCount}
-        </p>
-        <p>
-          <strong>Accommodations:</strong> {stats.accommodationCount}
-        </p>
-        <p>
-          <strong>Transports:</strong> {stats.transportCount}
-        </p>
-      </div>
-      <div>
-        <p>
-          {stats.startDate || "N/A"} | {stats.endDate || "N/A"}
-        </p>
-        <p>
-          <strong>Days:</strong> {stats.totalDays}
-        </p>
-      </div>
-      <div className="mt-2">
-        <strong>Total Cost:</strong>
-        <ul className="ml-4 list-disc">
-          {Object.entries(stats.currencyTotals).map(([currency, total]) => (
-            <li key={currency}>
-              <strong>{currency}:</strong> {total.toFixed(2)}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Trip Statistics</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="secondary">
+            {stats.stopCount}{" "}
+            {stats.stopCount === 1 ? "Destination" : "Destinations"}
+          </Badge>
+          <Badge variant="secondary">
+            {stats.accommodationCount}{" "}
+            {stats.accommodationCount === 1
+              ? "Accommodation"
+              : "Accommodations"}
+          </Badge>
+          <Badge variant="secondary">
+            {stats.transportCount}{" "}
+            {stats.transportCount === 1 ? "Transport" : "Transports"}
+          </Badge>
+        </div>
+
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">Duration:</span>
+            <span className="text-muted-foreground">
+              {stats.startDate
+                ? new Date(stats.startDate).toLocaleDateString()
+                : "N/A"}{" "}
+              →{" "}
+              {stats.endDate
+                ? new Date(stats.endDate).toLocaleDateString()
+                : "N/A"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">Days:</span>
+            <span className="text-muted-foreground">{stats.totalDays}</span>
+          </div>
+        </div>
+
+        {Object.keys(stats.currencyTotals).length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Total Cost:</p>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(stats.currencyTotals).map(([currency, total]) => (
+                <Badge key={currency} variant="outline">
+                  {currency}: {total.toFixed(2)}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

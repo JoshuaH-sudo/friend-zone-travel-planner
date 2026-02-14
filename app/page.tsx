@@ -5,6 +5,8 @@ import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TripDocument } from "@/lib/rxdb-schema";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 function TripList() {
   const router = useRouter();
@@ -59,34 +61,30 @@ function TripList() {
 
       <ul className="mt-4 space-y-2">
         {trips.map((trip) => (
-          <div
-            key={trip.id}
-            className="relative flex items-center justify-between gap-4 rounded-md bg-gray-100 p-4 dark:bg-gray-800"
-          >
-            <Link
-              href={`/trip/${trip.id}`}
-              className="block hover:text-blue-400 hover:underline"
-            >
-              <li className="">{trip.name}</li>
-            </Link>
-            <button
-              onClick={() => deleteTrip(trip.id)}
-              className="text-sm text-gray-400 hover:text-red-600"
-              aria-label="Delete trip"
-              type="button"
-            >
-              ✕
-            </button>
-          </div>
+          <Card key={trip.id}>
+            <CardContent className="flex items-center justify-between gap-4 p-4">
+              <Link
+                href={`/trip/${trip.id}`}
+                className="flex-1 hover:text-blue-400 hover:underline"
+              >
+                {trip.name}
+              </Link>
+              <Button
+                onClick={() => deleteTrip(trip.id)}
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Delete trip"
+              >
+                ✕
+              </Button>
+            </CardContent>
+          </Card>
         ))}
 
         <li>
-          <button
-            className="rounded-md bg-gray-100 p-4 dark:bg-gray-800"
-            onClick={createTrip}
-          >
+          <Button variant="outline" className="w-full" onClick={createTrip}>
             Add Trip
-          </button>
+          </Button>
         </li>
       </ul>
     </div>
