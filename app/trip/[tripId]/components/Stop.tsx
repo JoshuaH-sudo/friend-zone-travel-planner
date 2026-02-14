@@ -13,7 +13,7 @@ const stopSchema = z.object({
 
 type StopFormData = z.infer<typeof stopSchema>;
 
-export const Stop = ({ stop, onStopChange }: { stop: StopDocumentType }) => {
+export const Stop = ({ stop }: { stop: StopDocumentType }) => {
   const [isEditing, setIsEditing] = useState(false);
   const database = useDatabase();
 
@@ -33,7 +33,6 @@ export const Stop = ({ stop, onStopChange }: { stop: StopDocumentType }) => {
       updatedAt: Date.now(),
     });
     setIsEditing(false);
-    await onStopChange();
   };
 
   const handleDelete = async () => {
@@ -53,7 +52,6 @@ export const Stop = ({ stop, onStopChange }: { stop: StopDocumentType }) => {
     }
 
     await stop.remove();
-    await onStopChange();
   };
 
   if (isEditing) {
