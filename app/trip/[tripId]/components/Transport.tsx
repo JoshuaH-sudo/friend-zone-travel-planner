@@ -69,7 +69,7 @@ export const Transport = ({
   if (isEditing) {
     return (
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="transport-name">Name</Label>
@@ -183,7 +183,7 @@ export const Transport = ({
 
   return (
     <Card className="relative">
-      <CardContent className="p-4">
+      <CardContent className="px-4">
         <Button
           onClick={handleDelete}
           variant="ghost"

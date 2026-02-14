@@ -14,6 +14,7 @@ import { StopItems } from "./components/StopItems";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { MapPin } from "lucide-react";
 
 function TripDetails() {
   const params = useParams();
@@ -217,26 +218,41 @@ function TripDetails() {
       />
       <Separator className="my-6" />
       <section id="stops-section" className="w-full text-left">
-        <ul className="space-y-8">
-          {stops.map((stop) => {
-            const accommodations = accommodationsByStop[stop.id] || [];
-            const transports = transportsByStop[stop.id] || [];
+        {stops.length > 0 && (
+          <div className="relative ml-3">
+            {/* Timeline line */}
+            <div className="absolute top-4 bottom-20 left-0 border-l-2" />
 
-            return (
-              <li key={stop.id}>
-                <Stop stop={stop} />
-                <StopItems
-                  transports={transports}
-                  accommodations={accommodations}
-                  stop={stop}
-                  onAddAccommodation={onAddAccommodation}
-                  onAddTransport={onAddTransport}
-                />
-              </li>
-            );
-          })}
-        </ul>
-        <Button className="mt-6" onClick={addStop}>
+            <ul className="space-y-8">
+              {stops.map((stop) => {
+                const accommodations = accommodationsByStop[stop.id] || [];
+                const transports = transportsByStop[stop.id] || [];
+
+                return (
+                  <li key={stop.id} className="relative pl-8">
+                    <div className="flex w-full items-center gap-4">
+                      {/* Icon */}
+                      <div className="border-primary bg-background absolute top-3 left-px mb-3 flex size-9 -translate-x-1/2 items-center justify-center rounded-full border-2">
+                        <MapPin className="h-5 w-5" />
+                      </div>
+
+                      {/* Stop content */}
+                      <Stop stop={stop} />
+                    </div>
+                    <StopItems
+                      transports={transports}
+                      accommodations={accommodations}
+                      stop={stop}
+                      onAddAccommodation={onAddAccommodation}
+                      onAddTransport={onAddTransport}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+        <Button className="mt-6 ml-11" onClick={addStop}>
           Add Stop
         </Button>
       </section>

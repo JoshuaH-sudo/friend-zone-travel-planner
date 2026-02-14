@@ -7,6 +7,7 @@ import {
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Button } from "@/components/ui/button";
+import { Hotel, Plane, Bus, Car, Train, Calendar } from "lucide-react";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
@@ -38,22 +39,74 @@ export function StopItems({
     })),
   ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  const getTransportIcon = (type: string) => {
+    switch (type) {
+      case "flight":
+        return <Plane className="h-4 w-4" />;
+      case "bus":
+        return <Bus className="h-4 w-4" />;
+      case "car":
+        return <Car className="h-4 w-4" />;
+      case "train":
+        return <Train className="h-4 w-4" />;
+      default:
+        return <Plane className="h-4 w-4" />;
+    }
+  };
+
   return (
     <div className="mt-4 ml-6 space-y-3">
       {items.length > 0 && (
-        <ul className="space-y-3">
-          {items.map((item) =>
-            item.type === "accommodation" ? (
-              <li key={item.id}>
-                <Accommodation accommodation={item.model} />
+        <div className="relative ml-3">
+          {/* Timeline line */}
+          <div className="absolute top-4 bottom-0 left-0 border-l-2" />
+
+          <ul className="space-y-6">
+            {items.map((item) => (
+              <li key={item.id} className="relative pl-8">
+                <div
+                  id={`item-icon-${item.id}`}
+                  className="bg-background border-primary absolute top-3 left-px flex size-7 shrink-0 -translate-x-1/2 items-center justify-center rounded-full border-2"
+                >
+                  {item.type === "accommodation" ? (
+                    <Hotel className="text-foreground h-4 w-4" />
+                  ) : (
+                    <span className="text-foreground">
+                      {getTransportIcon(
+                        (item.model as TransportDocumentType).type,
+                      )}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  {/* Icon and date */}
+                  <div
+                    id={`item-date-${item.id}`}
+                    className="mb-2 flex items-center gap-2.5"
+                  >
+                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span>
+                        {new Date(item.date).toLocaleDateString()}
+                        {item.type === "accommodation" &&
+                          ` - ${new Date(
+                            (item.model as AccommodationDocumentType).checkOut,
+                          ).toLocaleDateString()}`}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  {item.type === "accommodation" ? (
+                    <Accommodation accommodation={item.model} />
+                  ) : (
+                    <Transport transport={item.model} />
+                  )}
+                </div>
               </li>
-            ) : (
-              <li key={item.id}>
-                <Transport transport={item.model} />
-              </li>
-            ),
-          )}
-        </ul>
+            ))}
+          </ul>
+        </div>
       )}
       <div className="mt-3 flex gap-2">
         <Button

@@ -72,7 +72,7 @@ export const Accommodation = ({
   if (isEditing) {
     return (
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="accommodation-name">Name</Label>
@@ -168,7 +168,7 @@ export const Accommodation = ({
 
   return (
     <Card className="relative">
-      <CardContent className="p-4">
+      <CardContent className="px-4">
         <Button
           onClick={handleDelete}
           variant="ghost"
@@ -195,7 +195,7 @@ export const Accommodation = ({
         <p className="text-muted-foreground mt-2">
           Check-in: {new Date(checkIn).toLocaleDateString()}
         </p>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-2">
           Check-out: {new Date(checkOut).toLocaleDateString()}
         </p>
       </CardContent>

@@ -105,8 +105,8 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
   }
 
   return (
-    <Card className="relative">
-      <CardContent className="p-4">
+    <Card className="relative w-full">
+      <CardContent className="px-4">
         <Button
           onClick={handleDelete}
           variant="ghost"
