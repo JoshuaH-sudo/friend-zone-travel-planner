@@ -43,7 +43,7 @@ export const Transport = ({
     await transport.patch({
       name: data.name,
       type: data.type,
-      price: data.price,
+      price: Math.round(data.price * 100) / 100,
       currency: data.currency,
       date: data.date,
       updatedAt: Date.now(),

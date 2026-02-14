@@ -45,7 +45,7 @@ export const Accommodation = ({
   const onSubmit = async (data: AccommodationFormData) => {
     await accommodation.patch({
       name: data.name,
-      price: data.price,
+      price: Math.round(data.price * 100) / 100,
       currency: data.currency,
       checkIn: data.checkIn,
       checkOut: data.checkOut,
