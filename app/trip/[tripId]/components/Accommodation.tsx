@@ -27,12 +27,10 @@ export type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
 export const Accommodation = ({
   accommodation,
-  onUpdate,
-  onDelete,
+  onItemsChange,
 }: {
   accommodation: AccommodationDocumentType;
-  onUpdate: (data: AccommodationFormData) => void;
-  onDelete: () => void;
+  onItemsChange: () => Promise<void>;
 }) => {
   const { name, price, currency, checkIn, checkOut } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
@@ -46,9 +44,22 @@ export const Accommodation = ({
     defaultValues: { name, price, currency, checkIn, checkOut },
   });
 
-  const onSubmit = (data: AccommodationFormData) => {
-    onUpdate(data);
+  const onSubmit = async (data: AccommodationFormData) => {
+    await accommodation.patch({
+      name: data.name,
+      price: data.price,
+      currency: data.currency,
+      checkIn: data.checkIn,
+      checkOut: data.checkOut,
+      updatedAt: Date.now(),
+    });
     setIsEditing(false);
+    await onItemsChange();
+  };
+
+  const handleDelete = async () => {
+    await accommodation.remove();
+    await onItemsChange();
   };
 
   if (isEditing) {
@@ -162,9 +173,7 @@ export const Accommodation = ({
   return (
     <div className="relative rounded-lg border p-4">
       <button
-        onClick={() => {
-          onDelete();
-        }}
+        onClick={handleDelete}
         className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete accommodation"
         type="button"

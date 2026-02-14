@@ -24,12 +24,10 @@ export type TransportFormData = z.infer<typeof transportSchema>;
 
 export const Transport = ({
   transport,
-  onUpdate,
-  onDelete,
+  onItemsChange,
 }: {
   transport: TransportDocumentType;
-  onUpdate: (data: TransportFormData) => void;
-  onDelete: () => void;
+  onItemsChange: () => Promise<void>;
 }) => {
   const { name, type, price, currency, date } = transport;
   const [isEditing, setIsEditing] = useState(false);
@@ -43,9 +41,22 @@ export const Transport = ({
     defaultValues: { name, type, price, currency, date },
   });
 
-  const onSubmit = (data: TransportFormData) => {
-    onUpdate(data);
+  const onSubmit = async (data: TransportFormData) => {
+    await transport.patch({
+      name: data.name,
+      type: data.type,
+      price: data.price,
+      currency: data.currency,
+      date: data.date,
+      updatedAt: Date.now(),
+    });
     setIsEditing(false);
+    await onItemsChange();
+  };
+
+  const handleDelete = async () => {
+    await transport.remove();
+    await onItemsChange();
   };
 
   if (isEditing) {
@@ -157,9 +168,7 @@ export const Transport = ({
   return (
     <div className="relative rounded-lg border p-4">
       <button
-        onClick={() => {
-          onDelete();
-        }}
+        onClick={handleDelete}
         className="absolute top-2 right-2 z-10 cursor-pointer text-xl text-gray-400 hover:text-red-600"
         aria-label="Delete transport"
         type="button"

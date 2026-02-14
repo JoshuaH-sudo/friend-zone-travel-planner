@@ -2,11 +2,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
-import { Transport, TransportFormData } from "./components/Transport";
-import {
-  Accommodation,
-  AccommodationFormData,
-} from "./components/Accommodation";
 import { Stop } from "./components/Stop";
 import {
   TripDocumentType,
@@ -15,6 +10,7 @@ import {
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
 import { TripStats } from "./components/TripStats";
+import { StopItems } from "./components/StopItems";
 
 function TripDetails() {
   const params = useParams();
@@ -177,48 +173,6 @@ function TripDetails() {
     await loadTripData();
   };
 
-  const onUpdateAccommodation = async (
-    stopId: string,
-    accommodationId: string,
-    data: AccommodationFormData,
-  ) => {
-    console.log("onUpdateAccommodation called", {
-      stopId,
-      accommodationId,
-      data,
-    });
-    const accoms = accommodationsByStop[stopId] || [];
-    const accomRecord = accoms.find((a) => a.id === accommodationId);
-    if (!accomRecord) {
-      console.error("Accommodation record not found");
-      return;
-    }
-
-    await accomRecord.patch({
-      name: data.name,
-      price: data.price,
-      currency: data.currency,
-      checkIn: data.checkIn,
-      checkOut: data.checkOut,
-      updatedAt: Date.now(),
-    });
-    await loadTripData();
-  };
-
-  const onDeleteAccommodation = async (
-    stopId: string,
-    accommodationId: string,
-  ) => {
-    const accoms = accommodationsByStop[stopId] || [];
-    const accomRecord = accoms.find((a) => a.id === accommodationId);
-    if (!accomRecord) {
-      return;
-    }
-
-    await accomRecord.remove();
-    await loadTripData();
-  };
-
   const onAddTransport = async (stopId: string) => {
     const stop = stops.find((s) => s.id === stopId);
     if (!stop) return;
@@ -235,41 +189,6 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
-    await loadTripData();
-  };
-
-  const onUpdateTransport = async (
-    stopId: string,
-    transportId: string,
-    data: TransportFormData,
-  ) => {
-    console.log("onUpdateTransport called", { stopId, transportId, data });
-    const trans = transportsByStop[stopId] || [];
-    const transRecord = trans.find((t) => t.id === transportId);
-    if (!transRecord) {
-      console.error("Transport record not found");
-      return;
-    }
-
-    await transRecord.patch({
-      name: data.name,
-      type: data.type,
-      price: data.price,
-      currency: data.currency,
-      date: data.date,
-      updatedAt: Date.now(),
-    });
-    await loadTripData();
-  };
-
-  const onDeleteTransport = async (stopId: string, transportId: string) => {
-    const trans = transportsByStop[stopId] || [];
-    const transRecord = trans.find((t) => t.id === transportId);
-    if (!transRecord) {
-      return;
-    }
-
-    await transRecord.remove();
     await loadTripData();
   };
 
@@ -329,81 +248,14 @@ function TripDetails() {
                   onUpdate={(data) => updateStop(stop.id, data)}
                   onDelete={() => deleteStop(stop.id)}
                 />
-                <div className="mt-4 ml-6 space-y-3">
-                  {(() => {
-                    const items = [
-                      ...transports.map((trans) => ({
-                        model: trans,
-                        id: trans.id,
-                        type: "transport" as const,
-                        date: trans.date,
-                      })),
-                      ...accommodations.map((acc) => ({
-                        model: acc,
-                        id: acc.id,
-                        type: "accommodation" as const,
-                        date: acc.checkIn,
-                      })),
-                    ].sort(
-                      (a, b) =>
-                        new Date(a.date).getTime() - new Date(b.date).getTime(),
-                    );
-
-                    return (
-                      <>
-                        {items.length > 0 && (
-                          <ul className="space-y-3">
-                            {items.map((item) =>
-                              item.type === "accommodation" ? (
-                                <li key={item.id}>
-                                  <Accommodation
-                                    accommodation={item.model}
-                                    onUpdate={(data) =>
-                                      onUpdateAccommodation(
-                                        stop.id,
-                                        item.id,
-                                        data,
-                                      )
-                                    }
-                                    onDelete={() =>
-                                      onDeleteAccommodation(stop.id, item.id)
-                                    }
-                                  />
-                                </li>
-                              ) : (
-                                <li key={item.id}>
-                                  <Transport
-                                    transport={item.model}
-                                    onUpdate={(data) =>
-                                      onUpdateTransport(stop.id, item.id, data)
-                                    }
-                                    onDelete={() =>
-                                      onDeleteTransport(stop.id, item.id)
-                                    }
-                                  />
-                                </li>
-                              ),
-                            )}
-                          </ul>
-                        )}
-                        <div className="mt-3 flex gap-2">
-                          <button
-                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                            onClick={() => onAddAccommodation(stop.id)}
-                          >
-                            Add Accommodation
-                          </button>
-                          <button
-                            className="rounded bg-green-500 px-4 py-2 text-sm text-white hover:bg-green-600"
-                            onClick={() => onAddTransport(stop.id)}
-                          >
-                            Add Transport
-                          </button>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
+                <StopItems
+                  transports={transports}
+                  accommodations={accommodations}
+                  stop={stop}
+                  onAddAccommodation={onAddAccommodation}
+                  onAddTransport={onAddTransport}
+                  onItemsChange={loadTripData}
+                />
               </li>
             );
           })}
