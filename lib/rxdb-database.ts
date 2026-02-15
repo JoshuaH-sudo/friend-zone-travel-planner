@@ -13,6 +13,13 @@ import {
   TransportCollection,
 } from "./rxdb-schema";
 import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
+import CryptoJS from "crypto-js";
+
+// Custom hash function that works in non-secure contexts
+async function customHashFunction(input: string): Promise<string> {
+  // Fallback to CryptoJS for non-secure contexts (like mobile browsers over HTTP)
+  return CryptoJS.SHA256(input).toString(CryptoJS.enc.Hex);
+}
 
 export type DatabaseCollections = {
   trips: TripCollection;
@@ -27,7 +34,10 @@ let dbPromise: Promise<MyDatabase> | null = null;
 
 addRxPlugin(RxDBQueryBuilderPlugin);
 
-if (process.env.NODE_ENV === "development") {
+const isDevMode = process.env.NODE_ENV === "development";
+const cryptoAvailable = typeof crypto !== "undefined" && crypto.subtle;
+
+if (isDevMode) {
   console.log("Enabling RxDB Dev Mode plugin");
   addRxPlugin(RxDBDevModePlugin);
 } else {
@@ -53,6 +63,8 @@ async function createDatabase(): Promise<MyDatabase> {
     }),
     multiInstance: true,
     eventReduce: true,
+    hashFunction:
+      isDevMode && !cryptoAvailable ? customHashFunction : undefined,
   });
 
   console.log("RxDB database created");

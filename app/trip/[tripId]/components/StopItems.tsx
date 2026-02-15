@@ -7,7 +7,7 @@ import {
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Button } from "@/components/ui/button";
-import { Hotel, Plane, Bus, Car, Train, Calendar } from "lucide-react";
+import { Hotel, Plane, Bus, Car, Train } from "lucide-react";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
@@ -79,24 +79,6 @@ export function StopItems({
                   )}
                 </div>
                 <div>
-                  {/* Icon and date */}
-                  <div
-                    id={`item-date-${item.id}`}
-                    className="mb-2 flex items-center gap-2.5"
-                  >
-                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                      <Calendar className="h-3.5 w-3.5" />
-                      <span>
-                        {new Date(item.date).toLocaleDateString()}
-                        {item.type === "accommodation" &&
-                          ` - ${new Date(
-                            (item.model as AccommodationDocumentType).checkOut,
-                          ).toLocaleDateString()}`}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content */}
                   {item.type === "accommodation" ? (
                     <Accommodation accommodation={item.model} />
                   ) : (
