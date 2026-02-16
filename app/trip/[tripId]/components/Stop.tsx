@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
 
 const stopSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -114,7 +116,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
           className="absolute top-2 right-2"
           aria-label="Delete stop"
         >
-          ✕
+          <HugeiconsIcon icon={Cancel01Icon} />
         </Button>
         <Button
           onClick={() => setIsEditing(true)}
@@ -123,7 +125,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
           className="absolute top-2 right-10"
           aria-label="Edit stop"
         >
-          ✎
+          <HugeiconsIcon icon={Edit03Icon} />
         </Button>
         <h3 className="text-xl font-semibold">{stop.name}</h3>
         <p className="text-muted-foreground mt-2">

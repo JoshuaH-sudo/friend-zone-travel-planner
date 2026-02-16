@@ -63,6 +63,7 @@ async function createDatabase(): Promise<MyDatabase> {
     }),
     multiInstance: true,
     eventReduce: true,
+    //@ts-expect-error only used in dev mode
     hashFunction:
       isDevMode && !cryptoAvailable ? customHashFunction : undefined,
   });

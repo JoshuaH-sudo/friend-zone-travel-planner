@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -191,7 +193,7 @@ export const Transport = ({
           className="absolute top-2 right-2"
           aria-label="Delete transport"
         >
-          ✕
+          <HugeiconsIcon icon={Cancel01Icon} />
         </Button>
         <Button
           onClick={() => setIsEditing(true)}
@@ -200,7 +202,7 @@ export const Transport = ({
           className="absolute top-2 right-10"
           aria-label="Edit transport"
         >
-          ✎
+          <HugeiconsIcon icon={Edit03Icon} />
         </Button>
         <h4 className="text-lg font-semibold">{name}</h4>
         <div className="text-muted-foreground mt-2 flex items-center gap-2">
