@@ -7,7 +7,7 @@ import {
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Button } from "@/components/ui/button";
-import { Hotel, Plane, Bus, Car, Train } from "lucide-react";
+import { Hotel, Plane, Bus, Car, Train, Plus, Dot } from "lucide-react";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
@@ -88,6 +88,9 @@ export function StopItems({
               </li>
             ))}
           </ul>
+          <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
+            <Dot className="text-foreground h-8 w-8" />
+          </div>
         </div>
       )}
       <div className="mt-3 flex gap-2">

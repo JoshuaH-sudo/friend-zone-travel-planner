@@ -14,7 +14,7 @@ import { StopItems } from "./components/StopItems";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MapPin } from "lucide-react";
+import { Dot, MapPin } from "lucide-react";
 
 function TripDetails() {
   const params = useParams();
@@ -221,7 +221,7 @@ function TripDetails() {
         {stops.length > 0 && (
           <div className="relative ml-3">
             {/* Timeline line */}
-            <div className="absolute top-4 bottom-20 left-0 border-l-2" />
+            <div className="absolute top-4 bottom-1 left-0 border-l-2" />
 
             <ul className="space-y-8">
               {stops.map((stop) => {
@@ -250,6 +250,9 @@ function TripDetails() {
                 );
               })}
             </ul>
+            <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
+              <Dot className="text-foreground h-8 w-8" />
+            </div>
           </div>
         )}
         <Button className="mt-6 ml-11" onClick={addStop}>
