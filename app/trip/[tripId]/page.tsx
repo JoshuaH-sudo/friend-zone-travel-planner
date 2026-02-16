@@ -11,6 +11,7 @@ import {
 } from "@/lib/rxdb-schema";
 import { TripStats } from "./components/TripStats";
 import { StopItems } from "./components/StopItems";
+import { Timeline } from "./components/Timeline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -219,10 +220,15 @@ function TripDetails() {
       <Separator className="my-6" />
       <section id="stops-section" className="w-full text-left">
         {stops.length > 0 && (
-          <div className="relative ml-3">
-            {/* Timeline line */}
-            <div className="absolute top-4 bottom-1 left-0 border-l-2" />
-
+          <Timeline
+            className="ml-3"
+            lineClassName="absolute top-4 bottom-1 left-0 border-l-2"
+            endMarker={
+              <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
+                <Dot className="text-foreground h-8 w-8" />
+              </div>
+            }
+          >
             <ul className="space-y-8">
               {stops.map((stop) => {
                 const accommodations = accommodationsByStop[stop.id] || [];
@@ -250,10 +256,7 @@ function TripDetails() {
                 );
               })}
             </ul>
-            <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
-              <Dot className="text-foreground h-8 w-8" />
-            </div>
-          </div>
+          </Timeline>
         )}
         <Button className="mt-6 ml-11" onClick={addStop}>
           Add Stop

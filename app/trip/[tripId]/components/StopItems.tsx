@@ -6,6 +6,7 @@ import {
 } from "@/lib/rxdb-schema";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
+import { Timeline } from "./Timeline";
 import { Button } from "@/components/ui/button";
 import { Hotel, Plane, Bus, Car, Train, Dot } from "lucide-react";
 
@@ -57,10 +58,15 @@ export function StopItems({
   return (
     <div className="mt-4 ml-6 space-y-3">
       {items.length > 0 && (
-        <div className="relative ml-3">
-          {/* Timeline line */}
-          <div className="absolute top-4 bottom-0 left-0 border-l-2" />
-
+        <Timeline
+          className="ml-3"
+          lineClassName="absolute top-4 bottom-0 left-0 border-l-2"
+          endMarker={
+            <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
+              <Dot className="text-foreground h-8 w-8" />
+            </div>
+          }
+        >
           <ul className="space-y-6">
             {items.map((item) => (
               <li key={item.id} className="relative pl-8">
@@ -88,10 +94,7 @@ export function StopItems({
               </li>
             ))}
           </ul>
-          <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
-            <Dot className="text-foreground h-8 w-8" />
-          </div>
-        </div>
+        </Timeline>
       )}
       <div className="mt-3 flex gap-2">
         <Button
