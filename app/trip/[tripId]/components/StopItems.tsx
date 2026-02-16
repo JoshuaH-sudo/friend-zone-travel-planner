@@ -7,7 +7,7 @@ import {
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Button } from "@/components/ui/button";
-import { Hotel, Plane, Bus, Car, Train, Plus, Dot } from "lucide-react";
+import { Hotel, Plane, Bus, Car, Train, Dot } from "lucide-react";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
