@@ -16,7 +16,7 @@ import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 import CryptoJS from "crypto-js";
 
 // Custom hash function that works in non-secure contexts
-async function customHashFunction(input: string): Promise<string> {
+function customHashFunction(input: string) {
   // Fallback to CryptoJS for non-secure contexts (like mobile browsers over HTTP)
   return CryptoJS.SHA256(input).toString(CryptoJS.enc.Hex);
 }
@@ -92,5 +92,8 @@ async function createDatabase(): Promise<MyDatabase> {
 
 // Helper function to generate IDs
 export function generateId(): string {
+  if (isDevMode && !cryptoAvailable) {
+    return customHashFunction(Date.now().toString() + Math.random().toString());
+  }
   return crypto.randomUUID();
 }

@@ -42,7 +42,7 @@ export default function RootLayout({
           <DatabaseProvider>
             <Header />
             <div className="flex grow">
-              <main className="w-full max-w-4xl items-center gap-4 px-6 py-10 sm:items-start">
+              <main className="w-full max-w-4xl items-center gap-4 px-2 py-10 sm:items-start">
                 {children}
               </main>
             </div>
