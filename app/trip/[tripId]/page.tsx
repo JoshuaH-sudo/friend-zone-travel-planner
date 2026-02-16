@@ -258,7 +258,7 @@ function TripDetails() {
             </ul>
           </Timeline>
         )}
-        <Button className="mt-6 ml-11" onClick={addStop}>
+        <Button className="mt-6 w-full" onClick={addStop}>
           Add Stop
         </Button>
       </section>

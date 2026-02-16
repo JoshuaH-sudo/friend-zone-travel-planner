@@ -15,8 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
+import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
+import useTime from "@/components/hooks/useTime";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -40,6 +40,7 @@ export const Transport = ({
 }: {
   transport: TransportDocumentType;
 }) => {
+  const time = useTime();
   const { name, type, price, currency, date } = transport;
   const [isEditing, setIsEditing] = useState(false);
 
@@ -59,7 +60,7 @@ export const Transport = ({
       price: Math.round(data.price * 100) / 100,
       currency: data.currency,
       date: data.date,
-      updatedAt: Date.now(),
+      updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
   };
@@ -184,37 +185,22 @@ export const Transport = ({
   }
 
   return (
-    <Card className="relative">
-      <CardContent className="px-4">
-        <Button
-          onClick={handleDelete}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-2"
-          aria-label="Delete transport"
-        >
-          <HugeiconsIcon icon={Cancel01Icon} />
-        </Button>
-        <Button
-          onClick={() => setIsEditing(true)}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-10"
-          aria-label="Edit transport"
-        >
-          <HugeiconsIcon icon={Edit03Icon} />
-        </Button>
-        <h4 className="text-lg font-semibold">{name}</h4>
-        <div className="text-muted-foreground mt-2 flex items-center gap-2">
-          <span className="capitalize">{type}</span>
-          <span>•</span>
-          <span>{price}</span>
-          <span>{currency}</span>
-        </div>
-        <p className="text-muted-foreground mt-2">
-          Date: {new Date(date).toLocaleDateString()}
-        </p>
-      </CardContent>
-    </Card>
+    <TripItemCard
+      onDelete={handleDelete}
+      onEdit={() => setIsEditing(true)}
+      deleteLabel="Delete transport"
+      editLabel="Edit transport"
+      title={<h4 className="text-lg font-semibold">{name}</h4>}
+    >
+      <div className="text-muted-foreground mt-2 flex items-center gap-2">
+        <span className="capitalize">{type}</span>
+        <span>•</span>
+        <span>{price}</span>
+        <span>{currency}</span>
+      </div>
+      <p className="text-muted-foreground mt-2">
+        Date: {new Date(date).toLocaleDateString()}
+      </p>
+    </TripItemCard>
   );
 };

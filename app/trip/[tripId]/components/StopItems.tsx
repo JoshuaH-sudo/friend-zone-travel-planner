@@ -9,6 +9,8 @@ import { Transport } from "./Transport";
 import { Timeline } from "./Timeline";
 import { Button } from "@/components/ui/button";
 import { Hotel, Plane, Bus, Car, Train, Dot } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Hotel01Icon, PlaneTakeoff, Plus } from "@hugeicons/core-free-icons";
 
 interface StopItemsProps {
   transports: TransportDocumentType[];
@@ -96,20 +98,22 @@ export function StopItems({
           </ul>
         </Timeline>
       )}
-      <div className="mt-3 flex gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         <Button
           variant="secondary"
           size="sm"
           onClick={() => onAddAccommodation(stop.id)}
         >
-          Add Accommodation
+          <HugeiconsIcon icon={Hotel01Icon} /> Accommodation
+          <HugeiconsIcon icon={Plus} className="ml-1" />
         </Button>
         <Button
           variant="secondary"
           size="sm"
           onClick={() => onAddTransport(stop.id)}
         >
-          Add Transport
+          <HugeiconsIcon icon={PlaneTakeoff} /> Transport
+          <HugeiconsIcon icon={Plus} className="ml-1" />
         </Button>
       </div>
     </div>

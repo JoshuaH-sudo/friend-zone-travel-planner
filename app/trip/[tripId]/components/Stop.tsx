@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
+import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
+import useTime from "@/components/hooks/useTime";
 
 const stopSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
@@ -20,6 +20,7 @@ const stopSchema = z.object({
 type StopFormData = z.infer<typeof stopSchema>;
 
 export const Stop = ({ stop }: { stop: StopDocumentType }) => {
+  const time = useTime();
   const [isEditing, setIsEditing] = useState(false);
   const database = useDatabase();
 
@@ -36,7 +37,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
     await stop.patch({
       name: data.name,
       date: data.date,
-      updatedAt: Date.now(),
+      updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
   };
@@ -107,31 +108,17 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
   }
 
   return (
-    <Card className="relative w-full">
-      <CardContent className="px-4">
-        <Button
-          onClick={handleDelete}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-2"
-          aria-label="Delete stop"
-        >
-          <HugeiconsIcon icon={Cancel01Icon} />
-        </Button>
-        <Button
-          onClick={() => setIsEditing(true)}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-10"
-          aria-label="Edit stop"
-        >
-          <HugeiconsIcon icon={Edit03Icon} />
-        </Button>
-        <h3 className="text-xl font-semibold">{stop.name}</h3>
-        <p className="text-muted-foreground mt-2">
-          {new Date(stop.date).toLocaleDateString()}
-        </p>
-      </CardContent>
-    </Card>
+    <TripItemCard
+      onDelete={handleDelete}
+      onEdit={() => setIsEditing(true)}
+      deleteLabel="Delete stop"
+      editLabel="Edit stop"
+      className="w-full"
+      title={<h3 className="text-xl font-semibold">{stop.name}</h3>}
+    >
+      <p className="text-muted-foreground mt-2">
+        {new Date(stop.date).toLocaleDateString()}
+      </p>
+    </TripItemCard>
   );
 };

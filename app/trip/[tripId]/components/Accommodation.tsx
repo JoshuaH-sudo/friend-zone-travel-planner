@@ -15,8 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Edit03Icon } from "@hugeicons/core-free-icons";
+import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
+import useTime from "@/components/hooks/useTime";
 
 const accommodationSchema = z
   .object({
@@ -43,6 +43,7 @@ export const Accommodation = ({
 }: {
   accommodation: AccommodationDocumentType;
 }) => {
+  const time = useTime();
   const { name, price, currency, checkIn, checkOut } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
 
@@ -62,7 +63,7 @@ export const Accommodation = ({
       currency: data.currency,
       checkIn: data.checkIn,
       checkOut: data.checkOut,
-      updatedAt: Date.now(),
+      updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
   };
@@ -169,38 +170,23 @@ export const Accommodation = ({
   }
 
   return (
-    <Card className="relative">
-      <CardContent className="px-4">
-        <Button
-          onClick={handleDelete}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-2"
-          aria-label="Delete accommodation"
-        >
-          <HugeiconsIcon icon={Cancel01Icon} />
-        </Button>
-        <Button
-          onClick={() => setIsEditing(true)}
-          variant="ghost"
-          size="icon-sm"
-          className="absolute top-2 right-10"
-          aria-label="Edit accommodation"
-        >
-          <HugeiconsIcon icon={Edit03Icon} />
-        </Button>
-        <h4 className="text-lg font-semibold">{name}</h4>
-        <div className="text-muted-foreground mt-2 flex items-center gap-2">
-          <span>{price}</span>
-          <span>{currency}</span>
-        </div>
-        <p className="text-muted-foreground mt-2">
-          Check-in: {new Date(checkIn).toLocaleDateString()}
-        </p>
-        <p className="text-muted-foreground mt-2">
-          Check-out: {new Date(checkOut).toLocaleDateString()}
-        </p>
-      </CardContent>
-    </Card>
+    <TripItemCard
+      onDelete={handleDelete}
+      onEdit={() => setIsEditing(true)}
+      deleteLabel="Delete accommodation"
+      editLabel="Edit accommodation"
+      title={<h4 className="text-lg font-semibold">{name}</h4>}
+    >
+      <div className="text-muted-foreground mt-2 flex items-center gap-2">
+        <span>{price}</span>
+        <span>{currency}</span>
+      </div>
+      <p className="text-muted-foreground mt-2">
+        Check-in: {new Date(checkIn).toLocaleDateString()}
+      </p>
+      <p className="text-muted-foreground mt-2">
+        Check-out: {new Date(checkOut).toLocaleDateString()}
+      </p>
+    </TripItemCard>
   );
 };
