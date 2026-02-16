@@ -194,7 +194,7 @@ function TripDetails() {
   }
 
   return (
-    <main className="flex min-h-screen max-w-4xl flex-col items-center sm:items-start">
+    <main className="flex min-h-screen max-w-4xl flex-col items-center px-2 sm:items-start">
       {isEditingTripName ? (
         <Input
           type="text"
@@ -223,10 +223,10 @@ function TripDetails() {
       <section id="stops-section" className="w-full text-left">
         {stops.length > 0 && (
           <Timeline
-            className="ml-3"
-            lineClassName="absolute top-4 bottom-1 left-0 border-l-2"
+            className="pl-4"
+            lineClassName="absolute top-4 bottom-1 left-4 border-l-2"
             endMarker={
-              <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
+              <div className="bg-background border-primary absolute -bottom-2 left-4 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
                 <Dot className="text-foreground h-8 w-8" />
               </div>
             }

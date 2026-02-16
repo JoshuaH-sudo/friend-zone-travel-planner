@@ -61,7 +61,7 @@ export function StopItems({
     <div className="mt-4 ml-6 space-y-3">
       {items.length > 0 && (
         <Timeline
-          className="ml-3"
+          className="ml-0.5"
           lineClassName="absolute top-4 bottom-0 left-0 border-l-2"
           endMarker={
             <div className="bg-background border-primary absolute -bottom-2 left-0 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2">
