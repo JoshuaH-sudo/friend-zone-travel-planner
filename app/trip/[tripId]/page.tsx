@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dot, MapPin } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Plus } from "@hugeicons/core-free-icons";
 
 function TripDetails() {
   const params = useParams();
@@ -259,7 +261,7 @@ function TripDetails() {
           </Timeline>
         )}
         <Button className="mt-6 w-full" onClick={addStop}>
-          Add Stop
+          Add Stop <HugeiconsIcon icon={Plus} className="ml-2" />
         </Button>
       </section>
     </main>
