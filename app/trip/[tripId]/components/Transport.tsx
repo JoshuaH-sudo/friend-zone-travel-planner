@@ -17,6 +17,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -121,7 +122,7 @@ export const Transport = ({
               )}
             </div>
             <div className="flex gap-4">
-              <div className="flex-1 space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="transport-price">Price</Label>
                 <Input
                   id="transport-price"
@@ -135,9 +136,11 @@ export const Transport = ({
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="w-42 space-y-2">
                 <Label htmlFor="transport-currency">Currency</Label>
-                <Select
+                <CurrencySelect
+                  id="transport-currency"
+                  name="currency"
                   value={watchedCurrency}
                   onValueChange={(value) => {
                     const event = {
@@ -145,17 +148,7 @@ export const Transport = ({
                     };
                     register("currency").onChange(event);
                   }}
-                >
-                  <SelectTrigger id="transport-currency" className="w-25">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="JPY">JPY</SelectItem>
-                    <SelectItem value="AUD">AUD</SelectItem>
-                  </SelectContent>
-                </Select>
+                />
                 {errors.currency && (
                   <p className="text-destructive text-sm">
                     {errors.currency.message}
