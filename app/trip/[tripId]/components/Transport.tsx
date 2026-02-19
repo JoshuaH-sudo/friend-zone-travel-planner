@@ -136,7 +136,7 @@ export const Transport = ({
                   </p>
                 )}
               </div>
-              <div className="w-42 space-y-2">
+              <div className="w-24 space-y-2">
                 <Label htmlFor="transport-currency">Currency</Label>
                 <CurrencySelect
                   id="transport-currency"

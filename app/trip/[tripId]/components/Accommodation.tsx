@@ -7,16 +7,10 @@ import { AccommodationDocumentType } from "@/lib/rxdb-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
+import { CurrencySelect } from "@/components/ui/currency-select";
 
 const accommodationSchema = z
   .object({
@@ -50,11 +44,14 @@ export const Accommodation = ({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<AccommodationFormData>({
     resolver: zodResolver(accommodationSchema),
     defaultValues: { name, price, currency, checkIn, checkOut },
   });
+
+  const watchedCurrency = watch("currency");
 
   const onSubmit = async (data: AccommodationFormData) => {
     await accommodation.patch({
@@ -93,7 +90,7 @@ export const Accommodation = ({
               )}
             </div>
             <div className="flex gap-4">
-              <div className="flex-1 space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="accommodation-price">Price</Label>
                 <Input
                   id="accommodation-price"
@@ -107,27 +104,19 @@ export const Accommodation = ({
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="w-24 space-y-2">
                 <Label htmlFor="accommodation-currency">Currency</Label>
-                <Select
-                  value={String(currency)}
+                <CurrencySelect
+                  id="accommodation-currency"
+                  name="currency"
+                  value={watchedCurrency}
                   onValueChange={(value) => {
                     const event = {
                       target: { name: "currency", value },
                     };
                     register("currency").onChange(event);
                   }}
-                >
-                  <SelectTrigger id="accommodation-currency" className="w-25">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="JPY">JPY</SelectItem>
-                    <SelectItem value="AUD">AUD</SelectItem>
-                  </SelectContent>
-                </Select>
+                />
                 {errors.currency && (
                   <p className="text-destructive text-sm">
                     {errors.currency.message}
