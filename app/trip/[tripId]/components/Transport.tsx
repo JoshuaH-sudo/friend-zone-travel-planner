@@ -47,11 +47,15 @@ export const Transport = ({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<TransportFormData>({
     resolver: zodResolver(transportSchema),
     defaultValues: { name, type, price, currency, date },
   });
+
+  const watchedType = watch("type");
+  const watchedCurrency = watch("currency");
 
   const onSubmit = async (data: TransportFormData) => {
     await transport.patch({
@@ -92,7 +96,7 @@ export const Transport = ({
             <div className="space-y-2">
               <Label htmlFor="transport-type">Type</Label>
               <Select
-                value={String(type)}
+                value={watchedType}
                 onValueChange={(value) => {
                   const event = {
                     target: { name: "type", value },
@@ -134,7 +138,7 @@ export const Transport = ({
               <div className="space-y-2">
                 <Label htmlFor="transport-currency">Currency</Label>
                 <Select
-                  value={String(currency)}
+                  value={watchedCurrency}
                   onValueChange={(value) => {
                     const event = {
                       target: { name: "currency", value },
