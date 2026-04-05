@@ -1,14 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
 import { Stop } from "./components/Stop";
-import {
-  TripDocumentType,
-  StopDocumentType,
-  AccommodationDocumentType,
-  TransportDocumentType,
-} from "@/lib/rxdb-schema";
 import { TripStats } from "./components/TripStats";
 import { StopItems } from "./components/StopItems";
 import { Timeline } from "./components/Timeline";
@@ -18,84 +12,15 @@ import { Separator } from "@/components/ui/separator";
 import { Dot, MapPin } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Plus } from "@hugeicons/core-free-icons";
+import { useTripData } from "@/components/hooks/useTripData";
 
 function TripDetails() {
   const params = useParams();
   const tripId = params.tripId as string;
   const database = useDatabase();
-
-  const [trip, setTrip] = useState<TripDocumentType | null>(null);
-  const [stops, setStops] = useState<StopDocumentType[]>([]);
-  const [accommodationsByStop, setAccommodationsByStop] = useState<
-    Record<string, AccommodationDocumentType[]>
-  >({});
-  const [transportsByStop, setTransportsByStop] = useState<
-    Record<string, TransportDocumentType[]>
-  >({});
   const [isEditingTripName, setIsEditingTripName] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Subscribe to trip changes
-  useEffect(() => {
-    const subscription = database.trips
-      .findOne(tripId)
-      .$.subscribe((tripRecord) => {
-        setTrip(tripRecord);
-        setLoading(false);
-      });
-
-    return () => subscription.unsubscribe();
-  }, [tripId, database]);
-
-  // Subscribe to stops changes
-  useEffect(() => {
-    const subscription = database.stops
-      .find({ selector: { tripId } })
-      .sort({ date: "asc", createdAt: "asc" })
-      .$.subscribe((stopsRecords) => {
-        setStops(stopsRecords);
-      });
-
-    return () => subscription.unsubscribe();
-  }, [tripId, database]);
-
-  // Subscribe to accommodations changes
-  useEffect(() => {
-    const subscription = database.accommodations
-      .find()
-      .sort({ checkIn: "asc", createdAt: "asc" })
-      .$.subscribe((allAccommodations) => {
-        const accomMap: Record<string, AccommodationDocumentType[]> = {};
-        allAccommodations.forEach((accom) => {
-          if (!accomMap[accom.stopId]) {
-            accomMap[accom.stopId] = [];
-          }
-          accomMap[accom.stopId].push(accom);
-        });
-        setAccommodationsByStop(accomMap);
-      });
-
-    return () => subscription.unsubscribe();
-  }, [database]);
-
-  // Subscribe to transports changes
-  useEffect(() => {
-    const subscription = database.transports
-      .find()
-      .sort({ date: "asc", createdAt: "asc" })
-      .$.subscribe((allTransports) => {
-        const transMap: Record<string, TransportDocumentType[]> = {};
-        allTransports.forEach((transport) => {
-          if (!transMap[transport.stopId]) {
-            transMap[transport.stopId] = [];
-          }
-          transMap[transport.stopId].push(transport);
-        });
-        setTransportsByStop(transMap);
-      });
-
-    return () => subscription.unsubscribe();
-  }, [database]);
+  const tripData = useTripData(tripId, { database });
+  const { trip, stops, accommodationsByStop, transportsByStop, loading } = tripData;
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
@@ -213,7 +138,7 @@ function TripDetails() {
         </h1>
       )}
       <Separator className="my-6" />
-      <TripStats tripId={tripId} />
+      <TripStats tripId={tripId} tripData={tripData} />
       <Separator className="my-6" />
       <section id="stops-section" className="w-full text-left">
         {stops.length > 0 && (
