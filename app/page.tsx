@@ -7,8 +7,11 @@ import { useEffect, useState } from "react";
 import { TripDocument } from "@/lib/rxdb-schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { PlusIcon } from "lucide-react";
 import { TripStats } from "./trip/[tripId]/components/TripStats";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
 function TripList() {
   const router = useRouter();
@@ -82,14 +85,26 @@ function TripList() {
                 >
                   {trip.name}
                 </Link>
-                <Button
-                  onClick={() => deleteTrip(trip.id)}
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Delete trip"
+                <ConfirmationDialog
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
+                      aria-label="Delete trip"
+                    >
+                      <HugeiconsIcon icon={Cancel01Icon} />
+                    </Button>
+                  }
+                  title="Delete this trip?"
+                  description={`This will permanently remove ${trip.name} and all of its trip data.`}
+                  confirmLabel="Delete trip"
+                  onConfirm={() => deleteTrip(trip.id)}
                 >
-                  ✕
-                </Button>
+                  <p className="text-muted-foreground text-sm">
+                    This action cannot be undone.
+                  </p>
+                </ConfirmationDialog>
               </div>
               <TripStats tripId={trip.id} />
             </CardContent>
