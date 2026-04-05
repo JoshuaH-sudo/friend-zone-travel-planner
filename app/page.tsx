@@ -59,7 +59,17 @@ function TripList() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold">Your Trips</h2>
+      <span className="flex justify-between">
+        <h2 className="text-2xl font-bold">Your Trips</h2>
+        <Button
+          variant="outline"
+          className="bg-accent text-accent-foreground"
+          onClick={createTrip}
+        >
+          Add Trip
+          <PlusIcon />
+        </Button>
+      </span>
 
       <ul className="mt-4 space-y-2">
         {trips.map((trip) => (
@@ -68,7 +78,7 @@ function TripList() {
               <div className="flex items-start justify-between gap-4">
                 <Link
                   href={`/trip/${trip.id}`}
-                  className="flex-1 hover:text-blue-400 hover:underline font-bold text-4xl"
+                  className="flex-1 text-4xl font-bold hover:text-blue-400 hover:underline"
                 >
                   {trip.name}
                 </Link>
@@ -89,7 +99,7 @@ function TripList() {
         <li>
           <Button
             variant="outline"
-            className="w-full bg-accent text-accent-foreground"
+            className="bg-accent text-accent-foreground w-full"
             onClick={createTrip}
           >
             Add Trip
