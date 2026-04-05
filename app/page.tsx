@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { TripDocument } from "@/lib/rxdb-schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PlusIcon } from "lucide-react";
+import { TripStats } from "./trip/[tripId]/components/TripStats";
 
 function TripList() {
   const router = useRouter();
@@ -62,28 +64,36 @@ function TripList() {
       <ul className="mt-4 space-y-2">
         {trips.map((trip) => (
           <Card key={trip.id}>
-            <CardContent className="flex items-center justify-between gap-4 p-4">
-              <Link
-                href={`/trip/${trip.id}`}
-                className="flex-1 hover:text-blue-400 hover:underline"
-              >
-                {trip.name}
-              </Link>
-              <Button
-                onClick={() => deleteTrip(trip.id)}
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Delete trip"
-              >
-                ✕
-              </Button>
+            <CardContent className="space-y-4 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <Link
+                  href={`/trip/${trip.id}`}
+                  className="flex-1 hover:text-blue-400 hover:underline font-bold text-4xl"
+                >
+                  {trip.name}
+                </Link>
+                <Button
+                  onClick={() => deleteTrip(trip.id)}
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Delete trip"
+                >
+                  ✕
+                </Button>
+              </div>
+              <TripStats tripId={trip.id} />
             </CardContent>
           </Card>
         ))}
 
         <li>
-          <Button variant="outline" className="w-full" onClick={createTrip}>
+          <Button
+            variant="outline"
+            className="w-full bg-accent text-accent-foreground"
+            onClick={createTrip}
+          >
             Add Trip
+            <PlusIcon />
           </Button>
         </li>
       </ul>

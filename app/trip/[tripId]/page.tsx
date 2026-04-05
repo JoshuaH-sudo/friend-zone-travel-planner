@@ -213,12 +213,7 @@ function TripDetails() {
         </h1>
       )}
       <Separator className="my-6" />
-      <TripStats
-        trip={trip}
-        stops={stops}
-        accommodationsByStop={accommodationsByStop}
-        transportsByStop={transportsByStop}
-      />
+      <TripStats tripId={tripId} />
       <Separator className="my-6" />
       <section id="stops-section" className="w-full text-left">
         {stops.length > 0 && (

@@ -5,21 +5,98 @@ import {
   AccommodationDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
-import { useMemo } from "react";
+import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export function TripStats({
-  trip,
-  stops,
-  accommodationsByStop,
-  transportsByStop,
+  tripId,
 }: {
-  trip: TripDocumentType | null;
-  stops: StopDocumentType[];
-  accommodationsByStop: Record<string, AccommodationDocumentType[]>;
-  transportsByStop: Record<string, TransportDocumentType[]>;
+  tripId: string;
 }) {
+  const [database, setDatabase] = useState<MyDatabase | null>(null);
+  const [trip, setTrip] = useState<TripDocumentType | null>(null);
+  const [stops, setStops] = useState<StopDocumentType[]>([]);
+  const [accommodationsByStop, setAccommodationsByStop] = useState<
+    Record<string, AccommodationDocumentType[]>
+  >({});
+  const [transportsByStop, setTransportsByStop] = useState<
+    Record<string, TransportDocumentType[]>
+  >({});
+
+  useEffect(() => {
+    const fetchDatabase = async () => {
+      const db = await getDatabase();
+      setDatabase(db);
+    };
+
+    fetchDatabase();
+  }, []);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const subscription = database.trips.findOne(tripId).$.subscribe((tripRecord) => {
+      setTrip(tripRecord);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [database, tripId]);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const subscription = database.stops
+      .find({ selector: { tripId } })
+      .sort({ date: "asc", createdAt: "asc" })
+      .$.subscribe((stopsRecords) => {
+        setStops(stopsRecords);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database, tripId]);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const subscription = database.accommodations
+      .find()
+      .sort({ checkIn: "asc", createdAt: "asc" })
+      .$.subscribe((allAccommodations) => {
+        const accomMap: Record<string, AccommodationDocumentType[]> = {};
+        allAccommodations.forEach((accommodation) => {
+          if (!accomMap[accommodation.stopId]) {
+            accomMap[accommodation.stopId] = [];
+          }
+          accomMap[accommodation.stopId].push(accommodation);
+        });
+        setAccommodationsByStop(accomMap);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database]);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const subscription = database.transports
+      .find()
+      .sort({ date: "asc", createdAt: "asc" })
+      .$.subscribe((allTransports) => {
+        const transportMap: Record<string, TransportDocumentType[]> = {};
+        allTransports.forEach((transport) => {
+          if (!transportMap[transport.stopId]) {
+            transportMap[transport.stopId] = [];
+          }
+          transportMap[transport.stopId].push(transport);
+        });
+        setTransportsByStop(transportMap);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database]);
+
   const stats = useMemo(() => {
     const currencyTotals: Record<string, number> = {};
     let stopCount = 0;
@@ -37,6 +114,7 @@ export function TripStats({
         transportCount,
         startDate,
         endDate,
+        totalDays,
       };
     }
 
