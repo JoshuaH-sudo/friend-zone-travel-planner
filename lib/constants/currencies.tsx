@@ -1,3 +1,17 @@
+import { currencies as countryDataCurrencies } from "country-data-list";
+
+type CurrencyOption = {
+  code: string;
+  decimals: number;
+  name: string;
+  number: string;
+  symbol?: string;
+};
+
+type RawCurrencyOption = CurrencyOption & {
+  symbol?: string;
+};
+
 /**
  * New currencies data ISO-4217 from https://en.wikipedia.org/wiki/ISO_4217
  * Used in new <CurrencySelect /> component (Nov 2024)
@@ -65,4 +79,48 @@ export const customCurrencies = [
   "GBP",
   "AUD",
   "NZD",
-];
+] as const;
+
+const customCurrencyCodeSet = new Set<string>(customCurrencies);
+
+function isSupportedCurrency(currency: RawCurrencyOption): currency is CurrencyOption {
+  return Boolean(currency.code && currency.name && currency.symbol);
+}
+
+function normalizeCurrencyOption(currency: CurrencyOption): CurrencyOption {
+  if (currency.code === "EUR") {
+    return {
+      code: currency.code,
+      name: "Euro",
+      symbol: currency.symbol,
+      decimals: currency.decimals,
+      number: currency.number,
+    };
+  }
+
+  return {
+    code: currency.code,
+    name: currency.name,
+    symbol: currency.symbol,
+    decimals: currency.decimals,
+    number: currency.number,
+  };
+}
+
+export const allCurrencyOptions = countryDataCurrencies.all
+  .filter((currency): currency is RawCurrencyOption => isSupportedCurrency(currency))
+  .filter((currency) => !allCurrencies.includes(currency.code))
+  .map(normalizeCurrencyOption)
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+export const customCurrencyOptions = allCurrencyOptions.filter((currency) =>
+  customCurrencyCodeSet.has(currency.code),
+);
+
+export const allCurrencyCodes = allCurrencyOptions.map(
+  (currency) => currency.code,
+);
+
+export const customCurrencyCodes = customCurrencyOptions.map(
+  (currency) => currency.code,
+);

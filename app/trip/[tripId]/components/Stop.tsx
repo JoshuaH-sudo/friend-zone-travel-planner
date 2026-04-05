@@ -63,7 +63,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
 
   if (isEditing) {
     return (
-      <Card>
+      <Card className="w-full">
         <CardContent className="p-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div className="space-y-2">
@@ -82,7 +82,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
                 </p>
               )}
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="stop-date">Date</Label>
               <Input id="stop-date" {...register("date")} type="date" />
               {errors.date && (
@@ -90,7 +90,7 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
                   {errors.date.message}
                 </p>
               )}
-            </div>
+            </div> */}
             <div className="flex gap-2">
               <Button type="submit">Save</Button>
               <Button
@@ -116,9 +116,9 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
       className="w-full"
       title={<h3 className="text-xl font-semibold">{stop.name}</h3>}
     >
-      <p className="text-muted-foreground mt-2">
+      {/* <p className="text-muted-foreground mt-2">
         {new Date(stop.date).toLocaleDateString()}
-      </p>
+      </p> */}
     </TripItemCard>
   );
 };

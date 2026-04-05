@@ -1,7 +1,7 @@
 import { RxJsonSchema, RxDocument, RxCollection } from "rxdb";
+import { allCurrencyCodes } from "@/lib/constants/currencies";
 
-const Currency = ["USD", "EUR", "JPY", "AUD"] as const;
-type Currency = (typeof Currency)[number];
+type Currency = string;
 
 const TransportType = ["flight", "bus", "car", "train"] as const;
 type TransportType = (typeof TransportType)[number];
@@ -135,7 +135,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
     },
     currency: {
       type: "string",
-      enum: ["USD", "EUR", "JPY", "AUD"],
+      enum: allCurrencyCodes,
     },
     checkIn: {
       type: "string",
@@ -201,7 +201,7 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     },
     currency: {
       type: "string",
-      enum: Currency,
+      enum: allCurrencyCodes,
     },
     date: {
       type: "string",

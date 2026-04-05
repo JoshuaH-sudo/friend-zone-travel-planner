@@ -2,9 +2,6 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
-// data
-import { currencies as AllCurrencies } from "country-data-list";
-
 // shadcn
 import {
   Select,
@@ -32,14 +29,18 @@ export interface Currency {
 }
 
 // constants
-import { customCurrencies, allCurrencies } from "@/lib/constants/currencies";
+import {
+  allCurrencyOptions,
+  customCurrencyOptions,
+} from "@/lib/constants/currencies";
 
 interface CurrencySelectProps extends Omit<
   SelectPrimitive.Group.Props,
   "onValueChange"
 > {
+  disabled?: boolean;
   value?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (value: string | null) => void;
   onCurrencySelect?: (currency: Currency) => void;
   name: string;
   placeholder?: string;
@@ -68,53 +69,21 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
       React.useState<Currency | null>(null);
 
     const uniqueCurrencies = React.useMemo<Currency[]>(() => {
-      const currencyMap = new Map<string, Currency>();
+      if (currencies === "custom") {
+        return customCurrencyOptions;
+      }
 
-      AllCurrencies.all.forEach((currency: Currency) => {
-        if (currency.code && currency.name && currency.symbol) {
-          let shouldInclude = false;
-
-          switch (currencies) {
-            case "custom":
-              shouldInclude = customCurrencies.includes(currency.code);
-              break;
-            case "all":
-              shouldInclude = !allCurrencies.includes(currency.code);
-              break;
-            default:
-              shouldInclude = !allCurrencies.includes(currency.code);
-          }
-
-          if (shouldInclude) {
-            // Special handling for Euro
-            if (currency.code === "EUR") {
-              currencyMap.set(currency.code, {
-                code: currency.code,
-                name: "Euro",
-                symbol: currency.symbol,
-                decimals: currency.decimals,
-                number: currency.number,
-              });
-            } else {
-              currencyMap.set(currency.code, {
-                code: currency.code,
-                name: currency.name,
-                symbol: currency.symbol,
-                decimals: currency.decimals,
-                number: currency.number,
-              });
-            }
-          }
-        }
-      });
-
-      // Convert the map to an array and sort by currency name
-      return Array.from(currencyMap.values()).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
+      return allCurrencyOptions;
     }, [currencies]);
 
-    const handleValueChange = (newValue: string) => {
+    const handleValueChange = (newValue: string | null) => {
+      if (!newValue) {
+        if (onValueChange) {
+          onValueChange(null);
+        }
+        return;
+      }
+
       const fullCurrencyData = uniqueCurrencies.find(
         (curr) => curr.code === newValue,
       );
@@ -164,6 +133,7 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
             onValueChange={handleValueChange}
             {...props}
             name={name}
+            disabled={disabled}
             data-valid={valid}
           >
             <SelectTrigger

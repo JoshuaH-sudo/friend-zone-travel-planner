@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { allCurrencyCodes } from "@/lib/constants/currencies";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -28,7 +29,7 @@ const transportSchema = z.object({
     .number()
     .min(0, "Price must be positive")
     .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
-  currency: z.enum(["USD", "EUR", "JPY", "AUD"], {
+  currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
     message: "Invalid currency",
   }),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
@@ -143,6 +144,7 @@ export const Transport = ({
                   name="currency"
                   value={watchedCurrency}
                   onValueChange={(value) => {
+                    if (!value) return;
                     const event = {
                       target: { name: "currency", value },
                     };
