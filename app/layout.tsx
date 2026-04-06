@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import { DatabaseProvider } from "@/lib/DatabaseProvider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SettingsProvider } from "@/lib/SettingsProvider";
 
 const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -40,16 +41,18 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <DatabaseProvider>
-            <Header />
-            <div className="flex grow">
-              <main className="w-full max-w-4xl items-center gap-4 px-4 mx-auto py-10 sm:items-start">
-                {children}
-              </main>
-            </div>
-            <footer className="w-full py-2 text-center text-sm text-gray-500">
-              &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
-              rights reserved.
-            </footer>
+            <SettingsProvider>
+              <Header />
+              <div className="flex grow">
+                <main className="w-full max-w-4xl items-center gap-4 px-4 mx-auto py-10 sm:items-start">
+                  {children}
+                </main>
+              </div>
+              <footer className="w-full py-2 text-center text-sm text-gray-500">
+                &copy; {new Date().getFullYear()} Friend Zone Travel Planner. All
+                rights reserved.
+              </footer>
+            </SettingsProvider>
           </DatabaseProvider>
         </ThemeProvider>
       </body>
