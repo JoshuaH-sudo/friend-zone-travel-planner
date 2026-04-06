@@ -45,7 +45,7 @@ export default function SettingsPage() {
             <div>
               <p className="font-medium">Theme</p>
               <p className="text-muted-foreground text-sm">
-                Choose your preferred colour scheme.
+                Choose your preferred color scheme.
               </p>
             </div>
             <Select value={theme} onValueChange={(v) => v && setTheme(v)}>

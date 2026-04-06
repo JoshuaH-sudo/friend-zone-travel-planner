@@ -33,7 +33,6 @@ const STORAGE_KEY = "fzt-settings";
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,7 +43,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore parse errors
     }
-    setMounted(true);
   }, []);
 
   const updateSettings = (partial: Partial<Settings>) => {
@@ -64,8 +62,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setDefaultCurrency: (currency) => updateSettings({ defaultCurrency: currency }),
     setLanguage: (language) => updateSettings({ language }),
   };
-
-  if (!mounted) return null;
 
   return (
     <SettingsContext.Provider value={value}>
