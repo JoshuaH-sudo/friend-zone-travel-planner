@@ -37,7 +37,7 @@ export default function SettingsPage() {
               onValueChange={(value) => {
                 if (value) setDefaultCurrency(value);
               }}
-              currencies="custom"
+              currencies="all"
             />
           </div>
 

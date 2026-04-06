@@ -7,10 +7,12 @@ import {
   stopSchema,
   accommodationSchema,
   transportSchema,
+  userSettingsSchema,
   TripCollection,
   StopCollection,
   AccommodationCollection,
   TransportCollection,
+  UserSettingsCollection,
 } from "./rxdb-schema";
 import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 import CryptoJS from "crypto-js";
@@ -26,6 +28,7 @@ export type DatabaseCollections = {
   stops: StopCollection;
   accommodations: AccommodationCollection;
   transports: TransportCollection;
+  settings: UserSettingsCollection;
 };
 
 export type MyDatabase = RxDatabase<DatabaseCollections>;
@@ -83,6 +86,9 @@ async function createDatabase(): Promise<MyDatabase> {
     },
     transports: {
       schema: transportSchema,
+    },
+    settings: {
+      schema: userSettingsSchema,
     },
   });
 

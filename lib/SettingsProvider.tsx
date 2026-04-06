@@ -7,6 +7,8 @@ import {
   useState,
   useEffect,
 } from "react";
+import { useDatabase } from "@/lib/DatabaseProvider";
+import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
 
 interface Settings {
   defaultCurrency: string;
@@ -29,31 +31,31 @@ const SettingsContext = createContext<SettingsContextValue>({
   setLanguage: () => {},
 });
 
-const STORAGE_KEY = "fzt-settings";
-
 export function SettingsProvider({ children }: { children: ReactNode }) {
+  const db = useDatabase();
   const [settings, setSettings] = useState<Settings>(defaultSettings);
 
+  // Subscribe to settings document in RxDB
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setSettings({ ...defaultSettings, ...JSON.parse(stored) });
-      }
-    } catch {
-      // ignore parse errors
-    }
-  }, []);
+    const subscription = db.settings
+      .findOne(USER_SETTINGS_ID)
+      .$.subscribe((doc) => {
+        if (doc) {
+          setSettings({
+            defaultCurrency: doc.defaultCurrency,
+            language: doc.language,
+          });
+        }
+      });
 
-  const updateSettings = (partial: Partial<Settings>) => {
-    setSettings((prev) => {
-      const next = { ...prev, ...partial };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // ignore storage errors
-      }
-      return next;
+    return () => subscription.unsubscribe();
+  }, [db]);
+
+  const updateSettings = async (partial: Partial<Settings>) => {
+    const next = { ...settings, ...partial };
+    await db.settings.upsert({
+      id: USER_SETTINGS_ID,
+      ...next,
     });
   };
 
