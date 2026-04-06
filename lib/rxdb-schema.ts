@@ -47,6 +47,12 @@ export type TransportDocument = {
   updatedAt: number;
 };
 
+export type UserSettingsDocument = {
+  id: string;
+  defaultCurrency: string;
+  language: string;
+};
+
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
   version: 0,
@@ -285,4 +291,40 @@ export type TransportCollection = RxCollection<
   TransportDocument,
   TransportDocMethods,
   TransportCollectionMethods
+>;
+
+export const USER_SETTINGS_ID = "user-settings";
+
+export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      maxLength: 100,
+    },
+    defaultCurrency: {
+      type: "string",
+      enum: allCurrencyCodes,
+    },
+    language: {
+      type: "string",
+      maxLength: 10,
+    },
+  },
+  required: ["id", "defaultCurrency", "language"],
+};
+
+export type UserSettingsDocMethods = Record<string, never>;
+export type UserSettingsDocumentType = RxDocument<
+  UserSettingsDocument,
+  UserSettingsDocMethods
+>;
+
+export type UserSettingsCollectionMethods = Record<string, never>;
+export type UserSettingsCollection = RxCollection<
+  UserSettingsDocument,
+  UserSettingsDocMethods,
+  UserSettingsCollectionMethods
 >;
