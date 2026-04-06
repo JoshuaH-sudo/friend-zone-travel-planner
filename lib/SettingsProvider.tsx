@@ -52,10 +52,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [db]);
 
   const updateSettings = async (partial: Partial<Settings>) => {
-    const next = { ...settings, ...partial };
+    const currentDoc = await db.settings.findOne(USER_SETTINGS_ID).exec();
+    const current: Settings = currentDoc
+      ? { defaultCurrency: currentDoc.defaultCurrency, language: currentDoc.language }
+      : defaultSettings;
     await db.settings.upsert({
       id: USER_SETTINGS_ID,
-      ...next,
+      ...current,
+      ...partial,
     });
   };
 
