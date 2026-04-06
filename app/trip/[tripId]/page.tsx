@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dot, MapPin } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Plus, Tick02Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, Plus, Tick02Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
 import { useTripData } from "@/components/hooks/useTripData";
+import { exportTripToIcal } from "@/lib/ical-export";
 
 function TripDetails() {
   const params = useParams();
@@ -45,6 +46,10 @@ function TripDetails() {
   const cancelTripNameEdit = () => {
     setTripNameDraft(trip?.name ?? "");
     setIsEditingTripName(false);
+  };
+
+  const exportTrip = async () => {
+    await exportTripToIcal(database, tripId);
   };
 
   const addStop = async () => {
@@ -179,12 +184,23 @@ function TripDetails() {
           </div>
         </form>
       ) : (
-        <h5
-          className="cursor-pointer text-xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
-          onClick={startEditingTripName}
-        >
-          {trip.name}
-        </h5>
+        <div className="flex w-full items-center justify-between gap-4">
+          <h5
+            className="cursor-pointer text-xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
+            onClick={startEditingTripName}
+          >
+            {trip.name}
+          </h5>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="shrink-0 bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
+            aria-label="Export trip to iCal"
+            onClick={exportTrip}
+          >
+            <HugeiconsIcon icon={CalendarDownload01Icon} />
+          </Button>
+        </div>
       )}
       <Separator className="my-6" />
       <TripStats tripId={tripId} tripData={tripData} />

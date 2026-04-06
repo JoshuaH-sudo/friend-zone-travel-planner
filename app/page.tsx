@@ -11,7 +11,8 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { PlusIcon } from "lucide-react";
 import { TripStats } from "./trip/[tripId]/components/TripStats";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { Cancel01Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
+import { exportTripToIcal } from "@/lib/ical-export";
 
 function TripList() {
   const router = useRouter();
@@ -60,6 +61,11 @@ function TripList() {
     }
   };
 
+  const exportTrip = async (tripId: string) => {
+    if (!database) return;
+    await exportTripToIcal(database, tripId);
+  };
+
   return (
     <div>
       <span className="flex justify-between">
@@ -85,26 +91,37 @@ function TripList() {
                 >
                   {trip.name}
                 </Link>
-                <ConfirmationDialog
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
-                      aria-label="Delete trip"
-                    >
-                      <HugeiconsIcon icon={Cancel01Icon} />
-                    </Button>
-                  }
-                  title="Delete this trip?"
-                  description={`This will permanently remove ${trip.name} and all of its trip data.`}
-                  confirmLabel="Delete trip"
-                  onConfirm={() => deleteTrip(trip.id)}
-                >
-                  <p className="text-muted-foreground text-sm">
-                    This action cannot be undone.
-                  </p>
-                </ConfirmationDialog>
+                <div className="flex shrink-0 items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
+                    aria-label="Export trip to iCal"
+                    onClick={() => exportTrip(trip.id)}
+                  >
+                    <HugeiconsIcon icon={CalendarDownload01Icon} />
+                  </Button>
+                  <ConfirmationDialog
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
+                        aria-label="Delete trip"
+                      >
+                        <HugeiconsIcon icon={Cancel01Icon} />
+                      </Button>
+                    }
+                    title="Delete this trip?"
+                    description={`This will permanently remove ${trip.name} and all of its trip data.`}
+                    confirmLabel="Delete trip"
+                    onConfirm={() => deleteTrip(trip.id)}
+                  >
+                    <p className="text-muted-foreground text-sm">
+                      This action cannot be undone.
+                    </p>
+                  </ConfirmationDialog>
+                </div>
               </div>
               <TripStats tripId={trip.id} />
             </CardContent>
