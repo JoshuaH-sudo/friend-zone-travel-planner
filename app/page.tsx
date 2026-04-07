@@ -13,11 +13,13 @@ import { TripStats } from "./trip/[tripId]/components/TripStats";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
 import { exportTripToIcal } from "@/lib/ical-export";
+import { useSettings } from "@/lib/SettingsProvider";
 
 function TripList() {
   const router = useRouter();
   const [trips, setTrips] = useState<TripDocument[]>([]);
   const [database, setDatabase] = useState<MyDatabase | null>(null);
+  const { timezone } = useSettings();
 
   useEffect(() => {
     const fetchDatabase = async () => {
@@ -63,7 +65,7 @@ function TripList() {
 
   const exportTrip = async (tripId: string) => {
     if (!database) return;
-    await exportTripToIcal(database, tripId);
+    await exportTripToIcal(database, tripId, timezone);
   };
 
   return (

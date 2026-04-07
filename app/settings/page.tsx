@@ -13,7 +13,7 @@ import { useSettings } from "@/lib/SettingsProvider";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const { defaultCurrency, setDefaultCurrency, language, setLanguage } =
+  const { defaultCurrency, setDefaultCurrency, language, setLanguage, timezone, setTimezone } =
     useSettings();
 
   return (
@@ -73,6 +73,27 @@ export default function SettingsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">Timezone</p>
+              <p className="text-muted-foreground text-sm">
+                The timezone used when exporting trip data to iCal.
+              </p>
+            </div>
+            <Select value={timezone} onValueChange={(v) => v && setTimezone(v)}>
+              <SelectTrigger className="w-56">
+                <SelectValue placeholder="Select timezone" />
+              </SelectTrigger>
+              <SelectContent>
+                {Intl.supportedValuesOf("timeZone").map((tz) => (
+                  <SelectItem key={tz} value={tz}>
+                    {tz}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

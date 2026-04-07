@@ -2,6 +2,7 @@ import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { wrappedValidateAjvStorage } from "rxdb/plugins/validate-ajv";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+import { RxDBMigrationPlugin } from "rxdb/plugins/migration-schema";
 import {
   tripSchema,
   stopSchema,
@@ -36,6 +37,7 @@ export type MyDatabase = RxDatabase<DatabaseCollections>;
 let dbPromise: Promise<MyDatabase> | null = null;
 
 addRxPlugin(RxDBQueryBuilderPlugin);
+addRxPlugin(RxDBMigrationPlugin);
 
 const isDevMode = process.env.NODE_ENV === "development";
 const cryptoAvailable = typeof crypto !== "undefined" && crypto.subtle;
@@ -89,6 +91,9 @@ async function createDatabase(): Promise<MyDatabase> {
     },
     settings: {
       schema: userSettingsSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, timezone: "UTC" }),
+      },
     },
   });
 

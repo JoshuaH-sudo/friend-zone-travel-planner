@@ -13,22 +13,26 @@ import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
 interface Settings {
   defaultCurrency: string;
   language: string;
+  timezone: string;
 }
 
 interface SettingsContextValue extends Settings {
   setDefaultCurrency: (currency: string) => void;
   setLanguage: (language: string) => void;
+  setTimezone: (timezone: string) => void;
 }
 
 const defaultSettings: Settings = {
   defaultCurrency: "USD",
   language: "en",
+  timezone: "UTC",
 };
 
 const SettingsContext = createContext<SettingsContextValue>({
   ...defaultSettings,
   setDefaultCurrency: () => {},
   setLanguage: () => {},
+  setTimezone: () => {},
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
@@ -44,6 +48,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           setSettings({
             defaultCurrency: doc.defaultCurrency,
             language: doc.language,
+            timezone: doc.timezone,
           });
         }
       });
@@ -54,7 +59,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const updateSettings = async (partial: Partial<Settings>) => {
     const currentDoc = await db.settings.findOne(USER_SETTINGS_ID).exec();
     const current: Settings = currentDoc
-      ? { defaultCurrency: currentDoc.defaultCurrency, language: currentDoc.language }
+      ? {
+          defaultCurrency: currentDoc.defaultCurrency,
+          language: currentDoc.language,
+          timezone: currentDoc.timezone,
+        }
       : defaultSettings;
     await db.settings.upsert({
       id: USER_SETTINGS_ID,
@@ -67,6 +76,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     ...settings,
     setDefaultCurrency: (currency) => updateSettings({ defaultCurrency: currency }),
     setLanguage: (language) => updateSettings({ language }),
+    setTimezone: (timezone) => updateSettings({ timezone }),
   };
 
   return (

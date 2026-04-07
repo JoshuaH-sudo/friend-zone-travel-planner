@@ -51,6 +51,7 @@ export type UserSettingsDocument = {
   id: string;
   defaultCurrency: string;
   language: string;
+  timezone: string;
 };
 
 // RxDB Schemas
@@ -296,7 +297,7 @@ export type TransportCollection = RxCollection<
 export const USER_SETTINGS_ID = "user-settings";
 
 export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -312,8 +313,12 @@ export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
       type: "string",
       maxLength: 10,
     },
+    timezone: {
+      type: "string",
+      maxLength: 100,
+    },
   },
-  required: ["id", "defaultCurrency", "language"],
+  required: ["id", "defaultCurrency", "language", "timezone"],
 };
 
 export type UserSettingsDocMethods = Record<string, never>;

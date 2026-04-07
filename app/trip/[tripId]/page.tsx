@@ -14,11 +14,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, Plus, Tick02Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
 import { useTripData } from "@/components/hooks/useTripData";
 import { exportTripToIcal } from "@/lib/ical-export";
+import { useSettings } from "@/lib/SettingsProvider";
 
 function TripDetails() {
   const params = useParams();
   const tripId = params.tripId as string;
   const database = useDatabase();
+  const { timezone } = useSettings();
   const [isEditingTripName, setIsEditingTripName] = useState(false);
   const [tripNameDraft, setTripNameDraft] = useState("");
   const tripData = useTripData(tripId, { database });
@@ -49,7 +51,7 @@ function TripDetails() {
   };
 
   const exportTrip = async () => {
-    await exportTripToIcal(database, tripId);
+    await exportTripToIcal(database, tripId, timezone);
   };
 
   const addStop = async () => {
