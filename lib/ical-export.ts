@@ -58,7 +58,7 @@ function foldLine(line: string): string {
       segments.push(current);
       current = char;
       currentBytes = charBytes;
-      maxBytes = 74; // continuation lines: 1 space prefix (not counted here) + 74 octets = 75
+      maxBytes = 74; // physical line = 1-byte space prefix (added by join) + ≤74 content bytes = ≤75 octets total
     } else {
       current += char;
       currentBytes += charBytes;
