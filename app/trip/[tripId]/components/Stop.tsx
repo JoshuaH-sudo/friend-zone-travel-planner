@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, type ZodType } from "zod";
+import { z } from "zod";
 import { StopDocumentType } from "@/lib/rxdb-schema";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
-
-type StopFormData = {
-  name: string;
-  date: string;
-};
 
 type StopProps = {
   stop: StopDocumentType;
@@ -31,7 +26,7 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const database = useDatabase();
 
-  const stopSchema: ZodType<StopFormData> = z.object({
+  const stopSchema = z.object({
     name: z
       .string()
       .min(1, t("errors.nameRequired"))
@@ -40,6 +35,7 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, t("errors.invalidDateFormat")),
   });
+  type StopFormData = z.infer<typeof stopSchema>;
 
   const {
     register,

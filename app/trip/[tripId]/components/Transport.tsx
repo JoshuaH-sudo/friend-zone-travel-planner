@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, type ZodType } from "zod";
+import { z } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,16 +24,6 @@ import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
-
-export type TransportFormData = {
-  name: string;
-  type: "flight" | "bus" | "car" | "train";
-  price: number;
-  currency: string;
-  departureDateTime: string;
-  arrivalDateTime?: string;
-  timezone?: string;
-};
 
 export const Transport = ({
   transport,
@@ -58,7 +48,7 @@ export const Transport = ({
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
-  const transportSchema: ZodType<TransportFormData> = z.object({
+  const transportSchema = z.object({
     name: z
       .string()
       .min(1, t("errors.nameRequired"))
@@ -83,6 +73,7 @@ export const Transport = ({
       .optional(),
     timezone: z.string().optional(),
   });
+  type TransportFormData = z.infer<typeof transportSchema>;
 
   const {
     register,

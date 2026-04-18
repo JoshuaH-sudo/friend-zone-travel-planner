@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, type ZodType } from "zod";
+import { z } from "zod";
 import { AccommodationDocumentType } from "@/lib/rxdb-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,15 +21,6 @@ import {
   formatStoredDateTime,
 } from "@/lib/datetime-utils";
 
-export type AccommodationFormData = {
-  name: string;
-  price: number;
-  currency: string;
-  checkIn: string;
-  checkOut: string;
-  timezone?: string;
-};
-
 export const Accommodation = ({
   accommodation,
   startInEditMode = false,
@@ -46,7 +37,7 @@ export const Accommodation = ({
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
-  const accommodationSchema: ZodType<AccommodationFormData> = z
+  const accommodationSchema = z
     .object({
       name: z
         .string()
@@ -71,6 +62,7 @@ export const Accommodation = ({
       message: t("errors.checkOutAfterCheckIn"),
       path: ["checkOut"],
     });
+  type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
   const {
     handleSubmit,
