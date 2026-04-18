@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -48,13 +48,17 @@ export type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
 export const Accommodation = ({
   accommodation,
+  startInEditMode = false,
 }: {
   accommodation: AccommodationDocumentType;
+  startInEditMode?: boolean;
 }) => {
   const time = useTime();
   const { timezone: settingsTimezone } = useSettings();
   const { name, price, currency, checkIn, checkOut, timezone } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
+  const [highlightNameInput, setHighlightNameInput] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     handleSubmit,
@@ -75,6 +79,24 @@ export const Accommodation = ({
   });
 
   const watchedCurrency = watch("currency");
+
+  useEffect(() => {
+    if (!startInEditMode) return;
+
+    setIsEditing(true);
+    setHighlightNameInput(true);
+
+    requestAnimationFrame(() => {
+      nameInputRef.current?.focus();
+      nameInputRef.current?.select();
+    });
+
+    const timeout = setTimeout(() => {
+      setHighlightNameInput(false);
+    }, 1400);
+
+    return () => clearTimeout(timeout);
+  }, [startInEditMode]);
 
   const onSubmit = async (data: AccommodationFormData) => {
     await accommodation.patch({
@@ -109,11 +131,16 @@ export const Accommodation = ({
                   <>
                     <Label htmlFor="accommodation-name">Name</Label>
                     <Input
-                      id="accommodation-name"
+                      id={`accommodation-name-${accommodation.id}`}
                       {...field}
+                      ref={(element) => {
+                        field.ref(element);
+                        nameInputRef.current = element;
+                      }}
                       type="text"
                       autoFocus
                       placeholder="Accommodation name"
+                      className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
                     />
                   </>
                 )}

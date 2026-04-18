@@ -24,6 +24,12 @@ function TripDetails() {
   const [pendingNewStopId, setPendingNewStopId] = useState<string | null>(
     null,
   );
+  const [pendingNewAccommodationId, setPendingNewAccommodationId] = useState<
+    string | null
+  >(null);
+  const [pendingNewTransportId, setPendingNewTransportId] = useState<
+    string | null
+  >(null);
   const tripData = useTripData(tripId, { database });
   const { trip, stops, accommodationsByStop, transportsByStop, loading } =
     tripData;
@@ -40,6 +46,36 @@ function TripDetails() {
 
     setPendingNewStopId(null);
   }, [stops, pendingNewStopId]);
+
+  useEffect(() => {
+    if (!pendingNewAccommodationId) return;
+
+    const createdAccommodationExists = Object.values(accommodationsByStop)
+      .flat()
+      .some((accommodation) => accommodation.id === pendingNewAccommodationId);
+    if (!createdAccommodationExists) return;
+
+    document
+      .getElementById(`trip-item-${pendingNewAccommodationId}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    setPendingNewAccommodationId(null);
+  }, [accommodationsByStop, pendingNewAccommodationId]);
+
+  useEffect(() => {
+    if (!pendingNewTransportId) return;
+
+    const createdTransportExists = Object.values(transportsByStop)
+      .flat()
+      .some((transport) => transport.id === pendingNewTransportId);
+    if (!createdTransportExists) return;
+
+    document
+      .getElementById(`trip-item-${pendingNewTransportId}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    setPendingNewTransportId(null);
+  }, [transportsByStop, pendingNewTransportId]);
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
@@ -97,8 +133,9 @@ function TripDetails() {
     if (!stop) return;
 
     const { generateId } = await import("@/lib/rxdb-database");
+    const newAccommodationId = generateId();
     await database.accommodations.insert({
-      id: generateId(),
+      id: newAccommodationId,
       name: "New Accommodation",
       price: 0,
       currency: "USD",
@@ -108,6 +145,8 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+
+    setPendingNewAccommodationId(newAccommodationId);
   };
 
   const onAddTransport = async (stopId: string) => {
@@ -115,8 +154,9 @@ function TripDetails() {
     if (!stop) return;
 
     const { generateId } = await import("@/lib/rxdb-database");
+    const newTransportId = generateId();
     await database.transports.insert({
-      id: generateId(),
+      id: newTransportId,
       name: "New Transport",
       type: "flight",
       price: 0,
@@ -126,6 +166,8 @@ function TripDetails() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+
+    setPendingNewTransportId(newTransportId);
   };
 
   if (loading) {
@@ -195,6 +237,8 @@ function TripDetails() {
                       stop={stop}
                       onAddAccommodation={onAddAccommodation}
                       onAddTransport={onAddTransport}
+                      pendingNewAccommodationId={pendingNewAccommodationId}
+                      pendingNewTransportId={pendingNewTransportId}
                     />
                   </li>
                 );

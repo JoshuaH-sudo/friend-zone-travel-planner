@@ -18,6 +18,8 @@ interface StopItemsProps {
   stop: StopDocumentType;
   onAddAccommodation: (stopId: string) => Promise<void>;
   onAddTransport: (stopId: string) => Promise<void>;
+  pendingNewAccommodationId?: string | null;
+  pendingNewTransportId?: string | null;
 }
 
 export function StopItems({
@@ -26,6 +28,8 @@ export function StopItems({
   stop,
   onAddAccommodation,
   onAddTransport,
+  pendingNewAccommodationId,
+  pendingNewTransportId,
 }: StopItemsProps) {
   const items = [
     ...transports.map((trans) => ({
@@ -71,7 +75,7 @@ export function StopItems({
         >
           <ul className="space-y-6">
             {items.map((item) => (
-              <li key={item.id} className="relative pl-8">
+              <li id={`trip-item-${item.id}`} key={item.id} className="relative pl-8">
                 <div
                   id={`item-icon-${item.id}`}
                   className="bg-background border-primary absolute top-3 left-px flex size-7 shrink-0 -translate-x-1/2 items-center justify-center rounded-full border-2"
@@ -88,9 +92,15 @@ export function StopItems({
                 </div>
                 <div>
                   {item.type === "accommodation" ? (
-                    <Accommodation accommodation={item.model} />
+                    <Accommodation
+                      accommodation={item.model}
+                      startInEditMode={pendingNewAccommodationId === item.id}
+                    />
                   ) : (
-                    <Transport transport={item.model} />
+                    <Transport
+                      transport={item.model}
+                      startInEditMode={pendingNewTransportId === item.id}
+                    />
                   )}
                 </div>
               </li>

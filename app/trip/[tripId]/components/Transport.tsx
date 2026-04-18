@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -51,8 +51,10 @@ export type TransportFormData = z.infer<typeof transportSchema>;
 
 export const Transport = ({
   transport,
+  startInEditMode = false,
 }: {
   transport: TransportDocumentType;
+  startInEditMode?: boolean;
 }) => {
   const time = useTime();
   const { timezone: settingsTimezone } = useSettings();
@@ -66,6 +68,8 @@ export const Transport = ({
     timezone,
   } = transport;
   const [isEditing, setIsEditing] = useState(false);
+  const [highlightNameInput, setHighlightNameInput] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -88,6 +92,25 @@ export const Transport = ({
 
   const watchedType = watch("type");
   const watchedCurrency = watch("currency");
+  const nameRegistration = register("name");
+
+  useEffect(() => {
+    if (!startInEditMode) return;
+
+    setIsEditing(true);
+    setHighlightNameInput(true);
+
+    requestAnimationFrame(() => {
+      nameInputRef.current?.focus();
+      nameInputRef.current?.select();
+    });
+
+    const timeout = setTimeout(() => {
+      setHighlightNameInput(false);
+    }, 1400);
+
+    return () => clearTimeout(timeout);
+  }, [startInEditMode]);
 
   const onSubmit = async (data: TransportFormData) => {
     await transport.patch({
@@ -116,13 +139,18 @@ export const Transport = ({
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="transport-name">Name</Label>
+              <Label htmlFor={`transport-name-${transport.id}`}>Name</Label>
               <Input
-                id="transport-name"
-                {...register("name")}
+                id={`transport-name-${transport.id}`}
+                {...nameRegistration}
+                ref={(element) => {
+                  nameRegistration.ref(element);
+                  nameInputRef.current = element;
+                }}
                 type="text"
                 autoFocus
                 placeholder="Transport name"
+                className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
