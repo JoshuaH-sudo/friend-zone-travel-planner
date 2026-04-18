@@ -20,6 +20,8 @@ import {
   isValidTheme,
 } from "@/lib/app-data-transfer";
 
+const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+
 export default function SettingsPage() {
   const database = useDatabase();
   const { theme, setTheme } = useTheme();
@@ -52,6 +54,12 @@ export default function SettingsPage() {
   const handleImportFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
+      return;
+    }
+
+    if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+      setStatusMessage("Failed to import app data: file is too large (max 5 MB).");
+      event.target.value = "";
       return;
     }
 
@@ -160,7 +168,7 @@ export default function SettingsPage() {
           <p className="text-muted-foreground text-sm">
             Export all app data (trips, settings, and preferences) or upload a
             previously exported backup. Uploading a backup replaces current app
-            data.
+            data. Maximum upload size is 5 MB.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button

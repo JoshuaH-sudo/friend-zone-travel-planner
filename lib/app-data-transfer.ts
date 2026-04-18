@@ -4,6 +4,7 @@ import {
   StopDocument,
   TransportDocument,
   TripDocument,
+  USER_SETTINGS_ID,
   UserSettingsDocument,
 } from "@/lib/rxdb-schema";
 
@@ -68,6 +69,10 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return isObject(value) && !Array.isArray(value);
+}
+
 export function isValidTheme(value: unknown): value is AllowedThemeValue {
   return ALLOWED_THEME_VALUES.includes(value as AllowedThemeValue);
 }
@@ -76,7 +81,7 @@ function readArray<T>(value: unknown, key: string): T[] {
   if (!Array.isArray(value)) {
     throw new Error(`Invalid export format: ${key}`);
   }
-  if (!value.every((item) => isObject(item))) {
+  if (!value.every((item) => isPlainObject(item))) {
     throw new Error(`Invalid export format: ${key}`);
   }
   return value as T[];
@@ -110,6 +115,10 @@ export async function importAppData(db: MyDatabase, content: string) {
     ),
     settings: readArray<UserSettingsDocument>(dataValue.settings, "data.settings"),
   };
+
+  if (data.settings.length !== 1 || data.settings[0]?.id !== USER_SETTINGS_ID) {
+    throw new Error("Invalid export format: data.settings");
+  }
 
   const [
     previousTrips,
