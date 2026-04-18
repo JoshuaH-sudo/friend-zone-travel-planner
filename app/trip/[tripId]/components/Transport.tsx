@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,31 +48,37 @@ export const Transport = ({
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
-  const transportSchema = z.object({
-    name: z
-      .string()
-      .min(1, t("errors.nameRequired"))
-      .max(200, t("errors.nameTooLong")),
-    type: z.enum(["flight", "bus", "car", "train"], {
-      message: t("errors.invalidTransportType"),
-    }),
-    price: z
-      .number()
-      .min(0, t("errors.priceMustBePositive"))
-      .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
-    currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-      message: t("errors.invalidCurrency"),
-    }),
-    departureDateTime: z
-      .string()
-      .regex(DATETIME_REGEX, t("errors.selectDepartureDateTime")),
-    arrivalDateTime: z
-      .string()
-      .regex(DATETIME_REGEX, t("errors.invalidArrivalDateTime"))
-      .or(z.literal(""))
-      .optional(),
-    timezone: z.string().optional(),
-  });
+  const transportSchema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .min(1, t("errors.nameRequired"))
+          .max(200, t("errors.nameTooLong")),
+        type: z.enum(["flight", "bus", "car", "train"], {
+          message: t("errors.invalidTransportType"),
+        }),
+        price: z
+          .number()
+          .min(0, t("errors.priceMustBePositive"))
+          .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+        currency: z
+          .string()
+          .refine((value) => allCurrencyCodes.includes(value), {
+            message: t("errors.invalidCurrency"),
+          }),
+        departureDateTime: z
+          .string()
+          .regex(DATETIME_REGEX, t("errors.selectDepartureDateTime")),
+        arrivalDateTime: z
+          .string()
+          .regex(DATETIME_REGEX, t("errors.invalidArrivalDateTime"))
+          .or(z.literal(""))
+          .optional(),
+        timezone: z.string().optional(),
+      }),
+    [t],
+  );
   type TransportFormData = z.infer<typeof transportSchema>;
 
   const {

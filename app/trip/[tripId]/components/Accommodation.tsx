@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,31 +37,37 @@ export const Accommodation = ({
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
-  const accommodationSchema = z
-    .object({
-      name: z
-        .string()
-        .min(1, t("errors.nameRequired"))
-        .max(200, t("errors.nameTooLong")),
-      price: z
-        .number()
-        .min(0, t("errors.priceMustBePositive"))
-        .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
-      currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-        message: t("errors.invalidCurrency"),
-      }),
-      checkIn: z
-        .string()
-        .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckInDateTime")),
-      checkOut: z
-        .string()
-        .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckOutDateTime")),
-      timezone: z.string().optional(),
-    })
-    .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
-      message: t("errors.checkOutAfterCheckIn"),
-      path: ["checkOut"],
-    });
+  const accommodationSchema = useMemo(
+    () =>
+      z
+        .object({
+          name: z
+            .string()
+            .min(1, t("errors.nameRequired"))
+            .max(200, t("errors.nameTooLong")),
+          price: z
+            .number()
+            .min(0, t("errors.priceMustBePositive"))
+            .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+          currency: z
+            .string()
+            .refine((value) => allCurrencyCodes.includes(value), {
+              message: t("errors.invalidCurrency"),
+            }),
+          checkIn: z
+            .string()
+            .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckInDateTime")),
+          checkOut: z
+            .string()
+            .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckOutDateTime")),
+          timezone: z.string().optional(),
+        })
+        .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
+          message: t("errors.checkOutAfterCheckIn"),
+          path: ["checkOut"],
+        }),
+    [t],
+  );
   type AccommodationFormData = z.infer<typeof accommodationSchema>;
 
   const {
