@@ -30,6 +30,7 @@ export type AccommodationDocument = {
   currency: Currency;
   checkIn: string;
   checkOut: string;
+  timezone?: string;
   stopId: string;
   createdAt: number;
   updatedAt: number;
@@ -42,6 +43,9 @@ export type TransportDocument = {
   price: number;
   currency: Currency;
   date: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  timezone?: string;
   stopId: string;
   createdAt: number;
   updatedAt: number;
@@ -123,7 +127,7 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
 };
 
 export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -149,6 +153,10 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
       maxLength: 100,
     },
     checkOut: {
+      type: "string",
+      maxLength: 100,
+    },
+    timezone: {
       type: "string",
       maxLength: 100,
     },
@@ -185,7 +193,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
 };
 
 export const transportSchema: RxJsonSchema<TransportDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -211,6 +219,18 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
       enum: allCurrencyCodes,
     },
     date: {
+      type: "string",
+      maxLength: 100,
+    },
+    departureTime: {
+      type: "string",
+      maxLength: 10,
+    },
+    arrivalTime: {
+      type: "string",
+      maxLength: 10,
+    },
+    timezone: {
       type: "string",
       maxLength: 100,
     },

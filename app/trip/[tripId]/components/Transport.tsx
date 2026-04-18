@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
@@ -18,22 +18,38 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
+import { useSettings } from "@/lib/SettingsProvider";
 
-const transportSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
-  type: z.enum(["flight", "bus", "car", "train"], {
-    message: "Invalid transport type",
-  }),
-  price: z
-    .number()
-    .min(0, "Price must be positive")
-    .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
-  currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-    message: "Invalid currency",
-  }),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
-});
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+const transportSchema = z
+  .object({
+    name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+    type: z.enum(["flight", "bus", "car", "train"], {
+      message: "Invalid transport type",
+    }),
+    price: z
+      .number()
+      .min(0, "Price must be positive")
+      .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
+    currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
+      message: "Invalid currency",
+    }),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+    departureTime: z
+      .string()
+      .regex(timeRegex, "Invalid time (HH:MM)")
+      .or(z.literal(""))
+      .optional(),
+    arrivalTime: z
+      .string()
+      .regex(timeRegex, "Invalid time (HH:MM)")
+      .or(z.literal(""))
+      .optional(),
+    timezone: z.string().optional(),
+  });
 
 export type TransportFormData = z.infer<typeof transportSchema>;
 
@@ -43,17 +59,28 @@ export const Transport = ({
   transport: TransportDocumentType;
 }) => {
   const time = useTime();
-  const { name, type, price, currency, date } = transport;
+  const { timezone: settingsTimezone } = useSettings();
+  const { name, type, price, currency, date, departureTime, arrivalTime, timezone } = transport;
   const [isEditing, setIsEditing] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<TransportFormData>({
     resolver: zodResolver(transportSchema),
-    defaultValues: { name, type, price, currency, date },
+    defaultValues: {
+      name,
+      type,
+      price,
+      currency,
+      date,
+      departureTime: departureTime ?? "",
+      arrivalTime: arrivalTime ?? "",
+      timezone: timezone ?? settingsTimezone,
+    },
   });
 
   const watchedType = watch("type");
@@ -66,6 +93,9 @@ export const Transport = ({
       price: Math.round(data.price * 100) / 100,
       currency: data.currency,
       date: data.date,
+      departureTime: data.departureTime || undefined,
+      arrivalTime: data.arrivalTime || undefined,
+      timezone: data.timezone || undefined,
       updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
@@ -167,6 +197,57 @@ export const Transport = ({
                 </p>
               )}
             </div>
+            <div className="flex gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="transport-departure-time">
+                  Departure time{" "}
+                  <span className="text-muted-foreground text-xs">(optional)</span>
+                </Label>
+                <Input
+                  id="transport-departure-time"
+                  {...register("departureTime")}
+                  type="time"
+                />
+                {errors.departureTime && (
+                  <p className="text-destructive text-sm">
+                    {errors.departureTime.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="transport-arrival-time">
+                  Arrival time{" "}
+                  <span className="text-muted-foreground text-xs">(optional)</span>
+                </Label>
+                <Input
+                  id="transport-arrival-time"
+                  {...register("arrivalTime")}
+                  type="time"
+                />
+                {errors.arrivalTime && (
+                  <p className="text-destructive text-sm">
+                    {errors.arrivalTime.message}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>
+                Timezone{" "}
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </Label>
+              <Controller
+                control={control}
+                name="timezone"
+                render={({ field }) => (
+                  <TimezonePicker
+                    value={field.value ?? settingsTimezone}
+                    onValueChange={field.onChange}
+                    className="w-full"
+                  />
+                )}
+              />
+            </div>
             <div className="flex gap-2">
               <Button type="submit">Save</Button>
               <Button
@@ -200,6 +281,14 @@ export const Transport = ({
       <p className="text-muted-foreground mt-2">
         Date: {new Date(date).toLocaleDateString()}
       </p>
+      {(departureTime || arrivalTime) && (
+        <p className="text-muted-foreground mt-1 text-sm">
+          {departureTime && <>Dep: {departureTime}</>}
+          {departureTime && arrivalTime && <span className="mx-1">→</span>}
+          {arrivalTime && <>Arr: {arrivalTime}</>}
+          {timezone && <span className="ml-1 text-xs">({timezone})</span>}
+        </p>
+      )}
     </TripItemCard>
   );
 };

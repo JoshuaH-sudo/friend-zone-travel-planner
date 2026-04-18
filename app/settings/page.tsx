@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { useSettings } from "@/lib/SettingsProvider";
 
 export default function SettingsPage() {
@@ -79,23 +80,17 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-medium">Timezone</p>
+              <p className="font-medium">Default Timezone</p>
               <p className="text-muted-foreground text-sm">
-                The timezone used when exporting trip data to iCal.
+                Used as the default when exporting trip data to iCal and when
+                adding new transport or accommodation items.
               </p>
             </div>
-            <Select value={timezone} onValueChange={(v) => v && setTimezone(v)}>
-              <SelectTrigger className="w-56">
-                <SelectValue placeholder="Select timezone" />
-              </SelectTrigger>
-              <SelectContent>
-                {Intl.supportedValuesOf("timeZone").map((tz) => (
-                  <SelectItem key={tz} value={tz}>
-                    {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <TimezonePicker
+              value={timezone}
+              onValueChange={(v) => v && setTimezone(v)}
+              className="max-w-56"
+            />
           </div>
         </div>
       </section>

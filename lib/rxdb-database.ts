@@ -85,9 +85,20 @@ async function createDatabase(): Promise<MyDatabase> {
     },
     accommodations: {
       schema: accommodationSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, timezone: undefined }),
+      },
     },
     transports: {
       schema: transportSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({
+          ...oldDoc,
+          departureTime: undefined,
+          arrivalTime: undefined,
+          timezone: undefined,
+        }),
+      },
     },
     settings: {
       schema: userSettingsSchema,

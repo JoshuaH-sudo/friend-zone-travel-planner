@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AccommodationDocumentType } from "@/lib/rxdb-schema";
@@ -11,7 +11,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
+import { useSettings } from "@/lib/SettingsProvider";
 
 const accommodationSchema = z
   .object({
@@ -25,6 +27,7 @@ const accommodationSchema = z
     }),
     checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
     checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+    timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
     message: "Check-out date must be after check-in date",
@@ -39,17 +42,26 @@ export const Accommodation = ({
   accommodation: AccommodationDocumentType;
 }) => {
   const time = useTime();
-  const { name, price, currency, checkIn, checkOut } = accommodation;
+  const { timezone: settingsTimezone } = useSettings();
+  const { name, price, currency, checkIn, checkOut, timezone } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<AccommodationFormData>({
     resolver: zodResolver(accommodationSchema),
-    defaultValues: { name, price, currency, checkIn, checkOut },
+    defaultValues: {
+      name,
+      price,
+      currency,
+      checkIn,
+      checkOut,
+      timezone: timezone ?? settingsTimezone,
+    },
   });
 
   const watchedCurrency = watch("currency");
@@ -61,6 +73,7 @@ export const Accommodation = ({
       currency: data.currency,
       checkIn: data.checkIn,
       checkOut: data.checkOut,
+      timezone: data.timezone || undefined,
       updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
@@ -144,6 +157,23 @@ export const Accommodation = ({
                 </p>
               )}
             </div>
+            <div className="space-y-2">
+              <Label>
+                Timezone{" "}
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </Label>
+              <Controller
+                control={control}
+                name="timezone"
+                render={({ field }) => (
+                  <TimezonePicker
+                    value={field.value ?? settingsTimezone}
+                    onValueChange={field.onChange}
+                    className="w-full"
+                  />
+                )}
+              />
+            </div>
             <div className="flex gap-2">
               <Button type="submit">Save</Button>
               <Button
@@ -178,6 +208,11 @@ export const Accommodation = ({
       <p className="text-muted-foreground mt-2">
         Check-out: {new Date(checkOut).toLocaleDateString()}
       </p>
+      {timezone && (
+        <p className="text-muted-foreground mt-1 text-sm">
+          Timezone: {timezone}
+        </p>
+      )}
     </TripItemCard>
   );
 };

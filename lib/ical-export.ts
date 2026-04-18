@@ -29,6 +29,26 @@ function formatDtStamp(now: Date): string {
   return `${y}${mo}${d}T${h}${mi}${s}Z`;
 }
 
+/**
+ * Build a DTSTART or DTEND property string.
+ * When a time (HH:MM) is supplied, emits a floating datetime with TZID; otherwise an all-day DATE.
+ */
+function dtProp(
+  propName: "DTSTART" | "DTEND",
+  dateStr: string,
+  timeStr: string | undefined,
+  tz: string | undefined,
+): string {
+  if (timeStr) {
+    const icalTime = `${formatIcalDate(dateStr)}T${timeStr.replace(":", "")}00`;
+    if (tz) {
+      return `${propName};TZID=${tz}:${icalTime}`;
+    }
+    return `${propName}:${icalTime}`;
+  }
+  return `${propName};VALUE=DATE:${formatIcalDate(dateStr)}`;
+}
+
 /** Escape special characters in iCal text values per RFC 5545. */
 function sanitizeText(text: string): string {
   return text
@@ -133,24 +153,28 @@ export async function exportTripToIcal(
   }
 
   for (const transport of transports) {
+    const tz = transport.timezone || (transport.departureTime ? timezone : undefined);
     lines.push(
       "BEGIN:VEVENT",
       `UID:transport-${transport.id}@friend-zone-travel-planner`,
       `DTSTAMP:${dtstamp}`,
-      `DTSTART;VALUE=DATE:${formatIcalDate(transport.date)}`,
-      `DTEND;VALUE=DATE:${addOneDay(transport.date)}`,
+      dtProp("DTSTART", transport.date, transport.departureTime, tz),
+      transport.arrivalTime
+        ? dtProp("DTEND", transport.date, transport.arrivalTime, tz)
+        : `DTEND;VALUE=DATE:${addOneDay(transport.date)}`,
       `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
       "END:VEVENT",
     );
   }
 
   for (const accommodation of accommodations) {
+    const tz = accommodation.timezone || undefined;
     lines.push(
       "BEGIN:VEVENT",
       `UID:accommodation-${accommodation.id}@friend-zone-travel-planner`,
       `DTSTAMP:${dtstamp}`,
-      `DTSTART;VALUE=DATE:${formatIcalDate(accommodation.checkIn)}`,
-      `DTEND;VALUE=DATE:${addOneDay(accommodation.checkOut)}`,
+      dtProp("DTSTART", accommodation.checkIn, undefined, tz),
+      dtProp("DTEND", accommodation.checkOut, undefined, tz),
       `SUMMARY:${sanitizeText(accommodation.name)}`,
       "END:VEVENT",
     );
