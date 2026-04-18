@@ -32,7 +32,7 @@ export function StopItems({
       model: trans,
       id: trans.id,
       type: "transport" as const,
-      date: trans.date,
+      date: trans.departureDateTime,
     })),
     ...accommodations.map((acc) => ({
       model: acc,

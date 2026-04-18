@@ -72,7 +72,7 @@ function TripDetails() {
     Object.values(transportsByStop)
       .flat()
       .forEach((trans) => {
-        allDates.push(trans.date);
+        allDates.push(trans.departureDateTime.split("T")[0]);
       });
 
     // Find the maximum date

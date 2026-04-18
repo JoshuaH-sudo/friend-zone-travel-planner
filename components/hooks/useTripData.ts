@@ -132,7 +132,7 @@ export function useTripData(
 
     const subscription = database.transports
       .find()
-      .sort({ date: "asc", createdAt: "asc" })
+      .sort({ departureDateTime: "asc", createdAt: "asc" })
       .$.subscribe((allTransports) => {
         const nextTransportsByStop: Record<string, TransportDocumentType[]> = {};
 
