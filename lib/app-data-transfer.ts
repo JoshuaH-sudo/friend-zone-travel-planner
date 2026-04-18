@@ -111,14 +111,26 @@ export async function importAppData(db: MyDatabase, content: string) {
     settings: readArray<UserSettingsDocument>(dataValue.settings, "data.settings"),
   };
 
+  const [
+    previousTrips,
+    previousStops,
+    previousAccommodations,
+    previousTransports,
+    previousSettings,
+  ] = await Promise.all([
+    db.trips.find().exec(),
+    db.stops.find().exec(),
+    db.accommodations.find().exec(),
+    db.transports.find().exec(),
+    db.settings.find().exec(),
+  ]);
+
   const previous = {
-    trips: (await db.trips.find().exec()).map((doc) => doc.toJSON()),
-    stops: (await db.stops.find().exec()).map((doc) => doc.toJSON()),
-    accommodations: (await db.accommodations.find().exec()).map((doc) =>
-      doc.toJSON(),
-    ),
-    transports: (await db.transports.find().exec()).map((doc) => doc.toJSON()),
-    settings: (await db.settings.find().exec()).map((doc) => doc.toJSON()),
+    trips: previousTrips.map((doc) => doc.toJSON()),
+    stops: previousStops.map((doc) => doc.toJSON()),
+    accommodations: previousAccommodations.map((doc) => doc.toJSON()),
+    transports: previousTransports.map((doc) => doc.toJSON()),
+    settings: previousSettings.map((doc) => doc.toJSON()),
   };
 
   try {
