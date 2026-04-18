@@ -15,11 +15,12 @@ import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
-import { format } from "date-fns";
+import {
+  DATE_OR_DATETIME_REGEX,
+  formatStoredDateTime,
+} from "@/lib/datetime-utils";
 
 // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
-const dateOrDateTimeRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
-
 const accommodationSchema = z
   .object({
     name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -32,10 +33,10 @@ const accommodationSchema = z
     }),
     checkIn: z
       .string()
-      .regex(dateOrDateTimeRegex, "Select a check-in date and time"),
+      .regex(DATE_OR_DATETIME_REGEX, "Select a check-in date and time"),
     checkOut: z
       .string()
-      .regex(dateOrDateTimeRegex, "Select a check-out date and time"),
+      .regex(DATE_OR_DATETIME_REGEX, "Select a check-out date and time"),
     timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
@@ -93,16 +94,7 @@ export const Accommodation = ({
   };
 
   /** Format a stored ISO datetime string for display. */
-  const formatDateTime = (dt: string) => {
-    try {
-      const [datePart, timePart] = dt.split("T");
-      const [y, m, d] = datePart.split("-").map(Number);
-      const [h, min] = (timePart ?? "12:00").split(":").map(Number);
-      return format(new Date(y, m - 1, d, h, min), "MM/dd/yyyy hh:mm aa");
-    } catch {
-      return dt;
-    }
-  };
+  const formatDateTime = formatStoredDateTime;
 
   if (isEditing) {
     return (

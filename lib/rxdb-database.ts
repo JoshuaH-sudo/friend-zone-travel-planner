@@ -100,6 +100,10 @@ async function createDatabase(): Promise<MyDatabase> {
         }),
         // v1 → v2: merge `date` + optional `departureTime`/`arrivalTime` into
         // `departureDateTime` / `arrivalDateTime` ISO datetime strings.
+        // Note: the old schema stored a single `date` for both departure and
+        // arrival. Arrival on a different calendar day was not representable, so
+        // we place both events on the same date — the best approximation from
+        // the available data.
         2: (oldDoc) => {
           const { date, departureTime, arrivalTime, ...rest } = oldDoc as {
             date: string;

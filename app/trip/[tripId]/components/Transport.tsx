@@ -22,9 +22,7 @@ import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
-import { format } from "date-fns";
-
-const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -40,10 +38,10 @@ const transportSchema = z.object({
   }),
   departureDateTime: z
     .string()
-    .regex(dateTimeRegex, "Select a departure date and time"),
+    .regex(DATETIME_REGEX, "Select a departure date and time"),
   arrivalDateTime: z
     .string()
-    .regex(dateTimeRegex, "Invalid arrival date/time")
+    .regex(DATETIME_REGEX, "Invalid arrival date/time")
     .or(z.literal(""))
     .optional(),
   timezone: z.string().optional(),
@@ -110,16 +108,7 @@ export const Transport = ({
   };
 
   /** Format a stored ISO datetime string for display. */
-  const formatDateTime = (dt: string) => {
-    try {
-      const [datePart, timePart] = dt.split("T");
-      const [y, m, d] = datePart.split("-").map(Number);
-      const [h, min] = (timePart ?? "12:00").split(":").map(Number);
-      return format(new Date(y, m - 1, d, h, min), "MM/dd/yyyy hh:mm aa");
-    } catch {
-      return dt;
-    }
-  };
+  const formatDateTime = formatStoredDateTime;
 
   if (isEditing) {
     return (
