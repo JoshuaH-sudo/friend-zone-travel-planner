@@ -30,6 +30,7 @@ export type AccommodationDocument = {
   currency: Currency;
   checkIn: string;
   checkOut: string;
+  timezone?: string;
   stopId: string;
   createdAt: number;
   updatedAt: number;
@@ -41,7 +42,11 @@ export type TransportDocument = {
   type: TransportType;
   price: number;
   currency: Currency;
-  date: string;
+  /** ISO datetime string "YYYY-MM-DDTHH:MM" for the departure; replaces the old `date` field. */
+  departureDateTime: string;
+  /** ISO datetime string "YYYY-MM-DDTHH:MM" for the arrival (optional). */
+  arrivalDateTime?: string;
+  timezone?: string;
   stopId: string;
   createdAt: number;
   updatedAt: number;
@@ -51,6 +56,7 @@ export type UserSettingsDocument = {
   id: string;
   defaultCurrency: string;
   language: string;
+  timezone: string;
 };
 
 // RxDB Schemas
@@ -122,7 +128,7 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
 };
 
 export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -148,6 +154,10 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
       maxLength: 100,
     },
     checkOut: {
+      type: "string",
+      maxLength: 100,
+    },
+    timezone: {
       type: "string",
       maxLength: 100,
     },
@@ -184,7 +194,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
 };
 
 export const transportSchema: RxJsonSchema<TransportDocument> = {
-  version: 0,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -209,7 +219,15 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
       type: "string",
       enum: allCurrencyCodes,
     },
-    date: {
+    departureDateTime: {
+      type: "string",
+      maxLength: 20,
+    },
+    arrivalDateTime: {
+      type: "string",
+      maxLength: 20,
+    },
+    timezone: {
       type: "string",
       maxLength: 100,
     },
@@ -237,12 +255,12 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     "type",
     "price",
     "currency",
-    "date",
+    "departureDateTime",
     "stopId",
     "createdAt",
     "updatedAt",
   ],
-  indexes: ["stopId", "date"],
+  indexes: ["stopId", "departureDateTime"],
 };
 
 // RxDocument types
@@ -296,7 +314,7 @@ export type TransportCollection = RxCollection<
 export const USER_SETTINGS_ID = "user-settings";
 
 export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -312,8 +330,12 @@ export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
       type: "string",
       maxLength: 10,
     },
+    timezone: {
+      type: "string",
+      maxLength: 100,
+    },
   },
-  required: ["id", "defaultCurrency", "language"],
+  required: ["id", "defaultCurrency", "language", "timezone"],
 };
 
 export type UserSettingsDocMethods = Record<string, never>;

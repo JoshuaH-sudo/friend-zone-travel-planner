@@ -2,6 +2,7 @@ import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import { wrappedValidateAjvStorage } from "rxdb/plugins/validate-ajv";
 import { RxDBQueryBuilderPlugin } from "rxdb/plugins/query-builder";
+import { RxDBMigrationPlugin } from "rxdb/plugins/migration-schema";
 import {
   tripSchema,
   stopSchema,
@@ -36,6 +37,7 @@ export type MyDatabase = RxDatabase<DatabaseCollections>;
 let dbPromise: Promise<MyDatabase> | null = null;
 
 addRxPlugin(RxDBQueryBuilderPlugin);
+addRxPlugin(RxDBMigrationPlugin);
 
 const isDevMode = process.env.NODE_ENV === "development";
 const cryptoAvailable = typeof crypto !== "undefined" && crypto.subtle;
@@ -83,12 +85,47 @@ async function createDatabase(): Promise<MyDatabase> {
     },
     accommodations: {
       schema: accommodationSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, timezone: undefined }),
+      },
     },
     transports: {
       schema: transportSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({
+          ...oldDoc,
+          departureTime: undefined,
+          arrivalTime: undefined,
+          timezone: undefined,
+        }),
+        // v1 → v2: merge `date` + optional `departureTime`/`arrivalTime` into
+        // `departureDateTime` / `arrivalDateTime` ISO datetime strings.
+        // Note: the old schema stored a single `date` for both departure and
+        // arrival. Arrival on a different calendar day was not representable, so
+        // we place both events on the same date — the best approximation from
+        // the available data.
+        2: (oldDoc) => {
+          const { date, departureTime, arrivalTime, ...rest } = oldDoc as {
+            date: string;
+            departureTime?: string;
+            arrivalTime?: string;
+            [key: string]: unknown;
+          };
+          return {
+            ...rest,
+            departureDateTime: departureTime
+              ? `${date}T${departureTime}`
+              : `${date}T12:00`,
+            arrivalDateTime: arrivalTime ? `${date}T${arrivalTime}` : undefined,
+          };
+        },
+      },
     },
     settings: {
       schema: userSettingsSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, timezone: "UTC" }),
+      },
     },
   });
 

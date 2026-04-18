@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
@@ -18,7 +18,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { TimezonePicker } from "@/components/ui/timezone-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
+import { useSettings } from "@/lib/SettingsProvider";
+import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
 
 const transportSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -32,7 +36,15 @@ const transportSchema = z.object({
   currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
     message: "Invalid currency",
   }),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  departureDateTime: z
+    .string()
+    .regex(DATETIME_REGEX, "Select a departure date and time"),
+  arrivalDateTime: z
+    .string()
+    .regex(DATETIME_REGEX, "Invalid arrival date/time")
+    .or(z.literal(""))
+    .optional(),
+  timezone: z.string().optional(),
 });
 
 export type TransportFormData = z.infer<typeof transportSchema>;
@@ -43,17 +55,35 @@ export const Transport = ({
   transport: TransportDocumentType;
 }) => {
   const time = useTime();
-  const { name, type, price, currency, date } = transport;
+  const { timezone: settingsTimezone } = useSettings();
+  const {
+    name,
+    type,
+    price,
+    currency,
+    departureDateTime,
+    arrivalDateTime,
+    timezone,
+  } = transport;
   const [isEditing, setIsEditing] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<TransportFormData>({
     resolver: zodResolver(transportSchema),
-    defaultValues: { name, type, price, currency, date },
+    defaultValues: {
+      name,
+      type,
+      price,
+      currency,
+      departureDateTime,
+      arrivalDateTime: arrivalDateTime ?? "",
+      timezone: timezone ?? settingsTimezone,
+    },
   });
 
   const watchedType = watch("type");
@@ -65,7 +95,9 @@ export const Transport = ({
       type: data.type,
       price: Math.round(data.price * 100) / 100,
       currency: data.currency,
-      date: data.date,
+      departureDateTime: data.departureDateTime,
+      arrivalDateTime: data.arrivalDateTime || undefined,
+      timezone: data.timezone || undefined,
       updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);
@@ -74,6 +106,9 @@ export const Transport = ({
   const handleDelete = async () => {
     await transport.remove();
   };
+
+  /** Format a stored ISO datetime string for display. */
+  const formatDateTime = formatStoredDateTime;
 
   if (isEditing) {
     return (
@@ -159,13 +194,64 @@ export const Transport = ({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transport-date">Date</Label>
-              <Input id="transport-date" {...register("date")} type="date" />
-              {errors.date && (
+              <Label>Departure</Label>
+              <Controller
+                control={control}
+                name="departureDateTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Pick departure date & time"
+                    className="w-full"
+                  />
+                )}
+              />
+              {errors.departureDateTime && (
                 <p className="text-destructive text-sm">
-                  {errors.date.message}
+                  {errors.departureDateTime.message}
                 </p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label>
+                Arrival{" "}
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </Label>
+              <Controller
+                control={control}
+                name="arrivalDateTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value || undefined}
+                    onChange={field.onChange}
+                    placeholder="Pick arrival date & time"
+                    className="w-full"
+                  />
+                )}
+              />
+              {errors.arrivalDateTime && (
+                <p className="text-destructive text-sm">
+                  {errors.arrivalDateTime.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label>
+                Timezone{" "}
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </Label>
+              <Controller
+                control={control}
+                name="timezone"
+                render={({ field }) => (
+                  <TimezonePicker
+                    value={field.value || settingsTimezone}
+                    onValueChange={field.onChange}
+                    className="w-full"
+                  />
+                )}
+              />
             </div>
             <div className="flex gap-2">
               <Button type="submit">Save</Button>
@@ -198,8 +284,19 @@ export const Transport = ({
         <span>{currency}</span>
       </div>
       <p className="text-muted-foreground mt-2">
-        Date: {new Date(date).toLocaleDateString()}
+        Departure: {formatDateTime(departureDateTime)}
       </p>
+      {arrivalDateTime && (
+        <p className="text-muted-foreground mt-1">
+          Arrival: {formatDateTime(arrivalDateTime)}
+        </p>
+      )}
+      {timezone && (
+        <p className="text-muted-foreground mt-1 text-sm">
+          Timezone: {timezone}
+        </p>
+      )}
     </TripItemCard>
   );
 };
+
