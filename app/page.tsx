@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TripDocument } from "@/lib/rxdb-schema";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { PlusIcon } from "lucide-react";
 import { TripStats } from "./trip/[tripId]/components/TripStats";
@@ -69,8 +75,8 @@ function TripList() {
   };
 
   return (
-    <div>
-      <span className="flex justify-between">
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-2xl font-bold">Your Trips</h2>
         <Button
           variant="outline"
@@ -80,68 +86,74 @@ function TripList() {
           Add Trip
           <PlusIcon />
         </Button>
-      </span>
+      </div>
 
-      <ul className="mt-4 space-y-2">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {trips.map((trip) => (
-          <Card key={trip.id}>
-            <CardContent className="space-y-4 p-4">
+          <Card key={trip.id} className="flex h-full flex-col hover:scale-[1.01] transition-transform duration-200">
+            <CardHeader>
               <div className="flex items-start justify-between gap-4">
                 <Link
                   href={`/trip/${trip.id}`}
-                  className="flex-1 text-4xl font-bold hover:text-blue-400 hover:underline"
+                  className="flex-1 text-2xl font-semibold hover:text-primary hover:underline"
                 >
                   {trip.name}
                 </Link>
-                <div className="flex shrink-0 items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
-                    aria-label="Export trip to iCal"
-                    onClick={() => exportTrip(trip.id)}
-                  >
-                    <HugeiconsIcon icon={CalendarDownload01Icon} />
-                  </Button>
-                  <ConfirmationDialog
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
-                        aria-label="Delete trip"
-                      >
-                        <HugeiconsIcon icon={Cancel01Icon} />
-                      </Button>
-                    }
-                    title="Delete this trip?"
-                    description={`This will permanently remove ${trip.name} and all of its trip data.`}
-                    confirmLabel="Delete trip"
-                    onConfirm={() => deleteTrip(trip.id)}
-                  >
-                    <p className="text-muted-foreground text-sm">
-                      This action cannot be undone.
-                    </p>
-                  </ConfirmationDialog>
-                </div>
+                <ConfirmationDialog
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="text-destructive hover:bg-destructive/10"
+                      aria-label="Delete trip"
+                    >
+                      <HugeiconsIcon icon={Cancel01Icon} />
+                    </Button>
+                  }
+                  title="Delete this trip?"
+                  description={`This will permanently remove ${trip.name} and all of its trip data.`}
+                  confirmLabel="Delete trip"
+                  onConfirm={() => deleteTrip(trip.id)}
+                >
+                  <p className="text-muted-foreground text-sm">
+                    This action cannot be undone.
+                  </p>
+                </ConfirmationDialog>
               </div>
+            </CardHeader>
+
+            <CardContent className="flex-1">
               <TripStats tripId={trip.id} />
             </CardContent>
+
+            <CardFooter>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => router.push(`/trip/${trip.id}`)}
+              >
+                Open Trip
+              </Button>
+            </CardFooter>
           </Card>
         ))}
 
-        <li>
-          <Button
-            variant="outline"
-            className="bg-accent text-accent-foreground w-full"
-            onClick={createTrip}
-          >
-            Add Trip
-            <PlusIcon />
-          </Button>
-        </li>
-      </ul>
-    </div>
+        <Card className="border-dashed bg-muted/50 hover:scale-[1.01] transition-transform duration-200">
+          <CardHeader>
+            <CardTitle>Add a new trip</CardTitle>
+          </CardHeader>
+          <CardContent className="text-muted-foreground text-sm">
+            Create another itinerary and start planning your next adventure.
+          </CardContent>
+          <CardFooter>
+            <Button onClick={createTrip} className="w-full">
+              Add Trip
+              <PlusIcon />
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+     </div>
   );
 }
 

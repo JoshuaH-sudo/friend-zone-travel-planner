@@ -44,7 +44,7 @@ export default function RootLayout({
             <SettingsProvider>
               <Header />
               <div className="flex grow">
-                <main className="w-full max-w-4xl items-center gap-4 px-4 mx-auto py-10 sm:items-start">
+                <main className="w-full max-w-6xl items-center gap-4 px-4 mx-auto py-10 sm:items-start">
                   {children}
                 </main>
               </div>
