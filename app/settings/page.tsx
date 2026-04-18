@@ -14,7 +14,11 @@ import {
 import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useSettings } from "@/lib/SettingsProvider";
-import { exportAppData, importAppData } from "@/lib/app-data-transfer";
+import {
+  exportAppData,
+  importAppData,
+  isValidTheme,
+} from "@/lib/app-data-transfer";
 
 export default function SettingsPage() {
   const database = useDatabase();
@@ -30,10 +34,12 @@ export default function SettingsPage() {
     try {
       setIsExporting(true);
       setStatusMessage(null);
-      await exportAppData(database, { theme: theme ?? null });
+      await exportAppData(database, { theme: isValidTheme(theme) ? theme : null });
       setStatusMessage("App data exported.");
-    } catch {
-      setStatusMessage("Failed to export app data.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      setStatusMessage(`Failed to export app data: ${errorMessage}`);
     } finally {
       setIsExporting(false);
     }
@@ -54,12 +60,14 @@ export default function SettingsPage() {
       setStatusMessage(null);
       const content = await file.text();
       const { theme: importedTheme } = await importAppData(database, content);
-      if (importedTheme && ["light", "dark", "system"].includes(importedTheme)) {
+      if (importedTheme) {
         setTheme(importedTheme);
       }
       setStatusMessage("App data imported.");
-    } catch {
-      setStatusMessage("Failed to import app data.");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      setStatusMessage(`Failed to import app data: ${errorMessage}`);
     } finally {
       event.target.value = "";
       setIsImporting(false);
@@ -151,7 +159,8 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm">
             Export all app data (trips, settings, and preferences) or upload a
-            previously exported backup.
+            previously exported backup. Uploading a backup replaces current app
+            data.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button

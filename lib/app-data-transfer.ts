@@ -8,12 +8,14 @@ import {
 } from "@/lib/rxdb-schema";
 
 export const APP_DATA_EXPORT_VERSION = 1;
+export const ALLOWED_THEME_VALUES = ["light", "dark", "system"] as const;
+export type AllowedThemeValue = (typeof ALLOWED_THEME_VALUES)[number];
 
 export type AppDataExport = {
   version: number;
   exportedAt: string;
   preferences: {
-    theme: string | null;
+    theme: AllowedThemeValue | null;
   };
   data: {
     trips: TripDocument[];
@@ -66,8 +68,15 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+export function isValidTheme(value: unknown): value is AllowedThemeValue {
+  return ALLOWED_THEME_VALUES.includes(value as AllowedThemeValue);
+}
+
 function readArray<T>(value: unknown, key: string): T[] {
   if (!Array.isArray(value)) {
+    throw new Error(`Invalid export format: ${key}`);
+  }
+  if (!value.every((item) => isObject(item))) {
     throw new Error(`Invalid export format: ${key}`);
   }
   return value as T[];
@@ -102,17 +111,47 @@ export async function importAppData(db: MyDatabase, content: string) {
     settings: readArray<UserSettingsDocument>(dataValue.settings, "data.settings"),
   };
 
-  const currentTransports = await db.transports.find().exec();
-  await Promise.all(currentTransports.map((doc) => doc.remove()));
-  const currentAccommodations = await db.accommodations.find().exec();
-  await Promise.all(currentAccommodations.map((doc) => doc.remove()));
-  const currentStops = await db.stops.find().exec();
-  await Promise.all(currentStops.map((doc) => doc.remove()));
-  const currentTrips = await db.trips.find().exec();
-  await Promise.all(currentTrips.map((doc) => doc.remove()));
-  const currentSettings = await db.settings.find().exec();
-  await Promise.all(currentSettings.map((doc) => doc.remove()));
+  const previous = {
+    trips: (await db.trips.find().exec()).map((doc) => doc.toJSON()),
+    stops: (await db.stops.find().exec()).map((doc) => doc.toJSON()),
+    accommodations: (await db.accommodations.find().exec()).map((doc) =>
+      doc.toJSON(),
+    ),
+    transports: (await db.transports.find().exec()).map((doc) => doc.toJSON()),
+    settings: (await db.settings.find().exec()).map((doc) => doc.toJSON()),
+  };
 
+  try {
+    await clearAllCollections(db);
+    await upsertAllCollections(db, data);
+  } catch (error) {
+    await clearAllCollections(db);
+    await upsertAllCollections(db, previous);
+    throw error;
+  }
+
+  const preferencesValue = parsed.preferences;
+  const themeValue =
+    isObject(preferencesValue) && typeof preferencesValue.theme === "string"
+      ? preferencesValue.theme
+      : null;
+  const theme = isValidTheme(themeValue) ? themeValue : null;
+
+  return { theme };
+}
+
+async function clearAllCollections(db: MyDatabase) {
+  await db.transports.find().remove();
+  await db.accommodations.find().remove();
+  await db.stops.find().remove();
+  await db.trips.find().remove();
+  await db.settings.find().remove();
+}
+
+async function upsertAllCollections(
+  db: MyDatabase,
+  data: AppDataExport["data"],
+) {
   if (data.trips.length > 0) {
     await db.trips.bulkUpsert(data.trips);
   }
@@ -128,12 +167,4 @@ export async function importAppData(db: MyDatabase, content: string) {
   if (data.settings.length > 0) {
     await db.settings.bulkUpsert(data.settings);
   }
-
-  const preferencesValue = parsed.preferences;
-  const theme =
-    isObject(preferencesValue) && typeof preferencesValue.theme === "string"
-      ? preferencesValue.theme
-      : null;
-
-  return { theme };
 }
