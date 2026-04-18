@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z, type ZodType } from "zod";
 import { AccommodationDocumentType } from "@/lib/rxdb-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,34 +21,14 @@ import {
   formatStoredDateTime,
 } from "@/lib/datetime-utils";
 
-// Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
-const accommodationSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "errors.nameRequired")
-      .max(200, "errors.nameTooLong"),
-    price: z
-      .number()
-      .min(0, "errors.priceMustBePositive")
-      .max(Number.MAX_SAFE_INTEGER, "errors.priceTooHigh"),
-    currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-      message: "errors.invalidCurrency",
-    }),
-    checkIn: z
-      .string()
-      .regex(DATE_OR_DATETIME_REGEX, "errors.selectCheckInDateTime"),
-    checkOut: z
-      .string()
-      .regex(DATE_OR_DATETIME_REGEX, "errors.selectCheckOutDateTime"),
-    timezone: z.string().optional(),
-  })
-  .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
-    message: "errors.checkOutAfterCheckIn",
-    path: ["checkOut"],
-  });
-
-export type AccommodationFormData = z.infer<typeof accommodationSchema>;
+export type AccommodationFormData = {
+  name: string;
+  price: number;
+  currency: string;
+  checkIn: string;
+  checkOut: string;
+  timezone?: string;
+};
 
 export const Accommodation = ({
   accommodation,
@@ -64,6 +44,33 @@ export const Accommodation = ({
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
+  const accommodationSchema: ZodType<AccommodationFormData> = z
+    .object({
+      name: z
+        .string()
+        .min(1, t("errors.nameRequired"))
+        .max(200, t("errors.nameTooLong")),
+      price: z
+        .number()
+        .min(0, t("errors.priceMustBePositive"))
+        .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+      currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
+        message: t("errors.invalidCurrency"),
+      }),
+      checkIn: z
+        .string()
+        .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckInDateTime")),
+      checkOut: z
+        .string()
+        .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckOutDateTime")),
+      timezone: z.string().optional(),
+    })
+    .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
+      message: t("errors.checkOutAfterCheckIn"),
+      path: ["checkOut"],
+    });
 
   const {
     handleSubmit,
@@ -154,7 +161,7 @@ export const Accommodation = ({
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
-                  {t(errors.name.message ?? "")}
+                  {errors.name.message}
                 </p>
               )}
             </div>
@@ -182,7 +189,7 @@ export const Accommodation = ({
                 />
                 {errors.price && (
                   <p className="text-destructive text-sm">
-                    {t(errors.price.message ?? "")}
+                    {errors.price.message}
                   </p>
                 )}
               </div>
@@ -201,7 +208,7 @@ export const Accommodation = ({
                 />
                 {errors.currency && (
                   <p className="text-destructive text-sm">
-                    {t(errors.currency.message ?? "")}
+                    {errors.currency.message}
                   </p>
                 )}
               </div>
@@ -222,7 +229,7 @@ export const Accommodation = ({
               />
               {errors.checkIn && (
                 <p className="text-destructive text-sm">
-                  {t(errors.checkIn.message ?? "")}
+                  {errors.checkIn.message}
                 </p>
               )}
             </div>
@@ -242,7 +249,7 @@ export const Accommodation = ({
               />
               {errors.checkOut && (
                 <p className="text-destructive text-sm">
-                  {t(errors.checkOut.message ?? "")}
+                  {errors.checkOut.message}
                 </p>
               )}
             </div>

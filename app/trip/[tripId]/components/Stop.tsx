@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z, type ZodType } from "zod";
 import { StopDocumentType } from "@/lib/rxdb-schema";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 
-const stopSchema = z.object({
-  name: z.string().min(1, "errors.nameRequired").max(100, "errors.nameTooLong"),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "errors.invalidDateFormat"),
-});
-
-type StopFormData = z.infer<typeof stopSchema>;
+type StopFormData = {
+  name: string;
+  date: string;
+};
 
 type StopProps = {
   stop: StopDocumentType;
@@ -32,6 +30,16 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const database = useDatabase();
+
+  const stopSchema: ZodType<StopFormData> = z.object({
+    name: z
+      .string()
+      .min(1, t("errors.nameRequired"))
+      .max(100, t("errors.nameTooLong")),
+    date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, t("errors.invalidDateFormat")),
+  });
 
   const {
     register,
@@ -112,7 +120,7 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
-                  {t(errors.name.message ?? "")}
+                  {errors.name.message}
                 </p>
               )}
             </div>

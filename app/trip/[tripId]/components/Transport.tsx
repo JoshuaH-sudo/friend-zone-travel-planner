@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z, type ZodType } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,30 +25,15 @@ import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
 
-const transportSchema = z.object({
-  name: z.string().min(1, "errors.nameRequired").max(200, "errors.nameTooLong"),
-  type: z.enum(["flight", "bus", "car", "train"], {
-    message: "errors.invalidTransportType",
-  }),
-  price: z
-    .number()
-    .min(0, "errors.priceMustBePositive")
-    .max(Number.MAX_SAFE_INTEGER, "errors.priceTooHigh"),
-  currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-    message: "errors.invalidCurrency",
-  }),
-  departureDateTime: z
-    .string()
-    .regex(DATETIME_REGEX, "errors.selectDepartureDateTime"),
-  arrivalDateTime: z
-    .string()
-    .regex(DATETIME_REGEX, "errors.invalidArrivalDateTime")
-    .or(z.literal(""))
-    .optional(),
-  timezone: z.string().optional(),
-});
-
-export type TransportFormData = z.infer<typeof transportSchema>;
+export type TransportFormData = {
+  name: string;
+  type: "flight" | "bus" | "car" | "train";
+  price: number;
+  currency: string;
+  departureDateTime: string;
+  arrivalDateTime?: string;
+  timezone?: string;
+};
 
 export const Transport = ({
   transport,
@@ -72,6 +57,32 @@ export const Transport = ({
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
+
+  const transportSchema: ZodType<TransportFormData> = z.object({
+    name: z
+      .string()
+      .min(1, t("errors.nameRequired"))
+      .max(200, t("errors.nameTooLong")),
+    type: z.enum(["flight", "bus", "car", "train"], {
+      message: t("errors.invalidTransportType"),
+    }),
+    price: z
+      .number()
+      .min(0, t("errors.priceMustBePositive"))
+      .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+    currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
+      message: t("errors.invalidCurrency"),
+    }),
+    departureDateTime: z
+      .string()
+      .regex(DATETIME_REGEX, t("errors.selectDepartureDateTime")),
+    arrivalDateTime: z
+      .string()
+      .regex(DATETIME_REGEX, t("errors.invalidArrivalDateTime"))
+      .or(z.literal(""))
+      .optional(),
+    timezone: z.string().optional(),
+  });
 
   const {
     register,
@@ -158,7 +169,7 @@ export const Transport = ({
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
-                  {t(errors.name.message ?? "")}
+                  {errors.name.message}
                 </p>
               )}
             </div>
@@ -185,7 +196,7 @@ export const Transport = ({
               </Select>
               {errors.type && (
                 <p className="text-destructive text-sm">
-                  {t(errors.type.message ?? "")}
+                  {errors.type.message}
                 </p>
               )}
             </div>
@@ -200,7 +211,7 @@ export const Transport = ({
                 />
                 {errors.price && (
                   <p className="text-destructive text-sm">
-                    {t(errors.price.message ?? "")}
+                    {errors.price.message}
                   </p>
                 )}
               </div>
@@ -220,7 +231,7 @@ export const Transport = ({
                 />
                 {errors.currency && (
                   <p className="text-destructive text-sm">
-                    {t(errors.currency.message ?? "")}
+                    {errors.currency.message}
                   </p>
                 )}
               </div>
@@ -241,7 +252,7 @@ export const Transport = ({
               />
               {errors.departureDateTime && (
                 <p className="text-destructive text-sm">
-                  {t(errors.departureDateTime.message ?? "")}
+                  {errors.departureDateTime.message}
                 </p>
               )}
             </div>
@@ -266,7 +277,7 @@ export const Transport = ({
               />
               {errors.arrivalDateTime && (
                 <p className="text-destructive text-sm">
-                  {t(errors.arrivalDateTime.message ?? "")}
+                  {errors.arrivalDateTime.message}
                 </p>
               )}
             </div>

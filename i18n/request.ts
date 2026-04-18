@@ -6,10 +6,20 @@ const defaultLocale = "en";
 
 const resolveLocaleFromAcceptLanguage = (header: string | null) => {
   if (!header) return defaultLocale;
-  const normalized = header.toLowerCase();
 
-  if (normalized.includes("de")) {
-    return "de";
+  const requestedLocales = header
+    .split(",")
+    .map((entry) => entry.trim())
+    .map((entry) => entry.split(";")[0]?.toLowerCase())
+    .filter(Boolean);
+
+  for (const locale of requestedLocales) {
+    if (locale === "de" || locale.startsWith("de-")) {
+      return "de";
+    }
+    if (locale === "en" || locale.startsWith("en-")) {
+      return "en";
+    }
   }
 
   return defaultLocale;
