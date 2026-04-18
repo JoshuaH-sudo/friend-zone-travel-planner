@@ -11,7 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dot, MapPin } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Plus, Tick02Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  Plus,
+  Tick02Icon,
+  CalendarDownload01Icon,
+} from "@hugeicons/core-free-icons";
 import { useTripData } from "@/components/hooks/useTripData";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
@@ -24,7 +29,8 @@ function TripDetails() {
   const [isEditingTripName, setIsEditingTripName] = useState(false);
   const [tripNameDraft, setTripNameDraft] = useState("");
   const tripData = useTripData(tripId, { database });
-  const { trip, stops, accommodationsByStop, transportsByStop, loading } = tripData;
+  const { trip, stops, accommodationsByStop, transportsByStop, loading } =
+    tripData;
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
@@ -196,7 +202,7 @@ function TripDetails() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="shrink-0 bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
+            className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary shrink-0"
             aria-label="Export trip to iCal"
             onClick={exportTrip}
           >
@@ -206,7 +212,12 @@ function TripDetails() {
       )}
       <Separator className="my-6" />
       <TripStats tripId={tripId} tripData={tripData} />
-      <Separator className="my-6" />
+      <Separator className="my-6 mb-4" />
+      <div className="flex items-center justify-end gap-4 w-full mb-4">
+        <Button onClick={addStop}>
+          Add Stop <HugeiconsIcon icon={Plus} className="ml-2" />
+        </Button>
+      </div>
       <section id="stops-section" className="w-full text-left">
         {stops.length > 0 && (
           <Timeline
