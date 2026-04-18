@@ -53,7 +53,16 @@ function dtProp(
   return `${propName};VALUE=DATE:${formatIcalDate(dateStr)}`;
 }
 
-/** Escape special characters in iCal text values per RFC 5545. */
+/** Extract just the date portion (YYYY-MM-DD) from an ISO date or datetime string. */
+function getDatePart(isoStr: string): string {
+  return isoStr.split("T")[0];
+}
+
+/** Extract the time portion (HH:MM) from an ISO datetime string, or undefined for date-only. */
+function getTimePart(isoStr: string): string | undefined {
+  const parts = isoStr.split("T");
+  return parts.length > 1 ? parts[1].substring(0, 5) : undefined;
+}
 function sanitizeText(text: string): string {
   return text
     .replace(/\\/g, "\\\\")
@@ -126,8 +135,11 @@ export async function exportTripToIcal(
 
   const allDates: string[] = [
     ...stops.map((s) => s.date),
-    ...accommodations.flatMap((a) => [a.checkIn, a.checkOut]),
-    ...transports.map((t) => t.date),
+    ...accommodations.flatMap((a) => [
+      getDatePart(a.checkIn),
+      getDatePart(a.checkOut),
+    ]),
+    ...transports.map((t) => getDatePart(t.departureDateTime)),
   ].filter(Boolean);
 
   const dtstamp = formatDtStamp(new Date());
@@ -158,31 +170,55 @@ export async function exportTripToIcal(
 
   for (const transport of transports) {
     const tz = transport.timezone || timezone;
-    // iCal requires consistent event types: both DTSTART and DTEND must be either
-    // all-day DATE or timed DATETIME. If only one of the two times is set, fall back
-    // to an all-day event to avoid a mixed-mode violation (RFC 5545 §3.6.1).
-    const hasBothTimes = !!(transport.departureTime && transport.arrivalTime);
-    lines.push(
-      "BEGIN:VEVENT",
-      `UID:transport-${transport.id}@friend-zone-travel-planner`,
-      `DTSTAMP:${dtstamp}`,
-      dtProp("DTSTART", transport.date, hasBothTimes ? transport.departureTime : undefined, tz),
-      hasBothTimes
-        ? dtProp("DTEND", transport.date, transport.arrivalTime, tz)
-        : `DTEND;VALUE=DATE:${addOneDay(transport.date)}`,
-      `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
-      "END:VEVENT",
-    );
+    const depDateStr = getDatePart(transport.departureDateTime);
+    const depTimeStr = getTimePart(transport.departureDateTime);
+
+    if (transport.arrivalDateTime) {
+      // Both departure and arrival are known — emit timed DTSTART + DTEND.
+      const arrDateStr = getDatePart(transport.arrivalDateTime);
+      const arrTimeStr = getTimePart(transport.arrivalDateTime);
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:transport-${transport.id}@friend-zone-travel-planner`,
+        `DTSTAMP:${dtstamp}`,
+        dtProp("DTSTART", depDateStr, depTimeStr, tz),
+        dtProp("DTEND", arrDateStr, arrTimeStr, tz),
+        `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
+        "END:VEVENT",
+      );
+    } else if (depTimeStr) {
+      // Only departure time known — emit timed DTSTART with a 1-hour default duration.
+      // (RFC 5545: DTSTART DATETIME + DURATION avoids a mixed DATE/DATETIME violation.)
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:transport-${transport.id}@friend-zone-travel-planner`,
+        `DTSTAMP:${dtstamp}`,
+        dtProp("DTSTART", depDateStr, depTimeStr, tz),
+        "DURATION:PT1H",
+        `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
+        "END:VEVENT",
+      );
+    } else {
+      // No times at all — emit an all-day event.
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:transport-${transport.id}@friend-zone-travel-planner`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART;VALUE=DATE:${formatIcalDate(depDateStr)}`,
+        `DTEND;VALUE=DATE:${addOneDay(depDateStr)}`,
+        `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
+        "END:VEVENT",
+      );
+    }
   }
 
   for (const accommodation of accommodations) {
-    const tz = accommodation.timezone || timezone;
     lines.push(
       "BEGIN:VEVENT",
       `UID:accommodation-${accommodation.id}@friend-zone-travel-planner`,
       `DTSTAMP:${dtstamp}`,
-      `DTSTART;VALUE=DATE:${formatIcalDate(accommodation.checkIn)}`,
-      `DTEND;VALUE=DATE:${addOneDay(accommodation.checkOut)}`,
+      `DTSTART;VALUE=DATE:${formatIcalDate(getDatePart(accommodation.checkIn))}`,
+      `DTEND;VALUE=DATE:${addOneDay(getDatePart(accommodation.checkOut))}`,
       `SUMMARY:${sanitizeText(accommodation.name)}`,
       "END:VEVENT",
     );

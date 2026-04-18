@@ -98,6 +98,23 @@ async function createDatabase(): Promise<MyDatabase> {
           arrivalTime: undefined,
           timezone: undefined,
         }),
+        // v1 → v2: merge `date` + optional `departureTime`/`arrivalTime` into
+        // `departureDateTime` / `arrivalDateTime` ISO datetime strings.
+        2: (oldDoc) => {
+          const { date, departureTime, arrivalTime, ...rest } = oldDoc as {
+            date: string;
+            departureTime?: string;
+            arrivalTime?: string;
+            [key: string]: unknown;
+          };
+          return {
+            ...rest,
+            departureDateTime: departureTime
+              ? `${date}T${departureTime}`
+              : `${date}T12:00`,
+            arrivalDateTime: arrivalTime ? `${date}T${arrivalTime}` : undefined,
+          };
+        },
       },
     },
     settings: {

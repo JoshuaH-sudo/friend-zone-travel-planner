@@ -19,35 +19,35 @@ import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { TimezonePicker } from "@/components/ui/timezone-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
+import { format } from "date-fns";
 
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
-const optionalTimeField = z
-  .string()
-  .regex(timeRegex, "Invalid time (HH:MM)")
-  .or(z.literal(""))
-  .optional();
-
-const transportSchema = z
-  .object({
-    name: z.string().min(1, "Name is required").max(200, "Name is too long"),
-    type: z.enum(["flight", "bus", "car", "train"], {
-      message: "Invalid transport type",
-    }),
-    price: z
-      .number()
-      .min(0, "Price must be positive")
-      .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
-    currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-      message: "Invalid currency",
-    }),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
-    departureTime: optionalTimeField,
-    arrivalTime: optionalTimeField,
-    timezone: z.string().optional(),
-  });
+const transportSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+  type: z.enum(["flight", "bus", "car", "train"], {
+    message: "Invalid transport type",
+  }),
+  price: z
+    .number()
+    .min(0, "Price must be positive")
+    .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
+  currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
+    message: "Invalid currency",
+  }),
+  departureDateTime: z
+    .string()
+    .regex(dateTimeRegex, "Select a departure date and time"),
+  arrivalDateTime: z
+    .string()
+    .regex(dateTimeRegex, "Invalid arrival date/time")
+    .or(z.literal(""))
+    .optional(),
+  timezone: z.string().optional(),
+});
 
 export type TransportFormData = z.infer<typeof transportSchema>;
 
@@ -58,7 +58,15 @@ export const Transport = ({
 }) => {
   const time = useTime();
   const { timezone: settingsTimezone } = useSettings();
-  const { name, type, price, currency, date, departureTime, arrivalTime, timezone } = transport;
+  const {
+    name,
+    type,
+    price,
+    currency,
+    departureDateTime,
+    arrivalDateTime,
+    timezone,
+  } = transport;
   const [isEditing, setIsEditing] = useState(false);
 
   const {
@@ -74,9 +82,8 @@ export const Transport = ({
       type,
       price,
       currency,
-      date,
-      departureTime: departureTime ?? "",
-      arrivalTime: arrivalTime ?? "",
+      departureDateTime,
+      arrivalDateTime: arrivalDateTime ?? "",
       timezone: timezone ?? settingsTimezone,
     },
   });
@@ -90,9 +97,8 @@ export const Transport = ({
       type: data.type,
       price: Math.round(data.price * 100) / 100,
       currency: data.currency,
-      date: data.date,
-      departureTime: data.departureTime || undefined,
-      arrivalTime: data.arrivalTime || undefined,
+      departureDateTime: data.departureDateTime,
+      arrivalDateTime: data.arrivalDateTime || undefined,
       timezone: data.timezone || undefined,
       updatedAt: time.getUTCDate(),
     });
@@ -101,6 +107,18 @@ export const Transport = ({
 
   const handleDelete = async () => {
     await transport.remove();
+  };
+
+  /** Format a stored ISO datetime string for display. */
+  const formatDateTime = (dt: string) => {
+    try {
+      const [datePart, timePart] = dt.split("T");
+      const [y, m, d] = datePart.split("-").map(Number);
+      const [h, min] = (timePart ?? "12:00").split(":").map(Number);
+      return format(new Date(y, m - 1, d, h, min), "MM/dd/yyyy hh:mm aa");
+    } catch {
+      return dt;
+    }
   };
 
   if (isEditing) {
@@ -187,47 +205,47 @@ export const Transport = ({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transport-date">Date</Label>
-              <Input id="transport-date" {...register("date")} type="date" />
-              {errors.date && (
+              <Label>Departure</Label>
+              <Controller
+                control={control}
+                name="departureDateTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Pick departure date & time"
+                    className="w-full"
+                  />
+                )}
+              />
+              {errors.departureDateTime && (
                 <p className="text-destructive text-sm">
-                  {errors.date.message}
+                  {errors.departureDateTime.message}
                 </p>
               )}
             </div>
-            <div className="flex gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="transport-departure-time">
-                  Departure time{" "}
-                  <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="transport-departure-time"
-                  {...register("departureTime")}
-                  type="time"
-                />
-                {errors.departureTime && (
-                  <p className="text-destructive text-sm">
-                    {errors.departureTime.message}
-                  </p>
+            <div className="space-y-2">
+              <Label>
+                Arrival{" "}
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </Label>
+              <Controller
+                control={control}
+                name="arrivalDateTime"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value || undefined}
+                    onChange={field.onChange}
+                    placeholder="Pick arrival date & time"
+                    className="w-full"
+                  />
                 )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="transport-arrival-time">
-                  Arrival time{" "}
-                  <span className="text-muted-foreground text-xs">(optional)</span>
-                </Label>
-                <Input
-                  id="transport-arrival-time"
-                  {...register("arrivalTime")}
-                  type="time"
-                />
-                {errors.arrivalTime && (
-                  <p className="text-destructive text-sm">
-                    {errors.arrivalTime.message}
-                  </p>
-                )}
-              </div>
+              />
+              {errors.arrivalDateTime && (
+                <p className="text-destructive text-sm">
+                  {errors.arrivalDateTime.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label>
@@ -277,16 +295,19 @@ export const Transport = ({
         <span>{currency}</span>
       </div>
       <p className="text-muted-foreground mt-2">
-        Date: {new Date(date).toLocaleDateString()}
+        Departure: {formatDateTime(departureDateTime)}
       </p>
-      {(departureTime || arrivalTime) && (
+      {arrivalDateTime && (
+        <p className="text-muted-foreground mt-1">
+          Arrival: {formatDateTime(arrivalDateTime)}
+        </p>
+      )}
+      {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
-          {departureTime && <>Dep: {departureTime}</>}
-          {departureTime && arrivalTime && <span className="mx-1">→</span>}
-          {arrivalTime && <>Arr: {arrivalTime}</>}
-          {timezone && <span className="ml-1 text-xs">({timezone})</span>}
+          Timezone: {timezone}
         </p>
       )}
     </TripItemCard>
   );
 };
+

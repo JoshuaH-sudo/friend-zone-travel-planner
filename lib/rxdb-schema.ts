@@ -42,9 +42,10 @@ export type TransportDocument = {
   type: TransportType;
   price: number;
   currency: Currency;
-  date: string;
-  departureTime?: string;
-  arrivalTime?: string;
+  /** ISO datetime string "YYYY-MM-DDTHH:MM" for the departure; replaces the old `date` field. */
+  departureDateTime: string;
+  /** ISO datetime string "YYYY-MM-DDTHH:MM" for the arrival (optional). */
+  arrivalDateTime?: string;
   timezone?: string;
   stopId: string;
   createdAt: number;
@@ -193,7 +194,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
 };
 
 export const transportSchema: RxJsonSchema<TransportDocument> = {
-  version: 1,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -218,17 +219,13 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
       type: "string",
       enum: allCurrencyCodes,
     },
-    date: {
+    departureDateTime: {
       type: "string",
-      maxLength: 100,
+      maxLength: 20,
     },
-    departureTime: {
+    arrivalDateTime: {
       type: "string",
-      maxLength: 10,
-    },
-    arrivalTime: {
-      type: "string",
-      maxLength: 10,
+      maxLength: 20,
     },
     timezone: {
       type: "string",
@@ -258,12 +255,12 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
     "type",
     "price",
     "currency",
-    "date",
+    "departureDateTime",
     "stopId",
     "createdAt",
     "updatedAt",
   ],
-  indexes: ["stopId", "date"],
+  indexes: ["stopId", "departureDateTime"],
 };
 
 // RxDocument types

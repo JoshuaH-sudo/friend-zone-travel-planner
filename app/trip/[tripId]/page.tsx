@@ -122,7 +122,7 @@ function TripDetails() {
       type: "flight",
       price: 0,
       currency: "USD",
-      date: stop.date || new Date().toISOString().split("T")[0],
+      departureDateTime: `${stop.date || new Date().toISOString().split("T")[0]}T12:00`,
       stopId,
       createdAt: Date.now(),
       updatedAt: Date.now(),

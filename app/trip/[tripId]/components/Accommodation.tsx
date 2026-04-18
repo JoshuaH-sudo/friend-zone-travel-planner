@@ -12,8 +12,13 @@ import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { TimezonePicker } from "@/components/ui/timezone-picker";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
+import { format } from "date-fns";
+
+// Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
+const dateOrDateTimeRegex = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
 
 const accommodationSchema = z
   .object({
@@ -25,8 +30,12 @@ const accommodationSchema = z
     currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
       message: "Invalid currency",
     }),
-    checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
-    checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+    checkIn: z
+      .string()
+      .regex(dateOrDateTimeRegex, "Select a check-in date and time"),
+    checkOut: z
+      .string()
+      .regex(dateOrDateTimeRegex, "Select a check-out date and time"),
     timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
@@ -47,10 +56,10 @@ export const Accommodation = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const {
-    register,
     handleSubmit,
     watch,
     control,
+    setValue,
     formState: { errors },
   } = useForm<AccommodationFormData>({
     resolver: zodResolver(accommodationSchema),
@@ -83,19 +92,39 @@ export const Accommodation = ({
     await accommodation.remove();
   };
 
+  /** Format a stored ISO datetime string for display. */
+  const formatDateTime = (dt: string) => {
+    try {
+      const [datePart, timePart] = dt.split("T");
+      const [y, m, d] = datePart.split("-").map(Number);
+      const [h, min] = (timePart ?? "12:00").split(":").map(Number);
+      return format(new Date(y, m - 1, d, h, min), "MM/dd/yyyy hh:mm aa");
+    } catch {
+      return dt;
+    }
+  };
+
   if (isEditing) {
     return (
       <Card>
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="accommodation-name">Name</Label>
-              <Input
-                id="accommodation-name"
-                {...register("name")}
-                type="text"
-                autoFocus
-                placeholder="Accommodation name"
+              <Controller
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <>
+                    <Label htmlFor="accommodation-name">Name</Label>
+                    <Input
+                      id="accommodation-name"
+                      {...field}
+                      type="text"
+                      autoFocus
+                      placeholder="Accommodation name"
+                    />
+                  </>
+                )}
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
@@ -105,12 +134,23 @@ export const Accommodation = ({
             </div>
             <div className="flex gap-4">
               <div className="space-y-2">
-                <Label htmlFor="accommodation-price">Price</Label>
-                <Input
-                  id="accommodation-price"
-                  {...register("price", { valueAsNumber: true })}
-                  type="number"
-                  step="0.01"
+                <Controller
+                  control={control}
+                  name="price"
+                  render={({ field }) => (
+                    <>
+                      <Label htmlFor="accommodation-price">Price</Label>
+                      <Input
+                        id="accommodation-price"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                        type="number"
+                        step="0.01"
+                      />
+                    </>
+                  )}
                 />
                 {errors.price && (
                   <p className="text-destructive text-sm">
@@ -126,10 +166,7 @@ export const Accommodation = ({
                   value={watchedCurrency}
                   onValueChange={(value) => {
                     if (!value) return;
-                    const event = {
-                      target: { name: "currency", value },
-                    };
-                    register("currency").onChange(event);
+                    setValue("currency", value, { shouldValidate: true });
                   }}
                 />
                 {errors.currency && (
@@ -140,8 +177,19 @@ export const Accommodation = ({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="check-in">Check-in</Label>
-              <Input id="check-in" {...register("checkIn")} type="date" />
+              <Label>Check-in</Label>
+              <Controller
+                control={control}
+                name="checkIn"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Pick check-in date & time"
+                    className="w-full"
+                  />
+                )}
+              />
               {errors.checkIn && (
                 <p className="text-destructive text-sm">
                   {errors.checkIn.message}
@@ -149,8 +197,19 @@ export const Accommodation = ({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="check-out">Check-out</Label>
-              <Input id="check-out" {...register("checkOut")} type="date" />
+              <Label>Check-out</Label>
+              <Controller
+                control={control}
+                name="checkOut"
+                render={({ field }) => (
+                  <DateTimePicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Pick check-out date & time"
+                    className="w-full"
+                  />
+                )}
+              />
               {errors.checkOut && (
                 <p className="text-destructive text-sm">
                   {errors.checkOut.message}
@@ -203,10 +262,10 @@ export const Accommodation = ({
         <span>{currency}</span>
       </div>
       <p className="text-muted-foreground mt-2">
-        Check-in: {new Date(checkIn).toLocaleDateString()}
+        Check-in: {formatDateTime(checkIn)}
       </p>
       <p className="text-muted-foreground mt-2">
-        Check-out: {new Date(checkOut).toLocaleDateString()}
+        Check-out: {formatDateTime(checkOut)}
       </p>
       {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
@@ -216,3 +275,4 @@ export const Accommodation = ({
     </TripItemCard>
   );
 };
+
