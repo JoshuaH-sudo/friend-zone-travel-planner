@@ -18,17 +18,24 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row gap-4",
-        month: "relative space-y-3",
-        month_caption: "flex justify-center pt-1 items-center",
+        months: "relative flex flex-col gap-4 sm:flex-row",
+        month: "flex w-full flex-col gap-4",
+        month_caption: "flex h-9 w-full items-center justify-center px-8",
         caption_label: "text-sm font-medium",
-        nav: "absolute top-0 left-0 right-0 flex justify-between items-center pt-1 px-1",
+        dropdowns: "flex h-9 w-full items-center justify-center gap-1.5",
+        dropdown_root:
+          "relative has-focus-visible:border-ring has-focus-visible:ring-ring/50 rounded-md border border-input shadow-xs has-focus-visible:ring-[3px]",
+        dropdown:
+          "absolute inset-0 rounded-md bg-popover opacity-0 text-sm disabled:cursor-not-allowed",
+        months_dropdown: "font-medium",
+        years_dropdown: "font-medium",
+        nav: "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
         button_previous: cn(
-          "h-7 w-7 rounded-md border border-input bg-transparent p-0 opacity-60",
+          "h-7 w-7 rounded-md border border-input bg-transparent p-0 opacity-60 shadow-xs",
           "hover:opacity-100 hover:bg-accent flex items-center justify-center",
         ),
         button_next: cn(
-          "h-7 w-7 rounded-md border border-input bg-transparent p-0 opacity-60",
+          "h-7 w-7 rounded-md border border-input bg-transparent p-0 opacity-60 shadow-xs",
           "hover:opacity-100 hover:bg-accent flex items-center justify-center",
         ),
         weekdays: "flex",

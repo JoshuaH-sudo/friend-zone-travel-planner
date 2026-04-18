@@ -138,6 +138,9 @@ export function DateTimePicker({
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
+            captionLayout="dropdown"
+            startMonth={new Date(1900, 0)}
+            endMonth={new Date(2100, 11)}
             initialFocus
           />
           {/* Time selectors — only usable after a date is chosen */}
