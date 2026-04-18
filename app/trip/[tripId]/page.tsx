@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
 import { Stop } from "./components/Stop";
@@ -20,9 +21,25 @@ function TripDetails() {
   const tripId = params.tripId as string;
   const database = useDatabase();
   const { timezone } = useSettings();
+  const [pendingNewStopId, setPendingNewStopId] = useState<string | null>(
+    null,
+  );
   const tripData = useTripData(tripId, { database });
   const { trip, stops, accommodationsByStop, transportsByStop, loading } =
     tripData;
+
+  useEffect(() => {
+    if (!pendingNewStopId) return;
+
+    const createdStopExists = stops.some((stop) => stop.id === pendingNewStopId);
+    if (!createdStopExists) return;
+
+    document
+      .getElementById(`stop-${pendingNewStopId}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    setPendingNewStopId(null);
+  }, [stops, pendingNewStopId]);
 
   const updateTripName = async (newName: string) => {
     if (!trip) return;
@@ -35,6 +52,7 @@ function TripDetails() {
 
   const addStop = async () => {
     const { generateId } = await import("@/lib/rxdb-database");
+    const newStopId = generateId();
 
     // Find the latest date from stops, accommodations, and transports
     let latestDate = new Date().toISOString().split("T")[0];
@@ -63,13 +81,15 @@ function TripDetails() {
     }
 
     await database.stops.insert({
-      id: generateId(),
+      id: newStopId,
       name: `New Stop ${stops.length + 1}`,
       date: latestDate,
       tripId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+
+    setPendingNewStopId(newStopId);
   };
 
   const onAddAccommodation = async (stopId: string) => {
@@ -156,7 +176,7 @@ function TripDetails() {
                 const transports = transportsByStop[stop.id] || [];
 
                 return (
-                  <li key={stop.id} className="relative pl-8">
+                  <li id={`stop-${stop.id}`} key={stop.id} className="relative pl-8">
                     <div className="flex w-full items-center gap-4">
                       {/* Icon */}
                       <div className="border-primary bg-background absolute top-3 left-px mb-3 flex size-9 -translate-x-1/2 items-center justify-center rounded-full border-2">
@@ -164,7 +184,10 @@ function TripDetails() {
                       </div>
 
                       {/* Stop content */}
-                      <Stop stop={stop} />
+                      <Stop
+                        stop={stop}
+                        startInEditMode={pendingNewStopId === stop.id}
+                      />
                     </div>
                     <StopItems
                       transports={transports}

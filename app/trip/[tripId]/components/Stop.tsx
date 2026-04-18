@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,9 +19,16 @@ const stopSchema = z.object({
 
 type StopFormData = z.infer<typeof stopSchema>;
 
-export const Stop = ({ stop }: { stop: StopDocumentType }) => {
+type StopProps = {
+  stop: StopDocumentType;
+  startInEditMode?: boolean;
+};
+
+export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
   const time = useTime();
   const [isEditing, setIsEditing] = useState(false);
+  const [highlightNameInput, setHighlightNameInput] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
   const database = useDatabase();
 
   const {
@@ -32,6 +39,25 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
     resolver: zodResolver(stopSchema),
     defaultValues: { name: stop.name, date: stop.date },
   });
+  const nameRegistration = register("name");
+
+  useEffect(() => {
+    if (!startInEditMode) return;
+
+    setIsEditing(true);
+    setHighlightNameInput(true);
+
+    requestAnimationFrame(() => {
+      nameInputRef.current?.focus();
+      nameInputRef.current?.select();
+    });
+
+    const timeout = setTimeout(() => {
+      setHighlightNameInput(false);
+    }, 1400);
+
+    return () => clearTimeout(timeout);
+  }, [startInEditMode]);
 
   const onSubmit = async (data: StopFormData) => {
     await stop.patch({
@@ -69,12 +95,18 @@ export const Stop = ({ stop }: { stop: StopDocumentType }) => {
             <div className="space-y-2">
               <Label htmlFor="stop-name">Stop Name</Label>
               <Input
-                id="stop-name"
-                {...register("name")}
+                id={`stop-name-${stop.id}`}
+                {...nameRegistration}
+                ref={(element) => {
+                  nameRegistration.ref(element);
+                  nameInputRef.current = element;
+                }}
                 type="text"
                 autoFocus
                 placeholder="Stop name"
-                className="text-xl font-semibold"
+                className={`text-xl font-semibold ${
+                  highlightNameInput ? "ring-primary/40 ring-2" : ""
+                }`}
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
