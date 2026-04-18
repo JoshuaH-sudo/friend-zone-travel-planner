@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AccommodationDocumentType } from "@/lib/rxdb-schema";
@@ -23,24 +24,27 @@ import {
 // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
 const accommodationSchema = z
   .object({
-    name: z.string().min(1, "Name is required").max(200, "Name is too long"),
+    name: z
+      .string()
+      .min(1, "errors.nameRequired")
+      .max(200, "errors.nameTooLong"),
     price: z
       .number()
-      .min(0, "Price must be positive")
-      .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
+      .min(0, "errors.priceMustBePositive")
+      .max(Number.MAX_SAFE_INTEGER, "errors.priceTooHigh"),
     currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-      message: "Invalid currency",
+      message: "errors.invalidCurrency",
     }),
     checkIn: z
       .string()
-      .regex(DATE_OR_DATETIME_REGEX, "Select a check-in date and time"),
+      .regex(DATE_OR_DATETIME_REGEX, "errors.selectCheckInDateTime"),
     checkOut: z
       .string()
-      .regex(DATE_OR_DATETIME_REGEX, "Select a check-out date and time"),
+      .regex(DATE_OR_DATETIME_REGEX, "errors.selectCheckOutDateTime"),
     timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
-    message: "Check-out date must be after check-in date",
+    message: "errors.checkOutAfterCheckIn",
     path: ["checkOut"],
   });
 
@@ -53,6 +57,7 @@ export const Accommodation = ({
   accommodation: AccommodationDocumentType;
   startInEditMode?: boolean;
 }) => {
+  const t = useTranslations("accommodation");
   const time = useTime();
   const { timezone: settingsTimezone } = useSettings();
   const { name, price, currency, checkIn, checkOut, timezone } = accommodation;
@@ -129,7 +134,7 @@ export const Accommodation = ({
                 name="name"
                 render={({ field }) => (
                   <>
-                    <Label htmlFor="accommodation-name">Name</Label>
+                    <Label htmlFor="accommodation-name">{t("nameLabel")}</Label>
                     <Input
                       id={`accommodation-name-${accommodation.id}`}
                       {...field}
@@ -139,15 +144,17 @@ export const Accommodation = ({
                       }}
                       type="text"
                       autoFocus
-                      placeholder="Accommodation name"
-                      className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
+                      placeholder={t("namePlaceholder")}
+                      className={
+                        highlightNameInput ? "ring-primary/40 ring-2" : ""
+                      }
                     />
                   </>
                 )}
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
-                  {errors.name.message}
+                  {t(errors.name.message ?? "")}
                 </p>
               )}
             </div>
@@ -158,7 +165,9 @@ export const Accommodation = ({
                   name="price"
                   render={({ field }) => (
                     <>
-                      <Label htmlFor="accommodation-price">Price</Label>
+                      <Label htmlFor="accommodation-price">
+                        {t("priceLabel")}
+                      </Label>
                       <Input
                         id="accommodation-price"
                         {...field}
@@ -173,12 +182,14 @@ export const Accommodation = ({
                 />
                 {errors.price && (
                   <p className="text-destructive text-sm">
-                    {errors.price.message}
+                    {t(errors.price.message ?? "")}
                   </p>
                 )}
               </div>
               <div className="w-24 space-y-2">
-                <Label htmlFor="accommodation-currency">Currency</Label>
+                <Label htmlFor="accommodation-currency">
+                  {t("currencyLabel")}
+                </Label>
                 <CurrencySelect
                   id="accommodation-currency"
                   name="currency"
@@ -190,13 +201,13 @@ export const Accommodation = ({
                 />
                 {errors.currency && (
                   <p className="text-destructive text-sm">
-                    {errors.currency.message}
+                    {t(errors.currency.message ?? "")}
                   </p>
                 )}
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Check-in</Label>
+              <Label>{t("checkInLabel")}</Label>
               <Controller
                 control={control}
                 name="checkIn"
@@ -204,19 +215,19 @@ export const Accommodation = ({
                   <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Pick check-in date & time"
+                    placeholder={t("checkInPlaceholder")}
                     className="w-full"
                   />
                 )}
               />
               {errors.checkIn && (
                 <p className="text-destructive text-sm">
-                  {errors.checkIn.message}
+                  {t(errors.checkIn.message ?? "")}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label>Check-out</Label>
+              <Label>{t("checkOutLabel")}</Label>
               <Controller
                 control={control}
                 name="checkOut"
@@ -224,21 +235,23 @@ export const Accommodation = ({
                   <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Pick check-out date & time"
+                    placeholder={t("checkOutPlaceholder")}
                     className="w-full"
                   />
                 )}
               />
               {errors.checkOut && (
                 <p className="text-destructive text-sm">
-                  {errors.checkOut.message}
+                  {t(errors.checkOut.message ?? "")}
                 </p>
               )}
             </div>
             <div className="space-y-2">
               <Label>
-                Timezone{" "}
-                <span className="text-muted-foreground text-xs">(optional)</span>
+                {t("timezoneLabel")}{" "}
+                <span className="text-muted-foreground text-xs">
+                  {t("optional")}
+                </span>
               </Label>
               <Controller
                 control={control}
@@ -253,13 +266,13 @@ export const Accommodation = ({
               />
             </div>
             <div className="flex gap-2">
-              <Button type="submit">Save</Button>
+              <Button type="submit">{t("save")}</Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditing(false)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </form>
@@ -272,8 +285,8 @@ export const Accommodation = ({
     <TripItemCard
       onDelete={handleDelete}
       onEdit={() => setIsEditing(true)}
-      deleteLabel="Delete accommodation"
-      editLabel="Edit accommodation"
+      deleteLabel={t("deleteAriaLabel")}
+      editLabel={t("editAriaLabel")}
       title={<h4 className="text-lg font-semibold">{name}</h4>}
     >
       <div className="text-muted-foreground mt-2 flex items-center gap-2">
@@ -281,17 +294,16 @@ export const Accommodation = ({
         <span>{currency}</span>
       </div>
       <p className="text-muted-foreground mt-2">
-        Check-in: {formatDateTime(checkIn)}
+        {t("checkInDisplay", { value: formatDateTime(checkIn) })}
       </p>
       <p className="text-muted-foreground mt-2">
-        Check-out: {formatDateTime(checkOut)}
+        {t("checkOutDisplay", { value: formatDateTime(checkOut) })}
       </p>
       {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
-          Timezone: {timezone}
+          {t("timezoneDisplay", { value: timezone })}
         </p>
       )}
     </TripItemCard>
   );
 };
-

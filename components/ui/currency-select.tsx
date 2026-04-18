@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -56,7 +57,7 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
       onValueChange,
       onCurrencySelect,
       name,
-      placeholder = "Select currency",
+      placeholder,
       currencies = "all",
       variant = "default",
       valid = true,
@@ -64,7 +65,9 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
     },
     ref,
   ) => {
+    const t = useTranslations("currencySelect");
     const { disabled } = props;
+    const resolvedPlaceholder = placeholder ?? t("placeholder");
     const [selectedCurrency, setSelectedCurrency] =
       React.useState<Currency | null>(null);
 
@@ -112,13 +115,13 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
             disabled={disabled}
             aria-invalid={!valid}
             data-valid={valid}
-            displayValue={value ? value : placeholder}
+            displayValue={value ? value : resolvedPlaceholder}
             displayValueClassName={
               value ? "text-foreground" : "text-muted-foreground"
             }
           >
             <NativeSelectOption value="" disabled>
-              {placeholder}
+              {resolvedPlaceholder}
             </NativeSelectOption>
             {uniqueCurrencies.map((currency) => (
               <NativeSelectOption key={currency.code} value={currency.code}>
@@ -142,11 +145,11 @@ const CurrencySelect = React.forwardRef<HTMLButtonElement, CurrencySelectProps>(
               ref={ref}
             >
               {value ? (
-                <SelectValue placeholder={placeholder}>
+                <SelectValue placeholder={resolvedPlaceholder}>
                   <span>{value}</span>
                 </SelectValue>
               ) : (
-                <SelectValue placeholder={placeholder} />
+                <SelectValue placeholder={resolvedPlaceholder} />
               )}
             </SelectTrigger>
             <SelectContent className="w-max max-w-(--available-width) min-w-(--anchor-width)">

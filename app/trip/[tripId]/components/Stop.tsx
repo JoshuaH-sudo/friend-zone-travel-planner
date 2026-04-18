@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { StopDocumentType } from "@/lib/rxdb-schema";
@@ -13,8 +14,8 @@ import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 
 const stopSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+  name: z.string().min(1, "errors.nameRequired").max(100, "errors.nameTooLong"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "errors.invalidDateFormat"),
 });
 
 type StopFormData = z.infer<typeof stopSchema>;
@@ -25,6 +26,7 @@ type StopProps = {
 };
 
 export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
+  const t = useTranslations("stop");
   const time = useTime();
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
@@ -93,7 +95,7 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
         <CardContent className="p-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div className="space-y-2">
-              <Label htmlFor="stop-name">Stop Name</Label>
+              <Label htmlFor="stop-name">{t("nameLabel")}</Label>
               <Input
                 id={`stop-name-${stop.id}`}
                 {...nameRegistration}
@@ -103,14 +105,14 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
                 }}
                 type="text"
                 autoFocus
-                placeholder="Stop name"
+                placeholder={t("namePlaceholder")}
                 className={`text-xl font-semibold ${
                   highlightNameInput ? "ring-primary/40 ring-2" : ""
                 }`}
               />
               {errors.name && (
                 <p className="text-destructive text-sm">
-                  {errors.name.message}
+                  {t(errors.name.message ?? "")}
                 </p>
               )}
             </div>
@@ -124,13 +126,13 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
               )}
             </div> */}
             <div className="flex gap-2">
-              <Button type="submit">Save</Button>
+              <Button type="submit">{t("save")}</Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditing(false)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </form>
@@ -143,8 +145,8 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
     <TripItemCard
       onDelete={handleDelete}
       onEdit={() => setIsEditing(true)}
-      deleteLabel="Delete stop"
-      editLabel="Edit stop"
+      deleteLabel={t("deleteAriaLabel")}
+      editLabel={t("editAriaLabel")}
       className="w-full"
       title={<h3 className="text-xl font-semibold">{stop.name}</h3>}
     >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -21,6 +22,7 @@ export function TripNameEditor({
   onSave,
   onExport,
 }: TripNameEditorProps) {
+  const t = useTranslations("tripNameEditor");
   const [isEditingTripName, setIsEditingTripName] = useState(false);
   const [tripNameDraft, setTripNameDraft] = useState("");
 
@@ -64,7 +66,7 @@ export function TripNameEditor({
             variant="ghost"
             size="icon-sm"
             className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
-            aria-label="Save trip name"
+            aria-label={t("saveAriaLabel")}
             disabled={!tripNameDraft.trim()}
           >
             <HugeiconsIcon icon={Tick02Icon} />
@@ -74,7 +76,7 @@ export function TripNameEditor({
             variant="ghost"
             size="icon-sm"
             className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
-            aria-label="Cancel editing trip name"
+            aria-label={t("cancelAriaLabel")}
             onClick={cancelTripNameEdit}
           >
             <HugeiconsIcon icon={Cancel01Icon} />
@@ -96,7 +98,7 @@ export function TripNameEditor({
         variant="ghost"
         size="icon-sm"
         className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary shrink-0"
-        aria-label="Export trip to iCal"
+        aria-label={t("exportAriaLabel")}
         onClick={onExport}
       >
         <HugeiconsIcon icon={CalendarDownload01Icon} />

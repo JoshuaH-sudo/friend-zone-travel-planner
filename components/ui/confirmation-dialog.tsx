@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { ReactElement, ReactNode } from "react";
 import type { VariantProps } from "class-variance-authority";
 import {
@@ -35,16 +36,20 @@ export function ConfirmationDialog({
   title,
   description,
   children,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   size = "default",
   confirmVariant = "destructive",
   cancelVariant = "outline",
   disabled = false,
 }: ConfirmationDialogProps) {
+  const t = useTranslations("confirmationDialog");
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const resolvedConfirmLabel = confirmLabel ?? t("confirm");
+  const resolvedCancelLabel = cancelLabel ?? t("cancel");
 
   const handleConfirm = async () => {
     try {
@@ -68,18 +73,15 @@ export function ConfirmationDialog({
         </AlertDialogHeader>
         {children}
         <AlertDialogFooter>
-          <AlertDialogCancel
-            variant={cancelVariant}
-            disabled={isSubmitting}
-          >
-            {cancelLabel}
+          <AlertDialogCancel variant={cancelVariant} disabled={isSubmitting}>
+            {resolvedCancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
             variant={confirmVariant}
             onClick={handleConfirm}
             disabled={isSubmitting || disabled}
           >
-            {isSubmitting ? "Working..." : confirmLabel}
+            {isSubmitting ? t("working") : resolvedConfirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
