@@ -24,6 +24,12 @@ import { useSettings } from "@/lib/SettingsProvider";
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+const optionalTimeField = z
+  .string()
+  .regex(timeRegex, "Invalid time (HH:MM)")
+  .or(z.literal(""))
+  .optional();
+
 const transportSchema = z
   .object({
     name: z.string().min(1, "Name is required").max(200, "Name is too long"),
@@ -38,16 +44,8 @@ const transportSchema = z
       message: "Invalid currency",
     }),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
-    departureTime: z
-      .string()
-      .regex(timeRegex, "Invalid time (HH:MM)")
-      .or(z.literal(""))
-      .optional(),
-    arrivalTime: z
-      .string()
-      .regex(timeRegex, "Invalid time (HH:MM)")
-      .or(z.literal(""))
-      .optional(),
+    departureTime: optionalTimeField,
+    arrivalTime: optionalTimeField,
     timezone: z.string().optional(),
   });
 
@@ -241,7 +239,7 @@ export const Transport = ({
                 name="timezone"
                 render={({ field }) => (
                   <TimezonePicker
-                    value={field.value ?? settingsTimezone}
+                    value={field.value || settingsTimezone}
                     onValueChange={field.onChange}
                     className="w-full"
                   />

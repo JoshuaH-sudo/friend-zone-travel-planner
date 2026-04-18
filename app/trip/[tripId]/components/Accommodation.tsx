@@ -167,7 +167,7 @@ export const Accommodation = ({
                 name="timezone"
                 render={({ field }) => (
                   <TimezonePicker
-                    value={field.value ?? settingsTimezone}
+                    value={field.value || settingsTimezone}
                     onValueChange={field.onChange}
                     className="w-full"
                   />

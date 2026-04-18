@@ -90,11 +90,10 @@ interface TimezoneEntry {
   region: string;
   offset: string;
   offsetMinutes: number;
-  currentTime: string;
 }
 
-// Pre-compute all timezone entries once.
-const ALL_TIMEZONES: TimezoneEntry[] = (() => {
+// Pre-compute all timezone entries (except current time, which is refreshed on open).
+const ALL_TIMEZONES: Omit<TimezoneEntry, "currentTime">[] = (() => {
   const zones: string[] = Intl.supportedValuesOf("timeZone");
   return zones
     .map((tz) => ({
@@ -103,7 +102,6 @@ const ALL_TIMEZONES: TimezoneEntry[] = (() => {
       region: getRegion(tz),
       offset: getUtcOffset(tz),
       offsetMinutes: getOffsetMinutes(tz),
-      currentTime: getCurrentTime(tz),
     }))
     .sort((a, b) => a.offsetMinutes - b.offsetMinutes || a.tz.localeCompare(b.tz));
 })();
@@ -126,6 +124,16 @@ export function TimezonePicker({
 }: TimezonePickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  // Compute current times for all zones once when the dialog opens.
+  const currentTimes = useMemo(() => {
+    if (!open) return {} as Record<string, string>;
+    const map: Record<string, string> = {};
+    for (const entry of ALL_TIMEZONES) {
+      map[entry.tz] = getCurrentTime(entry.tz);
+    }
+    return map;
+  }, [open]);
 
   const handleSelect = useCallback(
     (tz: string) => {
@@ -176,7 +184,6 @@ export function TimezonePicker({
     const entry = ALL_TIMEZONES.find((e) => e.tz === value);
     return entry ? `${entry.label} (${entry.offset})` : value;
   }, [value]);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <button
@@ -224,9 +231,9 @@ export function TimezonePicker({
             )}
             {grouped.map(([region, entries]) => (
               <div key={region}>
-                <p className="text-muted-foreground sticky top-0 bg-transparent px-2 py-1.5 text-xs font-semibold tracking-wide uppercase">
+                <h3 className="text-muted-foreground bg-background sticky top-0 px-2 py-1.5 text-xs font-semibold tracking-wide uppercase">
                   {region}
-                </p>
+                </h3>
                 {entries.map((entry) => (
                   <button
                     key={entry.tz}
@@ -244,7 +251,7 @@ export function TimezonePicker({
                       {entry.offset}
                     </span>
                     <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
-                      {entry.currentTime}
+                      {currentTimes[entry.tz] ?? ""}
                     </span>
                   </button>
                 ))}

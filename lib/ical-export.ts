@@ -31,7 +31,11 @@ function formatDtStamp(now: Date): string {
 
 /**
  * Build a DTSTART or DTEND property string.
- * When a time (HH:MM) is supplied, emits a floating datetime with TZID; otherwise an all-day DATE.
+ *
+ * When a time (HH:MM) is supplied, the date+time represent a local moment in
+ * the named timezone (the user entered both values in that tz), so we emit a
+ * TZID-scoped datetime without any UTC conversion. When no time is given, we
+ * emit a floating all-day DATE value.
  */
 function dtProp(
   propName: "DTSTART" | "DTEND",
@@ -153,13 +157,17 @@ export async function exportTripToIcal(
   }
 
   for (const transport of transports) {
-    const tz = transport.timezone || (transport.departureTime ? timezone : undefined);
+    const tz = transport.timezone || timezone;
+    // iCal requires consistent event types: both DTSTART and DTEND must be either
+    // all-day DATE or timed DATETIME. If only one of the two times is set, fall back
+    // to an all-day event to avoid a mixed-mode violation (RFC 5545 §3.6.1).
+    const hasBothTimes = !!(transport.departureTime && transport.arrivalTime);
     lines.push(
       "BEGIN:VEVENT",
       `UID:transport-${transport.id}@friend-zone-travel-planner`,
       `DTSTAMP:${dtstamp}`,
-      dtProp("DTSTART", transport.date, transport.departureTime, tz),
-      transport.arrivalTime
+      dtProp("DTSTART", transport.date, hasBothTimes ? transport.departureTime : undefined, tz),
+      hasBothTimes
         ? dtProp("DTEND", transport.date, transport.arrivalTime, tz)
         : `DTEND;VALUE=DATE:${addOneDay(transport.date)}`,
       `SUMMARY:${sanitizeText(transport.name)} (${transport.type})`,
@@ -168,13 +176,13 @@ export async function exportTripToIcal(
   }
 
   for (const accommodation of accommodations) {
-    const tz = accommodation.timezone || undefined;
+    const tz = accommodation.timezone || timezone;
     lines.push(
       "BEGIN:VEVENT",
       `UID:accommodation-${accommodation.id}@friend-zone-travel-planner`,
       `DTSTAMP:${dtstamp}`,
-      dtProp("DTSTART", accommodation.checkIn, undefined, tz),
-      dtProp("DTEND", accommodation.checkOut, undefined, tz),
+      `DTSTART;VALUE=DATE:${formatIcalDate(accommodation.checkIn)}`,
+      `DTEND;VALUE=DATE:${addOneDay(accommodation.checkOut)}`,
       `SUMMARY:${sanitizeText(accommodation.name)}`,
       "END:VEVENT",
     );
