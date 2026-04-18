@@ -125,7 +125,7 @@ function TripDetails() {
   }
 
   return (
-    <main className="flex min-h-screen max-w-4xl flex-col items-center px-2 sm:items-start">
+    <main className="flex min-h-screen max-w-4xl m-auto flex-col items-center px-2 sm:items-start">
       <TripNameEditor
         tripName={trip.name}
         onSave={updateTripName}
