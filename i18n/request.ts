@@ -3,6 +3,10 @@ import { cookies, headers } from "next/headers";
 
 const locales = ["en", "de"] as const;
 const defaultLocale = "en";
+type AppLocale = (typeof locales)[number];
+
+const isSupportedLocale = (value: string | undefined): value is AppLocale =>
+  locales.some((locale) => locale === value);
 
 const resolveLocaleFromAcceptLanguage = (header: string | null) => {
   if (!header) return defaultLocale;
@@ -27,7 +31,7 @@ const resolveLocaleFromAcceptLanguage = (header: string | null) => {
 
 export default getRequestConfig(async () => {
   const localeCookie = (await cookies()).get("NEXT_LOCALE")?.value;
-  const locale = locales.includes(localeCookie as (typeof locales)[number])
+  const locale = isSupportedLocale(localeCookie)
     ? localeCookie
     : resolveLocaleFromAcceptLanguage((await headers()).get("accept-language"));
 

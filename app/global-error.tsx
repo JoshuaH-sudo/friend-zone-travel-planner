@@ -8,9 +8,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   const locale =
-    typeof window !== "undefined" &&
-    navigator.language.toLowerCase().startsWith("de")
-      ? "de"
+    typeof window !== "undefined"
+      ? navigator.language.toLowerCase().startsWith("de")
+        ? "de"
+        : "en"
       : "en";
 
   const messages = {
