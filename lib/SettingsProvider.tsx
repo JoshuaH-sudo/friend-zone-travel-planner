@@ -80,7 +80,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       updateSettings({ defaultCurrency: currency }),
     setLanguage: (language) => {
       if (typeof document !== "undefined" && supportedLanguages.has(language)) {
-        document.cookie = `NEXT_LOCALE=${language};path=/;max-age=31536000;samesite=lax`;
+        const secureCookieAttribute =
+          process.env.NODE_ENV === "production" ? ";secure" : "";
+        document.cookie = `NEXT_LOCALE=${language};path=/;max-age=31536000;samesite=lax${secureCookieAttribute}`;
       }
       updateSettings({ language });
     },
