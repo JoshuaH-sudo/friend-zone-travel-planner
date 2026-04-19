@@ -129,15 +129,6 @@ export const Stop = ({
                 </p>
               )}
             </div>
-            {/* <div className="space-y-2">
-              <Label htmlFor="stop-date">Date</Label>
-              <Input id="stop-date" {...register("date")} type="date" />
-              {errors.date && (
-                <p className="text-destructive text-sm">
-                  {errors.date.message}
-                </p>
-              )}
-            </div> */}
             <div className="flex gap-2">
               <Button type="submit">{t("save")}</Button>
               <Button
@@ -172,9 +163,6 @@ export const Stop = ({
         </div>
       }
     >
-      {/* <p className="text-muted-foreground mt-2">
-        {new Date(stop.date).toLocaleDateString()}
-      </p> */}
     </TripItemCard>
   );
 };
