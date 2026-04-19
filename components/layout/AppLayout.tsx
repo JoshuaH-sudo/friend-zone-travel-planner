@@ -45,9 +45,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto w-full">{children}</main>
-      <footer className="text-muted-foreground py-6 text-center text-sm">
-        Your data lives only on this device.
+      <main className="mx-auto w-full flex-1">{children}</main>
+      <footer className="border-t mt-12">
+        <div className="container py-6 text-xs text-muted-foreground text-center">
+          Your data lives only on this device. No account, no cloud.
+        </div>
       </footer>
     </div>
   );
