@@ -9,19 +9,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
+import { formatMoney } from "@/lib/format";
 import {
   DATE_OR_DATETIME_REGEX,
   formatStoredDateTime,
 } from "@/lib/datetime-utils";
 import { MS_PER_DAY } from "@/lib/constants/time";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Bed, Pencil, Trash2 } from "lucide-react";
 
 export const Accommodation = ({
   accommodation,
@@ -313,34 +313,48 @@ export const Accommodation = ({
   }
 
   return (
-    <TripItemCard
-      onDelete={handleDelete}
-      onEdit={() => setIsEditing(true)}
-      deleteLabel={t("deleteAriaLabel")}
-      editLabel={t("editAriaLabel")}
-      title={<h4 className="text-lg font-semibold">{name}</h4>}
-    >
-      <div className="text-muted-foreground mt-2 flex items-center gap-2">
-        <span>{price}</span>
-        <span>{currency}</span>
+    <div className="flex items-start gap-3 rounded-md border border-border/50 bg-card px-3 py-2 text-sm">
+      <Bed className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-foreground">{name}</p>
+        <p className="text-xs text-muted-foreground">
+          {formatDateTime(checkIn)}{" -> "}{formatDateTime(checkOut)}
+        </p>
+        {timezone && (
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {t("timezoneDisplay", { value: timezone })}
+          </p>
+        )}
+        {warningSummary && (
+          <p className="text-destructive mt-1 flex items-center gap-1.5 text-xs">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            {warningSummary}
+          </p>
+        )}
       </div>
-      <p className="text-muted-foreground mt-2">
-        {t("checkInDisplay", { value: formatDateTime(checkIn) })}
-      </p>
-      <p className="text-muted-foreground mt-2">
-        {t("checkOutDisplay", { value: formatDateTime(checkOut) })}
-      </p>
-      {timezone && (
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t("timezoneDisplay", { value: timezone })}
-        </p>
-      )}
-      {warningSummary && (
-        <p className="text-destructive mt-2 flex items-center gap-2 text-sm">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          {warningSummary}
-        </p>
-      )}
-    </TripItemCard>
+      <div className="flex shrink-0 items-center gap-1">
+        <span className="mr-1 text-sm font-medium text-foreground">
+          {formatMoney(price, currency)}
+        </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsEditing(true)}
+          aria-label={t("editAriaLabel")}
+          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDelete}
+          aria-label={t("deleteAriaLabel")}
+          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </div>
   );
 };

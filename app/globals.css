@@ -34,6 +34,7 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-muted: var(--primary-muted);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -55,7 +56,8 @@
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(200 25% 12%);
   --primary: hsl(150 30% 28%);
-  --primary-foreground: hsl(40 33% 97%);
+  --primary-foreground: hsl(36 33% 97%);
+  --primary-muted: hsl(152 22%, 90%);
   --secondary: hsl(40 25% 92%);
   --secondary-foreground: hsl(200 25% 12%);
   --muted: hsl(40 20% 94%);
@@ -95,6 +97,7 @@
   --popover-foreground: hsl(40 25% 92%);
   --primary: hsl(150 35% 50%);
   --primary-foreground: hsl(200 25% 8%);
+  --primary-muted: hsl(150 35% 50% / 20%);
   --secondary: hsl(200 15% 16%);
   --secondary-foreground: hsl(40 25% 92%);
   --muted: hsl(200 15% 16%);
@@ -169,17 +172,6 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0s !important;
     scroll-behavior: auto !important;
-  }
-}
-
-.container {
-  center: true;
-  padding: "1.5rem";
-  @apply mx-auto w-full;
-  @media (min-width: 1280px) {
-    .container {
-      max-width: 1280px;
-    }
   }
 }
 

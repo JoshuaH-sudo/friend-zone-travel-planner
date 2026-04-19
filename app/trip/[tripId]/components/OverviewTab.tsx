@@ -138,7 +138,7 @@ export function OverviewTab({
         <SortableContext items={activeOrder} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-3">
             {orderedStops.map((stop, index) => (
-              <SortableStopCard key={stop.id} stop={stop}>
+              <SortableStopCard key={stop.id} index={index + 1} stop={stop}>
                 <div className="flex flex-col gap-2">
                   <details className="bg-muted/40 rounded-xl p-3">
                     <summary className="text-sm font-medium">Accommodations</summary>
