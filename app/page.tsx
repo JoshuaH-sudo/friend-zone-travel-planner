@@ -26,10 +26,12 @@ import type {
 import { useSettings } from "@/lib/SettingsProvider";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
 export default function HomePage() {
+  const t = useTranslations("home");
   const db = useDatabase();
   const router = useRouter();
   const { defaultCurrency } = useSettings();
@@ -88,9 +90,9 @@ export default function HomePage() {
     const nextTripId = generateId();
     let createdTrip: Awaited<ReturnType<typeof db.trips.insert>> | null = null;
     try {
-      createdTrip = await db.trips.insert({
-        id: nextTripId,
-        name: tripName.trim() || "New Trip",
+        createdTrip = await db.trips.insert({
+          id: nextTripId,
+          name: tripName.trim() || t("newTripName"),
         createdAt: now,
         updatedAt: now,
       });
@@ -110,7 +112,7 @@ export default function HomePage() {
       if (createdTrip) {
         await createdTrip.remove();
       }
-      toast.error("Could not create trip.");
+      toast.error(t("createTripError"));
       return;
     }
 
@@ -127,11 +129,11 @@ export default function HomePage() {
       28">
         <section className="animate-fade-in flex flex-col gap-3">
           <p className="text-accent text-2xs font-medium tracking-[0.2em] uppercase">
-            Your travels
+            {t("heroEyebrow")}
           </p>
-          <h1 className="font-serif text-4xl font-semibold">Trips</h1>
+          <h1 className="font-serif text-4xl font-semibold">{t("heroTitle")}</h1>
           <p className="text-muted-foreground">
-            Plan, organise and recall every stop, stay and journey.
+            {t("heroDescription")}
           </p>
         </section>
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
@@ -139,34 +141,34 @@ export default function HomePage() {
             render={
               <Button size="lg">
                 <Plus data-icon="inline-start" />
-                Plan a trip
+                {t("planTrip")}
               </Button>
             }
           />
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create a new trip</DialogTitle>
+              <DialogTitle>{t("createTripTitle")}</DialogTitle>
               <DialogDescription>
-                Start with a name and optionally your first stop.
+                {t("createTripDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3">
               <Input
                 value={tripName}
                 onChange={(event) => setTripName(event.target.value)}
-                placeholder="Trip name"
+                placeholder={t("tripNamePlaceholder")}
               />
               <Input
                 value={firstStopName}
                 onChange={(event) => setFirstStopName(event.target.value)}
-                placeholder="First stop (optional)"
+                placeholder={t("firstStopPlaceholder")}
               />
               <Input
                 value={firstStopDate}
                 onChange={(event) => setFirstStopDate(event.target.value)}
                 type="date"
               />
-              <Button onClick={createTrip}>Create and open</Button>
+              <Button onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -181,7 +183,7 @@ export default function HomePage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="pl-10"
-                placeholder="Search trips..."
+                placeholder={t("searchPlaceholder")}
               />
             </div>
             <Tabs
@@ -194,7 +196,7 @@ export default function HomePage() {
                   ["all", "upcoming", "ongoing", "past"] as TripStatusFilter[]
                 ).map((value) => (
                   <TabsTrigger key={value} value={value} className="capitalize">
-                    {value}
+                    {t(`filters.${value}`)}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -206,8 +208,8 @@ export default function HomePage() {
       {cards.length === 0 ? (
         <Card className="shadow-soft">
           <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center">
-            <p>No trips yet.</p>
-            <Button onClick={() => setIsCreating(true)}>Plan a trip</Button>
+            <p>{t("empty.noTrips")}</p>
+            <Button onClick={() => setIsCreating(true)}>{t("planTrip")}</Button>
           </CardContent>
         </Card>
       ) : (
@@ -221,11 +223,11 @@ export default function HomePage() {
               <CardHeader className="gradient-hero relative h-32 p-0">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--accent)/0.4),transparent_60%)]" />
                 <span className="bg-background/90 text-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase">
-                  {card.status}
+                  {t(`filters.${card.status}`)}
                 </span>
                 <div className="text-primary-foreground/80 absolute bottom-3 left-4 flex items-center gap-1.5 text-xs">
                   <MapPin className="h-3.5 w-3.5" />
-                  {card.stopCount} {card.stopCount === 1 ? "stop" : "stops"}
+                  {t("stopCount", { count: card.stopCount })}
                 </div>
               </CardHeader>
               <CardContent className="p-5">
@@ -238,7 +240,7 @@ export default function HomePage() {
                     ? card.endDate
                       ? `${formatDateShort(card.startDate)} - ${formatDateShort(card.endDate)}`
                       : formatDateShort(card.startDate)
-                    : "No dates yet"}
+                    : t("noDatesYet")}
                 </div>
                 {card.stopCount > 0 && (
                   <p className="text-muted-foreground mt-3 line-clamp-1 text-sm">
