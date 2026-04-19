@@ -20,7 +20,12 @@ import { BudgetTab } from "./components/BudgetTab";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
-import { convert, daysBetween, formatDateShort, formatMoney } from "@/lib/format";
+import {
+  convert,
+  daysBetween,
+  formatDateShort,
+  formatMoney,
+} from "@/lib/format";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
 import {
@@ -34,7 +39,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { ArrowLeft, Bed, Calendar, MapPin, MoreHorizontal, Plane, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  Bed,
+  Calendar,
+  CalendarDays,
+  MapPin,
+  MoreHorizontal,
+  Plane,
+  Wallet,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
@@ -161,8 +175,9 @@ export default function TripPage() {
     const sorted = [...stops].sort((a, b) => a.date.localeCompare(b.date));
     return { start: sorted[0].date, end: sorted[sorted.length - 1].date };
   })();
-  
-    const totalDays = range.start && range.end ? daysBetween(range.start, range.end) + 1 : 0;
+
+  const totalDays =
+    range.start && range.end ? daysBetween(range.start, range.end) + 1 : 0;
 
   if (loading) {
     return <p className="text-muted-foreground">Loading trip...</p>;
@@ -178,13 +193,13 @@ export default function TripPage() {
         <div className="container py-8 sm:py-12">
           <Link
             href="/"
-            className="text-primary-foreground/80 hover:text-primary-foreground mb-6 inline-flex items-center gap-1.5 text-sm"
+            className="text-foreground/80 hover:text-primary-foreground mb-6 inline-flex items-center gap-1.5 text-sm"
           >
             <ArrowLeft className="h-4 w-4" /> All trips
           </Link>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <p className="text-primary-foreground/70 mb-2 text-xs tracking-widest uppercase">
+              <p className="text-foreground/60 mb-2 text-xs tracking-widest uppercase">
                 Trip
               </p>
               <EditableText
@@ -192,9 +207,9 @@ export default function TripPage() {
                 onSave={async (nextName) => {
                   await trip.patch({ name: nextName, updatedAt: Date.now() });
                 }}
-                className="font-serif text-4xl leading-tight font-semibold sm:text-6xl"
+                className="text-foreground font-serif text-4xl leading-tight font-semibold sm:text-6xl"
               />
-              <div className="text-primary-foreground/85 mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              <div className="text-foreground/85 mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                 <span className="inline-flex items-center gap-1.5">
                   <Calendar className="h-4 w-4" />
                   {range.start
@@ -215,17 +230,25 @@ export default function TripPage() {
                   {Math.round(totals.grandCost).toLocaleString()}
                 </span>
                 {totalDays > 0 && (
-                  <span className="opacity-80">{totalDays} days</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarDays className="h-4 w-4" />
+                    {totalDays} days
+                  </span>
                 )}
               </div>
             </div>
             <DropdownMenu data-cy="trip-actions">
-              <DropdownMenuTrigger render={
-                <Button variant="secondary" size="icon" className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              }>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                }
+              ></DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
                   <DropdownMenuItem
@@ -265,7 +288,7 @@ export default function TripPage() {
 
       <div className="container py-8">
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto sm:inline-grid mb-6">
+          <TabsList className="mb-6 grid w-full grid-cols-4 sm:inline-grid sm:w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
             <TabsTrigger value="map">Map</TabsTrigger>
