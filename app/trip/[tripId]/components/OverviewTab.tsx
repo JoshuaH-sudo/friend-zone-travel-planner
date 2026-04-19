@@ -31,6 +31,7 @@ import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
 import { Bed, Plane, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -75,6 +76,7 @@ export function OverviewTab({
   onAddAccommodation,
   onAddTransport,
 }: OverviewTabProps) {
+  const t = useTranslations("overviewTab");
   const sortedStops = useMemo(
     () => [...stops].sort((a, b) => a.date.localeCompare(b.date)),
     [stops],
@@ -132,19 +134,19 @@ export function OverviewTab({
     } catch (error) {
       console.error(error);
       setOrder(previousOrder);
-      toast.error("Could not reorder stops.");
+      toast.error(t("toast.reorderFailed"));
       return;
     }
-    toast("Stop order updated.", {
+    toast(t("toast.reorderUpdated"), {
       action: {
-        label: "Undo",
+        label: t("toast.undo"),
         onClick: async () => {
           try {
             setOrder(previousOrder);
             await persistOrder(previousOrder);
           } catch (error) {
             console.error(error);
-            toast.error("Undo failed.");
+            toast.error(t("toast.undoFailed"));
           }
         },
       },
@@ -170,12 +172,10 @@ export function OverviewTab({
                     <div className="mt-2 flex flex-col gap-2">
                       <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
                         <Bed className="text-muted-foreground h-4 w-4" />
-                        <p>Stays</p>
+                        <p>{t("sections.stays")}</p>
                       </div>
                       {accommodationsByStop[stop.id]?.length === 0 && (
-                        <p className="text-muted-foreground">
-                          No stays for this stop.
-                        </p>
+                        <p className="text-muted-foreground">{t("sections.noStays")}</p>
                       )}
                       {(accommodationsByStop[stop.id] || []).map((item) => (
                         <Accommodation key={item.id} accommodation={item} />
@@ -204,8 +204,8 @@ export function OverviewTab({
                             onCancel={() =>
                               setAddingAccommodationForStopId(null)
                             }
-                            submitLabel="Add trip"
-                            cancelLabel="Cancel"
+                            submitLabel={t("actions.addStay")}
+                            cancelLabel={t("actions.cancel")}
                             autoFocusName
                           />
                         </div>
@@ -219,7 +219,7 @@ export function OverviewTab({
                           className="text-muted-foreground w-fit px-0"
                         >
                           <Plus className="h-4 w-4" />
-                          Add stay
+                          {t("actions.addStay")}
                         </Button>
                       )}
                     </div>
@@ -227,12 +227,10 @@ export function OverviewTab({
                   <section>
                     <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
                       <Plane className="text-muted-foreground h-4 w-4" />
-                      <p>Journeys</p>
+                      <p>{t("sections.journeys")}</p>
                     </div>
                     {transportsByStop[stop.id]?.length === 0 && (
-                      <p className="text-muted-foreground">
-                        No journeys for this stop.
-                      </p>
+                      <p className="text-muted-foreground">{t("sections.noJourneys")}</p>
                     )}
                     <div className="mt-2 flex flex-col gap-2">
                       {(transportsByStop[stop.id] || []).map((item) => (
@@ -261,8 +259,8 @@ export function OverviewTab({
                               setAddingTransportForStopId(null);
                             }}
                             onCancel={() => setAddingTransportForStopId(null)}
-                            submitLabel="Add journey"
-                            cancelLabel="Cancel"
+                            submitLabel={t("actions.addJourney")}
+                            cancelLabel={t("actions.cancel")}
                             autoFocusName
                           />
                         </div>
@@ -274,7 +272,7 @@ export function OverviewTab({
                           className="text-muted-foreground w-fit px-0"
                         >
                           <Plus className="h-4 w-4" />
-                          Add journey
+                          {t("actions.addJourney")}
                         </Button>
                       )}
                     </div>
@@ -287,7 +285,7 @@ export function OverviewTab({
       </DndContext>
       {orderedStops.length === 0 ? (
         <div className="text-muted-foreground rounded-xl border border-dashed p-6 text-center">
-          No stops yet.
+          {t("empty.noStops")}
         </div>
       ) : null}
       <form
@@ -296,7 +294,7 @@ export function OverviewTab({
           event.preventDefault();
           if (!newStopName.trim()) return;
           if (!newStopDate) {
-            toast.error("A date is required for this stop.");
+            toast.error(t("validation.dateRequired"));
             return;
           }
           await onAddStop(newStopName.trim(), newStopDate);
@@ -307,7 +305,7 @@ export function OverviewTab({
         <Input
           value={newStopName}
           onChange={(event) => setNewStopName(event.target.value)}
-          placeholder="Add another stop..."
+          placeholder={t("addStop.placeholder")}
           className="min-w-56 flex-1 rounded-xl bg-white/80"
         />
         <Input
@@ -317,7 +315,7 @@ export function OverviewTab({
           className="w-40 rounded-xl bg-white/80"
         />
         <Button type="submit" className="h-10 rounded-xl px-4">
-          Add trip
+          {t("addStop.submit")}
         </Button>
       </form>
       <div className="flex justify-end">
@@ -325,7 +323,7 @@ export function OverviewTab({
           variant="outline"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          Back to top
+          {t("actions.backToTop")}
         </Button>
       </div>
     </div>

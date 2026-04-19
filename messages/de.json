@@ -92,6 +92,36 @@
     "editAriaLabel": "Reisename bearbeiten",
     "exportAriaLabel": "Reise als iCal exportieren"
   },
+  "overviewTab": {
+    "sections": {
+      "stays": "Unterkünfte",
+      "journeys": "Reisen",
+      "noStays": "Keine Unterkünfte für diesen Stopp.",
+      "noJourneys": "Keine Reisen für diesen Stopp."
+    },
+    "actions": {
+      "addStay": "Unterkunft hinzufügen",
+      "addJourney": "Reise hinzufügen",
+      "cancel": "Abbrechen",
+      "backToTop": "Nach oben"
+    },
+    "addStop": {
+      "placeholder": "Weiteren Stopp hinzufügen...",
+      "submit": "Stopp hinzufügen"
+    },
+    "empty": {
+      "noStops": "Noch keine Stopps."
+    },
+    "validation": {
+      "dateRequired": "Für diesen Stopp ist ein Datum erforderlich."
+    },
+    "toast": {
+      "reorderFailed": "Stopps konnten nicht neu sortiert werden.",
+      "reorderUpdated": "Stopp-Reihenfolge wurde aktualisiert.",
+      "undo": "Rückgängig",
+      "undoFailed": "Rückgängig fehlgeschlagen."
+    }
+  },
   "stopItems": {
     "accommodation": "Unterkunft",
     "transport": "Transport",

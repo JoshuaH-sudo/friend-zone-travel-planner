@@ -92,6 +92,36 @@
     "editAriaLabel": "Edit trip name",
     "exportAriaLabel": "Export trip to iCal"
   },
+  "overviewTab": {
+    "sections": {
+      "stays": "Stays",
+      "journeys": "Journeys",
+      "noStays": "No stays for this stop.",
+      "noJourneys": "No journeys for this stop."
+    },
+    "actions": {
+      "addStay": "Add stay",
+      "addJourney": "Add journey",
+      "cancel": "Cancel",
+      "backToTop": "Back to top"
+    },
+    "addStop": {
+      "placeholder": "Add another stop...",
+      "submit": "Add stop"
+    },
+    "empty": {
+      "noStops": "No stops yet."
+    },
+    "validation": {
+      "dateRequired": "A date is required for this stop."
+    },
+    "toast": {
+      "reorderFailed": "Could not reorder stops.",
+      "reorderUpdated": "Stop order updated.",
+      "undo": "Undo",
+      "undoFailed": "Undo failed."
+    }
+  },
   "stopItems": {
     "accommodation": "Accommodation",
     "transport": "Transport",
