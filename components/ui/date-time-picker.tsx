@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea, ScrollAreaScrollbar } from "@/components/ui/scroll-area";
+import { MS_PER_DAY } from "@/lib/constants/time";
 import {
   PopoverRoot,
   PopoverTrigger,
@@ -52,8 +53,6 @@ export interface DateTimePickerProps {
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
 const minutes = Array.from({ length: 60 }, (_, i) => i); // 0-59
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
 export function DateTimePicker({
   value,
   onChange,

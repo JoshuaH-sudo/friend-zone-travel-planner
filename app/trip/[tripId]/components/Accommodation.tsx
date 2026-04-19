@@ -20,6 +20,7 @@ import {
   DATE_OR_DATETIME_REGEX,
   formatStoredDateTime,
 } from "@/lib/datetime-utils";
+import { MS_PER_DAY } from "@/lib/constants/time";
 import { AlertTriangle } from "lucide-react";
 
 export const Accommodation = ({
@@ -97,10 +98,10 @@ export const Accommodation = ({
   const watchedCheckIn = watch("checkIn");
   const datePresets = [
     { label: t("datePresetToday"), date: new Date() },
-    { label: t("datePresetTomorrow"), date: new Date(Date.now() + 86400000) },
+    { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
     {
       label: t("datePresetIn7Days"),
-      date: new Date(Date.now() + 7 * 86400000),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
     },
   ];
 

@@ -24,6 +24,7 @@ import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
+import { MS_PER_DAY } from "@/lib/constants/time";
 import { AlertTriangle } from "lucide-react";
 
 export const Transport = ({
@@ -111,10 +112,10 @@ export const Transport = ({
   const nameRegistration = register("name");
   const datePresets = [
     { label: t("datePresetToday"), date: new Date() },
-    { label: t("datePresetTomorrow"), date: new Date(Date.now() + 86400000) },
+    { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
     {
       label: t("datePresetIn7Days"),
-      date: new Date(Date.now() + 7 * 86400000),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
     },
   ];
 
