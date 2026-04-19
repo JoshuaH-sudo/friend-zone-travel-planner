@@ -45,6 +45,9 @@ export interface DateTimePickerProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  highlightedDates?: string[];
+  pairedHighlightDate?: string;
+  presets?: Array<{ label: string; date: Date }>;
 }
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
@@ -55,6 +58,9 @@ export function DateTimePicker({
   onChange,
   placeholder = "Pick date & time",
   className,
+  highlightedDates,
+  pairedHighlightDate,
+  presets,
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -63,6 +69,45 @@ export function DateTimePicker({
     () => (value ? parseIsoString(value) : undefined),
     [value],
   );
+  const highlightedDays = React.useMemo(
+    () =>
+      [...new Set(highlightedDates ?? [])]
+        .filter(Boolean)
+        .map((highlightedDate) => parseIsoString(highlightedDate)),
+    [highlightedDates],
+  );
+  const pairedDay = React.useMemo(
+    () =>
+      pairedHighlightDate ? parseIsoString(pairedHighlightDate) : undefined,
+    [pairedHighlightDate],
+  );
+  const datePresets = React.useMemo(
+    () =>
+      presets ?? [
+        { label: "Today", date: new Date() },
+        { label: "Tomorrow", date: new Date(Date.now() + 24 * 60 * 60 * 1000) },
+        {
+          label: "In 7 days",
+          date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      ],
+    [presets],
+  );
+
+  const applyPreset = (presetDate: Date) => {
+    const h = date ? date.getHours() : 12;
+    const m = date ? date.getMinutes() : 0;
+    const merged = new Date(
+      presetDate.getFullYear(),
+      presetDate.getMonth(),
+      presetDate.getDate(),
+      h,
+      m,
+      0,
+      0,
+    );
+    onChange(toIsoDateTimeString(merged));
+  };
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate) return;
@@ -107,7 +152,7 @@ export function DateTimePicker({
   };
 
   // Derive 12-hour display values
-  const display12Hour = date ? ((date.getHours() % 12) || 12) : 12;
+  const display12Hour = date ? date.getHours() % 12 || 12 : 12;
   const displayMinute = date ? date.getMinutes() : 0;
   const displayAmPm = date ? (date.getHours() >= 12 ? "PM" : "AM") : "AM";
 
@@ -133,6 +178,21 @@ export function DateTimePicker({
         )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
+        <div className="border-b p-2">
+          <div className="flex flex-wrap gap-1">
+            {datePresets.map((preset) => (
+              <Button
+                key={preset.label}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset(preset.date)}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+        </div>
         <div className="sm:flex">
           <Calendar
             mode="single"
@@ -142,6 +202,14 @@ export function DateTimePicker({
             startMonth={new Date(1900, 0)}
             endMonth={new Date(2100, 11)}
             initialFocus
+            modifiers={{
+              highlighted: highlightedDays,
+              paired: pairedDay ? [pairedDay] : undefined,
+            }}
+            modifiersClassNames={{
+              highlighted: "bg-muted text-muted-foreground",
+              paired: "ring-1 ring-primary/60",
+            }}
           />
           {/* Time selectors — only usable after a date is chosen */}
           <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
@@ -171,9 +239,7 @@ export function DateTimePicker({
                   <Button
                     key={m}
                     size="icon"
-                    variant={
-                      displayMinute === m && date ? "default" : "ghost"
-                    }
+                    variant={displayMinute === m && date ? "default" : "ghost"}
                     className="aspect-square w-full shrink-0 text-sm"
                     onClick={() => handleTimeChange("minute", String(m))}
                     disabled={!date}
@@ -191,9 +257,7 @@ export function DateTimePicker({
                 <Button
                   key={period}
                   size="icon"
-                  variant={
-                    displayAmPm === period && date ? "default" : "ghost"
-                  }
+                  variant={displayAmPm === period && date ? "default" : "ghost"}
                   className="aspect-square w-full shrink-0 text-sm"
                   onClick={() => handleTimeChange("ampm", period)}
                   disabled={!date}
