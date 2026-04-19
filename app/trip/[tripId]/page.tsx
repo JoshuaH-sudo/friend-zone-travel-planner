@@ -220,10 +220,11 @@ export default function TripPage() {
               </div>
             </div>
             <DropdownMenu data-cy="trip-actions">
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger render={
                 <Button variant="secondary" size="icon" className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
+              }>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
@@ -264,7 +265,7 @@ export default function TripPage() {
 
       <div className="container py-8">
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="mb-6 grid w-full grid-cols-4 sm:inline-grid sm:w-auto">
+          <TabsList className="grid grid-cols-4 w-full sm:w-auto sm:inline-grid mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
             <TabsTrigger value="map">Map</TabsTrigger>
