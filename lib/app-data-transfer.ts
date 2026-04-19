@@ -161,6 +161,16 @@ export async function importAppData(db: MyDatabase, content: string) {
   return { theme };
 }
 
+export async function resetAppData(db: MyDatabase) {
+  await clearAllCollections(db);
+  await db.settings.upsert({
+    id: USER_SETTINGS_ID,
+    defaultCurrency: "USD",
+    language: "en",
+    timezone: "UTC",
+  });
+}
+
 async function clearAllCollections(db: MyDatabase) {
   await db.transports.find().remove();
   await db.accommodations.find().remove();
