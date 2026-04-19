@@ -62,12 +62,19 @@
       "exporting": "Exportiere...",
       "import": "App-Daten hochladen",
       "importing": "Importiere...",
+      "reset": "Alle Daten löschen",
+      "resetConfirmTitle": "Alle App-Daten löschen?",
+      "resetConfirmDescription": "Dadurch werden alle auf diesem Gerät gespeicherten Reisen und Einstellungen dauerhaft entfernt.",
+      "resetConfirm": "Alle Daten löschen",
+      "resetWarning": "Diese Aktion kann nicht rückgängig gemacht werden.",
       "status": {
         "exported": "App-Daten wurden exportiert.",
         "exportFailed": "Export der App-Daten fehlgeschlagen: {errorMessage}",
         "imported": "App-Daten wurden importiert.",
         "importFailed": "Import der App-Daten fehlgeschlagen: {errorMessage}",
-        "importFailedFileTooLarge": "Import der App-Daten fehlgeschlagen: Datei ist zu groß (max. 5 MB)."
+        "importFailedFileTooLarge": "Import der App-Daten fehlgeschlagen: Datei ist zu groß (max. 5 MB).",
+        "reset": "Alle App-Daten wurden gelöscht.",
+        "resetFailed": "Löschen der App-Daten fehlgeschlagen: {errorMessage}"
       }
     }
   },

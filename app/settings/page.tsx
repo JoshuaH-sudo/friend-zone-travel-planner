@@ -14,12 +14,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TimezonePicker } from "@/components/ui/timezone-picker";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useSettings } from "@/lib/SettingsProvider";
 import {
   exportAppData,
   importAppData,
   isValidTheme,
+  resetAppData,
 } from "@/lib/app-data-transfer";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -41,6 +43,7 @@ export default function SettingsPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleExport = async () => {
     try {
@@ -91,6 +94,21 @@ export default function SettingsPage() {
     } finally {
       event.target.value = "";
       setIsImporting(false);
+    }
+  };
+
+  const handleResetAppData = async () => {
+    try {
+      setIsResetting(true);
+      setStatusMessage(null);
+      await resetAppData(database);
+      setStatusMessage(t("backup.status.reset"));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : t("errors.unknownError");
+      setStatusMessage(t("backup.status.resetFailed", { errorMessage }));
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -205,7 +223,7 @@ export default function SettingsPage() {
             <Button
               type="button"
               onClick={handleExport}
-              disabled={isExporting || isImporting}
+              disabled={isExporting || isImporting || isResetting}
             >
               {isExporting ? t("backup.exporting") : t("backup.export")}
             </Button>
@@ -213,10 +231,30 @@ export default function SettingsPage() {
               type="button"
               variant="outline"
               onClick={handleImportClick}
-              disabled={isExporting || isImporting}
+              disabled={isExporting || isImporting || isResetting}
             >
               {isImporting ? t("backup.importing") : t("backup.import")}
             </Button>
+            <ConfirmationDialog
+              trigger={
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={isExporting || isImporting || isResetting}
+                >
+                  {t("backup.reset")}
+                </Button>
+              }
+              title={t("backup.resetConfirmTitle")}
+              description={t("backup.resetConfirmDescription")}
+              confirmLabel={t("backup.resetConfirm")}
+              onConfirm={handleResetAppData}
+              disabled={isExporting || isImporting || isResetting}
+            >
+              <p className="text-muted-foreground text-sm">
+                {t("backup.resetWarning")}
+              </p>
+            </ConfirmationDialog>
             <input
               ref={importInputRef}
               type="file"
