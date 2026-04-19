@@ -23,7 +23,7 @@ export function SortableStopCard({ stop, index, children }: SortableStopCardProp
     <Card
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="rounded-2xl"
+      className="rounded-2xl pb-0"
     >
       <CardHeader className="flex flex-row items-center gap-1 pb-4">
         <button
@@ -45,7 +45,7 @@ export function SortableStopCard({ stop, index, children }: SortableStopCardProp
           <p className="text-muted-foreground text-sm">{stop.date}</p>
         </div>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="border-t bg-secondary/30 px-4 sm:px-5 py-3 space-y-3">{children}</CardContent>
     </Card>
   );
 }

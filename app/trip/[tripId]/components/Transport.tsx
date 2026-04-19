@@ -25,7 +25,15 @@ import { useSettings } from "@/lib/SettingsProvider";
 import { formatMoney } from "@/lib/format";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
 import { MS_PER_DAY } from "@/lib/constants/time";
-import { AlertTriangle, Pencil, Plane, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Bus,
+  Car,
+  Pencil,
+  Plane,
+  Train,
+  Trash2,
+} from "lucide-react";
 
 export const Transport = ({
   transport,
@@ -340,20 +348,23 @@ export const Transport = ({
   }
 
   return (
-    <div className="flex items-start gap-3 rounded-md border border-border/50 bg-card px-3 py-2 text-sm">
-      <Plane className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+    <div className="border-border/50 bg-card flex items-start gap-3 rounded-md border px-3 py-2 text-sm">
+      {type === "flight" && <Plane className="text-primary h-5 w-5 shrink-0" />}
+      {type === "bus" && <Bus className="text-primary h-5 w-5 shrink-0" />}
+      {type === "car" && <Car className="text-primary h-5 w-5 shrink-0" />}
+      {type === "train" && <Train className="text-primary h-5 w-5 shrink-0" />}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-foreground">{name}</p>
-        <p className="text-xs text-muted-foreground capitalize">
+        <p className="text-foreground truncate font-medium">{name}</p>
+        <p className="text-muted-foreground text-xs capitalize">
           {t(`type.${type}`)} · {formatDateTime(departureDateTime)}
         </p>
         {arrivalDateTime && (
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             {t("arrivalDisplay", { value: formatDateTime(arrivalDateTime) })}
           </p>
         )}
         {timezone && (
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             {t("timezoneDisplay", { value: timezone })}
           </p>
         )}
@@ -365,7 +376,7 @@ export const Transport = ({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        <span className="mr-1 text-sm font-medium text-foreground">
+        <span className="text-foreground mr-1 text-sm font-medium">
           {formatMoney(price, currency)}
         </span>
         <Button
@@ -373,7 +384,7 @@ export const Transport = ({
           size="icon"
           onClick={() => setIsEditing(true)}
           aria-label={t("editAriaLabel")}
-          className="h-7 w-7 text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground h-7 w-7"
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
@@ -382,7 +393,7 @@ export const Transport = ({
           size="icon"
           onClick={handleDelete}
           aria-label={t("deleteAriaLabel")}
-          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          className="text-muted-foreground hover:text-destructive h-7 w-7"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>

@@ -36,7 +36,13 @@ type OverviewTabProps = {
   onAddStop: (name: string, date: string) => Promise<void>;
   onAddAccommodation: (
     stopId: string,
-    payload: { name: string; price: number; currency: string; checkIn: string; checkOut: string },
+    payload: {
+      name: string;
+      price: number;
+      currency: string;
+      checkIn: string;
+      checkOut: string;
+    },
   ) => Promise<void>;
   onAddTransport: (
     stopId: string,
@@ -75,14 +81,17 @@ export function OverviewTab({
   );
 
   const activeOrder =
-    order.length === sortedStops.length ? order : sortedStops.map((stop) => stop.id);
+    order.length === sortedStops.length
+      ? order
+      : sortedStops.map((stop) => stop.id);
   const orderedStops = activeOrder
     .map((id) => sortedStops.find((stop) => stop.id === id))
     .filter((stop): stop is StopDocumentType => Boolean(stop));
 
   const persistOrder = async (ids: string[]) => {
     if (ids.length === 0) return;
-    const firstDate = sortedStops[0]?.date ?? new Date().toISOString().slice(0, 10);
+    const firstDate =
+      sortedStops[0]?.date ?? new Date().toISOString().slice(0, 10);
     await Promise.all(
       ids.map(async (id, index) => {
         const stop = sortedStops.find((item) => item.id === id);
@@ -135,69 +144,66 @@ export function OverviewTab({
         collisionDetection={closestCenter}
         onDragEnd={onDragEnd}
       >
-        <SortableContext items={activeOrder} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={activeOrder}
+          strategy={verticalListSortingStrategy}
+        >
           <div className="flex flex-col gap-3">
             {orderedStops.map((stop, index) => (
               <SortableStopCard key={stop.id} index={index + 1} stop={stop}>
-                <div className="flex flex-col gap-2">
-                  <details className="bg-muted/40 rounded-xl p-3">
-                    <summary className="text-sm font-medium">Accommodations</summary>
-                    <div className="mt-2 flex flex-col gap-2">
-                      {(accommodationsByStop[stop.id] || []).map((item) => (
-                        <Accommodation key={item.id} accommodation={item} />
-                      ))}
-                      <StopItemForm
-                        kind="accommodation"
-                        placeholder="Add accommodation"
-                        defaultDate={stop.date}
-                        onSubmit={async ({
+                <div className="flex flex-col gap-4">
+                  <div className="mt-2 flex flex-col gap-2">
+                    {(accommodationsByStop[stop.id] || []).map((item) => (
+                      <Accommodation key={item.id} accommodation={item} />
+                    ))}
+                    <StopItemForm
+                      kind="accommodation"
+                      placeholder="Add accommodation"
+                      defaultDate={stop.date}
+                      onSubmit={async ({
+                        name,
+                        price,
+                        currency,
+                        startDateTime,
+                        endDateTime,
+                      }) => {
+                        if (!startDateTime || !endDateTime) return;
+                        await onAddAccommodation(stop.id, {
                           name,
                           price,
                           currency,
-                          startDateTime,
-                          endDateTime,
-                        }) => {
-                          if (!startDateTime || !endDateTime) return;
-                          await onAddAccommodation(stop.id, {
-                            name,
-                            price,
-                            currency,
-                            checkIn: startDateTime,
-                            checkOut: endDateTime,
-                          });
-                        }}
-                      />
-                    </div>
-                  </details>
-                  <details className="bg-muted/40 rounded-xl p-3">
-                    <summary className="text-sm font-medium">Transports</summary>
-                    <div className="mt-2 flex flex-col gap-2">
-                      {(transportsByStop[stop.id] || []).map((item) => (
-                        <Transport key={item.id} transport={item} />
-                      ))}
-                      <StopItemForm
-                        kind="transport"
-                        placeholder="Add transport"
-                        defaultDate={stop.date}
-                        onSubmit={async ({
+                          checkIn: startDateTime,
+                          checkOut: endDateTime,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {(transportsByStop[stop.id] || []).map((item) => (
+                      <Transport key={item.id} transport={item} />
+                    ))}
+                    <StopItemForm
+                      kind="transport"
+                      placeholder="Add transport"
+                      defaultDate={stop.date}
+                      onSubmit={async ({
+                        name,
+                        price,
+                        currency,
+                        startDateTime,
+                        endDateTime,
+                      }) => {
+                        if (!startDateTime || !endDateTime) return;
+                        await onAddTransport(stop.id, {
                           name,
                           price,
                           currency,
-                          startDateTime,
-                          endDateTime,
-                        }) => {
-                          if (!startDateTime || !endDateTime) return;
-                          await onAddTransport(stop.id, {
-                            name,
-                            price,
-                            currency,
-                            departureDateTime: startDateTime,
-                            arrivalDateTime: endDateTime,
-                          });
-                        }}
-                      />
-                    </div>
-                  </details>
+                          departureDateTime: startDateTime,
+                          arrivalDateTime: endDateTime,
+                        });
+                      }}
+                    />
+                  </div>
                 </div>
               </SortableStopCard>
             ))}
@@ -222,7 +228,10 @@ export function OverviewTab({
         }}
       />
       <div className="flex justify-end">
-        <Button variant="outline" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+        <Button
+          variant="outline"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
           Back to top
         </Button>
       </div>
