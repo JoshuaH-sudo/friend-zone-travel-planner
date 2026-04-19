@@ -32,6 +32,7 @@ import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
 import { Bed, Plane, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSettings } from "@/lib/SettingsProvider";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -46,6 +47,7 @@ type OverviewTabProps = {
       currency: string;
       checkIn: string;
       checkOut: string;
+      timezone?: string;
     },
   ) => Promise<void>;
   onAddTransport: (
@@ -56,6 +58,7 @@ type OverviewTabProps = {
       currency: string;
       departureDateTime: string;
       arrivalDateTime: string;
+      timezone?: string;
     },
   ) => Promise<void>;
 };
@@ -77,6 +80,7 @@ export function OverviewTab({
   onAddTransport,
 }: OverviewTabProps) {
   const t = useTranslations("overviewTab");
+  const { defaultCurrency, timezone } = useSettings();
   const sortedStops = useMemo(
     () => [...stops].sort((a, b) => a.date.localeCompare(b.date)),
     [stops],
@@ -186,10 +190,10 @@ export function OverviewTab({
                             initialValues={{
                               name: "",
                               price: 0,
-                              currency: "USD",
+                              currency: defaultCurrency,
                               checkIn: `${stop.date}T14:00`,
                               checkOut: `${stop.date}T11:00`,
-                              timezone: undefined,
+                              timezone,
                             }}
                             onSubmit={async (data) => {
                               await onAddAccommodation(stop.id, {
@@ -198,6 +202,7 @@ export function OverviewTab({
                                 currency: data.currency,
                                 checkIn: data.checkIn,
                                 checkOut: data.checkOut,
+                                timezone: data.timezone,
                               });
                               setAddingAccommodationForStopId(null);
                             }}
@@ -243,10 +248,10 @@ export function OverviewTab({
                               name: "",
                               type: "flight",
                               price: 0,
-                              currency: "USD",
+                              currency: defaultCurrency,
                               departureDateTime: `${stop.date}T12:00`,
                               arrivalDateTime: `${stop.date}T13:00`,
-                              timezone: undefined,
+                              timezone,
                             }}
                             onSubmit={async (data) => {
                               await onAddTransport(stop.id, {
@@ -255,6 +260,7 @@ export function OverviewTab({
                                 currency: data.currency,
                                 departureDateTime: data.departureDateTime,
                                 arrivalDateTime: data.arrivalDateTime ?? "",
+                                timezone: data.timezone,
                               });
                               setAddingTransportForStopId(null);
                             }}

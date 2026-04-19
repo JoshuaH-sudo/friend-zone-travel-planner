@@ -130,6 +130,7 @@ export default function TripPage() {
       currency: string;
       checkIn: string;
       checkOut: string;
+      timezone?: string;
     },
   ) => {
     await db.accommodations.insert({
@@ -140,6 +141,7 @@ export default function TripPage() {
       checkOut: payload.checkOut,
       price: payload.price,
       currency: payload.currency || defaultCurrency,
+      timezone: payload.timezone,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -153,6 +155,7 @@ export default function TripPage() {
       currency: string;
       departureDateTime: string;
       arrivalDateTime: string;
+      timezone?: string;
     },
   ) => {
     await db.transports.insert({
@@ -164,6 +167,7 @@ export default function TripPage() {
       arrivalDateTime: payload.arrivalDateTime,
       price: payload.price,
       currency: payload.currency || defaultCurrency,
+      timezone: payload.timezone,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
