@@ -28,7 +28,7 @@ export function SortableStopCard({
     <Card
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className="rounded-2xl pb-0"
+      className="rounded-2xl pb-0 shadow-md"
     >
       <CardHeader className="flex flex-row items-center gap-1 pb-4">
         <div className="flex flex-row items-start gap-2">

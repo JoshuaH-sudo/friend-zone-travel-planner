@@ -113,7 +113,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 container py-8 sm:py-12">
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
         <p className="text-muted-foreground">

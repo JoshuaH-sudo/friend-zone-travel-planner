@@ -30,8 +30,7 @@ import { Transport } from "./Transport";
 import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
-import { Bed, Bus, Plane, Plus } from "lucide-react";
-import { Flight } from "@hugeicons/core-free-icons";
+import { Bed, Plane, Plus } from "lucide-react";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -86,7 +85,6 @@ export function OverviewTab({
   const [addingTransportForStopId, setAddingTransportForStopId] = useState<
     string | null
   >(null);
-  const [showAddTripForm, setShowAddTripForm] = useState(false);
   const [newStopName, setNewStopName] = useState("");
   const [newStopDate, setNewStopDate] = useState(getTodayDate());
   const sensors = useSensors(
@@ -273,7 +271,7 @@ export function OverviewTab({
                           variant="ghost"
                           size="sm"
                           onClick={() => setAddingTransportForStopId(stop.id)}
-                          className="w-fit px-0 text-muted-foreground"
+                          className="text-muted-foreground w-fit px-0"
                         >
                           <Plus className="h-4 w-4" />
                           Add journey
@@ -292,53 +290,36 @@ export function OverviewTab({
           No stops yet.
         </div>
       ) : null}
-      {showAddTripForm ? (
-        <form
-          className="bg-muted/30 flex flex-wrap items-end gap-2 rounded-2xl border p-3"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            if (!newStopName.trim()) return;
-            if (!newStopDate) {
-              toast.error("A date is required for this stop.");
-              return;
-            }
-            await onAddStop(newStopName.trim(), newStopDate);
-            setNewStopName("");
-            setNewStopDate(getTodayDate());
-            setShowAddTripForm(false);
-          }}
-        >
-          <Input
-            value={newStopName}
-            onChange={(event) => setNewStopName(event.target.value)}
-            placeholder="Add another stop..."
-            className="min-w-56 flex-1 rounded-xl bg-white/80"
-          />
-          <Input
-            type="date"
-            value={newStopDate}
-            onChange={(event) => setNewStopDate(event.target.value)}
-            className="w-40 rounded-xl bg-white/80"
-          />
-          <Button type="submit" className="h-10 rounded-xl px-4">
-            Add trip
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowAddTripForm(false)}
-          >
-            Cancel
-          </Button>
-        </form>
-      ) : (
-        <div className="flex items-center gap-1">
-          <Plus className="text-muted-foreground h-4 w-4" />
-          <Button variant="ghost" onClick={() => setShowAddTripForm(true)}>
-            Add trip
-          </Button>
-        </div>
-      )}
+      <form
+        className="bg-muted/30 flex flex-wrap items-end gap-2 rounded-2xl border p-3"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (!newStopName.trim()) return;
+          if (!newStopDate) {
+            toast.error("A date is required for this stop.");
+            return;
+          }
+          await onAddStop(newStopName.trim(), newStopDate);
+          setNewStopName("");
+          setNewStopDate(getTodayDate());
+        }}
+      >
+        <Input
+          value={newStopName}
+          onChange={(event) => setNewStopName(event.target.value)}
+          placeholder="Add another stop..."
+          className="min-w-56 flex-1 rounded-xl bg-white/80"
+        />
+        <Input
+          type="date"
+          value={newStopDate}
+          onChange={(event) => setNewStopDate(event.target.value)}
+          className="w-40 rounded-xl bg-white/80"
+        />
+        <Button type="submit" className="h-10 rounded-xl px-4">
+          Add trip
+        </Button>
+      </form>
       <div className="flex justify-end">
         <Button
           variant="outline"
