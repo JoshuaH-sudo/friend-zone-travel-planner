@@ -31,7 +31,7 @@ export function SortableStopCard({
       className="rounded-2xl pb-0"
     >
       <CardHeader className="flex flex-row items-center gap-1 pb-4">
-        <div className="flex flex-row items-start">
+        <div className="flex flex-row items-start gap-2">
           <button
             type="button"
             className="text-muted-foreground hover:text-foreground mt-1 cursor-grab active:cursor-grabbing"

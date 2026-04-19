@@ -30,7 +30,7 @@ import { Transport } from "./Transport";
 import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
-import { Bed, Bus, Plane } from "lucide-react";
+import { Bed, Bus, Plane, Plus } from "lucide-react";
 import { Flight } from "@hugeicons/core-free-icons";
 
 type OverviewTabProps = {
@@ -168,113 +168,119 @@ export function OverviewTab({
             {orderedStops.map((stop, index) => (
               <SortableStopCard key={stop.id} index={index + 1} stop={stop}>
                 <div className="flex flex-col gap-4">
-                  <div className="mt-2 flex flex-col gap-2">
-                    <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
-                      <Bed className="text-muted-foreground h-4 w-4" />
-                      <p>Stays</p>
-                    </div>
-                    {accommodationsByStop[stop.id]?.length === 0 && (
-                      <p className="text-muted-foreground">
-                        No stays for this stop.
-                      </p>
-                    )}
-                    {(accommodationsByStop[stop.id] || []).map((item) => (
-                      <Accommodation key={item.id} accommodation={item} />
-                    ))}
-                    {addingAccommodationForStopId === stop.id ? (
-                      <div className="border-border/50 bg-muted/30 rounded-xl border p-3">
-                        <AccommodationForm
-                          initialValues={{
-                            name: "",
-                            price: 0,
-                            currency: "USD",
-                            checkIn: `${stop.date}T14:00`,
-                            checkOut: `${stop.date}T11:00`,
-                            timezone: undefined,
-                          }}
-                          onSubmit={async (data) => {
-                            await onAddAccommodation(stop.id, {
-                              name: data.name,
-                              price: data.price,
-                              currency: data.currency,
-                              checkIn: data.checkIn,
-                              checkOut: data.checkOut,
-                            });
-                            setAddingAccommodationForStopId(null);
-                          }}
-                          onCancel={() => setAddingAccommodationForStopId(null)}
-                          submitLabel="Add trip"
-                          cancelLabel="Cancel"
-                          autoFocusName
-                        />
+                  <section>
+                    <div className="mt-2 flex flex-col gap-2">
+                      <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+                        <Bed className="text-muted-foreground h-4 w-4" />
+                        <p>Stays</p>
                       </div>
-                    ) : (
-                      <div>
+                      {accommodationsByStop[stop.id]?.length === 0 && (
+                        <p className="text-muted-foreground">
+                          No stays for this stop.
+                        </p>
+                      )}
+                      {(accommodationsByStop[stop.id] || []).map((item) => (
+                        <Accommodation key={item.id} accommodation={item} />
+                      ))}
+                      {addingAccommodationForStopId === stop.id ? (
+                        <div className="border-border/50 bg-card rounded-xl border p-3">
+                          <AccommodationForm
+                            initialValues={{
+                              name: "",
+                              price: 0,
+                              currency: "USD",
+                              checkIn: `${stop.date}T14:00`,
+                              checkOut: `${stop.date}T11:00`,
+                              timezone: undefined,
+                            }}
+                            onSubmit={async (data) => {
+                              await onAddAccommodation(stop.id, {
+                                name: data.name,
+                                price: data.price,
+                                currency: data.currency,
+                                checkIn: data.checkIn,
+                                checkOut: data.checkOut,
+                              });
+                              setAddingAccommodationForStopId(null);
+                            }}
+                            onCancel={() =>
+                              setAddingAccommodationForStopId(null)
+                            }
+                            submitLabel="Add trip"
+                            cancelLabel="Cancel"
+                            autoFocusName
+                          />
+                        </div>
+                      ) : (
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() =>
                             setAddingAccommodationForStopId(stop.id)
                           }
+                          className="text-muted-foreground w-fit px-0"
                         >
-                          Add trip
+                          <Plus className="h-4 w-4" />
+                          Add stay
                         </Button>
-                      </div>
+                      )}
+                    </div>
+                  </section>
+                  <section>
+                    <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+                      <Plane className="text-muted-foreground h-4 w-4" />
+                      <p>Journeys</p>
+                    </div>
+                    {transportsByStop[stop.id]?.length === 0 && (
+                      <p className="text-muted-foreground">
+                        No journeys for this stop.
+                      </p>
                     )}
-                  </div>
-                  <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
-                    <Plane className="text-muted-foreground h-4 w-4" />
-                    <p>Journeys</p>
-                  </div>
-                  {transportsByStop[stop.id]?.length === 0 && (
-                    <p className="text-muted-foreground">
-                      No journeys for this stop.
-                    </p>
-                  )}
-                  <div className="mt-2 flex flex-col gap-2">
-                    {(transportsByStop[stop.id] || []).map((item) => (
-                      <Transport key={item.id} transport={item} />
-                    ))}
-                    {addingTransportForStopId === stop.id ? (
-                      <div className="border-border/50 bg-muted/30 rounded-xl border p-3">
-                        <TransportForm
-                          initialValues={{
-                            name: "",
-                            type: "flight",
-                            price: 0,
-                            currency: "USD",
-                            departureDateTime: `${stop.date}T12:00`,
-                            arrivalDateTime: `${stop.date}T13:00`,
-                            timezone: undefined,
-                          }}
-                          onSubmit={async (data) => {
-                            await onAddTransport(stop.id, {
-                              name: data.name,
-                              price: data.price,
-                              currency: data.currency,
-                              departureDateTime: data.departureDateTime,
-                              arrivalDateTime: data.arrivalDateTime ?? "",
-                            });
-                            setAddingTransportForStopId(null);
-                          }}
-                          onCancel={() => setAddingTransportForStopId(null)}
-                          submitLabel="Add journey"
-                          cancelLabel="Cancel"
-                          autoFocusName
-                        />
-                      </div>
-                    ) : (
-                      <div>
+                    <div className="mt-2 flex flex-col gap-2">
+                      {(transportsByStop[stop.id] || []).map((item) => (
+                        <Transport key={item.id} transport={item} />
+                      ))}
+                      {addingTransportForStopId === stop.id ? (
+                        <div className="border-border/50 bg-card rounded-xl border p-3">
+                          <TransportForm
+                            initialValues={{
+                              name: "",
+                              type: "flight",
+                              price: 0,
+                              currency: "USD",
+                              departureDateTime: `${stop.date}T12:00`,
+                              arrivalDateTime: `${stop.date}T13:00`,
+                              timezone: undefined,
+                            }}
+                            onSubmit={async (data) => {
+                              await onAddTransport(stop.id, {
+                                name: data.name,
+                                price: data.price,
+                                currency: data.currency,
+                                departureDateTime: data.departureDateTime,
+                                arrivalDateTime: data.arrivalDateTime ?? "",
+                              });
+                              setAddingTransportForStopId(null);
+                            }}
+                            onCancel={() => setAddingTransportForStopId(null)}
+                            submitLabel="Add journey"
+                            cancelLabel="Cancel"
+                            autoFocusName
+                          />
+                        </div>
+                      ) : (
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => setAddingTransportForStopId(stop.id)}
+                          className="w-fit px-0 text-muted-foreground"
                         >
+                          <Plus className="h-4 w-4" />
                           Add journey
                         </Button>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  </section>
                 </div>
               </SortableStopCard>
             ))}
@@ -326,8 +332,9 @@ export function OverviewTab({
           </Button>
         </form>
       ) : (
-        <div>
-          <Button variant="outline" onClick={() => setShowAddTripForm(true)}>
+        <div className="flex items-center gap-1">
+          <Plus className="text-muted-foreground h-4 w-4" />
+          <Button variant="ghost" onClick={() => setShowAddTripForm(true)}>
             Add trip
           </Button>
         </div>
