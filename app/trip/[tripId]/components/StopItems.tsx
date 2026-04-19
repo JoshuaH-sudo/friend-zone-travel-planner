@@ -98,7 +98,7 @@ export function StopItems({
     })),
   ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const overlapWarnings: Record<string, string> = {};
+  const overlapWarnings: Record<string, string[]> = {};
   for (let i = 0; i < items.length; i++) {
     for (let j = i + 1; j < items.length; j++) {
       const first = items[i];
@@ -111,7 +111,7 @@ export function StopItems({
       const secondStartTime = new Date(secondRange.start).getTime();
       const secondEndTime = new Date(secondRange.end).getTime();
       const overlaps =
-        firstStartTime < secondEndTime && secondStartTime < firstEndTime;
+        firstStartTime <= secondEndTime && secondStartTime <= firstEndTime;
 
       if (!overlaps) {
         continue;
@@ -120,27 +120,29 @@ export function StopItems({
       const overlapStart = new Date(Math.max(firstStartTime, secondStartTime));
       const overlapEnd = new Date(Math.min(firstEndTime, secondEndTime));
 
-      if (!overlapWarnings[first.id]) {
-        overlapWarnings[first.id] = t("overlapWarningSummary", {
+      overlapWarnings[first.id] = [
+        ...(overlapWarnings[first.id] || []),
+        t("overlapWarningSummary", {
           item: first.model.name,
           other: second.model.name,
           range: formatRangeLabel(
             overlapStart.toISOString(),
             overlapEnd.toISOString(),
           ),
-        });
-      }
+        }),
+      ];
 
-      if (!overlapWarnings[second.id]) {
-        overlapWarnings[second.id] = t("overlapWarningSummary", {
+      overlapWarnings[second.id] = [
+        ...(overlapWarnings[second.id] || []),
+        t("overlapWarningSummary", {
           item: second.model.name,
           other: first.model.name,
           range: formatRangeLabel(
             overlapStart.toISOString(),
             overlapEnd.toISOString(),
           ),
-        });
-      }
+        }),
+      ];
     }
   }
 
@@ -197,7 +199,7 @@ export function StopItems({
                     <Accommodation
                       accommodation={item.model as AccommodationDocumentType}
                       startInEditMode={pendingNewAccommodationId === item.id}
-                      warningSummary={overlapWarnings[item.id]}
+                      warningSummary={overlapWarnings[item.id]?.join(" • ")}
                       highlightedDates={items
                         .filter((otherItem) => otherItem.id !== item.id)
                         .flatMap((otherItem) => {
@@ -209,7 +211,7 @@ export function StopItems({
                     <Transport
                       transport={item.model as TransportDocumentType}
                       startInEditMode={pendingNewTransportId === item.id}
-                      warningSummary={overlapWarnings[item.id]}
+                      warningSummary={overlapWarnings[item.id]?.join(" • ")}
                       highlightedDates={items
                         .filter((otherItem) => otherItem.id !== item.id)
                         .flatMap((otherItem) => {

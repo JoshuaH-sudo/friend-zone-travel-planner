@@ -84,10 +84,10 @@ export function DateTimePicker({
   const datePresets = React.useMemo(
     () =>
       presets ?? [
-        { label: "Today", date: new Date() },
-        { label: "Tomorrow", date: new Date(Date.now() + MS_PER_DAY) },
+        { label: "T+0", date: new Date() },
+        { label: "T+1", date: new Date(Date.now() + MS_PER_DAY) },
         {
-          label: "In 7 days",
+          label: "T+7",
           date: new Date(Date.now() + 7 * MS_PER_DAY),
         },
       ],
