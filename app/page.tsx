@@ -225,7 +225,7 @@ export default function HomePage() {
                 <span className="bg-background/90 text-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase">
                   {t(`filters.${card.status}`)}
                 </span>
-                <div className="text-primary-foreground/80 absolute bottom-3 left-4 flex items-center gap-1.5 text-xs">
+                <div className="text-foreground/80 absolute bottom-3 left-4 flex items-center gap-1.5 text-xs">
                   <MapPin className="h-3.5 w-3.5" />
                   {t("stopCount", { count: card.stopCount })}
                 </div>
