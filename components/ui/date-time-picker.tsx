@@ -80,8 +80,7 @@ export function DateTimePicker({
   );
   const pairedDay = React.useMemo(() => {
     if (!pairedHighlightDate) return undefined;
-    const parsedDate = parseIsoString(pairedHighlightDate);
-    return parsedDate;
+    return parseIsoString(pairedHighlightDate);
   }, [pairedHighlightDate]);
   const datePresets = React.useMemo(
     () =>

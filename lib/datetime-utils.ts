@@ -10,6 +10,8 @@ export const DATE_OR_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
 /** Required combined datetime string: "YYYY-MM-DDTHH:MM" */
 export const DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const END_OF_DAY = { hour: 23, minute: 59, second: 59, ms: 999 };
+const START_OF_DAY = { hour: 0, minute: 0, second: 0, ms: 0 };
 
 /** Parse stored date/datetime values in local time. */
 export function parseStoredDateTime(value: string): Date | undefined {
@@ -39,14 +41,15 @@ export function getStoredDateTimeTimestamp(
   if (DATE_ONLY_REGEX.test(value)) {
     const [y, m, d] = value.split("-").map(Number);
     const isEnd = options?.dateOnlyBoundary === "end";
+    const boundary = isEnd ? END_OF_DAY : START_OF_DAY;
     return new Date(
       y,
       m - 1,
       d,
-      isEnd ? 23 : 0,
-      isEnd ? 59 : 0,
-      isEnd ? 59 : 0,
-      isEnd ? 999 : 0,
+      boundary.hour,
+      boundary.minute,
+      boundary.second,
+      boundary.ms,
     ).getTime();
   }
 
