@@ -62,12 +62,19 @@
       "exporting": "Exporting...",
       "import": "Upload App Data",
       "importing": "Importing...",
+      "reset": "Delete All Data",
+      "resetConfirmTitle": "Delete all app data?",
+      "resetConfirmDescription": "This will permanently remove all trips and settings stored on this device.",
+      "resetConfirm": "Delete all data",
+      "resetWarning": "This action cannot be undone.",
       "status": {
         "exported": "App data exported.",
         "exportFailed": "Failed to export app data: {errorMessage}",
         "imported": "App data imported.",
         "importFailed": "Failed to import app data: {errorMessage}",
-        "importFailedFileTooLarge": "Failed to import app data: file is too large (max 5 MB)."
+        "importFailedFileTooLarge": "Failed to import app data: file is too large (max 5 MB).",
+        "reset": "All app data deleted.",
+        "resetFailed": "Failed to delete app data: {errorMessage}"
       }
     }
   },
