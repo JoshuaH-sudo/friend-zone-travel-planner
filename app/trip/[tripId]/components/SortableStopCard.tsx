@@ -2,27 +2,42 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { StopDocumentType } from "@/lib/rxdb-schema";
+import type { AccommodationDocumentType, StopDocumentType, TransportDocumentType } from "@/lib/rxdb-schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GripVertical } from "lucide-react";
 import { capitalize } from "@/lib/utils";
 import { formatDate } from "date-fns";
 
 type SortableStopCardProps = {
-  stop: StopDocumentType;
   index: number;
+  stop: StopDocumentType;
+  accommodations: AccommodationDocumentType[];
+  transports: TransportDocumentType[];
   children: React.ReactNode;
 };
 
 export function SortableStopCard({
-  stop,
   index,
+  stop,
+  accommodations,
+  transports,
   children,
 }: SortableStopCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: stop.id,
     });
+
+    //Earliest date from all items in the stop, used for calculating the date range summary
+  const dates = [...accommodations.map((a) => a.startDate), ...transports.map((t) => t.date)].sort();
+  const earliestDate = dates[0];
+  const latestDate = dates[dates.length - 1];
+  let dateRangeSummary = "";
+  if (earliestDate && latestDate) {
+    dateRangeSummary = formatDate(new Date(earliestDate), "MMM d") + " - " + formatDate(new Date(latestDate), "MMM d, yyyy");
+  } 
+  
+
 
   return (
     <Card
@@ -48,7 +63,7 @@ export function SortableStopCard({
             <CardTitle className="font-serif text-2xl">
               {capitalize(stop.name)}
             </CardTitle>
-            <p className="text-muted-foreground text-sm">{formatDate(new Date(stop.date), "PPP")}</p>
+            <p className="text-muted-foreground text-sm">{dateRangeSummary}</p>
           </div>
         </div>
       </CardHeader>

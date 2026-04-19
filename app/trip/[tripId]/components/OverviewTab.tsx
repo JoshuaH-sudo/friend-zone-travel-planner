@@ -170,7 +170,13 @@ export function OverviewTab({
         >
           <div className="flex flex-col gap-3">
             {orderedStops.map((stop, index) => (
-              <SortableStopCard key={stop.id} index={index + 1} stop={stop}>
+              <SortableStopCard
+                key={stop.id}
+                index={index + 1}
+                stop={stop}
+                accommodations={accommodationsByStop[stop.id] || []}
+                transports={transportsByStop[stop.id] || []}
+              >
                 <div className="flex flex-col gap-4">
                   <section>
                     <div className="mt-2 flex flex-col gap-2">
@@ -179,7 +185,9 @@ export function OverviewTab({
                         <p>{t("sections.stays")}</p>
                       </div>
                       {accommodationsByStop[stop.id]?.length === 0 && (
-                        <p className="text-muted-foreground">{t("sections.noStays")}</p>
+                        <p className="text-muted-foreground">
+                          {t("sections.noStays")}
+                        </p>
                       )}
                       {(accommodationsByStop[stop.id] || []).map((item) => (
                         <Accommodation key={item.id} accommodation={item} />
@@ -235,7 +243,9 @@ export function OverviewTab({
                       <p>{t("sections.journeys")}</p>
                     </div>
                     {transportsByStop[stop.id]?.length === 0 && (
-                      <p className="text-muted-foreground">{t("sections.noJourneys")}</p>
+                      <p className="text-muted-foreground">
+                        {t("sections.noJourneys")}
+                      </p>
                     )}
                     <div className="mt-2 flex flex-col gap-2">
                       {(transportsByStop[stop.id] || []).map((item) => (
@@ -312,13 +322,13 @@ export function OverviewTab({
           value={newStopName}
           onChange={(event) => setNewStopName(event.target.value)}
           placeholder={t("addStop.placeholder")}
-          className="min-w-56 flex-1 rounded-xl bg-input"
+          className="bg-input min-w-56 flex-1 rounded-xl"
         />
         <Input
           type="date"
           value={newStopDate}
           onChange={(event) => setNewStopDate(event.target.value)}
-          className="w-40 rounded-xl bg-input"
+          className="bg-input w-40 rounded-xl"
         />
         <Button type="submit" className="h-10 rounded-xl px-4">
           {t("addStop.submit")}
