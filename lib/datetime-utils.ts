@@ -54,7 +54,12 @@ export function getStoredDateTimeTimestamp(
   }
 
   const parsed = parseStoredDateTime(value);
-  return parsed ? parsed.getTime() : new Date(value).getTime();
+  if (parsed) {
+    return parsed.getTime();
+  }
+
+  const fallbackTime = new Date(value).getTime();
+  return Number.isNaN(fallbackTime) ? Number.NaN : fallbackTime;
 }
 
 /**
