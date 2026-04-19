@@ -24,6 +24,8 @@ export function parseStoredDateTime(value: string): Date | undefined {
 
   if (DATE_ONLY_REGEX.test(value)) {
     const [y, m, d] = value.split("-").map(Number);
+    // Use noon for date-only values to avoid accidental day shifts in
+    // timezone formatting while still keeping the calendar date stable.
     return new Date(y, m - 1, d, 12, 0, 0, 0);
   }
 
@@ -57,9 +59,7 @@ export function getStoredDateTimeTimestamp(
   if (parsed) {
     return parsed.getTime();
   }
-
-  const fallbackTime = new Date(value).getTime();
-  return Number.isNaN(fallbackTime) ? Number.NaN : fallbackTime;
+  return Number.NaN;
 }
 
 /**
