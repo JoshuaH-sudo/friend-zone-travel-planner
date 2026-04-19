@@ -45,9 +45,6 @@ export function StopItemForm({
   const [endDateTime, setEndDateTime] = useState(
     toDateTimeLocal(defaultDate, kind === "accommodation" ? "11:00" : "13:00"),
   );
-  const [status, setStatus] = useState<"booked" | "planned" | "cancelled">(
-    "planned",
-  );
 
   return (
     <form
@@ -62,7 +59,6 @@ export function StopItemForm({
           date: kind === "stop" ? date : undefined,
           startDateTime: kind === "stop" ? undefined : startDateTime,
           endDateTime: kind === "stop" ? undefined : endDateTime,
-          status,
         });
         setName("");
         setPrice("0");

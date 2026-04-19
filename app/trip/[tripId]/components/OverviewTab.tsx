@@ -26,6 +26,8 @@ import { SortableStopCard } from "./SortableStopCard";
 import { StopItemForm } from "./StopItemForm";
 import { toast } from "sonner";
 import { addDays, format } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -65,6 +67,8 @@ export function OverviewTab({
     [stops],
   );
   const [order, setOrder] = useState<string[]>([]);
+  const [newStopName, setNewStopName] = useState("");
+  const [newStopDate, setNewStopDate] = useState("");
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -128,13 +132,6 @@ export function OverviewTab({
 
   return (
     <div className="flex flex-col gap-4">
-      <StopItemForm
-        kind="stop"
-        placeholder="Add stop"
-        onSubmit={async ({ name, date }) => {
-          await onAddStop(name, date ?? new Date().toISOString().slice(0, 10));
-        }}
-      />
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -218,6 +215,39 @@ export function OverviewTab({
           No stops yet.
         </div>
       ) : null}
+      <form
+        className="bg-muted/30 flex flex-wrap items-center gap-2 rounded-2xl border p-3"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (!newStopName.trim() || !newStopDate) {
+            toast.error("Add a stop name and date.");
+            return;
+          }
+          await onAddStop(newStopName.trim(), newStopDate);
+          setNewStopName("");
+          setNewStopDate("");
+        }}
+      >
+        <Input
+          value={newStopName}
+          onChange={(event) => setNewStopName(event.target.value)}
+          placeholder="Add another stop..."
+          className="min-w-56 flex-1 rounded-xl bg-white/80"
+        />
+        <Input
+          type="date"
+          value={newStopDate}
+          onChange={(event) => setNewStopDate(event.target.value)}
+          className="w-40 rounded-xl bg-white/80"
+        />
+        <Button
+          type="submit"
+          className="h-10 rounded-xl bg-emerald-900 px-4 text-white hover:bg-emerald-800"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Add stop
+        </Button>
+      </form>
       <div className="flex justify-end">
         <Button variant="outline" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
           Back to top
