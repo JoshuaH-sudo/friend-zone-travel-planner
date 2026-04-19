@@ -1,24 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
-import Header from "./components/Header";
 import { DatabaseProvider } from "@/lib/DatabaseProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SettingsProvider } from "@/lib/SettingsProvider";
-
-const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AppLayout } from "@/components/layout/AppLayout";
+import { ImportListener } from "@/components/ImportListener";
+import { Toaster } from "sonner";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
@@ -35,13 +24,26 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
-  const t = await getTranslations("layout");
 
   return (
-    <html lang={locale} className={roboto.variable} suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable}bg-zinc-50 relative flex h-screen flex-col font-sans antialiased dark:bg-black`}
-      >
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        />
+      </head>
+      <body className="font-sans antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute="class"
@@ -51,15 +53,9 @@ export default async function RootLayout({
           >
             <DatabaseProvider>
               <SettingsProvider>
-                <Header />
-                <div className="flex grow">
-                  <main className="mx-auto w-full max-w-6xl items-center gap-4 px-4 py-10 sm:items-start">
-                    {children}
-                  </main>
-                </div>
-                <footer className="w-full py-2 text-center text-sm text-gray-500">
-                  {t("footer", { year: new Date().getFullYear() })}
-                </footer>
+                <ImportListener />
+                <AppLayout>{children}</AppLayout>
+                <Toaster richColors />
               </SettingsProvider>
             </DatabaseProvider>
           </ThemeProvider>

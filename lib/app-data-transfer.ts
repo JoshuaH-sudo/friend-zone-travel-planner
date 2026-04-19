@@ -1,6 +1,7 @@
 import { MyDatabase } from "@/lib/rxdb-database";
 import {
   AccommodationDocument,
+  ExpenseDocument,
   StopDocument,
   TransportDocument,
   TripDocument,
@@ -23,6 +24,7 @@ export type AppDataExport = {
     stops: StopDocument[];
     accommodations: AccommodationDocument[];
     transports: TransportDocument[];
+    expenses: ExpenseDocument[];
     settings: UserSettingsDocument[];
   };
 };
@@ -31,13 +33,15 @@ export async function exportAppData(
   db: MyDatabase,
   preferences: AppDataExport["preferences"],
 ) {
-  const [trips, stops, accommodations, transports, settings] = await Promise.all([
-    db.trips.find().exec(),
-    db.stops.find().exec(),
-    db.accommodations.find().exec(),
-    db.transports.find().exec(),
-    db.settings.find().exec(),
-  ]);
+  const [trips, stops, accommodations, transports, expenses, settings] =
+    await Promise.all([
+      db.trips.find().exec(),
+      db.stops.find().exec(),
+      db.accommodations.find().exec(),
+      db.transports.find().exec(),
+      db.expenses.find().exec(),
+      db.settings.find().exec(),
+    ]);
 
   const payload: AppDataExport = {
     version: APP_DATA_EXPORT_VERSION,
@@ -48,6 +52,7 @@ export async function exportAppData(
       stops: stops.map((doc) => doc.toJSON()),
       accommodations: accommodations.map((doc) => doc.toJSON()),
       transports: transports.map((doc) => doc.toJSON()),
+      expenses: expenses.map((doc) => doc.toJSON()),
       settings: settings.map((doc) => doc.toJSON()),
     },
   };
@@ -113,6 +118,10 @@ export async function importAppData(db: MyDatabase, content: string) {
       dataValue.transports,
       "data.transports",
     ),
+    expenses:
+      dataValue.expenses === undefined
+        ? []
+        : readArray<ExpenseDocument>(dataValue.expenses, "data.expenses"),
     settings: readArray<UserSettingsDocument>(dataValue.settings, "data.settings"),
   };
 
@@ -125,12 +134,14 @@ export async function importAppData(db: MyDatabase, content: string) {
     previousStops,
     previousAccommodations,
     previousTransports,
+    previousExpenses,
     previousSettings,
   ] = await Promise.all([
     db.trips.find().exec(),
     db.stops.find().exec(),
     db.accommodations.find().exec(),
     db.transports.find().exec(),
+    db.expenses.find().exec(),
     db.settings.find().exec(),
   ]);
 
@@ -139,6 +150,7 @@ export async function importAppData(db: MyDatabase, content: string) {
     stops: previousStops.map((doc) => doc.toJSON()),
     accommodations: previousAccommodations.map((doc) => doc.toJSON()),
     transports: previousTransports.map((doc) => doc.toJSON()),
+    expenses: previousExpenses.map((doc) => doc.toJSON()),
     settings: previousSettings.map((doc) => doc.toJSON()),
   };
 
@@ -173,6 +185,7 @@ export async function resetAppData(db: MyDatabase) {
 
 async function clearAllCollections(db: MyDatabase) {
   await db.transports.find().remove();
+  await db.expenses.find().remove();
   await db.accommodations.find().remove();
   await db.stops.find().remove();
   await db.trips.find().remove();
@@ -194,6 +207,9 @@ async function upsertAllCollections(
   }
   if (data.transports.length > 0) {
     await db.transports.bulkUpsert(data.transports);
+  }
+  if (data.expenses.length > 0) {
+    await db.expenses.bulkUpsert(data.expenses);
   }
   if (data.settings.length > 0) {
     await db.settings.bulkUpsert(data.settings);

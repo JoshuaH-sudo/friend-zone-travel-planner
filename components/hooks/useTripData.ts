@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
 import {
   AccommodationDocumentType,
+  ExpenseDocumentType,
   StopDocumentType,
   TransportDocumentType,
   TripDocumentType,
@@ -12,6 +13,7 @@ export type UseTripDataResult = {
   stops: StopDocumentType[];
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
+  expenses: ExpenseDocumentType[];
   loading: boolean;
 };
 
@@ -25,6 +27,7 @@ const emptyTripData: UseTripDataResult = {
   stops: [],
   accommodationsByStop: {},
   transportsByStop: {},
+  expenses: [],
   loading: false,
 };
 
@@ -42,6 +45,7 @@ export function useTripData(
   const [transportsByStop, setTransportsByStop] = useState<
     Record<string, TransportDocumentType[]>
   >({});
+  const [expenses, setExpenses] = useState<ExpenseDocumentType[]>([]);
   const [resolvedTripId, setResolvedTripId] = useState<string | null>(null);
   const database = initialDatabase ?? loadedDatabase;
 
@@ -130,6 +134,21 @@ export function useTripData(
       return;
     }
 
+    const subscription = database.expenses
+      .find({ selector: { tripId } })
+      .sort({ date: "asc", createdAt: "asc" })
+      .$.subscribe((expenseRecords) => {
+        setExpenses(expenseRecords);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database, enabled, tripId]);
+
+  useEffect(() => {
+    if (!enabled || !database) {
+      return;
+    }
+
     const subscription = database.transports
       .find()
       .sort({ departureDateTime: "asc", createdAt: "asc" })
@@ -160,6 +179,7 @@ export function useTripData(
     stops,
     accommodationsByStop,
     transportsByStop,
+    expenses,
     loading,
   };
 }

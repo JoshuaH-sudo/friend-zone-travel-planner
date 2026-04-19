@@ -8,11 +8,13 @@ import {
   stopSchema,
   accommodationSchema,
   transportSchema,
+  expenseSchema,
   userSettingsSchema,
   TripCollection,
   StopCollection,
   AccommodationCollection,
   TransportCollection,
+  ExpenseCollection,
   UserSettingsCollection,
 } from "./rxdb-schema";
 import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
@@ -29,6 +31,7 @@ export type DatabaseCollections = {
   stops: StopCollection;
   accommodations: AccommodationCollection;
   transports: TransportCollection;
+  expenses: ExpenseCollection;
   settings: UserSettingsCollection;
 };
 
@@ -79,6 +82,9 @@ async function createDatabase(): Promise<MyDatabase> {
   await db.addCollections({
     trips: {
       schema: tripSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
+      },
     },
     stops: {
       schema: stopSchema,
@@ -120,6 +126,9 @@ async function createDatabase(): Promise<MyDatabase> {
           };
         },
       },
+    },
+    expenses: {
+      schema: expenseSchema,
     },
     settings: {
       schema: userSettingsSchema,

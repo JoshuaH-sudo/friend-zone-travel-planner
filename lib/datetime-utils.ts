@@ -96,7 +96,7 @@ export function formatStoredDateTime(dt: string): string {
   try {
     const parsed = parseStoredDateTime(dt);
     if (parsed) {
-      return format(parsed, "MM/dd/yyyy hh:mm aa");
+      return format(parsed, "L LLL");
     }
 
     return dt;

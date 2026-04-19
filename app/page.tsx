@@ -1,172 +1,260 @@
 "use client";
 
-import Link from "next/link";
-import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { TripDocument } from "@/lib/rxdb-schema";
+import { useDatabase } from "@/lib/DatabaseProvider";
+import { useRxQuery } from "@/lib/useRxQuery";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { PlusIcon } from "lucide-react";
-import { TripStats } from "./trip/[tripId]/components/TripStats";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Cancel01Icon,
-  CalendarDownload01Icon,
-} from "@hugeicons/core-free-icons";
-import { exportTripToIcal } from "@/lib/ical-export";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, Search, MapPin, CalendarIcon } from "lucide-react";
+import { formatMoney, convert, formatDateShort } from "@/lib/format";
+import type {
+  ExpenseDocument,
+  StopDocument,
+  TripDocument,
+} from "@/lib/rxdb-schema";
 import { useSettings } from "@/lib/SettingsProvider";
+import { generateId } from "@/lib/rxdb-database";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
-function TripList() {
-  const router = useRouter();
+type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
+
+export default function HomePage() {
   const t = useTranslations("home");
-  const [trips, setTrips] = useState<TripDocument[]>([]);
-  const [database, setDatabase] = useState<MyDatabase | null>(null);
-  const { timezone } = useSettings();
+  const db = useDatabase();
+  const router = useRouter();
+  const { defaultCurrency } = useSettings();
+  const trips = useRxQuery<TripDocument>(
+    db.trips.find().sort({ updatedAt: "desc" }),
+  );
+  const stops = useRxQuery<StopDocument>(db.stops.find());
+  const expenses = useRxQuery<ExpenseDocument>(db.expenses.find());
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<TripStatusFilter>("all");
+  const [isCreating, setIsCreating] = useState(false);
+  const [tripName, setTripName] = useState("");
+  const [firstStopName, setFirstStopName] = useState("");
+  const [firstStopDate, setFirstStopDate] = useState("");
 
-  useEffect(() => {
-    const fetchDatabase = async () => {
-      const db = await getDatabase();
-      setDatabase(db);
-    };
-    fetchDatabase();
-  }, []);
-
-  useEffect(() => {
-    if (!database) return;
-
-    const subscription = database.trips.find().$.subscribe((newTrips) => {
-      setTrips(newTrips);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [database]);
+  const cards = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return trips
+      .map((trip) => {
+        const tripStops = stops
+          .filter((stop) => stop.tripId === trip.id)
+          .sort((a, b) => a.date.localeCompare(b.date));
+        const minDate = tripStops[0]?.date;
+        const maxDate = tripStops[tripStops.length - 1]?.date;
+        const status: Exclude<TripStatusFilter, "all"> =
+          !minDate || minDate > today
+            ? "upcoming"
+            : maxDate && maxDate < today
+              ? "past"
+              : "ongoing";
+        const total = expenses
+          .filter((expense) => expense.tripId === trip.id)
+          .reduce(
+            (sum, expense) =>
+              sum + convert(expense.price, expense.currency, defaultCurrency),
+            0,
+          );
+        return {
+          trip,
+          status,
+          stopCount: tripStops.length,
+          startDate: minDate,
+          endDate: maxDate,
+          stopNames: tripStops.map((stop) => stop.name).join(" · "),
+          total,
+        };
+      })
+      .filter((card) =>
+        card.trip.name.toLowerCase().includes(search.trim().toLowerCase()),
+      )
+      .filter((card) => filter === "all" || card.status === filter);
+  }, [defaultCurrency, expenses, filter, search, stops, trips]);
 
   const createTrip = async () => {
-    if (!database) return;
+    const now = Date.now();
+    const nextTripId = generateId();
+    let createdTrip: Awaited<ReturnType<typeof db.trips.insert>> | null = null;
+    try {
+        createdTrip = await db.trips.insert({
+          id: nextTripId,
+          name: tripName.trim() || t("newTripName"),
+        createdAt: now,
+        updatedAt: now,
+      });
 
-    const { generateId } = await import("@/lib/rxdb-database");
-    const newTrip = await database.trips.insert({
-      id: generateId(),
-      name: t("newTripName"),
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
-    console.log("Created new trip:", newTrip);
-    router.push(`/trip/${newTrip.id}`);
-  };
-
-  const deleteTrip = async (tripId: string) => {
-    if (!database) return;
-
-    const trip = await database.trips.findOne(tripId).exec();
-    if (trip) {
-      await trip.remove();
-      console.log("Deleted trip:", tripId);
+      if (firstStopName.trim()) {
+        await db.stops.insert({
+          id: generateId(),
+          name: firstStopName.trim(),
+          date: firstStopDate || new Date().toISOString().slice(0, 10),
+          tripId: nextTripId,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      if (createdTrip) {
+        await createdTrip.remove();
+      }
+      toast.error(t("createTripError"));
+      return;
     }
-  };
 
-  const exportTrip = async (tripId: string) => {
-    if (!database) return;
-    await exportTripToIcal(database, tripId, timezone);
+    setTripName("");
+    setFirstStopName("");
+    setFirstStopDate("");
+    setIsCreating(false);
+    router.push(`/trip/${nextTripId}`);
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold">{t("yourTrips")}</h2>
-        <Button
-          variant="outline"
-          className="bg-accent text-accent-foreground"
-          onClick={createTrip}
-        >
-          {t("addTrip")}
-          <PlusIcon />
-        </Button>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {trips.map((trip) => (
-          <Card
-            key={trip.id}
-            className="flex h-full flex-col transition-transform duration-200 hover:scale-[1.01]"
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <Link
-                  href={`/trip/${trip.id}`}
-                  className="hover:text-primary flex-1 text-2xl font-semibold hover:underline"
-                >
-                  {trip.name}
-                </Link>
-                <ConfirmationDialog
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      className="text-destructive hover:bg-destructive/10"
-                      aria-label={t("deleteTripAriaLabel")}
-                    >
-                      <HugeiconsIcon icon={Cancel01Icon} />
-                    </Button>
-                  }
-                  title={t("deleteTripTitle")}
-                  description={t("deleteTripDescription", {
-                    tripName: trip.name,
-                  })}
-                  confirmLabel={t("deleteTripConfirm")}
-                  onConfirm={() => deleteTrip(trip.id)}
-                >
-                  <p className="text-muted-foreground text-sm">
-                    {t("deleteTripWarning")}
-                  </p>
-                </ConfirmationDialog>
-              </div>
-            </CardHeader>
-
-            <CardContent className="flex-1">
-              <TripStats tripId={trip.id} />
-            </CardContent>
-
-            <CardFooter>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push(`/trip/${trip.id}`)}
-              >
-                {t("openTrip")}
+    <div className="container flex flex-col gap-8 py-8 sm:py-12">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-
+      28">
+        <section className="animate-fade-in flex flex-col gap-3">
+          <p className="text-accent text-2xs font-medium tracking-[0.2em] uppercase">
+            {t("heroEyebrow")}
+          </p>
+          <h1 className="font-serif text-4xl font-semibold">{t("heroTitle")}</h1>
+          <p className="text-muted-foreground">
+            {t("heroDescription")}
+          </p>
+        </section>
+        <Dialog open={isCreating} onOpenChange={setIsCreating}>
+          <DialogTrigger
+            render={
+              <Button size="lg">
+                <Plus data-icon="inline-start" />
+                {t("planTrip")}
               </Button>
-            </CardFooter>
-          </Card>
-        ))}
-
-        <Card className="bg-muted/50 border-dashed transition-transform duration-200 hover:scale-[1.01]">
-          <CardHeader>
-            <CardTitle>{t("addNewTripTitle")}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-muted-foreground text-sm">
-            {t("addNewTripDescription")}
-          </CardContent>
-          <CardFooter>
-            <Button onClick={createTrip} className="w-full">
-              {t("addTrip")}
-              <PlusIcon />
-            </Button>
-          </CardFooter>
-        </Card>
+            }
+          />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("createTripTitle")}</DialogTitle>
+              <DialogDescription>
+                {t("createTripDescription")}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-3">
+              <Input
+                value={tripName}
+                onChange={(event) => setTripName(event.target.value)}
+                placeholder={t("tripNamePlaceholder")}
+              />
+              <Input
+                value={firstStopName}
+                onChange={(event) => setFirstStopName(event.target.value)}
+                placeholder={t("firstStopPlaceholder")}
+              />
+              <Input
+                value={firstStopDate}
+                onChange={(event) => setFirstStopDate(event.target.value)}
+                type="date"
+              />
+              <Button onClick={createTrip}>{t("createAndOpen")}</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
+
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex w-full flex-col gap-3 md:max-w-3xl md:flex-row md:items-center">
+            <div className="relative w-full md:flex-1">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" />
+              <Input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="pl-10"
+                placeholder={t("searchPlaceholder")}
+              />
+            </div>
+            <Tabs
+              value={filter}
+              onValueChange={(value) => setFilter(value as TripStatusFilter)}
+              className="w-full md:w-auto"
+            >
+              <TabsList className="bg-muted/70 h-10 w-full rounded-xl md:w-auto">
+                {(
+                  ["all", "upcoming", "ongoing", "past"] as TripStatusFilter[]
+                ).map((value) => (
+                  <TabsTrigger key={value} value={value} className="capitalize">
+                    {t(`filters.${value}`)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
+      </section>
+
+      {cards.length === 0 ? (
+        <Card className="shadow-soft">
+          <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center">
+            <p>{t("empty.noTrips")}</p>
+            <Button onClick={() => setIsCreating(true)}>{t("planTrip")}</Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {cards.map((card) => (
+            <Card
+              key={card.trip.id}
+              className="group shadow-soft hover:shadow-lift overflow-hidden border py-0 transition-all duration-300"
+              onClick={() => router.push(`/trip/${card.trip.id}`)}
+            >
+              <CardHeader className="gradient-hero relative h-32 p-0">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--accent)/0.4),transparent_60%)]" />
+                <span className="bg-background/90 text-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase">
+                  {t(`filters.${card.status}`)}
+                </span>
+                <div className="text-primary-foreground/80 absolute bottom-3 left-4 flex items-center gap-1.5 text-xs">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {t("stopCount", { count: card.stopCount })}
+                </div>
+              </CardHeader>
+              <CardContent className="p-5">
+                <CardTitle className="group-hover:text-primary font-serif text-2xl leading-tight font-semibold transition-colors">
+                  {card.trip.name}
+                </CardTitle>
+                <div className="text-muted-foreground mt-2 flex items-center gap-1.5 text-sm">
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {card.startDate
+                    ? card.endDate
+                      ? `${formatDateShort(card.startDate)} - ${formatDateShort(card.endDate)}`
+                      : formatDateShort(card.startDate)
+                    : t("noDatesYet")}
+                </div>
+                {card.stopCount > 0 && (
+                  <p className="text-muted-foreground mt-3 line-clamp-1 text-sm">
+                    {card.stopNames}
+                  </p>
+                )}
+                <p className="text-foreground mt-4 text-lg font-semibold">
+                  {formatMoney(card.total, defaultCurrency)}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+      )}
     </div>
   );
-}
-
-export default function Home() {
-  return <TripList />;
 }

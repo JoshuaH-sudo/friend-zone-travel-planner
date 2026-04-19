@@ -15,6 +15,28 @@
     "newTripName": "Neue Reise",
     "yourTrips": "Deine Reisen",
     "addTrip": "Reise hinzufügen",
+    "heroEyebrow": "Deine Reisen",
+    "heroTitle": "Reisen",
+    "heroDescription": "Plane, organisiere und erlebe jeden Stopp, jede Unterkunft und jede Reise erneut.",
+    "planTrip": "Reise planen",
+    "createTripTitle": "Neue Reise erstellen",
+    "createTripDescription": "Starte mit einem Namen und optional deinem ersten Stopp.",
+    "tripNamePlaceholder": "Reisename",
+    "firstStopPlaceholder": "Erster Stopp (optional)",
+    "createAndOpen": "Erstellen und öffnen",
+    "searchPlaceholder": "Reisen suchen...",
+    "noDatesYet": "Noch keine Daten",
+    "createTripError": "Reise konnte nicht erstellt werden.",
+    "stopCount": "{count, plural, one {# Stopp} other {# Stopps}}",
+    "filters": {
+      "all": "Alle",
+      "upcoming": "Bevorstehend",
+      "ongoing": "Laufend",
+      "past": "Vergangen"
+    },
+    "empty": {
+      "noTrips": "Noch keine Reisen."
+    },
     "deleteTripAriaLabel": "Reise löschen",
     "deleteTripTitle": "Diese Reise löschen?",
     "deleteTripDescription": "Dadurch werden {tripName} und alle zugehörigen Reisedaten dauerhaft entfernt.",
@@ -91,6 +113,36 @@
     "cancelAriaLabel": "Bearbeiten des Reisennamens abbrechen",
     "editAriaLabel": "Reisename bearbeiten",
     "exportAriaLabel": "Reise als iCal exportieren"
+  },
+  "overviewTab": {
+    "sections": {
+      "stays": "Unterkünfte",
+      "journeys": "Reisen",
+      "noStays": "Keine Unterkünfte für diesen Stopp.",
+      "noJourneys": "Keine Reisen für diesen Stopp."
+    },
+    "actions": {
+      "addStay": "Unterkunft hinzufügen",
+      "addJourney": "Reise hinzufügen",
+      "cancel": "Abbrechen",
+      "backToTop": "Nach oben"
+    },
+    "addStop": {
+      "placeholder": "Weiteren Stopp hinzufügen...",
+      "submit": "Stopp hinzufügen"
+    },
+    "empty": {
+      "noStops": "Noch keine Stopps."
+    },
+    "validation": {
+      "dateRequired": "Für diesen Stopp ist ein Datum erforderlich."
+    },
+    "toast": {
+      "reorderFailed": "Stopps konnten nicht neu sortiert werden.",
+      "reorderUpdated": "Stopp-Reihenfolge wurde aktualisiert.",
+      "undo": "Rückgängig",
+      "undoFailed": "Rückgängig fehlgeschlagen."
+    }
   },
   "stopItems": {
     "accommodation": "Unterkunft",
