@@ -17,7 +17,6 @@ type StopItemFormProps = {
     date?: string;
     startDateTime?: string;
     endDateTime?: string;
-    status: "booked" | "planned" | "cancelled";
   }) => Promise<void> | void;
 };
 
@@ -118,20 +117,6 @@ export function StopItemForm({
           </div>
         </div>
       )}
-      <div className="flex items-center gap-1">
-        {(["booked", "planned", "cancelled"] as const).map((value) => (
-          <Button
-            key={value}
-            type="button"
-            size="sm"
-            variant={status === value ? "default" : "outline"}
-            onClick={() => setStatus(value)}
-            className="capitalize"
-          >
-            {value}
-          </Button>
-        ))}
-      </div>
       <Button type="submit" size="sm">
         Add
       </Button>
