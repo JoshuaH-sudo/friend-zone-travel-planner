@@ -20,13 +20,19 @@ import {
   DATE_OR_DATETIME_REGEX,
   formatStoredDateTime,
 } from "@/lib/datetime-utils";
+import { MS_PER_DAY } from "@/lib/constants/time";
+import { AlertTriangle } from "lucide-react";
 
 export const Accommodation = ({
   accommodation,
   startInEditMode = false,
+  warningSummary,
+  highlightedDates = [],
 }: {
   accommodation: AccommodationDocumentType;
   startInEditMode?: boolean;
+  warningSummary?: string;
+  highlightedDates?: string[];
 }) => {
   const t = useTranslations("accommodation");
   const time = useTime();
@@ -89,6 +95,15 @@ export const Accommodation = ({
   });
 
   const watchedCurrency = watch("currency");
+  const watchedCheckIn = watch("checkIn");
+  const datePresets = [
+    { label: t("datePresetToday"), date: new Date() },
+    { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
+    {
+      label: t("datePresetIn7Days"),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
+    },
+  ];
 
   useEffect(() => {
     if (!startInEditMode) return;
@@ -133,6 +148,12 @@ export const Accommodation = ({
       <Card>
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {warningSummary && (
+              <p className="text-destructive flex items-center gap-2 text-sm">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {warningSummary}
+              </p>
+            )}
             <div className="space-y-2">
               <Controller
                 control={control}
@@ -222,6 +243,8 @@ export const Accommodation = ({
                     onChange={field.onChange}
                     placeholder={t("checkInPlaceholder")}
                     className="w-full"
+                    highlightedDates={highlightedDates}
+                    presets={datePresets}
                   />
                 )}
               />
@@ -242,6 +265,9 @@ export const Accommodation = ({
                     onChange={field.onChange}
                     placeholder={t("checkOutPlaceholder")}
                     className="w-full"
+                    highlightedDates={highlightedDates}
+                    pairedHighlightDate={watchedCheckIn}
+                    presets={datePresets}
                   />
                 )}
               />
@@ -307,6 +333,12 @@ export const Accommodation = ({
       {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
           {t("timezoneDisplay", { value: timezone })}
+        </p>
+      )}
+      {warningSummary && (
+        <p className="text-destructive mt-2 flex items-center gap-2 text-sm">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {warningSummary}
         </p>
       )}
     </TripItemCard>

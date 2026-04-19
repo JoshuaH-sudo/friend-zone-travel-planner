@@ -94,7 +94,9 @@
   },
   "stopItems": {
     "accommodation": "Accommodation",
-    "transport": "Transport"
+    "transport": "Transport",
+    "dateRangeSummary": "{start} - {end}",
+    "overlapWarningSummary": "{item} overlaps {other} from {range}"
   },
   "tripStats": {
     "title": "Trip Statistics",
@@ -141,6 +143,9 @@
     "checkInDisplay": "Check-in: {value}",
     "checkOutDisplay": "Check-out: {value}",
     "timezoneDisplay": "Timezone: {value}",
+    "datePresetToday": "Today",
+    "datePresetTomorrow": "Tomorrow",
+    "datePresetIn7Days": "In 7 days",
     "errors": {
       "nameRequired": "Name is required",
       "nameTooLong": "Name is too long",
@@ -177,6 +182,9 @@
     "departureDisplay": "Departure: {value}",
     "arrivalDisplay": "Arrival: {value}",
     "timezoneDisplay": "Timezone: {value}",
+    "datePresetToday": "Today",
+    "datePresetTomorrow": "Tomorrow",
+    "datePresetIn7Days": "In 7 days",
     "errors": {
       "nameRequired": "Name is required",
       "nameTooLong": "Name is too long",

@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea, ScrollAreaScrollbar } from "@/components/ui/scroll-area";
+import { MS_PER_DAY } from "@/lib/constants/time";
+import { parseStoredDateTime } from "@/lib/datetime-utils";
 import {
   PopoverRoot,
   PopoverTrigger,
@@ -16,17 +18,18 @@ import {
 
 /** Parse an ISO date or datetime string into a Date.
  * Parses in local time to avoid UTC midnight shifts.
+ * Returns undefined when the input cannot be parsed safely.
  */
-function parseIsoString(value: string): Date {
-  if (value.includes("T")) {
-    const [datePart, timePart] = value.split("T");
-    const [y, m, d] = datePart.split("-").map(Number);
-    const [h, min] = timePart.split(":").map(Number);
-    return new Date(y, m - 1, d, h, min, 0, 0);
+function parseDateTimeValue(value: string): Date | undefined {
+  const parsedStoredDate = parseStoredDateTime(value);
+  if (parsedStoredDate) {
+    return parsedStoredDate;
   }
-  const [y, m, d] = value.split("-").map(Number);
-  // Default to noon when no time is specified
-  return new Date(y, m - 1, d, 12, 0, 0, 0);
+  const parsedDate = new Date(value);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate;
+  }
+  return undefined;
 }
 
 /** Format a Date to "YYYY-MM-DDTHH:MM" */
@@ -45,24 +48,69 @@ export interface DateTimePickerProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  highlightedDates?: string[];
+  pairedHighlightDate?: string;
+  presets?: Array<{ label: string; date: Date }>;
 }
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
 const minutes = Array.from({ length: 60 }, (_, i) => i); // 0-59
-
 export function DateTimePicker({
   value,
   onChange,
   placeholder = "Pick date & time",
   className,
+  highlightedDates,
+  pairedHighlightDate,
+  presets,
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
   // Derive Date from the controlled string value
   const date = React.useMemo(
-    () => (value ? parseIsoString(value) : undefined),
+    () => (value ? parseDateTimeValue(value) : undefined),
     [value],
   );
+  const highlightedDays = React.useMemo(
+    () =>
+      [...new Set(highlightedDates ?? [])]
+        .filter(Boolean)
+        .map((highlightedDate) => parseDateTimeValue(highlightedDate))
+        .filter((d): d is Date => d !== undefined),
+    [highlightedDates],
+  );
+  const pairedDay = React.useMemo(() => {
+    if (!pairedHighlightDate) return undefined;
+    const parsed = parseDateTimeValue(pairedHighlightDate);
+    return parsed;
+  }, [pairedHighlightDate]);
+  const datePresets = React.useMemo(
+    () =>
+      presets ?? [
+        { label: "T+0", date: new Date() },
+        { label: "T+1", date: new Date(Date.now() + MS_PER_DAY) },
+        {
+          label: "T+7",
+          date: new Date(Date.now() + 7 * MS_PER_DAY),
+        },
+      ],
+    [presets],
+  );
+
+  const applyPreset = (presetDate: Date) => {
+    const h = date ? date.getHours() : 12;
+    const m = date ? date.getMinutes() : 0;
+    const merged = new Date(
+      presetDate.getFullYear(),
+      presetDate.getMonth(),
+      presetDate.getDate(),
+      h,
+      m,
+      0,
+      0,
+    );
+    onChange(toIsoDateTimeString(merged));
+  };
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate) return;
@@ -107,7 +155,7 @@ export function DateTimePicker({
   };
 
   // Derive 12-hour display values
-  const display12Hour = date ? ((date.getHours() % 12) || 12) : 12;
+  const display12Hour = date ? date.getHours() % 12 || 12 : 12;
   const displayMinute = date ? date.getMinutes() : 0;
   const displayAmPm = date ? (date.getHours() >= 12 ? "PM" : "AM") : "AM";
 
@@ -126,13 +174,28 @@ export function DateTimePicker({
         }
       >
         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-        {value && date ? (
+        {value && date && !Number.isNaN(date.getTime()) ? (
           format(date, "MM/dd/yyyy hh:mm aa")
         ) : (
           <span>{placeholder}</span>
         )}
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
+        <div className="border-b p-2">
+          <div className="flex flex-wrap gap-1">
+            {datePresets.map((preset) => (
+              <Button
+                key={preset.label}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => applyPreset(preset.date)}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+        </div>
         <div className="sm:flex">
           <Calendar
             mode="single"
@@ -142,6 +205,15 @@ export function DateTimePicker({
             startMonth={new Date(1900, 0)}
             endMonth={new Date(2100, 11)}
             initialFocus
+            modifiers={{
+              highlighted: highlightedDays,
+              paired: pairedDay ? [pairedDay] : undefined,
+            }}
+            modifiersClassNames={{
+              highlighted:
+                "[&>button]:bg-muted [&>button]:text-foreground [&>button]:opacity-80",
+              paired: "[&>button]:ring-1 [&>button]:ring-primary/60",
+            }}
           />
           {/* Time selectors — only usable after a date is chosen */}
           <div className="flex flex-col divide-y sm:h-[300px] sm:flex-row sm:divide-x sm:divide-y-0">
@@ -171,9 +243,7 @@ export function DateTimePicker({
                   <Button
                     key={m}
                     size="icon"
-                    variant={
-                      displayMinute === m && date ? "default" : "ghost"
-                    }
+                    variant={displayMinute === m && date ? "default" : "ghost"}
                     className="aspect-square w-full shrink-0 text-sm"
                     onClick={() => handleTimeChange("minute", String(m))}
                     disabled={!date}
@@ -191,9 +261,7 @@ export function DateTimePicker({
                 <Button
                   key={period}
                   size="icon"
-                  variant={
-                    displayAmPm === period && date ? "default" : "ghost"
-                  }
+                  variant={displayAmPm === period && date ? "default" : "ghost"}
                   className="aspect-square w-full shrink-0 text-sm"
                   onClick={() => handleTimeChange("ampm", period)}
                   disabled={!date}

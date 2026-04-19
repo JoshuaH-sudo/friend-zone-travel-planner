@@ -24,13 +24,19 @@ import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
+import { MS_PER_DAY } from "@/lib/constants/time";
+import { AlertTriangle } from "lucide-react";
 
 export const Transport = ({
   transport,
   startInEditMode = false,
+  warningSummary,
+  highlightedDates = [],
 }: {
   transport: TransportDocumentType;
   startInEditMode?: boolean;
+  warningSummary?: string;
+  highlightedDates?: string[];
 }) => {
   const t = useTranslations("transport");
   const time = useTime();
@@ -102,7 +108,16 @@ export const Transport = ({
 
   const watchedType = watch("type");
   const watchedCurrency = watch("currency");
+  const watchedArrivalDateTime = watch("arrivalDateTime");
   const nameRegistration = register("name");
+  const datePresets = [
+    { label: t("datePresetToday"), date: new Date() },
+    { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
+    {
+      label: t("datePresetIn7Days"),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
+    },
+  ];
 
   useEffect(() => {
     if (!startInEditMode) return;
@@ -148,6 +163,12 @@ export const Transport = ({
       <Card>
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {warningSummary && (
+              <p className="text-destructive flex items-center gap-2 text-sm">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {warningSummary}
+              </p>
+            )}
             <div className="space-y-2">
               <Label htmlFor={`transport-name-${transport.id}`}>
                 {t("nameLabel")}
@@ -244,6 +265,9 @@ export const Transport = ({
                     onChange={field.onChange}
                     placeholder={t("departurePlaceholder")}
                     className="w-full"
+                    highlightedDates={highlightedDates}
+                    pairedHighlightDate={watchedArrivalDateTime || undefined}
+                    presets={datePresets}
                   />
                 )}
               />
@@ -269,6 +293,8 @@ export const Transport = ({
                     onChange={field.onChange}
                     placeholder={t("arrivalPlaceholder")}
                     className="w-full"
+                    highlightedDates={highlightedDates}
+                    presets={datePresets}
                   />
                 )}
               />
@@ -338,6 +364,12 @@ export const Transport = ({
       {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
           {t("timezoneDisplay", { value: timezone })}
+        </p>
+      )}
+      {warningSummary && (
+        <p className="text-destructive mt-2 flex items-center gap-2 text-sm">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          {warningSummary}
         </p>
       )}
     </TripItemCard>

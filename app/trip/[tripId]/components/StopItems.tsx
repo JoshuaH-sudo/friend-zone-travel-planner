@@ -5,6 +5,10 @@ import {
   StopDocumentType,
 } from "@/lib/rxdb-schema";
 import { useTranslations } from "next-intl";
+import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Timeline } from "./Timeline";
@@ -33,7 +37,92 @@ export function StopItems({
   pendingNewTransportId,
 }: StopItemsProps) {
   const t = useTranslations("stopItems");
-  const items = [
+  type TripItem = {
+    model: TransportDocumentType | AccommodationDocumentType;
+    id: string;
+    type: "transport" | "accommodation";
+    date: string;
+  };
+
+  const getItemRange = (item: TripItem) => {
+    if (item.type === "accommodation") {
+      const accommodation = item.model as AccommodationDocumentType;
+      const startTime = getStoredDateTimeTimestamp(accommodation.checkIn, {
+        dateOnlyBoundary: "start",
+      });
+      const endTime = getStoredDateTimeTimestamp(accommodation.checkOut, {
+        dateOnlyBoundary: "end",
+      });
+      return startTime <= endTime
+        ? {
+            start: accommodation.checkIn,
+            end: accommodation.checkOut,
+            startTime,
+            endTime,
+          }
+        : {
+            start: accommodation.checkOut,
+            end: accommodation.checkIn,
+            startTime: getStoredDateTimeTimestamp(accommodation.checkOut, {
+              dateOnlyBoundary: "start",
+            }),
+            endTime: getStoredDateTimeTimestamp(accommodation.checkIn, {
+              dateOnlyBoundary: "end",
+            }),
+          };
+    }
+
+    const transport = item.model as TransportDocumentType;
+    const startTime = getStoredDateTimeTimestamp(transport.departureDateTime, {
+      dateOnlyBoundary: "start",
+    });
+    const arrival = transport.arrivalDateTime || transport.departureDateTime;
+    const endTime = getStoredDateTimeTimestamp(arrival, {
+      dateOnlyBoundary: "end",
+    });
+    return {
+      start: startTime <= endTime ? transport.departureDateTime : arrival,
+      end: startTime <= endTime ? arrival : transport.departureDateTime,
+      startTime: Math.min(startTime, endTime),
+      endTime: Math.max(startTime, endTime),
+    };
+  };
+
+  const formatDateLabel = (value: string) => {
+    const date = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    if (value.includes("T")) {
+      return date.toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    }
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const formatRangeLabel = (start: string, end: string) => {
+    if (start === end) {
+      return formatDateLabel(start);
+    }
+
+    return t("dateRangeSummary", {
+      start: formatDateLabel(start),
+      end: formatDateLabel(end),
+    });
+  };
+
+  const items: TripItem[] = [
     ...transports.map((trans) => ({
       model: trans,
       id: trans.id,
@@ -46,7 +135,59 @@ export function StopItems({
       type: "accommodation" as const,
       date: acc.checkIn,
     })),
-  ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  ].sort(
+    (a, b) =>
+      getStoredDateTimeTimestamp(a.date, { dateOnlyBoundary: "start" }) -
+      getStoredDateTimeTimestamp(b.date, { dateOnlyBoundary: "start" }),
+  );
+
+  const overlapWarnings: Record<string, string[]> = {};
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const first = items[i];
+      const second = items[j];
+      const firstRange = getItemRange(first);
+      const secondRange = getItemRange(second);
+
+      const firstStartTime = firstRange.startTime;
+      const firstEndTime = firstRange.endTime;
+      const secondStartTime = secondRange.startTime;
+      const secondEndTime = secondRange.endTime;
+      const overlaps =
+        firstStartTime <= secondEndTime && secondStartTime <= firstEndTime;
+
+      if (!overlaps) {
+        continue;
+      }
+
+      const overlapStart = new Date(Math.max(firstStartTime, secondStartTime));
+      const overlapEnd = new Date(Math.min(firstEndTime, secondEndTime));
+
+      overlapWarnings[first.id] = [
+        ...(overlapWarnings[first.id] || []),
+        t("overlapWarningSummary", {
+          item: first.model.name,
+          other: second.model.name,
+          range: formatRangeLabel(
+            overlapStart.toISOString(),
+            overlapEnd.toISOString(),
+          ),
+        }),
+      ];
+
+      overlapWarnings[second.id] = [
+        ...(overlapWarnings[second.id] || []),
+        t("overlapWarningSummary", {
+          item: second.model.name,
+          other: first.model.name,
+          range: formatRangeLabel(
+            overlapStart.toISOString(),
+            overlapEnd.toISOString(),
+          ),
+        }),
+      ];
+    }
+  }
 
   const getTransportIcon = (type: string) => {
     switch (type) {
@@ -99,13 +240,27 @@ export function StopItems({
                 <div>
                   {item.type === "accommodation" ? (
                     <Accommodation
-                      accommodation={item.model}
+                      accommodation={item.model as AccommodationDocumentType}
                       startInEditMode={pendingNewAccommodationId === item.id}
+                      warningSummary={overlapWarnings[item.id]?.join(" • ")}
+                      highlightedDates={items
+                        .filter((otherItem) => otherItem.id !== item.id)
+                        .flatMap((otherItem) => {
+                          const range = getItemRange(otherItem);
+                          return [range.start, range.end];
+                        })}
                     />
                   ) : (
                     <Transport
-                      transport={item.model}
+                      transport={item.model as TransportDocumentType}
                       startInEditMode={pendingNewTransportId === item.id}
+                      warningSummary={overlapWarnings[item.id]?.join(" • ")}
+                      highlightedDates={items
+                        .filter((otherItem) => otherItem.id !== item.id)
+                        .flatMap((otherItem) => {
+                          const range = getItemRange(otherItem);
+                          return [range.start, range.end];
+                        })}
                     />
                   )}
                 </div>

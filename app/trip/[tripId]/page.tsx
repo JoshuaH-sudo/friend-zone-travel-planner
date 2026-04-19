@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,10 @@ import { Plus } from "@hugeicons/core-free-icons";
 import { useTripData } from "@/components/hooks/useTripData";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
+import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
 
 function TripDetails() {
   const t = useTranslations("tripPage");
@@ -33,6 +37,94 @@ function TripDetails() {
   const tripData = useTripData(tripId, { database });
   const { trip, stops, accommodationsByStop, transportsByStop, loading } =
     tripData;
+  const formatRangeDate = (value: string) => {
+    const date = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+  const formatRangeSummary = (start: string, end: string) => {
+    if (start === end) {
+      return formatRangeDate(start);
+    }
+
+    return `${formatRangeDate(start)} - ${formatRangeDate(end)}`;
+  };
+  const stopRangeById = useMemo(() => {
+    const nextStopRangeById: Record<string, { start: string; end: string }> =
+      {};
+
+    stops.forEach((stop) => {
+      const stopAccommodations = accommodationsByStop[stop.id] || [];
+      const stopTransports = transportsByStop[stop.id] || [];
+      const itemDates = [
+        ...stopAccommodations.flatMap((accommodation) => [
+          accommodation.checkIn,
+          accommodation.checkOut,
+        ]),
+        ...stopTransports.flatMap((transport) => [
+          transport.departureDateTime,
+          transport.arrivalDateTime || transport.departureDateTime,
+        ]),
+      ].filter(Boolean);
+
+      if (itemDates.length === 0) {
+        nextStopRangeById[stop.id] = { start: stop.date, end: stop.date };
+        return;
+      }
+
+      nextStopRangeById[stop.id] = {
+        start: itemDates.reduce((earliest, current) =>
+          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "start" }) <
+          getStoredDateTimeTimestamp(earliest, { dateOnlyBoundary: "start" })
+            ? current
+            : earliest,
+        ),
+        end: itemDates.reduce((latest, current) =>
+          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "end" }) >
+          getStoredDateTimeTimestamp(latest, { dateOnlyBoundary: "end" })
+            ? current
+            : latest,
+        ),
+      };
+    });
+
+    return nextStopRangeById;
+  }, [accommodationsByStop, stops, transportsByStop]);
+  const sortedStops = useMemo(
+    () =>
+      [...stops].sort((firstStop, secondStop) => {
+        const firstRange = stopRangeById[firstStop.id];
+        const secondRange = stopRangeById[secondStop.id];
+        const firstStartTime = firstRange
+          ? getStoredDateTimeTimestamp(firstRange.start, {
+              dateOnlyBoundary: "start",
+            })
+          : getStoredDateTimeTimestamp(firstStop.date, {
+              dateOnlyBoundary: "start",
+            });
+        const secondStartTime = secondRange
+          ? getStoredDateTimeTimestamp(secondRange.start, {
+              dateOnlyBoundary: "start",
+            })
+          : getStoredDateTimeTimestamp(secondStop.date, {
+              dateOnlyBoundary: "start",
+            });
+
+        if (firstStartTime !== secondStartTime) {
+          return firstStartTime - secondStartTime;
+        }
+
+        return firstStop.createdAt - secondStop.createdAt;
+      }),
+    [stopRangeById, stops],
+  );
 
   useEffect(() => {
     if (!pendingNewStopId) return;
@@ -204,7 +296,7 @@ function TripDetails() {
         </Button>
       </div>
       <section id="stops-section" className="w-full text-left">
-        {stops.length > 0 && (
+        {sortedStops.length > 0 && (
           <Timeline
             className="pl-4"
             lineClassName="absolute top-4 bottom-1 left-4 border-l-2"
@@ -215,9 +307,13 @@ function TripDetails() {
             }
           >
             <ul className="space-y-8">
-              {stops.map((stop) => {
+              {sortedStops.map((stop) => {
                 const accommodations = accommodationsByStop[stop.id] || [];
                 const transports = transportsByStop[stop.id] || [];
+                const stopRange = stopRangeById[stop.id];
+                const stopDateRangeSummary = stopRange
+                  ? formatRangeSummary(stopRange.start, stopRange.end)
+                  : formatRangeDate(stop.date);
 
                 return (
                   <li
@@ -235,6 +331,7 @@ function TripDetails() {
                       <Stop
                         stop={stop}
                         startInEditMode={pendingNewStopId === stop.id}
+                        dateRangeSummary={stopDateRangeSummary}
                       />
                     </div>
                     <StopItems

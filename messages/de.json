@@ -94,7 +94,9 @@
   },
   "stopItems": {
     "accommodation": "Unterkunft",
-    "transport": "Transport"
+    "transport": "Transport",
+    "dateRangeSummary": "{start} - {end}",
+    "overlapWarningSummary": "{item} überschneidet sich mit {other} von {range}"
   },
   "tripStats": {
     "title": "Reisestatistiken",
@@ -141,6 +143,9 @@
     "checkInDisplay": "Check-in: {value}",
     "checkOutDisplay": "Check-out: {value}",
     "timezoneDisplay": "Zeitzone: {value}",
+    "datePresetToday": "Heute",
+    "datePresetTomorrow": "Morgen",
+    "datePresetIn7Days": "In 7 Tagen",
     "errors": {
       "nameRequired": "Name ist erforderlich",
       "nameTooLong": "Name ist zu lang",
@@ -177,6 +182,9 @@
     "departureDisplay": "Abfahrt: {value}",
     "arrivalDisplay": "Ankunft: {value}",
     "timezoneDisplay": "Zeitzone: {value}",
+    "datePresetToday": "Heute",
+    "datePresetTomorrow": "Morgen",
+    "datePresetIn7Days": "In 7 Tagen",
     "errors": {
       "nameRequired": "Name ist erforderlich",
       "nameTooLong": "Name ist zu lang",

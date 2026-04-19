@@ -16,9 +16,14 @@ import useTime from "@/components/hooks/useTime";
 type StopProps = {
   stop: StopDocumentType;
   startInEditMode?: boolean;
+  dateRangeSummary?: string;
 };
 
-export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
+export const Stop = ({
+  stop,
+  startInEditMode = false,
+  dateRangeSummary,
+}: StopProps) => {
   const t = useTranslations("stop");
   const time = useTime();
   const [isEditing, setIsEditing] = useState(false);
@@ -124,15 +129,6 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
                 </p>
               )}
             </div>
-            {/* <div className="space-y-2">
-              <Label htmlFor="stop-date">Date</Label>
-              <Input id="stop-date" {...register("date")} type="date" />
-              {errors.date && (
-                <p className="text-destructive text-sm">
-                  {errors.date.message}
-                </p>
-              )}
-            </div> */}
             <div className="flex gap-2">
               <Button type="submit">{t("save")}</Button>
               <Button
@@ -156,11 +152,17 @@ export const Stop = ({ stop, startInEditMode = false }: StopProps) => {
       deleteLabel={t("deleteAriaLabel")}
       editLabel={t("editAriaLabel")}
       className="w-full"
-      title={<h3 className="text-xl font-semibold">{stop.name}</h3>}
+      title={
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-xl font-semibold">{stop.name}</h3>
+          {dateRangeSummary && (
+            <span className="text-muted-foreground text-sm">
+              {dateRangeSummary}
+            </span>
+          )}
+        </div>
+      }
     >
-      {/* <p className="text-muted-foreground mt-2">
-        {new Date(stop.date).toLocaleDateString()}
-      </p> */}
     </TripItemCard>
   );
 };

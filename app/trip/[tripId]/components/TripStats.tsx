@@ -4,9 +4,20 @@ import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
+import {
   useTripData,
   type UseTripDataResult,
 } from "@/components/hooks/useTripData";
+
+const toStartTimestamp = (value: string) =>
+  getStoredDateTimeTimestamp(value, { dateOnlyBoundary: "start" });
+const toEndTimestamp = (value: string) =>
+  getStoredDateTimeTimestamp(value, { dateOnlyBoundary: "end" });
+const toStoredDatePart = (value: string) =>
+  value.includes("T") ? value.split("T")[0] : value;
 
 export function TripStats({
   tripId,
@@ -22,6 +33,14 @@ export function TripStats({
   const { trip, stops, accommodationsByStop, transportsByStop } =
     resolvedTripData;
 
+  const formatDate = (value: string) => {
+    const parsed = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+    return parsed.toLocaleDateString(locale);
+  };
+
   const stats = useMemo(() => {
     const currencyTotals: Record<string, number> = {};
     let stopCount = 0;
@@ -30,6 +49,8 @@ export function TripStats({
     let startDate: string | null = null;
     let endDate: string | null = null;
     let totalDays = 0;
+    let startTimestamp: number | null = null;
+    let endTimestamp: number | null = null;
 
     if (!trip) {
       return {
@@ -45,12 +66,45 @@ export function TripStats({
 
     stops.forEach((stop) => {
       stopCount++;
-
-      if (!startDate || stop.date < startDate) {
-        startDate = stop.date;
+      const stopItemDates = [
+        ...(accommodationsByStop[stop.id] || []).flatMap((acc) => [
+          acc.checkIn,
+          acc.checkOut,
+        ]),
+        ...(transportsByStop[stop.id] || []).flatMap((trans) => [
+          trans.departureDateTime,
+          ...(trans.arrivalDateTime ? [trans.arrivalDateTime] : []),
+        ]),
+      ].filter((value): value is string => Boolean(value));
+      const stopBounds = [stop.date, ...stopItemDates]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => ({
+          value,
+          startTimestamp: toStartTimestamp(value),
+          endTimestamp: toEndTimestamp(value),
+        }));
+      if (stopBounds.length === 0) {
+        return;
       }
-      if (!endDate || stop.date > endDate) {
-        endDate = stop.date;
+      const stopStartEntry = stopBounds.reduce(
+        (earliest, current) =>
+          current.startTimestamp < earliest.startTimestamp ? current : earliest,
+        stopBounds[0],
+      );
+      const stopEndEntry = stopBounds.reduce(
+        (latest, current) =>
+          current.endTimestamp > latest.endTimestamp ? current : latest,
+        stopBounds[0],
+      );
+      const stopStartTimestamp = stopStartEntry.startTimestamp;
+      const stopEndTimestamp = stopEndEntry.endTimestamp;
+      if (startTimestamp === null || stopStartTimestamp < startTimestamp) {
+        startTimestamp = stopStartTimestamp;
+        startDate = stopStartEntry.value;
+      }
+      if (endTimestamp === null || stopEndTimestamp > endTimestamp) {
+        endTimestamp = stopEndTimestamp;
+        endDate = stopEndEntry.value;
       }
 
       (accommodationsByStop[stop.id] || []).forEach((acc) => {
@@ -66,12 +120,15 @@ export function TripStats({
       });
     });
 
+    const startDay = startDate ? toStoredDatePart(startDate) : null;
+    const endDay = endDate ? toStoredDatePart(endDate) : null;
     totalDays =
-      startDate && endDate
-        ? (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+      startDay && endDay
+        ? (toStartTimestamp(endDay) - toStartTimestamp(startDay)) /
             (1000 * 60 * 60 * 24) +
           1
         : 0;
+    totalDays = Math.max(0, Math.round(totalDays));
 
     return {
       currencyTotals,
@@ -106,13 +163,8 @@ export function TripStats({
           <div className="flex items-center gap-2 text-sm">
             <span className="font-medium">{t("durationLabel")}</span>
             <span className="text-muted-foreground">
-              {stats.startDate
-                ? new Date(stats.startDate).toLocaleDateString(locale)
-                : t("notAvailable")}{" "}
-              →{" "}
-              {stats.endDate
-                ? new Date(stats.endDate).toLocaleDateString(locale)
-                : t("notAvailable")}
+              {stats.startDate ? formatDate(stats.startDate) : t("notAvailable")}{" "}
+              → {stats.endDate ? formatDate(stats.endDate) : t("notAvailable")}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
