@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 function Header() {
   const pathname = usePathname();
+  const t = useTranslations("header");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -32,7 +34,7 @@ function Header() {
         >
           {`<`}
         </Link>
-        <h1 className="text-xl font-bold">Friend Zone Travel Planner</h1>
+        <h1 className="text-xl font-bold">{t("title")}</h1>
       </div>
       {mounted && (
         <div className="flex items-center gap-1">
@@ -40,7 +42,7 @@ function Header() {
             variant="ghost"
             size="icon-sm"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle theme"
+            aria-label={t("toggleTheme")}
           >
             {theme === "dark" ? (
               <svg
@@ -82,8 +84,10 @@ function Header() {
           </Button>
           <Link
             href="/settings"
-            aria-label="Settings"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }))}
+            aria-label={t("settings")}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+            )}
           >
             <HugeiconsIcon icon={Settings02Icon} size={20} strokeWidth={2} />
           </Link>

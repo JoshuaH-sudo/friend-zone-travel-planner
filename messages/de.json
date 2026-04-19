@@ -1,0 +1,198 @@
+{
+  "metadata": {
+    "title": "Friend Zone Reiseplaner",
+    "description": "Plane deine Reisen mit Freunden und verwalte alle Reisedetails an einem Ort."
+  },
+  "layout": {
+    "footer": "© {year} Friend Zone Reiseplaner. Alle Rechte vorbehalten."
+  },
+  "header": {
+    "title": "Friend Zone Reiseplaner",
+    "toggleTheme": "Design umschalten",
+    "settings": "Einstellungen"
+  },
+  "home": {
+    "newTripName": "Neue Reise",
+    "yourTrips": "Deine Reisen",
+    "addTrip": "Reise hinzufügen",
+    "deleteTripAriaLabel": "Reise löschen",
+    "deleteTripTitle": "Diese Reise löschen?",
+    "deleteTripDescription": "Dadurch werden {tripName} und alle zugehörigen Reisedaten dauerhaft entfernt.",
+    "deleteTripConfirm": "Reise löschen",
+    "deleteTripWarning": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "openTrip": "Reise öffnen",
+    "addNewTripTitle": "Neue Reise hinzufügen",
+    "addNewTripDescription": "Erstelle eine weitere Route und plane dein nächstes Abenteuer."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "errors": {
+      "unknownError": "Unbekannter Fehler"
+    },
+    "general": {
+      "title": "Allgemein",
+      "defaultCurrency": {
+        "label": "Standardwährung",
+        "description": "Die Standardwährung für neue Reiseeinträge."
+      },
+      "theme": {
+        "label": "Design",
+        "description": "Wähle dein bevorzugtes Farbschema.",
+        "placeholder": "Design auswählen",
+        "system": "System",
+        "light": "Hell",
+        "dark": "Dunkel"
+      },
+      "language": {
+        "label": "Sprache",
+        "description": "Die in der gesamten App verwendete Sprache.",
+        "placeholder": "Sprache auswählen",
+        "english": "Englisch",
+        "german": "Deutsch"
+      },
+      "defaultTimezone": {
+        "label": "Standardzeitzone",
+        "description": "Wird standardmäßig für den iCal-Export von Reisedaten sowie für neue Transport- und Unterkunftseinträge verwendet."
+      }
+    },
+    "backup": {
+      "title": "Sichern und Wiederherstellen",
+      "description": "Exportiere alle App-Daten (Reisen, Einstellungen und Präferenzen) oder lade ein zuvor exportiertes Backup hoch. Beim Hochladen werden aktuelle Daten ersetzt. Maximale Upload-Größe: 5 MB.",
+      "export": "App-Daten exportieren",
+      "exporting": "Exportiere...",
+      "import": "App-Daten hochladen",
+      "importing": "Importiere...",
+      "status": {
+        "exported": "App-Daten wurden exportiert.",
+        "exportFailed": "Export der App-Daten fehlgeschlagen: {errorMessage}",
+        "imported": "App-Daten wurden importiert.",
+        "importFailed": "Import der App-Daten fehlgeschlagen: {errorMessage}",
+        "importFailedFileTooLarge": "Import der App-Daten fehlgeschlagen: Datei ist zu groß (max. 5 MB)."
+      }
+    }
+  },
+  "tripPage": {
+    "newStopName": "Neuer Stopp {number}",
+    "newAccommodationName": "Neue Unterkunft",
+    "newTransportName": "Neuer Transport",
+    "loading": "Reise wird geladen...",
+    "notFound": "Reise nicht gefunden",
+    "addStop": "Stopp hinzufügen"
+  },
+  "tripNameEditor": {
+    "saveAriaLabel": "Reisename speichern",
+    "cancelAriaLabel": "Bearbeiten des Reisennamens abbrechen",
+    "exportAriaLabel": "Reise als iCal exportieren"
+  },
+  "stopItems": {
+    "accommodation": "Unterkunft",
+    "transport": "Transport"
+  },
+  "tripStats": {
+    "title": "Reisestatistiken",
+    "destinations": "{count, plural, one {# Reiseziel} other {# Reiseziele}}",
+    "accommodations": "{count, plural, one {# Unterkunft} other {# Unterkünfte}}",
+    "transports": "{count, plural, one {# Transport} other {# Transporte}}",
+    "durationLabel": "Dauer:",
+    "daysLabel": "Tage:",
+    "notAvailable": "k. A.",
+    "totalCostLabel": "Gesamtkosten:"
+  },
+  "tripItemCard": {
+    "editItem": "Eintrag bearbeiten",
+    "deleteItem": "Eintrag löschen"
+  },
+  "stop": {
+    "nameLabel": "Stopp-Name",
+    "namePlaceholder": "Stopp-Name",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "deleteAriaLabel": "Stopp löschen",
+    "editAriaLabel": "Stopp bearbeiten",
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "nameTooLong": "Name ist zu lang",
+      "invalidDateFormat": "Ungültiges Datumsformat"
+    }
+  },
+  "accommodation": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Unterkunftsname",
+    "priceLabel": "Preis",
+    "currencyLabel": "Währung",
+    "checkInLabel": "Check-in",
+    "checkInPlaceholder": "Check-in Datum & Uhrzeit auswählen",
+    "checkOutLabel": "Check-out",
+    "checkOutPlaceholder": "Check-out Datum & Uhrzeit auswählen",
+    "timezoneLabel": "Zeitzone",
+    "optional": "(optional)",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "deleteAriaLabel": "Unterkunft löschen",
+    "editAriaLabel": "Unterkunft bearbeiten",
+    "checkInDisplay": "Check-in: {value}",
+    "checkOutDisplay": "Check-out: {value}",
+    "timezoneDisplay": "Zeitzone: {value}",
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "nameTooLong": "Name ist zu lang",
+      "priceMustBePositive": "Preis muss positiv sein",
+      "priceTooHigh": "Preis ist zu hoch",
+      "invalidCurrency": "Ungültige Währung",
+      "selectCheckInDateTime": "Wähle ein Check-in Datum und eine Uhrzeit",
+      "selectCheckOutDateTime": "Wähle ein Check-out Datum und eine Uhrzeit",
+      "checkOutAfterCheckIn": "Check-out muss nach dem Check-in liegen"
+    }
+  },
+  "transport": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Transportname",
+    "typeLabel": "Typ",
+    "type": {
+      "flight": "Flug",
+      "bus": "Bus",
+      "car": "Auto",
+      "train": "Zug"
+    },
+    "priceLabel": "Preis",
+    "currencyLabel": "Währung",
+    "departureLabel": "Abfahrt",
+    "departurePlaceholder": "Abfahrtsdatum & Uhrzeit auswählen",
+    "arrivalLabel": "Ankunft",
+    "arrivalPlaceholder": "Ankunftsdatum & Uhrzeit auswählen",
+    "timezoneLabel": "Zeitzone",
+    "optional": "(optional)",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "deleteAriaLabel": "Transport löschen",
+    "editAriaLabel": "Transport bearbeiten",
+    "departureDisplay": "Abfahrt: {value}",
+    "arrivalDisplay": "Ankunft: {value}",
+    "timezoneDisplay": "Zeitzone: {value}",
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "nameTooLong": "Name ist zu lang",
+      "invalidTransportType": "Ungültiger Transporttyp",
+      "priceMustBePositive": "Preis muss positiv sein",
+      "priceTooHigh": "Preis ist zu hoch",
+      "invalidCurrency": "Ungültige Währung",
+      "selectDepartureDateTime": "Wähle ein Abfahrtsdatum und eine Uhrzeit",
+      "invalidArrivalDateTime": "Ungültiges Ankunftsdatum/-uhrzeit"
+    }
+  },
+  "confirmationDialog": {
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen",
+    "working": "Wird verarbeitet..."
+  },
+  "timezonePicker": {
+    "pickTimezoneAriaLabel": "Zeitzone auswählen",
+    "selectTimezoneTitle": "Zeitzone auswählen",
+    "searchPlaceholder": "Zeitzonen suchen…",
+    "autoDetect": "Automatisch erkennen",
+    "noTimezonesFound": "Keine Zeitzonen gefunden."
+  },
+  "currencySelect": {
+    "placeholder": "Währung auswählen"
+  }
+}

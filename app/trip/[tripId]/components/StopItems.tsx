@@ -4,6 +4,7 @@ import {
   AccommodationDocumentType,
   StopDocumentType,
 } from "@/lib/rxdb-schema";
+import { useTranslations } from "next-intl";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Timeline } from "./Timeline";
@@ -31,6 +32,7 @@ export function StopItems({
   pendingNewAccommodationId,
   pendingNewTransportId,
 }: StopItemsProps) {
+  const t = useTranslations("stopItems");
   const items = [
     ...transports.map((trans) => ({
       model: trans,
@@ -75,7 +77,11 @@ export function StopItems({
         >
           <ul className="space-y-6">
             {items.map((item) => (
-              <li id={`trip-item-${item.id}`} key={item.id} className="relative pl-8">
+              <li
+                id={`trip-item-${item.id}`}
+                key={item.id}
+                className="relative pl-8"
+              >
                 <div
                   id={`item-icon-${item.id}`}
                   className="bg-background border-primary absolute top-3 left-px flex size-7 shrink-0 -translate-x-1/2 items-center justify-center rounded-full border-2"
@@ -114,7 +120,7 @@ export function StopItems({
           size="sm"
           onClick={() => onAddAccommodation(stop.id)}
         >
-          <HugeiconsIcon icon={Hotel01Icon} /> Accommodation
+          <HugeiconsIcon icon={Hotel01Icon} /> {t("accommodation")}
           <HugeiconsIcon icon={Plus} className="ml-1" />
         </Button>
         <Button
@@ -122,7 +128,7 @@ export function StopItems({
           size="sm"
           onClick={() => onAddTransport(stop.id)}
         >
-          <HugeiconsIcon icon={PlaneTakeoff} /> Transport
+          <HugeiconsIcon icon={PlaneTakeoff} /> {t("transport")}
           <HugeiconsIcon icon={Plus} className="ml-1" />
         </Button>
       </div>

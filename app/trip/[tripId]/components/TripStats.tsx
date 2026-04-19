@@ -1,8 +1,12 @@
 "use client";
 import { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useTripData, type UseTripDataResult } from "@/components/hooks/useTripData";
+import {
+  useTripData,
+  type UseTripDataResult,
+} from "@/components/hooks/useTripData";
 
 export function TripStats({
   tripId,
@@ -11,9 +15,12 @@ export function TripStats({
   tripId: string;
   tripData?: UseTripDataResult;
 }) {
+  const t = useTranslations("tripStats");
+  const locale = useLocale();
   const internalTripData = useTripData(tripId, { enabled: !tripData });
   const resolvedTripData = tripData ?? internalTripData;
-  const { trip, stops, accommodationsByStop, transportsByStop } = resolvedTripData;
+  const { trip, stops, accommodationsByStop, transportsByStop } =
+    resolvedTripData;
 
   const stats = useMemo(() => {
     const currencyTotals: Record<string, number> = {};
@@ -80,48 +87,43 @@ export function TripStats({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Trip Statistics</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap gap-2">
           <Badge variant="secondary">
-            {stats.stopCount}{" "}
-            {stats.stopCount === 1 ? "Destination" : "Destinations"}
+            {t("destinations", { count: stats.stopCount })}
           </Badge>
           <Badge variant="secondary">
-            {stats.accommodationCount}{" "}
-            {stats.accommodationCount === 1
-              ? "Accommodation"
-              : "Accommodations"}
+            {t("accommodations", { count: stats.accommodationCount })}
           </Badge>
           <Badge variant="secondary">
-            {stats.transportCount}{" "}
-            {stats.transportCount === 1 ? "Transport" : "Transports"}
+            {t("transports", { count: stats.transportCount })}
           </Badge>
         </div>
 
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium">Duration:</span>
+            <span className="font-medium">{t("durationLabel")}</span>
             <span className="text-muted-foreground">
               {stats.startDate
-                ? new Date(stats.startDate).toLocaleDateString()
-                : "N/A"}{" "}
+                ? new Date(stats.startDate).toLocaleDateString(locale)
+                : t("notAvailable")}{" "}
               →{" "}
               {stats.endDate
-                ? new Date(stats.endDate).toLocaleDateString()
-                : "N/A"}
+                ? new Date(stats.endDate).toLocaleDateString(locale)
+                : t("notAvailable")}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-medium">Days:</span>
+            <span className="font-medium">{t("daysLabel")}</span>
             <span className="text-muted-foreground">{stats.totalDays}</span>
           </div>
         </div>
 
         {Object.keys(stats.currencyTotals).length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium">Total Cost:</p>
+            <p className="text-sm font-medium">{t("totalCostLabel")}</p>
             <div className="flex flex-wrap gap-2">
               {Object.entries(stats.currencyTotals).map(([currency, total]) => (
                 <Badge key={currency} variant="outline">

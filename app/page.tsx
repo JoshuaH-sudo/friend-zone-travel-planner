@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { TripDocument } from "@/lib/rxdb-schema";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,16 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { PlusIcon } from "lucide-react";
 import { TripStats } from "./trip/[tripId]/components/TripStats";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, CalendarDownload01Icon } from "@hugeicons/core-free-icons";
+import {
+  Cancel01Icon,
+  CalendarDownload01Icon,
+} from "@hugeicons/core-free-icons";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
 
 function TripList() {
   const router = useRouter();
+  const t = useTranslations("home");
   const [trips, setTrips] = useState<TripDocument[]>([]);
   const [database, setDatabase] = useState<MyDatabase | null>(null);
   const { timezone } = useSettings();
@@ -51,7 +56,7 @@ function TripList() {
     const { generateId } = await import("@/lib/rxdb-database");
     const newTrip = await database.trips.insert({
       id: generateId(),
-      name: "New Trip",
+      name: t("newTripName"),
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -77,25 +82,28 @@ function TripList() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold">Your Trips</h2>
+        <h2 className="text-2xl font-bold">{t("yourTrips")}</h2>
         <Button
           variant="outline"
           className="bg-accent text-accent-foreground"
           onClick={createTrip}
         >
-          Add Trip
+          {t("addTrip")}
           <PlusIcon />
         </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {trips.map((trip) => (
-          <Card key={trip.id} className="flex h-full flex-col hover:scale-[1.01] transition-transform duration-200">
+          <Card
+            key={trip.id}
+            className="flex h-full flex-col transition-transform duration-200 hover:scale-[1.01]"
+          >
             <CardHeader>
               <div className="flex items-start justify-between gap-4">
                 <Link
                   href={`/trip/${trip.id}`}
-                  className="flex-1 text-2xl font-semibold hover:text-primary hover:underline"
+                  className="hover:text-primary flex-1 text-2xl font-semibold hover:underline"
                 >
                   {trip.name}
                 </Link>
@@ -105,18 +113,20 @@ function TripList() {
                       variant="ghost"
                       size="icon-sm"
                       className="text-destructive hover:bg-destructive/10"
-                      aria-label="Delete trip"
+                      aria-label={t("deleteTripAriaLabel")}
                     >
                       <HugeiconsIcon icon={Cancel01Icon} />
                     </Button>
                   }
-                  title="Delete this trip?"
-                  description={`This will permanently remove ${trip.name} and all of its trip data.`}
-                  confirmLabel="Delete trip"
+                  title={t("deleteTripTitle")}
+                  description={t("deleteTripDescription", {
+                    tripName: trip.name,
+                  })}
+                  confirmLabel={t("deleteTripConfirm")}
                   onConfirm={() => deleteTrip(trip.id)}
                 >
                   <p className="text-muted-foreground text-sm">
-                    This action cannot be undone.
+                    {t("deleteTripWarning")}
                   </p>
                 </ConfirmationDialog>
               </div>
@@ -132,28 +142,28 @@ function TripList() {
                 className="w-full"
                 onClick={() => router.push(`/trip/${trip.id}`)}
               >
-                Open Trip
+                {t("openTrip")}
               </Button>
             </CardFooter>
           </Card>
         ))}
 
-        <Card className="border-dashed bg-muted/50 hover:scale-[1.01] transition-transform duration-200">
+        <Card className="bg-muted/50 border-dashed transition-transform duration-200 hover:scale-[1.01]">
           <CardHeader>
-            <CardTitle>Add a new trip</CardTitle>
+            <CardTitle>{t("addNewTripTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="text-muted-foreground text-sm">
-            Create another itinerary and start planning your next adventure.
+            {t("addNewTripDescription")}
           </CardContent>
           <CardFooter>
             <Button onClick={createTrip} className="w-full">
-              Add Trip
+              {t("addTrip")}
               <PlusIcon />
             </Button>
           </CardFooter>
         </Card>
       </div>
-     </div>
+    </div>
   );
 }
 

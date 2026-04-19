@@ -1,6 +1,8 @@
 "use client";
 
 import { ChangeEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { Button } from "@/components/ui/button";
@@ -23,10 +25,18 @@ import {
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const t = useTranslations("settings");
   const database = useDatabase();
   const { theme, setTheme } = useTheme();
-  const { defaultCurrency, setDefaultCurrency, language, setLanguage, timezone, setTimezone } =
-    useSettings();
+  const {
+    defaultCurrency,
+    setDefaultCurrency,
+    language,
+    setLanguage,
+    timezone,
+    setTimezone,
+  } = useSettings();
   const importInputRef = useRef<HTMLInputElement>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -36,12 +46,14 @@ export default function SettingsPage() {
     try {
       setIsExporting(true);
       setStatusMessage(null);
-      await exportAppData(database, { theme: isValidTheme(theme) ? theme : null });
-      setStatusMessage("App data exported.");
+      await exportAppData(database, {
+        theme: isValidTheme(theme) ? theme : null,
+      });
+      setStatusMessage(t("backup.status.exported"));
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setStatusMessage(`Failed to export app data: ${errorMessage}`);
+        error instanceof Error ? error.message : t("errors.unknownError");
+      setStatusMessage(t("backup.status.exportFailed", { errorMessage }));
     } finally {
       setIsExporting(false);
     }
@@ -58,7 +70,7 @@ export default function SettingsPage() {
     }
 
     if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
-      setStatusMessage("Failed to import app data: file is too large (max 5 MB).");
+      setStatusMessage(t("backup.status.importFailedFileTooLarge"));
       event.target.value = "";
       return;
     }
@@ -71,11 +83,11 @@ export default function SettingsPage() {
       if (importedTheme) {
         setTheme(importedTheme);
       }
-      setStatusMessage("App data imported.");
+      setStatusMessage(t("backup.status.imported"));
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setStatusMessage(`Failed to import app data: ${errorMessage}`);
+        error instanceof Error ? error.message : t("errors.unknownError");
+      setStatusMessage(t("backup.status.importFailed", { errorMessage }));
     } finally {
       event.target.value = "";
       setIsImporting(false);
@@ -84,17 +96,21 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h2 className="text-2xl font-bold">Settings</h2>
+      <h2 className="text-2xl font-bold">{t("title")}</h2>
 
       <section className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold text-muted-foreground">General</h3>
+        <h3 className="text-muted-foreground text-lg font-semibold">
+          {t("general.title")}
+        </h3>
 
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-medium">Default Currency</p>
+              <p className="font-medium">
+                {t("general.defaultCurrency.label")}
+              </p>
               <p className="text-muted-foreground text-sm">
-                The default currency used when creating new trip items.
+                {t("general.defaultCurrency.description")}
               </p>
             </div>
             <CurrencySelect
@@ -109,46 +125,63 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-medium">Theme</p>
+              <p className="font-medium">{t("general.theme.label")}</p>
               <p className="text-muted-foreground text-sm">
-                Choose your preferred color scheme.
+                {t("general.theme.description")}
               </p>
             </div>
             <Select value={theme} onValueChange={(v) => v && setTheme(v)}>
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Select theme" />
+                <SelectValue placeholder={t("general.theme.placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="system">System</SelectItem>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="system">
+                  {t("general.theme.system")}
+                </SelectItem>
+                <SelectItem value="light">
+                  {t("general.theme.light")}
+                </SelectItem>
+                <SelectItem value="dark">{t("general.theme.dark")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-medium">Language</p>
+              <p className="font-medium">{t("general.language.label")}</p>
               <p className="text-muted-foreground text-sm">
-                The language used throughout the app.
+                {t("general.language.description")}
               </p>
             </div>
-            <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
+            <Select
+              value={language}
+              onValueChange={(v) => {
+                if (!v) return;
+                setLanguage(v);
+                router.refresh();
+              }}
+            >
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Select language" />
+                <SelectValue placeholder={t("general.language.placeholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="en">
+                  {t("general.language.english")}
+                </SelectItem>
+                <SelectItem value="de">
+                  {t("general.language.german")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="font-medium">Default Timezone</p>
+              <p className="font-medium">
+                {t("general.defaultTimezone.label")}
+              </p>
               <p className="text-muted-foreground text-sm">
-                Used as the default when exporting trip data to iCal and when
-                adding new transport or accommodation items.
+                {t("general.defaultTimezone.description")}
               </p>
             </div>
             <TimezonePicker
@@ -161,14 +194,12 @@ export default function SettingsPage() {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold text-muted-foreground">
-          Backup and Restore
+        <h3 className="text-muted-foreground text-lg font-semibold">
+          {t("backup.title")}
         </h3>
         <div className="flex flex-col gap-3">
           <p className="text-muted-foreground text-sm">
-            Export all app data (trips, settings, and preferences) or upload a
-            previously exported backup. Uploading a backup replaces current app
-            data. Maximum upload size is 5 MB.
+            {t("backup.description")}
           </p>
           <div className="flex flex-wrap gap-3">
             <Button
@@ -176,7 +207,7 @@ export default function SettingsPage() {
               onClick={handleExport}
               disabled={isExporting || isImporting}
             >
-              {isExporting ? "Exporting..." : "Export App Data"}
+              {isExporting ? t("backup.exporting") : t("backup.export")}
             </Button>
             <Button
               type="button"
@@ -184,7 +215,7 @@ export default function SettingsPage() {
               onClick={handleImportClick}
               disabled={isExporting || isImporting}
             >
-              {isImporting ? "Importing..." : "Upload App Data"}
+              {isImporting ? t("backup.importing") : t("backup.import")}
             </Button>
             <input
               ref={importInputRef}

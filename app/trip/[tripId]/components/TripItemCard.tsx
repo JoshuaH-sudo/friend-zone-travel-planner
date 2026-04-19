@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -21,11 +22,16 @@ export const TripItemCard = ({
   title,
   onEdit,
   onDelete,
-  editLabel = "Edit item",
-  deleteLabel = "Delete item",
+  editLabel,
+  deleteLabel,
   className,
   children,
 }: TripItemCardProps) => {
+  const t = useTranslations("tripItemCard");
+
+  const resolvedEditLabel = editLabel ?? t("editItem");
+  const resolvedDeleteLabel = deleteLabel ?? t("deleteItem");
+
   return (
     <Card className={cn("relative", className)}>
       <CardContent className="px-4">
@@ -37,7 +43,7 @@ export const TripItemCard = ({
               variant="ghost"
               size="icon-sm"
               className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary"
-              aria-label={editLabel}
+              aria-label={resolvedEditLabel}
             >
               <HugeiconsIcon icon={Edit03Icon} />
             </Button>
@@ -46,7 +52,7 @@ export const TripItemCard = ({
               variant="ghost"
               size="icon-sm"
               className="bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 focus-visible:border-destructive/40"
-              aria-label={deleteLabel}
+              aria-label={resolvedDeleteLabel}
             >
               <HugeiconsIcon icon={Cancel01Icon} />
             </Button>

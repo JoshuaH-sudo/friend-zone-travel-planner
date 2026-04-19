@@ -28,6 +28,8 @@ const defaultSettings: Settings = {
   timezone: "UTC",
 };
 
+const supportedLanguages = new Set(["en", "de"]);
+
 const SettingsContext = createContext<SettingsContextValue>({
   ...defaultSettings,
   setDefaultCurrency: () => {},
@@ -74,8 +76,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const value: SettingsContextValue = {
     ...settings,
-    setDefaultCurrency: (currency) => updateSettings({ defaultCurrency: currency }),
-    setLanguage: (language) => updateSettings({ language }),
+    setDefaultCurrency: (currency) =>
+      updateSettings({ defaultCurrency: currency }),
+    setLanguage: (language) => {
+      if (typeof document !== "undefined" && supportedLanguages.has(language)) {
+        const secureCookieAttribute =
+          process.env.NODE_ENV === "production" ? ";secure" : "";
+        document.cookie = `NEXT_LOCALE=${language};path=/;max-age=31536000;samesite=lax${secureCookieAttribute}`;
+      }
+      updateSettings({ language });
+    },
     setTimezone: (timezone) => updateSettings({ timezone }),
   };
 

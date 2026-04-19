@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { TransportDocumentType } from "@/lib/rxdb-schema";
@@ -24,31 +25,6 @@ import { allCurrencyCodes } from "@/lib/constants/currencies";
 import { useSettings } from "@/lib/SettingsProvider";
 import { DATETIME_REGEX, formatStoredDateTime } from "@/lib/datetime-utils";
 
-const transportSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200, "Name is too long"),
-  type: z.enum(["flight", "bus", "car", "train"], {
-    message: "Invalid transport type",
-  }),
-  price: z
-    .number()
-    .min(0, "Price must be positive")
-    .max(Number.MAX_SAFE_INTEGER, "Price is too high"),
-  currency: z.string().refine((value) => allCurrencyCodes.includes(value), {
-    message: "Invalid currency",
-  }),
-  departureDateTime: z
-    .string()
-    .regex(DATETIME_REGEX, "Select a departure date and time"),
-  arrivalDateTime: z
-    .string()
-    .regex(DATETIME_REGEX, "Invalid arrival date/time")
-    .or(z.literal(""))
-    .optional(),
-  timezone: z.string().optional(),
-});
-
-export type TransportFormData = z.infer<typeof transportSchema>;
-
 export const Transport = ({
   transport,
   startInEditMode = false,
@@ -56,6 +32,7 @@ export const Transport = ({
   transport: TransportDocumentType;
   startInEditMode?: boolean;
 }) => {
+  const t = useTranslations("transport");
   const time = useTime();
   const { timezone: settingsTimezone } = useSettings();
   const {
@@ -70,6 +47,39 @@ export const Transport = ({
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
+
+  const transportSchema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .min(1, t("errors.nameRequired"))
+          .max(200, t("errors.nameTooLong")),
+        type: z.enum(["flight", "bus", "car", "train"], {
+          message: t("errors.invalidTransportType"),
+        }),
+        price: z
+          .number()
+          .min(0, t("errors.priceMustBePositive"))
+          .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+        currency: z
+          .string()
+          .refine((value) => allCurrencyCodes.includes(value), {
+            message: t("errors.invalidCurrency"),
+          }),
+        departureDateTime: z
+          .string()
+          .regex(DATETIME_REGEX, t("errors.selectDepartureDateTime")),
+        arrivalDateTime: z
+          .string()
+          .regex(DATETIME_REGEX, t("errors.invalidArrivalDateTime"))
+          .or(z.literal(""))
+          .optional(),
+        timezone: z.string().optional(),
+      }),
+    [t],
+  );
+  type TransportFormData = z.infer<typeof transportSchema>;
 
   const {
     register,
@@ -139,7 +149,9 @@ export const Transport = ({
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor={`transport-name-${transport.id}`}>Name</Label>
+              <Label htmlFor={`transport-name-${transport.id}`}>
+                {t("nameLabel")}
+              </Label>
               <Input
                 id={`transport-name-${transport.id}`}
                 {...nameRegistration}
@@ -149,7 +161,7 @@ export const Transport = ({
                 }}
                 type="text"
                 autoFocus
-                placeholder="Transport name"
+                placeholder={t("namePlaceholder")}
                 className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
               />
               {errors.name && (
@@ -159,7 +171,7 @@ export const Transport = ({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="transport-type">Type</Label>
+              <Label htmlFor="transport-type">{t("typeLabel")}</Label>
               <Select
                 value={watchedType}
                 onValueChange={(value) => {
@@ -173,10 +185,10 @@ export const Transport = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="flight">Flight</SelectItem>
-                  <SelectItem value="bus">Bus</SelectItem>
-                  <SelectItem value="car">Car</SelectItem>
-                  <SelectItem value="train">Train</SelectItem>
+                  <SelectItem value="flight">{t("type.flight")}</SelectItem>
+                  <SelectItem value="bus">{t("type.bus")}</SelectItem>
+                  <SelectItem value="car">{t("type.car")}</SelectItem>
+                  <SelectItem value="train">{t("type.train")}</SelectItem>
                 </SelectContent>
               </Select>
               {errors.type && (
@@ -187,7 +199,7 @@ export const Transport = ({
             </div>
             <div className="flex gap-4">
               <div className="space-y-2">
-                <Label htmlFor="transport-price">Price</Label>
+                <Label htmlFor="transport-price">{t("priceLabel")}</Label>
                 <Input
                   id="transport-price"
                   {...register("price", { valueAsNumber: true })}
@@ -201,7 +213,7 @@ export const Transport = ({
                 )}
               </div>
               <div className="w-24 space-y-2">
-                <Label htmlFor="transport-currency">Currency</Label>
+                <Label htmlFor="transport-currency">{t("currencyLabel")}</Label>
                 <CurrencySelect
                   id="transport-currency"
                   name="currency"
@@ -222,7 +234,7 @@ export const Transport = ({
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Departure</Label>
+              <Label>{t("departureLabel")}</Label>
               <Controller
                 control={control}
                 name="departureDateTime"
@@ -230,7 +242,7 @@ export const Transport = ({
                   <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Pick departure date & time"
+                    placeholder={t("departurePlaceholder")}
                     className="w-full"
                   />
                 )}
@@ -243,8 +255,10 @@ export const Transport = ({
             </div>
             <div className="space-y-2">
               <Label>
-                Arrival{" "}
-                <span className="text-muted-foreground text-xs">(optional)</span>
+                {t("arrivalLabel")}{" "}
+                <span className="text-muted-foreground text-xs">
+                  {t("optional")}
+                </span>
               </Label>
               <Controller
                 control={control}
@@ -253,7 +267,7 @@ export const Transport = ({
                   <DateTimePicker
                     value={field.value || undefined}
                     onChange={field.onChange}
-                    placeholder="Pick arrival date & time"
+                    placeholder={t("arrivalPlaceholder")}
                     className="w-full"
                   />
                 )}
@@ -266,8 +280,10 @@ export const Transport = ({
             </div>
             <div className="space-y-2">
               <Label>
-                Timezone{" "}
-                <span className="text-muted-foreground text-xs">(optional)</span>
+                {t("timezoneLabel")}{" "}
+                <span className="text-muted-foreground text-xs">
+                  {t("optional")}
+                </span>
               </Label>
               <Controller
                 control={control}
@@ -282,13 +298,13 @@ export const Transport = ({
               />
             </div>
             <div className="flex gap-2">
-              <Button type="submit">Save</Button>
+              <Button type="submit">{t("save")}</Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditing(false)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </form>
@@ -301,30 +317,29 @@ export const Transport = ({
     <TripItemCard
       onDelete={handleDelete}
       onEdit={() => setIsEditing(true)}
-      deleteLabel="Delete transport"
-      editLabel="Edit transport"
+      deleteLabel={t("deleteAriaLabel")}
+      editLabel={t("editAriaLabel")}
       title={<h4 className="text-lg font-semibold">{name}</h4>}
     >
       <div className="text-muted-foreground mt-2 flex items-center gap-2">
-        <span className="capitalize">{type}</span>
+        <span className="capitalize">{t(`type.${type}`)}</span>
         <span>•</span>
         <span>{price}</span>
         <span>{currency}</span>
       </div>
       <p className="text-muted-foreground mt-2">
-        Departure: {formatDateTime(departureDateTime)}
+        {t("departureDisplay", { value: formatDateTime(departureDateTime) })}
       </p>
       {arrivalDateTime && (
         <p className="text-muted-foreground mt-1">
-          Arrival: {formatDateTime(arrivalDateTime)}
+          {t("arrivalDisplay", { value: formatDateTime(arrivalDateTime) })}
         </p>
       )}
       {timezone && (
         <p className="text-muted-foreground mt-1 text-sm">
-          Timezone: {timezone}
+          {t("timezoneDisplay", { value: timezone })}
         </p>
       )}
     </TripItemCard>
   );
 };
-

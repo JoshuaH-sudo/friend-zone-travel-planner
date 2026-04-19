@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +15,9 @@ import { cn } from "@/lib/utils";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
-function getUtcOffset(tz: string): string {
+function getUtcOffset(tz: string, locale: string): string {
   try {
-    const formatter = new Intl.DateTimeFormat("en", {
+    const formatter = new Intl.DateTimeFormat(locale, {
       timeZone: tz,
       timeZoneName: "shortOffset",
     });
@@ -28,9 +29,9 @@ function getUtcOffset(tz: string): string {
   }
 }
 
-function getCurrentTime(tz: string): string {
+function getCurrentTime(tz: string, locale: string): string {
   try {
-    return new Intl.DateTimeFormat("en", {
+    return new Intl.DateTimeFormat(locale, {
       timeZone: tz,
       hour: "2-digit",
       minute: "2-digit",
@@ -42,10 +43,10 @@ function getCurrentTime(tz: string): string {
 }
 
 /** Numeric UTC offset in minutes, used for stable sorting. */
-function getOffsetMinutes(tz: string): number {
+function getOffsetMinutes(tz: string, locale: string): number {
   try {
     // Intl.DateTimeFormat with timeZoneName:"shortOffset" gives e.g. "GMT+5:30"
-    const formatter = new Intl.DateTimeFormat("en", {
+    const formatter = new Intl.DateTimeFormat(locale, {
       timeZone: tz,
       timeZoneName: "shortOffset",
     });
@@ -92,19 +93,20 @@ interface TimezoneEntry {
   offsetMinutes: number;
 }
 
-// Pre-compute all timezone entries (except current time, which is refreshed on open).
-const ALL_TIMEZONES: Omit<TimezoneEntry, "currentTime">[] = (() => {
+function getAllTimezones(locale: string): Omit<TimezoneEntry, "currentTime">[] {
   const zones: string[] = Intl.supportedValuesOf("timeZone");
   return zones
     .map((tz) => ({
       tz,
       label: tz.replace(/_/g, " "),
       region: getRegion(tz),
-      offset: getUtcOffset(tz),
-      offsetMinutes: getOffsetMinutes(tz),
+      offset: getUtcOffset(tz, locale),
+      offsetMinutes: getOffsetMinutes(tz, locale),
     }))
-    .sort((a, b) => a.offsetMinutes - b.offsetMinutes || a.tz.localeCompare(b.tz));
-})();
+    .sort(
+      (a, b) => a.offsetMinutes - b.offsetMinutes || a.tz.localeCompare(b.tz),
+    );
+}
 
 // ── component ─────────────────────────────────────────────────────────────────
 
@@ -122,18 +124,21 @@ export function TimezonePicker({
   onValueChange,
   className,
 }: TimezonePickerProps) {
+  const t = useTranslations("timezonePicker");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const allTimezones = useMemo(() => getAllTimezones(locale), [locale]);
 
   // Compute current times for all zones once when the dialog opens.
   const currentTimes = useMemo(() => {
     if (!open) return {} as Record<string, string>;
     const map: Record<string, string> = {};
-    for (const entry of ALL_TIMEZONES) {
-      map[entry.tz] = getCurrentTime(entry.tz);
+    for (const entry of allTimezones) {
+      map[entry.tz] = getCurrentTime(entry.tz, locale);
     }
     return map;
-  }, [open]);
+  }, [open, allTimezones, locale]);
 
   const handleSelect = useCallback(
     (tz: string) => {
@@ -154,15 +159,15 @@ export function TimezonePicker({
   }, [handleSelect]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return ALL_TIMEZONES;
+    if (!query.trim()) return allTimezones;
     const q = query.toLowerCase();
-    return ALL_TIMEZONES.filter(
+    return allTimezones.filter(
       (e) =>
         e.label.toLowerCase().includes(q) ||
         e.offset.toLowerCase().includes(q) ||
         e.region.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, allTimezones]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, TimezoneEntry[]>();
@@ -181,31 +186,31 @@ export function TimezonePicker({
 
   // Display label for the trigger button
   const displayLabel = useMemo(() => {
-    const entry = ALL_TIMEZONES.find((e) => e.tz === value);
+    const entry = allTimezones.find((e) => e.tz === value);
     return entry ? `${entry.label} (${entry.offset})` : value;
-  }, [value]);
+  }, [value, allTimezones]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Pick timezone"
+        aria-label={t("pickTimezoneAriaLabel")}
         className={cn(
-          "border-input data-placeholder:text-muted-foreground bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 gap-1.5 rounded-4xl border px-3 py-2 text-sm transition-colors focus-visible:ring-[3px] h-9 flex items-center whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 min-w-0 truncate",
+          "border-input data-placeholder:text-muted-foreground bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 flex h-9 min-w-0 items-center gap-1.5 truncate rounded-4xl border px-3 py-2 text-sm whitespace-nowrap transition-colors outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
       >
         <span className="truncate">{displayLabel}</span>
       </button>
 
-      <DialogContent className="max-w-sm sm:max-w-lg flex flex-col gap-4 p-6">
+      <DialogContent className="flex max-w-sm flex-col gap-4 p-6 sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Select Timezone</DialogTitle>
+          <DialogTitle>{t("selectTimezoneTitle")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Search timezones…"
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1"
@@ -218,7 +223,7 @@ export function TimezonePicker({
             onClick={handleAutoDetect}
             className="shrink-0"
           >
-            Auto-detect
+            {t("autoDetect")}
           </Button>
         </div>
 
@@ -226,7 +231,7 @@ export function TimezonePicker({
           <div className="p-2">
             {grouped.length === 0 && (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                No timezones found.
+                {t("noTimezonesFound")}
               </p>
             )}
             {grouped.map(([region, entries]) => (

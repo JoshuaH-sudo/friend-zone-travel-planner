@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Stop } from "./components/Stop";
 import { TripStats } from "./components/TripStats";
 import { StopItems } from "./components/StopItems";
@@ -17,13 +18,12 @@ import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
 
 function TripDetails() {
+  const t = useTranslations("tripPage");
   const params = useParams();
   const tripId = params.tripId as string;
   const database = useDatabase();
   const { timezone } = useSettings();
-  const [pendingNewStopId, setPendingNewStopId] = useState<string | null>(
-    null,
-  );
+  const [pendingNewStopId, setPendingNewStopId] = useState<string | null>(null);
   const [pendingNewAccommodationId, setPendingNewAccommodationId] = useState<
     string | null
   >(null);
@@ -37,7 +37,9 @@ function TripDetails() {
   useEffect(() => {
     if (!pendingNewStopId) return;
 
-    const createdStopExists = stops.some((stop) => stop.id === pendingNewStopId);
+    const createdStopExists = stops.some(
+      (stop) => stop.id === pendingNewStopId,
+    );
     if (!createdStopExists) return;
 
     document
@@ -118,7 +120,7 @@ function TripDetails() {
 
     await database.stops.insert({
       id: newStopId,
-      name: `New Stop ${stops.length + 1}`,
+      name: t("newStopName", { number: stops.length + 1 }),
       date: latestDate,
       tripId,
       createdAt: Date.now(),
@@ -136,7 +138,7 @@ function TripDetails() {
     const newAccommodationId = generateId();
     await database.accommodations.insert({
       id: newAccommodationId,
-      name: "New Accommodation",
+      name: t("newAccommodationName"),
       price: 0,
       currency: "USD",
       checkIn: stop.date || new Date().toISOString().split("T")[0],
@@ -157,7 +159,7 @@ function TripDetails() {
     const newTransportId = generateId();
     await database.transports.insert({
       id: newTransportId,
-      name: "New Transport",
+      name: t("newTransportName"),
       type: "flight",
       price: 0,
       currency: "USD",
@@ -173,7 +175,7 @@ function TripDetails() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading trip...
+        {t("loading")}
       </div>
     );
   }
@@ -181,13 +183,13 @@ function TripDetails() {
   if (!trip) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Trip not found
+        {t("notFound")}
       </div>
     );
   }
 
   return (
-    <main className="flex min-h-screen max-w-4xl m-auto flex-col items-center px-2 sm:items-start">
+    <main className="m-auto flex min-h-screen max-w-4xl flex-col items-center px-2 sm:items-start">
       <TripNameEditor
         tripName={trip.name}
         onSave={updateTripName}
@@ -196,9 +198,9 @@ function TripDetails() {
       <Separator className="my-6" />
       <TripStats tripId={tripId} tripData={tripData} />
       <Separator className="my-6 mb-4" />
-      <div className="flex items-center justify-end gap-4 w-full mb-4">
+      <div className="mb-4 flex w-full items-center justify-end gap-4">
         <Button onClick={addStop}>
-          Add Stop <HugeiconsIcon icon={Plus} className="ml-2" />
+          {t("addStop")} <HugeiconsIcon icon={Plus} className="ml-2" />
         </Button>
       </div>
       <section id="stops-section" className="w-full text-left">
@@ -218,7 +220,11 @@ function TripDetails() {
                 const transports = transportsByStop[stop.id] || [];
 
                 return (
-                  <li id={`stop-${stop.id}`} key={stop.id} className="relative pl-8">
+                  <li
+                    id={`stop-${stop.id}`}
+                    key={stop.id}
+                    className="relative pl-8"
+                  >
                     <div className="flex w-full items-center gap-4">
                       {/* Icon */}
                       <div className="border-primary bg-background absolute top-3 left-px mb-3 flex size-9 -translate-x-1/2 items-center justify-center rounded-full border-2">
@@ -247,7 +253,7 @@ function TripDetails() {
           </Timeline>
         )}
         <Button className="mt-6 w-full" onClick={addStop}>
-          Add Stop <HugeiconsIcon icon={Plus} className="ml-2" />
+          {t("addStop")} <HugeiconsIcon icon={Plus} className="ml-2" />
         </Button>
       </section>
     </main>
