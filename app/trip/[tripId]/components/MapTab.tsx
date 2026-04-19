@@ -18,7 +18,7 @@ type MapTabProps = {
 };
 
 const markerIcon = L.divIcon({
-  html: `<div style="width:14px;height:14px;border-radius:9999px;background:hsl(150 30% 28%);border:2px solid white;box-shadow:0 2px 10px rgba(0,0,0,.25)"></div>`,
+  html: `<div style="width:14px;height:14px;border-radius:9999px;background:var(--primary);border:2px solid var(--background);box-shadow:var(--shadow-soft)"></div>`,
   className: "",
   iconSize: [14, 14],
   iconAnchor: [7, 7],
@@ -48,16 +48,26 @@ export function MapTab({ stops }: MapTabProps) {
 
     const findCoordinates = async () => {
       const updates: Record<string, Coordinates> = {};
-
+      const uniqueStopsByName = new Map<string, StopDocumentType[]>();
       for (const stop of stops) {
-        if (!stop.name.trim()) continue;
-        if (cache[stop.name]) {
-          updates[stop.id] = cache[stop.name];
+        const name = stop.name.trim();
+        if (!name) continue;
+        if (!uniqueStopsByName.has(name)) {
+          uniqueStopsByName.set(name, []);
+        }
+        uniqueStopsByName.get(name)?.push(stop);
+      }
+
+      for (const [name, stopsWithName] of uniqueStopsByName.entries()) {
+        if (cache[name]) {
+          for (const stop of stopsWithName) {
+            updates[stop.id] = cache[name];
+          }
           continue;
         }
 
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(stop.name)}&format=json&limit=1`,
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`,
           {
             headers: {
               "Accept-Language": "en",
@@ -70,10 +80,16 @@ export function MapTab({ stops }: MapTabProps) {
             lat: Number(result[0].lat),
             lon: Number(result[0].lon),
           };
-          cache[stop.name] = coords;
-          updates[stop.id] = coords;
+          cache[name] = coords;
+          for (const stop of stopsWithName) {
+            updates[stop.id] = coords;
+          }
+          if (!cancelled) {
+            setCoordinatesByStopId((current) => ({ ...current, ...updates }));
+          }
         }
 
+        // Keep a 1 req/sec pace to respect Nominatim usage policy.
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 

@@ -23,6 +23,16 @@ import { useSettings } from "@/lib/SettingsProvider";
 import { convert, formatMoney } from "@/lib/format";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
@@ -33,6 +43,7 @@ export default function TripPage() {
   const { timezone, defaultCurrency } = useSettings();
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { trip, stops, accommodationsByStop, transportsByStop, expenses, loading } =
     useTripData(tripId, { database: db });
 
@@ -167,11 +178,7 @@ export default function TripPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
-                  onClick={async () => {
-                    if (!window.confirm("Delete this trip and all its data?")) return;
-                    await trip.remove();
-                    router.push("/");
-                  }}
+                  onClick={() => setDeleteDialogOpen(true)}
                 >
                   Delete trip
                 </DropdownMenuItem>
@@ -219,12 +226,34 @@ export default function TripPage() {
       {tab === "budget" ? (
         <BudgetTab
           trip={trip}
-          stops={stops}
           accommodationsByStop={accommodationsByStop}
           transportsByStop={transportsByStop}
           expenses={expenses}
         />
       ) : null}
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this trip?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove the trip and all linked stops/items.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={async () => {
+                await trip.remove();
+                router.push("/");
+              }}
+            >
+              Delete trip
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

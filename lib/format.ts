@@ -1,4 +1,5 @@
 export const STATIC_RATES: Record<string, number> = {
+  // Static fallback FX table (updated: 2026-04-19, base USD=1).
   USD: 1,
   EUR: 0.92,
   GBP: 0.79,

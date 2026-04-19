@@ -21,6 +21,7 @@ import { formatMoney, convert } from "@/lib/format";
 import type { ExpenseDocument, StopDocument, TripDocument } from "@/lib/rxdb-schema";
 import { useSettings } from "@/lib/SettingsProvider";
 import { generateId } from "@/lib/rxdb-database";
+import { toast } from "sonner";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
@@ -77,22 +78,32 @@ export default function HomePage() {
   const createTrip = async () => {
     const now = Date.now();
     const nextTripId = generateId();
-    await db.trips.insert({
-      id: nextTripId,
-      name: tripName.trim() || "New Trip",
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    if (firstStopName.trim()) {
-      await db.stops.insert({
-        id: generateId(),
-        name: firstStopName.trim(),
-        date: firstStopDate || new Date().toISOString().slice(0, 10),
-        tripId: nextTripId,
+    let createdTrip: Awaited<ReturnType<typeof db.trips.insert>> | null = null;
+    try {
+      createdTrip = await db.trips.insert({
+        id: nextTripId,
+        name: tripName.trim() || "New Trip",
         createdAt: now,
         updatedAt: now,
       });
+
+      if (firstStopName.trim()) {
+        await db.stops.insert({
+          id: generateId(),
+          name: firstStopName.trim(),
+          date: firstStopDate || new Date().toISOString().slice(0, 10),
+          tripId: nextTripId,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      if (createdTrip) {
+        await createdTrip.remove();
+      }
+      toast.error("Could not create trip.");
+      return;
     }
 
     setTripName("");

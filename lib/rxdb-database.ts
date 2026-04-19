@@ -82,6 +82,9 @@ async function createDatabase(): Promise<MyDatabase> {
   await db.addCollections({
     trips: {
       schema: tripSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
+      },
     },
     stops: {
       schema: stopSchema,

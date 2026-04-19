@@ -10,6 +10,7 @@ type TransportType = (typeof TransportType)[number];
 export type TripDocument = {
   id: string;
   name: string;
+  budget?: number;
   createdAt: number;
   updatedAt: number;
 };
@@ -74,7 +75,7 @@ export type UserSettingsDocument = {
 
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -84,6 +85,12 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
     },
     name: {
       type: "string",
+    },
+    budget: {
+      type: "number",
+      multipleOf: 0.01,
+      minimum: 0,
+      maximum: 100000000,
     },
     createdAt: {
       type: "number",

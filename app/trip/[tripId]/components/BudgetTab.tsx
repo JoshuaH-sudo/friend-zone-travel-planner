@@ -3,11 +3,10 @@
 import type {
   AccommodationDocumentType,
   ExpenseDocumentType,
-  StopDocumentType,
   TransportDocumentType,
   TripDocumentType,
 } from "@/lib/rxdb-schema";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CurrencySelect } from "@/components/ui/currency-select";
@@ -19,7 +18,6 @@ import { useDatabase } from "@/lib/DatabaseProvider";
 
 type BudgetTabProps = {
   trip: TripDocumentType;
-  stops: StopDocumentType[];
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
   expenses: ExpenseDocumentType[];
@@ -27,24 +25,21 @@ type BudgetTabProps = {
 
 export function BudgetTab({
   trip,
-  stops,
   accommodationsByStop,
   transportsByStop,
   expenses,
 }: BudgetTabProps) {
   const db = useDatabase();
   const { defaultCurrency } = useSettings();
-  const budgetStorageKey = `trip-budget-${trip.id}`;
-  const [budgetValue, setBudgetValue] = useState(
-    () =>
-      typeof window === "undefined"
-        ? "0"
-        : (localStorage.getItem(budgetStorageKey) ?? "0"),
-  );
+  const [budgetValue, setBudgetValue] = useState(String(trip.budget ?? 0));
   const [expenseDescription, setExpenseDescription] = useState("");
   const [expensePrice, setExpensePrice] = useState("0");
   const [expenseCurrency, setExpenseCurrency] = useState(defaultCurrency);
   const [expenseDate, setExpenseDate] = useState(new Date().toISOString().slice(0, 10));
+
+  useEffect(() => {
+    setBudgetValue(String(trip.budget ?? 0));
+  }, [trip.budget]);
 
   const totals = useMemo(() => {
     const accommodationTotal = Object.values(accommodationsByStop)
@@ -84,7 +79,10 @@ export function BudgetTab({
           />
           <Button
             onClick={async () => {
-              localStorage.setItem(budgetStorageKey, String(Number(budgetValue) || 0));
+              await trip.patch({
+                budget: Number(budgetValue) || 0,
+                updatedAt: Date.now(),
+              });
             }}
           >
             Save budget
@@ -118,7 +116,7 @@ export function BudgetTab({
             await db.expenses.insert({
               id: generateId(),
               tripId: trip.id,
-              stopId: stops[0]?.id,
+              stopId: undefined,
               category: "other",
               description: expenseDescription.trim(),
               price: Number(expensePrice) || 0,

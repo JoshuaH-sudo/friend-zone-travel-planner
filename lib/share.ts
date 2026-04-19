@@ -18,6 +18,10 @@ type ShareBundle = {
   expenses: ExpenseDocument[];
 };
 
+function todayDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 async function getShareBundle(db: MyDatabase, tripId: string): Promise<ShareBundle> {
   const trip = await db.trips.findOne(tripId).exec();
   if (!trip) {
@@ -26,9 +30,16 @@ async function getShareBundle(db: MyDatabase, tripId: string): Promise<ShareBund
 
   const stops = await db.stops.find({ selector: { tripId } }).exec();
   const stopIds = new Set(stops.map((stop) => stop.id));
+  const stopIdList = [...stopIds];
   const [accommodations, transports, expenses] = await Promise.all([
-    db.accommodations.find().exec(),
-    db.transports.find().exec(),
+    stopIdList.length
+      ? db.accommodations
+          .find({ selector: { stopId: { $in: stopIdList } } })
+          .exec()
+      : Promise.resolve([]),
+    stopIdList.length
+      ? db.transports.find({ selector: { stopId: { $in: stopIdList } } }).exec()
+      : Promise.resolve([]),
     db.expenses.find({ selector: { tripId } }).exec(),
   ]);
 
@@ -36,12 +47,8 @@ async function getShareBundle(db: MyDatabase, tripId: string): Promise<ShareBund
     v: 1,
     trip: trip.toJSON(),
     stops: stops.map((stop) => stop.toJSON()),
-    accommodations: accommodations
-      .filter((doc) => stopIds.has(doc.stopId))
-      .map((doc) => doc.toJSON()),
-    transports: transports
-      .filter((doc) => stopIds.has(doc.stopId))
-      .map((doc) => doc.toJSON()),
+    accommodations: accommodations.map((doc) => doc.toJSON()),
+    transports: transports.map((doc) => doc.toJSON()),
     expenses: expenses.map((doc) => doc.toJSON()),
   };
 }
@@ -83,28 +90,24 @@ export async function importSharedTrip(db: MyDatabase, encoded: string) {
   const now = Date.now();
   const tripId = nanoid();
   const stopIdMap = new Map<string, string>();
-  const tripName =
-    typeof payload.trip.name === "string" && payload.trip.name.trim()
-      ? payload.trip.name
-      : "Imported Trip";
 
   await db.trips.insert({
     id: tripId,
-    name: tripName,
+    name: payload.trip.name || "Imported Trip",
     createdAt: now,
     updatedAt: now,
   });
 
   for (const stop of payload.stops) {
     const newStopId = nanoid();
-    stopIdMap.set(String(stop.id), newStopId);
+    stopIdMap.set(stop.id, newStopId);
     await db.stops.insert({
       id: newStopId,
       name: typeof stop.name === "string" ? stop.name : "Stop",
       date:
         typeof stop.date === "string"
           ? stop.date.slice(0, 10)
-          : new Date().toISOString().slice(0, 10),
+          : todayDate(),
       tripId,
       createdAt: now,
       updatedAt: now,
@@ -140,7 +143,7 @@ export async function importSharedTrip(db: MyDatabase, encoded: string) {
       ...expense,
       id: nanoid(),
       tripId,
-      stopId: expense.stopId ? stopIdMap.get(String(expense.stopId)) : undefined,
+      stopId: expense.stopId ? stopIdMap.get(expense.stopId) : undefined,
       createdAt: now,
       updatedAt: now,
     });

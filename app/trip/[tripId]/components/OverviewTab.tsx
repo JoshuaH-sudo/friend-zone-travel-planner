@@ -25,6 +25,7 @@ import { useMemo, useState } from "react";
 import { SortableStopCard } from "./SortableStopCard";
 import { StopItemForm } from "./StopItemForm";
 import { toast } from "sonner";
+import { addDays, format } from "date-fns";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -36,9 +37,7 @@ type OverviewTabProps = {
 };
 
 function shiftDate(base: string, plusDays: number) {
-  const date = new Date(`${base}T00:00:00`);
-  date.setDate(date.getDate() + plusDays);
-  return date.toISOString().slice(0, 10);
+  return format(addDays(new Date(`${base}T00:00:00`), plusDays), "yyyy-MM-dd");
 }
 
 export function OverviewTab({
@@ -91,13 +90,25 @@ export function OverviewTab({
     const nextOrder = arrayMove(activeOrder, from, to);
     const previousOrder = [...activeOrder];
     setOrder(nextOrder);
-    await persistOrder(nextOrder);
+    try {
+      await persistOrder(nextOrder);
+    } catch (error) {
+      console.error(error);
+      setOrder(previousOrder);
+      toast.error("Could not reorder stops.");
+      return;
+    }
     toast("Stop order updated.", {
       action: {
         label: "Undo",
         onClick: async () => {
-          setOrder(previousOrder);
-          await persistOrder(previousOrder);
+          try {
+            setOrder(previousOrder);
+            await persistOrder(previousOrder);
+          } catch (error) {
+            console.error(error);
+            toast.error("Undo failed.");
+          }
         },
       },
     });
