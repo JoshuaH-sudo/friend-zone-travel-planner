@@ -148,7 +148,7 @@ export function StopItems({
       const secondStartTime = secondRange.startTime;
       const secondEndTime = secondRange.endTime;
       const overlaps =
-        firstStartTime <= secondEndTime && secondStartTime <= firstEndTime;
+        firstStartTime < secondEndTime && secondStartTime < firstEndTime;
 
       if (!overlaps) {
         continue;
