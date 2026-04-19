@@ -133,7 +133,7 @@ export function StopItems({
       type: "accommodation" as const,
       date: acc.checkIn,
     })),
-  ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  ].sort((a, b) => toTime(a.date) - toTime(b.date));
 
   const overlapWarnings: Record<string, string[]> = {};
   for (let i = 0; i < items.length; i++) {
