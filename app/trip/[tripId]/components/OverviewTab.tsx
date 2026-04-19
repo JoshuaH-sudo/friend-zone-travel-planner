@@ -306,13 +306,13 @@ export function OverviewTab({
           value={newStopName}
           onChange={(event) => setNewStopName(event.target.value)}
           placeholder={t("addStop.placeholder")}
-          className="min-w-56 flex-1 rounded-xl bg-white/80"
+          className="min-w-56 flex-1 rounded-xl bg-input"
         />
         <Input
           type="date"
           value={newStopDate}
           onChange={(event) => setNewStopDate(event.target.value)}
-          className="w-40 rounded-xl bg-white/80"
+          className="w-40 rounded-xl bg-input"
         />
         <Button type="submit" className="h-10 rounded-xl px-4">
           {t("addStop.submit")}
