@@ -4,6 +4,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
+import {
   useTripData,
   type UseTripDataResult,
 } from "@/components/hooks/useTripData";
@@ -22,6 +26,14 @@ export function TripStats({
   const { trip, stops, accommodationsByStop, transportsByStop } =
     resolvedTripData;
 
+  const formatDate = (value: string) => {
+    const parsed = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return value;
+    }
+    return parsed.toLocaleDateString(locale);
+  };
+
   const stats = useMemo(() => {
     const currencyTotals: Record<string, number> = {};
     let stopCount = 0;
@@ -30,6 +42,8 @@ export function TripStats({
     let startDate: string | null = null;
     let endDate: string | null = null;
     let totalDays = 0;
+    let startTimestamp: number | null = null;
+    let endTimestamp: number | null = null;
 
     if (!trip) {
       return {
@@ -45,12 +59,49 @@ export function TripStats({
 
     stops.forEach((stop) => {
       stopCount++;
-
-      if (!startDate || stop.date < startDate) {
-        startDate = stop.date;
+      const stopItemDates = [
+        ...(accommodationsByStop[stop.id] || []).flatMap((acc) => [
+          acc.checkIn,
+          acc.checkOut,
+        ]),
+        ...(transportsByStop[stop.id] || []).flatMap((trans) => [
+          trans.departureDateTime,
+          trans.arrivalDateTime || trans.departureDateTime,
+        ]),
+      ].filter(Boolean);
+      const stopStart = stopItemDates.reduce(
+        (earliest, current) =>
+          getStoredDateTimeTimestamp(current, {
+            dateOnlyBoundary: "start",
+          }) <
+          getStoredDateTimeTimestamp(earliest, {
+            dateOnlyBoundary: "start",
+          })
+            ? current
+            : earliest,
+        stop.date,
+      );
+      const stopEnd = stopItemDates.reduce(
+        (latest, current) =>
+          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "end" }) >
+          getStoredDateTimeTimestamp(latest, { dateOnlyBoundary: "end" })
+            ? current
+            : latest,
+        stop.date,
+      );
+      const stopStartTimestamp = getStoredDateTimeTimestamp(stopStart, {
+        dateOnlyBoundary: "start",
+      });
+      const stopEndTimestamp = getStoredDateTimeTimestamp(stopEnd, {
+        dateOnlyBoundary: "end",
+      });
+      if (startTimestamp === null || stopStartTimestamp < startTimestamp) {
+        startTimestamp = stopStartTimestamp;
+        startDate = stopStart;
       }
-      if (!endDate || stop.date > endDate) {
-        endDate = stop.date;
+      if (endTimestamp === null || stopEndTimestamp > endTimestamp) {
+        endTimestamp = stopEndTimestamp;
+        endDate = stopEnd;
       }
 
       (accommodationsByStop[stop.id] || []).forEach((acc) => {
@@ -66,9 +117,12 @@ export function TripStats({
       });
     });
 
+    const startDay = startDate ? startDate.split("T")[0] : null;
+    const endDay = endDate ? endDate.split("T")[0] : null;
     totalDays =
-      startDate && endDate
-        ? (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+      startDay && endDay
+        ? (getStoredDateTimeTimestamp(endDay, { dateOnlyBoundary: "start" }) -
+            getStoredDateTimeTimestamp(startDay, { dateOnlyBoundary: "start" })) /
             (1000 * 60 * 60 * 24) +
           1
         : 0;
@@ -108,11 +162,11 @@ export function TripStats({
             <span className="font-medium">{t("durationLabel")}</span>
             <span className="text-muted-foreground">
               {stats.startDate
-                ? new Date(stats.startDate).toLocaleDateString(locale)
+                ? formatDate(stats.startDate)
                 : t("notAvailable")}{" "}
               →{" "}
               {stats.endDate
-                ? new Date(stats.endDate).toLocaleDateString(locale)
+                ? formatDate(stats.endDate)
                 : t("notAvailable")}
             </span>
           </div>
