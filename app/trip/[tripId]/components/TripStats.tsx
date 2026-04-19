@@ -72,6 +72,7 @@ export function TripStats({
             (1000 * 60 * 60 * 24) +
           1
         : 0;
+    totalDays = Math.max(0, Math.round(totalDays));
 
     return {
       currencyTotals,
