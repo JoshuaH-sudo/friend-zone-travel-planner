@@ -18,6 +18,7 @@ import {
 
 /** Parse an ISO date or datetime string into a Date.
  * Parses in local time to avoid UTC midnight shifts.
+ * Returns undefined when the input cannot be parsed safely.
  */
 function parseDateTimeValue(value: string): Date | undefined {
   const parsedStoredDate = parseStoredDateTime(value);

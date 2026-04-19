@@ -59,7 +59,8 @@ export function getStoredDateTimeTimestamp(
   if (parsed) {
     return parsed.getTime();
   }
-  return NaN;
+  // Sentinel for invalid/unexpected values.
+  return 0;
 }
 
 /**
