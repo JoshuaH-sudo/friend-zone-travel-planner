@@ -32,8 +32,20 @@ type OverviewTabProps = {
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
   onAddStop: (name: string, date: string) => Promise<void>;
-  onAddAccommodation: (stopId: string, name: string, date: string) => Promise<void>;
-  onAddTransport: (stopId: string, name: string, date: string) => Promise<void>;
+  onAddAccommodation: (
+    stopId: string,
+    payload: { name: string; price: number; currency: string; checkIn: string; checkOut: string },
+  ) => Promise<void>;
+  onAddTransport: (
+    stopId: string,
+    payload: {
+      name: string;
+      price: number;
+      currency: string;
+      departureDateTime: string;
+      arrivalDateTime: string;
+    },
+  ) => Promise<void>;
 };
 
 function shiftDate(base: string, plusDays: number) {
@@ -117,9 +129,10 @@ export function OverviewTab({
   return (
     <div className="flex flex-col gap-4">
       <StopItemForm
+        kind="stop"
         placeholder="Add stop"
         onSubmit={async ({ name, date }) => {
-          await onAddStop(name, date);
+          await onAddStop(name, date ?? new Date().toISOString().slice(0, 10));
         }}
       />
       <DndContext
@@ -141,10 +154,24 @@ export function OverviewTab({
                         </p>
                       ))}
                       <StopItemForm
+                        kind="accommodation"
                         placeholder="Add accommodation"
                         defaultDate={stop.date}
-                        onSubmit={async ({ name, date }) => {
-                          await onAddAccommodation(stop.id, name, date);
+                        onSubmit={async ({
+                          name,
+                          price,
+                          currency,
+                          startDateTime,
+                          endDateTime,
+                        }) => {
+                          if (!startDateTime || !endDateTime) return;
+                          await onAddAccommodation(stop.id, {
+                            name,
+                            price,
+                            currency,
+                            checkIn: startDateTime,
+                            checkOut: endDateTime,
+                          });
                         }}
                       />
                     </div>
@@ -158,10 +185,24 @@ export function OverviewTab({
                         </p>
                       ))}
                       <StopItemForm
+                        kind="transport"
                         placeholder="Add transport"
                         defaultDate={stop.date}
-                        onSubmit={async ({ name, date }) => {
-                          await onAddTransport(stop.id, name, date);
+                        onSubmit={async ({
+                          name,
+                          price,
+                          currency,
+                          startDateTime,
+                          endDateTime,
+                        }) => {
+                          if (!startDateTime || !endDateTime) return;
+                          await onAddTransport(stop.id, {
+                            name,
+                            price,
+                            currency,
+                            departureDateTime: startDateTime,
+                            arrivalDateTime: endDateTime,
+                          });
                         }}
                       />
                     </div>

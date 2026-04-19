@@ -4,20 +4,34 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type StopItemFormProps = {
+  kind: "stop" | "accommodation" | "transport";
   placeholder: string;
   defaultDate?: string;
   onSubmit: (payload: {
     name: string;
     price: number;
     currency: string;
-    date: string;
+    date?: string;
+    startDateTime?: string;
+    endDateTime?: string;
     status: "booked" | "planned" | "cancelled";
   }) => Promise<void> | void;
 };
 
+function getDefaultDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function toDateTimeLocal(value: string | undefined, fallbackTime: string) {
+  const date = value && value.length >= 10 ? value.slice(0, 10) : getDefaultDate();
+  return `${date}T${fallbackTime}`;
+}
+
 export function StopItemForm({
+  kind,
   placeholder,
   defaultDate,
   onSubmit,
@@ -25,7 +39,13 @@ export function StopItemForm({
   const [name, setName] = useState("");
   const [price, setPrice] = useState("0");
   const [currency, setCurrency] = useState("USD");
-  const [date, setDate] = useState(defaultDate ?? new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(defaultDate ?? getDefaultDate());
+  const [startDateTime, setStartDateTime] = useState(
+    toDateTimeLocal(defaultDate, kind === "accommodation" ? "14:00" : "12:00"),
+  );
+  const [endDateTime, setEndDateTime] = useState(
+    toDateTimeLocal(defaultDate, kind === "accommodation" ? "11:00" : "13:00"),
+  );
   const [status, setStatus] = useState<"booked" | "planned" | "cancelled">(
     "planned",
   );
@@ -40,7 +60,9 @@ export function StopItemForm({
           name: name.trim(),
           price: Number(price) || 0,
           currency,
-          date,
+          date: kind === "stop" ? date : undefined,
+          startDateTime: kind === "stop" ? undefined : startDateTime,
+          endDateTime: kind === "stop" ? undefined : endDateTime,
           status,
         });
         setName("");
@@ -66,7 +88,36 @@ export function StopItemForm({
         onValueChange={(value) => value && setCurrency(value)}
         currencies="custom"
       />
-      <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+      {kind === "stop" ? (
+        <Input
+          type="date"
+          value={date}
+          onChange={(event) => setDate(event.target.value)}
+        />
+      ) : (
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="flex flex-col gap-1">
+            <Label className="text-xs">
+              {kind === "accommodation" ? "Check-in" : "Departure"}
+            </Label>
+            <Input
+              type="datetime-local"
+              value={startDateTime}
+              onChange={(event) => setStartDateTime(event.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label className="text-xs">
+              {kind === "accommodation" ? "Check-out" : "Arrival"}
+            </Label>
+            <Input
+              type="datetime-local"
+              value={endDateTime}
+              onChange={(event) => setEndDateTime(event.target.value)}
+            />
+          </div>
+        </div>
+      )}
       <div className="flex items-center gap-1">
         {(["booked", "planned", "cancelled"] as const).map((value) => (
           <Button

@@ -88,30 +88,48 @@ export default function TripPage() {
     });
   };
 
-  const onAddAccommodation = async (stopId: string, name: string, date: string) => {
+  const onAddAccommodation = async (
+    stopId: string,
+    payload: {
+      name: string;
+      price: number;
+      currency: string;
+      checkIn: string;
+      checkOut: string;
+    },
+  ) => {
     await db.accommodations.insert({
       id: generateId(),
       stopId,
-      name,
-      checkIn: date,
-      checkOut: date,
-      price: 0,
-      currency: defaultCurrency,
+      name: payload.name,
+      checkIn: payload.checkIn,
+      checkOut: payload.checkOut,
+      price: payload.price,
+      currency: payload.currency || defaultCurrency,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
   };
 
-  const onAddTransport = async (stopId: string, name: string, date: string) => {
+  const onAddTransport = async (
+    stopId: string,
+    payload: {
+      name: string;
+      price: number;
+      currency: string;
+      departureDateTime: string;
+      arrivalDateTime: string;
+    },
+  ) => {
     await db.transports.insert({
       id: generateId(),
       stopId,
-      name,
+      name: payload.name,
       type: "flight",
-      departureDateTime: `${date}T12:00`,
-      arrivalDateTime: `${date}T13:00`,
-      price: 0,
-      currency: defaultCurrency,
+      departureDateTime: payload.departureDateTime,
+      arrivalDateTime: payload.arrivalDateTime,
+      price: payload.price,
+      currency: payload.currency || defaultCurrency,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
