@@ -114,9 +114,14 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h2 className="text-2xl font-bold">{t("title")}</h2>
+      <div className="flex flex-col gap-2">
+        <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
+        <p className="text-muted-foreground">
+          Manage defaults for planning, backup, and local device data.
+        </p>
+      </div>
 
-      <section className="flex flex-col gap-4">
+      <section className="bg-card shadow-soft flex flex-col gap-4 rounded-2xl border p-6">
         <h3 className="text-muted-foreground text-lg font-semibold">
           {t("general.title")}
         </h3>
@@ -211,7 +216,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="bg-card shadow-soft flex flex-col gap-4 rounded-2xl border p-6">
         <h3 className="text-muted-foreground text-lg font-semibold">
           {t("backup.title")}
         </h3>
@@ -242,7 +247,7 @@ export default function SettingsPage() {
                   variant="destructive"
                   disabled={isExporting || isImporting || isResetting}
                 >
-                  {t("backup.reset")}
+                  Wipe all data
                 </Button>
               }
               title={t("backup.resetConfirmTitle")}

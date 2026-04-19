@@ -52,6 +52,19 @@ export type TransportDocument = {
   updatedAt: number;
 };
 
+export type ExpenseDocument = {
+  id: string;
+  tripId: string;
+  stopId?: string;
+  category: "food" | "activity" | "shopping" | "other";
+  description: string;
+  price: number;
+  currency: Currency;
+  date: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
 export type UserSettingsDocument = {
   id: string;
   defaultCurrency: string;
@@ -263,6 +276,74 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
   indexes: ["stopId", "departureDateTime"],
 };
 
+export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: {
+      type: "string",
+      maxLength: 100,
+    },
+    tripId: {
+      type: "string",
+      maxLength: 100,
+      ref: "trips",
+    },
+    stopId: {
+      type: "string",
+      maxLength: 100,
+      ref: "stops",
+    },
+    category: {
+      type: "string",
+      enum: ["food", "activity", "shopping", "other"],
+    },
+    description: {
+      type: "string",
+      maxLength: 300,
+    },
+    price: {
+      type: "number",
+      multipleOf: 0.01,
+      minimum: 0,
+      maximum: 1000000,
+    },
+    currency: {
+      type: "string",
+      enum: allCurrencyCodes,
+    },
+    date: {
+      type: "string",
+      maxLength: 100,
+    },
+    createdAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+    updatedAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+  },
+  required: [
+    "id",
+    "tripId",
+    "category",
+    "description",
+    "price",
+    "currency",
+    "date",
+    "createdAt",
+    "updatedAt",
+  ],
+  indexes: ["tripId", "date"],
+};
+
 // RxDocument types
 export type TripDocMethods = Record<string, never>;
 export type TripDocumentType = RxDocument<TripDocument, TripDocMethods>;
@@ -281,6 +362,9 @@ export type TransportDocumentType = RxDocument<
   TransportDocument,
   TransportDocMethods
 >;
+
+export type ExpenseDocMethods = Record<string, never>;
+export type ExpenseDocumentType = RxDocument<ExpenseDocument, ExpenseDocMethods>;
 
 // RxCollection types
 export type TripCollectionMethods = Record<string, never>;
@@ -309,6 +393,13 @@ export type TransportCollection = RxCollection<
   TransportDocument,
   TransportDocMethods,
   TransportCollectionMethods
+>;
+
+export type ExpenseCollectionMethods = Record<string, never>;
+export type ExpenseCollection = RxCollection<
+  ExpenseDocument,
+  ExpenseDocMethods,
+  ExpenseCollectionMethods
 >;
 
 export const USER_SETTINGS_ID = "user-settings";

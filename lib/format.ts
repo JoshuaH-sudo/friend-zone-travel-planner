@@ -1,0 +1,49 @@
+export const STATIC_RATES: Record<string, number> = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.79,
+  CAD: 1.37,
+  AUD: 1.53,
+  NZD: 1.67,
+  SEK: 10.52,
+  NOK: 10.87,
+  DKK: 6.87,
+};
+
+export function convert(
+  amount: number,
+  from: string,
+  to: string,
+  rates: Record<string, number> = STATIC_RATES,
+) {
+  if (!Number.isFinite(amount)) return 0;
+  const fromRate = rates[from] ?? 1;
+  const toRate = rates[to] ?? 1;
+  return (amount / fromRate) * toRate;
+}
+
+export function formatMoney(amount: number, currency: string, locale = "en-US") {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2,
+  }).format(Number.isFinite(amount) ? amount : 0);
+}
+
+export function formatDateRange(start?: string, end?: string) {
+  if (!start && !end) return "No dates";
+  if (start && !end) return start;
+  if (!start && end) return end;
+  if (start === end) return start ?? "";
+  return `${start} → ${end}`;
+}
+
+export function daysBetween(start?: string, end?: string) {
+  if (!start || !end) return 0;
+  const startAt = new Date(start).getTime();
+  const endAt = new Date(end).getTime();
+  if (!Number.isFinite(startAt) || !Number.isFinite(endAt) || endAt < startAt) {
+    return 0;
+  }
+  return Math.max(1, Math.ceil((endAt - startAt) / 86_400_000));
+}
