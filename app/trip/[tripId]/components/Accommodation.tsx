@@ -1,27 +1,14 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { AccommodationDocumentType } from "@/lib/rxdb-schema";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import useTime from "@/components/hooks/useTime";
-import { CurrencySelect } from "@/components/ui/currency-select";
-import { TimezonePicker } from "@/components/ui/timezone-picker";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
-import { allCurrencyCodes } from "@/lib/constants/currencies";
-import { useSettings } from "@/lib/SettingsProvider";
 import { formatMoney } from "@/lib/format";
-import {
-  DATE_OR_DATETIME_REGEX,
-  formatStoredDateTime,
-} from "@/lib/datetime-utils";
-import { MS_PER_DAY } from "@/lib/constants/time";
+import { formatStoredDateTime } from "@/lib/datetime-utils";
 import { AlertTriangle, Bed, Pencil, Trash2 } from "lucide-react";
+import { AccommodationForm } from "./AccommodationForm";
 
 export const Accommodation = ({
   accommodation,
@@ -36,85 +23,17 @@ export const Accommodation = ({
 }) => {
   const t = useTranslations("accommodation");
   const time = useTime();
-  const { timezone: settingsTimezone } = useSettings();
   const { name, price, currency, checkIn, checkOut, timezone } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
-  const nameInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Accepts "YYYY-MM-DDTHH:MM" (new) or "YYYY-MM-DD" (legacy) stored values.
-  const accommodationSchema = useMemo(
-    () =>
-      z
-        .object({
-          name: z
-            .string()
-            .min(1, t("errors.nameRequired"))
-            .max(200, t("errors.nameTooLong")),
-          price: z
-            .number()
-            .min(0, t("errors.priceMustBePositive"))
-            .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
-          currency: z
-            .string()
-            .refine((value) => allCurrencyCodes.includes(value), {
-              message: t("errors.invalidCurrency"),
-            }),
-          checkIn: z
-            .string()
-            .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckInDateTime")),
-          checkOut: z
-            .string()
-            .regex(DATE_OR_DATETIME_REGEX, t("errors.selectCheckOutDateTime")),
-          timezone: z.string().optional(),
-        })
-        .refine((data) => new Date(data.checkOut) >= new Date(data.checkIn), {
-          message: t("errors.checkOutAfterCheckIn"),
-          path: ["checkOut"],
-        }),
-    [t],
-  );
-  type AccommodationFormData = z.infer<typeof accommodationSchema>;
-
-  const {
-    handleSubmit,
-    watch,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm<AccommodationFormData>({
-    resolver: zodResolver(accommodationSchema),
-    defaultValues: {
-      name,
-      price,
-      currency,
-      checkIn,
-      checkOut,
-      timezone: timezone ?? settingsTimezone,
-    },
-  });
-
-  const watchedCurrency = watch("currency");
-  const watchedCheckIn = watch("checkIn");
-  const datePresets = [
-    { label: t("datePresetToday"), date: new Date() },
-    { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
-    {
-      label: t("datePresetIn7Days"),
-      date: new Date(Date.now() + 7 * MS_PER_DAY),
-    },
-  ];
+  const didAutofocusRef = useRef(false);
 
   useEffect(() => {
     if (!startInEditMode) return;
 
     setIsEditing(true);
     setHighlightNameInput(true);
-
-    requestAnimationFrame(() => {
-      nameInputRef.current?.focus();
-      nameInputRef.current?.select();
-    });
+    didAutofocusRef.current = true;
 
     const timeout = setTimeout(() => {
       setHighlightNameInput(false);
@@ -123,10 +42,17 @@ export const Accommodation = ({
     return () => clearTimeout(timeout);
   }, [startInEditMode]);
 
-  const onSubmit = async (data: AccommodationFormData) => {
+  const onSubmit = async (data: {
+    name: string;
+    price: number;
+    currency: string;
+    checkIn: string;
+    checkOut: string;
+    timezone?: string;
+  }) => {
     await accommodation.patch({
       name: data.name,
-      price: Math.round(data.price * 100) / 100,
+      price: data.price,
       currency: data.currency,
       checkIn: data.checkIn,
       checkOut: data.checkOut,
@@ -147,166 +73,24 @@ export const Accommodation = ({
     return (
       <Card>
         <CardContent className="px-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {warningSummary && (
-              <p className="text-destructive flex items-center gap-2 text-sm">
-                <AlertTriangle className="h-4 w-4 shrink-0" />
-                {warningSummary}
-              </p>
-            )}
-            <div className="space-y-2">
-              <Controller
-                control={control}
-                name="name"
-                render={({ field }) => (
-                  <>
-                    <Label htmlFor="accommodation-name">{t("nameLabel")}</Label>
-                    <Input
-                      id={`accommodation-name-${accommodation.id}`}
-                      {...field}
-                      ref={(element) => {
-                        field.ref(element);
-                        nameInputRef.current = element;
-                      }}
-                      type="text"
-                      autoFocus
-                      placeholder={t("namePlaceholder")}
-                      className={
-                        highlightNameInput ? "ring-primary/40 ring-2" : ""
-                      }
-                    />
-                  </>
-                )}
-              />
-              {errors.name && (
-                <p className="text-destructive text-sm">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-            <div className="flex gap-4">
-              <div className="space-y-2">
-                <Controller
-                  control={control}
-                  name="price"
-                  render={({ field }) => (
-                    <>
-                      <Label htmlFor="accommodation-price">
-                        {t("priceLabel")}
-                      </Label>
-                      <Input
-                        id="accommodation-price"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
-                        type="number"
-                        step="0.01"
-                      />
-                    </>
-                  )}
-                />
-                {errors.price && (
-                  <p className="text-destructive text-sm">
-                    {errors.price.message}
-                  </p>
-                )}
-              </div>
-              <div className="w-24 space-y-2">
-                <Label htmlFor="accommodation-currency">
-                  {t("currencyLabel")}
-                </Label>
-                <CurrencySelect
-                  id="accommodation-currency"
-                  name="currency"
-                  value={watchedCurrency}
-                  onValueChange={(value) => {
-                    if (!value) return;
-                    setValue("currency", value, { shouldValidate: true });
-                  }}
-                />
-                {errors.currency && (
-                  <p className="text-destructive text-sm">
-                    {errors.currency.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>{t("checkInLabel")}</Label>
-              <Controller
-                control={control}
-                name="checkIn"
-                render={({ field }) => (
-                  <DateTimePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder={t("checkInPlaceholder")}
-                    className="w-full"
-                    highlightedDates={highlightedDates}
-                    presets={datePresets}
-                  />
-                )}
-              />
-              {errors.checkIn && (
-                <p className="text-destructive text-sm">
-                  {errors.checkIn.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label>{t("checkOutLabel")}</Label>
-              <Controller
-                control={control}
-                name="checkOut"
-                render={({ field }) => (
-                  <DateTimePicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder={t("checkOutPlaceholder")}
-                    className="w-full"
-                    highlightedDates={highlightedDates}
-                    pairedHighlightDate={watchedCheckIn}
-                    presets={datePresets}
-                  />
-                )}
-              />
-              {errors.checkOut && (
-                <p className="text-destructive text-sm">
-                  {errors.checkOut.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label>
-                {t("timezoneLabel")}{" "}
-                <span className="text-muted-foreground text-xs">
-                  {t("optional")}
-                </span>
-              </Label>
-              <Controller
-                control={control}
-                name="timezone"
-                render={({ field }) => (
-                  <TimezonePicker
-                    value={field.value || settingsTimezone}
-                    onValueChange={field.onChange}
-                    className="w-full"
-                  />
-                )}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button type="submit">{t("save")}</Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsEditing(false)}
-              >
-                {t("cancel")}
-              </Button>
-            </div>
-          </form>
+          <AccommodationForm
+            initialValues={{
+              name,
+              price,
+              currency,
+              checkIn,
+              checkOut,
+              timezone,
+            }}
+            onSubmit={onSubmit}
+            onCancel={() => setIsEditing(false)}
+            submitLabel={t("save")}
+            cancelLabel={t("cancel")}
+            warningSummary={warningSummary}
+            highlightedDates={highlightedDates}
+            autoFocusName={didAutofocusRef.current}
+            highlightNameInput={highlightNameInput}
+          />
         </CardContent>
       </Card>
     );
@@ -318,7 +102,7 @@ export const Accommodation = ({
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-foreground">{name}</p>
         <p className="text-xs text-muted-foreground">
-          {formatDateTime(checkIn)}{" -> "}{formatDateTime(checkOut)}
+          {formatDateTime(checkIn)}{"→"}{formatDateTime(checkOut)}
         </p>
         {timezone && (
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -339,7 +123,10 @@ export const Accommodation = ({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsEditing(true)}
+          onClick={() => {
+            didAutofocusRef.current = true;
+            setIsEditing(true);
+          }}
           aria-label={t("editAriaLabel")}
           className="h-7 w-7 text-muted-foreground hover:text-foreground"
         >

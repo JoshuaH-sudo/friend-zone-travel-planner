@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type {
   AccommodationDocumentType,
   StopDocumentType,
@@ -23,11 +24,12 @@ import type {
 } from "@/lib/rxdb-schema";
 import { useMemo, useState } from "react";
 import { SortableStopCard } from "./SortableStopCard";
-import { StopItemForm } from "./StopItemForm";
 import { toast } from "sonner";
 import { addDays, format } from "date-fns";
 import { Transport } from "./Transport";
 import { Accommodation } from "./Accommodation";
+import { AccommodationForm } from "./AccommodationForm";
+import { TransportForm } from "./TransportForm";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -60,6 +62,10 @@ function shiftDate(base: string, plusDays: number) {
   return format(addDays(new Date(`${base}T00:00:00`), plusDays), "yyyy-MM-dd");
 }
 
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export function OverviewTab({
   stops,
   accommodationsByStop,
@@ -73,6 +79,13 @@ export function OverviewTab({
     [stops],
   );
   const [order, setOrder] = useState<string[]>([]);
+  const [addingAccommodationForStopId, setAddingAccommodationForStopId] =
+    useState<string | null>(null);
+  const [addingTransportForStopId, setAddingTransportForStopId] =
+    useState<string | null>(null);
+  const [showAddTripForm, setShowAddTripForm] = useState(false);
+  const [newStopName, setNewStopName] = useState("");
+  const [newStopDate, setNewStopDate] = useState(getTodayDate());
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -156,53 +169,88 @@ export function OverviewTab({
                     {(accommodationsByStop[stop.id] || []).map((item) => (
                       <Accommodation key={item.id} accommodation={item} />
                     ))}
-                    <StopItemForm
-                      kind="accommodation"
-                      placeholder="Add accommodation"
-                      defaultDate={stop.date}
-                      onSubmit={async ({
-                        name,
-                        price,
-                        currency,
-                        startDateTime,
-                        endDateTime,
-                      }) => {
-                        if (!startDateTime || !endDateTime) return;
-                        await onAddAccommodation(stop.id, {
-                          name,
-                          price,
-                          currency,
-                          checkIn: startDateTime,
-                          checkOut: endDateTime,
-                        });
-                      }}
-                    />
+                    {addingAccommodationForStopId === stop.id ? (
+                      <div className="rounded-xl border border-border/50 bg-muted/30 p-3">
+                        <AccommodationForm
+                          initialValues={{
+                            name: "",
+                            price: 0,
+                            currency: "USD",
+                            checkIn: `${stop.date}T14:00`,
+                            checkOut: `${stop.date}T11:00`,
+                            timezone: undefined,
+                          }}
+                          onSubmit={async (data) => {
+                            await onAddAccommodation(stop.id, {
+                              name: data.name,
+                              price: data.price,
+                              currency: data.currency,
+                              checkIn: data.checkIn,
+                              checkOut: data.checkOut,
+                            });
+                            setAddingAccommodationForStopId(null);
+                          }}
+                          onCancel={() => setAddingAccommodationForStopId(null)}
+                          submitLabel="Add trip"
+                          cancelLabel="Cancel"
+                          autoFocusName
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAddingAccommodationForStopId(stop.id)}
+                        >
+                          Add trip
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <div className="mt-2 flex flex-col gap-2">
                     {(transportsByStop[stop.id] || []).map((item) => (
                       <Transport key={item.id} transport={item} />
                     ))}
-                    <StopItemForm
-                      kind="transport"
-                      placeholder="Add transport"
-                      defaultDate={stop.date}
-                      onSubmit={async ({
-                        name,
-                        price,
-                        currency,
-                        startDateTime,
-                        endDateTime,
-                      }) => {
-                        if (!startDateTime || !endDateTime) return;
-                        await onAddTransport(stop.id, {
-                          name,
-                          price,
-                          currency,
-                          departureDateTime: startDateTime,
-                          arrivalDateTime: endDateTime,
-                        });
-                      }}
-                    />
+                    {addingTransportForStopId === stop.id ? (
+                      <div className="rounded-xl border border-border/50 bg-muted/30 p-3">
+                        <TransportForm
+                          initialValues={{
+                            name: "",
+                            type: "flight",
+                            price: 0,
+                            currency: "USD",
+                            departureDateTime: `${stop.date}T12:00`,
+                            arrivalDateTime: `${stop.date}T13:00`,
+                            timezone: undefined,
+                          }}
+                          onSubmit={async (data) => {
+                            await onAddTransport(stop.id, {
+                              name: data.name,
+                              price: data.price,
+                              currency: data.currency,
+                              departureDateTime: data.departureDateTime,
+                              arrivalDateTime: data.arrivalDateTime ?? "",
+                            });
+                            setAddingTransportForStopId(null);
+                          }}
+                          onCancel={() => setAddingTransportForStopId(null)}
+                          submitLabel="Add transport"
+                          cancelLabel="Cancel"
+                          autoFocusName
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAddingTransportForStopId(stop.id)}
+                        >
+                          Add transport
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </SortableStopCard>
@@ -215,18 +263,52 @@ export function OverviewTab({
           No stops yet.
         </div>
       ) : null}
-      <StopItemForm
-        kind="stop"
-        placeholder="Add another stop..."
-        stopBottomLayout
-        onSubmit={async ({ name, date }) => {
-          if (!date) {
-            toast.error("A date is required for this stop.");
-            return;
-          }
-          await onAddStop(name, date);
-        }}
-      />
+      {showAddTripForm ? (
+        <form
+          className="bg-muted/30 flex flex-wrap items-end gap-2 rounded-2xl border p-3"
+          onSubmit={async (event) => {
+            event.preventDefault();
+            if (!newStopName.trim()) return;
+            if (!newStopDate) {
+              toast.error("A date is required for this stop.");
+              return;
+            }
+            await onAddStop(newStopName.trim(), newStopDate);
+            setNewStopName("");
+            setNewStopDate(getTodayDate());
+            setShowAddTripForm(false);
+          }}
+        >
+          <Input
+            value={newStopName}
+            onChange={(event) => setNewStopName(event.target.value)}
+            placeholder="Add another stop..."
+            className="min-w-56 flex-1 rounded-xl bg-white/80"
+          />
+          <Input
+            type="date"
+            value={newStopDate}
+            onChange={(event) => setNewStopDate(event.target.value)}
+            className="w-40 rounded-xl bg-white/80"
+          />
+          <Button type="submit" className="h-10 rounded-xl px-4">
+            Add trip
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setShowAddTripForm(false)}
+          >
+            Cancel
+          </Button>
+        </form>
+      ) : (
+        <div>
+          <Button variant="outline" onClick={() => setShowAddTripForm(true)}>
+            Add trip
+          </Button>
+        </div>
+      )}
       <div className="flex justify-end">
         <Button
           variant="outline"
