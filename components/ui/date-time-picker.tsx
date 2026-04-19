@@ -19,6 +19,23 @@ import {
  * Parses in local time to avoid UTC midnight shifts.
  */
 function parseIsoString(value: string): Date {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split("-").map(Number);
+    return new Date(y, m - 1, d, 12, 0, 0, 0);
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
+    const [datePart, timePart] = value.split("T");
+    const [y, m, d] = datePart.split("-").map(Number);
+    const [h, min] = timePart.split(":").map(Number);
+    return new Date(y, m - 1, d, h, min, 0, 0);
+  }
+
+  const parsedDate = new Date(value);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate;
+  }
+
   if (value.includes("T")) {
     const [datePart, timePart] = value.split("T");
     const [y, m, d] = datePart.split("-").map(Number);
@@ -207,8 +224,9 @@ export function DateTimePicker({
               paired: pairedDay ? [pairedDay] : undefined,
             }}
             modifiersClassNames={{
-              highlighted: "bg-muted text-muted-foreground",
-              paired: "ring-1 ring-primary/60",
+              highlighted:
+                "[&>button]:bg-muted [&>button]:text-foreground [&>button]:opacity-80",
+              paired: "[&>button]:ring-1 [&>button]:ring-primary/60",
             }}
           />
           {/* Time selectors — only usable after a date is chosen */}

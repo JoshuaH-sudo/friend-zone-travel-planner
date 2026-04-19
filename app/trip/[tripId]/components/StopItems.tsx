@@ -40,16 +40,53 @@ export function StopItems({
     date: string;
   };
 
+  const toTime = (value: string, isEndBoundary = false) => {
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      return new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        isEndBoundary ? 23 : 0,
+        isEndBoundary ? 59 : 0,
+        isEndBoundary ? 59 : 0,
+        isEndBoundary ? 999 : 0,
+      ).getTime();
+    }
+
+    return new Date(value).getTime();
+  };
+
   const getItemRange = (item: TripItem) => {
     if (item.type === "accommodation") {
       const accommodation = item.model as AccommodationDocumentType;
-      return { start: accommodation.checkIn, end: accommodation.checkOut };
+      const startTime = toTime(accommodation.checkIn);
+      const endTime = toTime(accommodation.checkOut, true);
+      return startTime <= endTime
+        ? {
+            start: accommodation.checkIn,
+            end: accommodation.checkOut,
+            startTime,
+            endTime,
+          }
+        : {
+            start: accommodation.checkOut,
+            end: accommodation.checkIn,
+            startTime: toTime(accommodation.checkOut),
+            endTime: toTime(accommodation.checkIn, true),
+          };
     }
 
     const transport = item.model as TransportDocumentType;
+    const startTime = toTime(transport.departureDateTime);
+    const arrival = transport.arrivalDateTime || transport.departureDateTime;
+    const endTime = toTime(arrival, true);
     return {
-      start: transport.departureDateTime,
-      end: transport.arrivalDateTime || transport.departureDateTime,
+      start: startTime <= endTime ? transport.departureDateTime : arrival,
+      end: startTime <= endTime ? arrival : transport.departureDateTime,
+      startTime: Math.min(startTime, endTime),
+      endTime: Math.max(startTime, endTime),
     };
   };
 
@@ -106,10 +143,10 @@ export function StopItems({
       const firstRange = getItemRange(first);
       const secondRange = getItemRange(second);
 
-      const firstStartTime = new Date(firstRange.start).getTime();
-      const firstEndTime = new Date(firstRange.end).getTime();
-      const secondStartTime = new Date(secondRange.start).getTime();
-      const secondEndTime = new Date(secondRange.end).getTime();
+      const firstStartTime = firstRange.startTime;
+      const firstEndTime = firstRange.endTime;
+      const secondStartTime = secondRange.startTime;
+      const secondEndTime = secondRange.endTime;
       const overlaps =
         firstStartTime <= secondEndTime && secondStartTime <= firstEndTime;
 

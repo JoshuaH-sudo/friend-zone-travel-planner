@@ -163,6 +163,12 @@ export const Transport = ({
       <Card>
         <CardContent className="px-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {warningSummary && (
+              <p className="text-destructive flex items-center gap-2 text-sm">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {warningSummary}
+              </p>
+            )}
             <div className="space-y-2">
               <Label htmlFor={`transport-name-${transport.id}`}>
                 {t("nameLabel")}

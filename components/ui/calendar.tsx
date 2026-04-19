@@ -16,6 +16,7 @@ export type CalendarProps = DayPickerProps;
 function Calendar({
   className,
   classNames,
+  modifiersClassNames,
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
@@ -78,6 +79,7 @@ function Calendar({
         today: "font-semibold",
         outside: "text-muted-foreground opacity-50",
         disabled: "text-muted-foreground opacity-30 cursor-not-allowed",
+        ...modifiersClassNames,
       }}
       {...props}
     />
