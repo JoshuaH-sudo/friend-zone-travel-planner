@@ -12,6 +12,13 @@ import {
   type UseTripDataResult,
 } from "@/components/hooks/useTripData";
 
+const toStartTimestamp = (value: string) =>
+  getStoredDateTimeTimestamp(value, { dateOnlyBoundary: "start" });
+const toEndTimestamp = (value: string) =>
+  getStoredDateTimeTimestamp(value, { dateOnlyBoundary: "end" });
+const toStoredDatePart = (value: string) =>
+  value.includes("T") ? value.split("T")[0] : value;
+
 export function TripStats({
   tripId,
   tripData,
@@ -66,42 +73,38 @@ export function TripStats({
         ]),
         ...(transportsByStop[stop.id] || []).flatMap((trans) => [
           trans.departureDateTime,
-          trans.arrivalDateTime || trans.departureDateTime,
+          ...(trans.arrivalDateTime ? [trans.arrivalDateTime] : []),
         ]),
-      ].filter(Boolean);
-      const stopStart = stopItemDates.reduce(
+      ].filter((value): value is string => Boolean(value));
+      const stopBounds = [stop.date, ...stopItemDates]
+        .filter((value): value is string => Boolean(value))
+        .map((value) => ({
+          value,
+          startTimestamp: toStartTimestamp(value),
+          endTimestamp: toEndTimestamp(value),
+        }));
+      if (stopBounds.length === 0) {
+        return;
+      }
+      const stopStartEntry = stopBounds.reduce(
         (earliest, current) =>
-          getStoredDateTimeTimestamp(current, {
-            dateOnlyBoundary: "start",
-          }) <
-          getStoredDateTimeTimestamp(earliest, {
-            dateOnlyBoundary: "start",
-          })
-            ? current
-            : earliest,
-        stop.date,
+          current.startTimestamp < earliest.startTimestamp ? current : earliest,
+        stopBounds[0],
       );
-      const stopEnd = stopItemDates.reduce(
+      const stopEndEntry = stopBounds.reduce(
         (latest, current) =>
-          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "end" }) >
-          getStoredDateTimeTimestamp(latest, { dateOnlyBoundary: "end" })
-            ? current
-            : latest,
-        stop.date,
+          current.endTimestamp > latest.endTimestamp ? current : latest,
+        stopBounds[0],
       );
-      const stopStartTimestamp = getStoredDateTimeTimestamp(stopStart, {
-        dateOnlyBoundary: "start",
-      });
-      const stopEndTimestamp = getStoredDateTimeTimestamp(stopEnd, {
-        dateOnlyBoundary: "end",
-      });
+      const stopStartTimestamp = stopStartEntry.startTimestamp;
+      const stopEndTimestamp = stopEndEntry.endTimestamp;
       if (startTimestamp === null || stopStartTimestamp < startTimestamp) {
         startTimestamp = stopStartTimestamp;
-        startDate = stopStart;
+        startDate = stopStartEntry.value;
       }
       if (endTimestamp === null || stopEndTimestamp > endTimestamp) {
         endTimestamp = stopEndTimestamp;
-        endDate = stopEnd;
+        endDate = stopEndEntry.value;
       }
 
       (accommodationsByStop[stop.id] || []).forEach((acc) => {
@@ -117,12 +120,11 @@ export function TripStats({
       });
     });
 
-    const startDay = startDate ? startDate.split("T")[0] : null;
-    const endDay = endDate ? endDate.split("T")[0] : null;
+    const startDay = startDate ? toStoredDatePart(startDate) : null;
+    const endDay = endDate ? toStoredDatePart(endDate) : null;
     totalDays =
       startDay && endDay
-        ? (getStoredDateTimeTimestamp(endDay, { dateOnlyBoundary: "start" }) -
-            getStoredDateTimeTimestamp(startDay, { dateOnlyBoundary: "start" })) /
+        ? (toStartTimestamp(endDay) - toStartTimestamp(startDay)) /
             (1000 * 60 * 60 * 24) +
           1
         : 0;
@@ -161,13 +163,8 @@ export function TripStats({
           <div className="flex items-center gap-2 text-sm">
             <span className="font-medium">{t("durationLabel")}</span>
             <span className="text-muted-foreground">
-              {stats.startDate
-                ? formatDate(stats.startDate)
-                : t("notAvailable")}{" "}
-              →{" "}
-              {stats.endDate
-                ? formatDate(stats.endDate)
-                : t("notAvailable")}
+              {stats.startDate ? formatDate(stats.startDate) : t("notAvailable")}{" "}
+              → {stats.endDate ? formatDate(stats.endDate) : t("notAvailable")}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
