@@ -36,15 +36,7 @@ function parseIsoString(value: string): Date {
     return parsedDate;
   }
 
-  if (value.includes("T")) {
-    const [datePart, timePart] = value.split("T");
-    const [y, m, d] = datePart.split("-").map(Number);
-    const [h, min] = timePart.split(":").map(Number);
-    return new Date(y, m - 1, d, h, min, 0, 0);
-  }
-  const [y, m, d] = value.split("-").map(Number);
-  // Default to noon when no time is specified
-  return new Date(y, m - 1, d, 12, 0, 0, 0);
+  return new Date(NaN);
 }
 
 /** Format a Date to "YYYY-MM-DDTHH:MM" */
