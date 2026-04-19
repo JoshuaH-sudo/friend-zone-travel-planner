@@ -48,3 +48,17 @@ export function daysBetween(start?: string, end?: string) {
   }
   return Math.max(1, Math.ceil((endAt - startAt) / 86_400_000));
 }
+
+export const formatDate = (iso: string) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+};
+
+export const formatDateShort = (iso: string) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};

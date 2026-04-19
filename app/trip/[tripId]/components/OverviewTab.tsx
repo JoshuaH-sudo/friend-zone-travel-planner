@@ -26,6 +26,8 @@ import { SortableStopCard } from "./SortableStopCard";
 import { StopItemForm } from "./StopItemForm";
 import { toast } from "sonner";
 import { addDays, format } from "date-fns";
+import { Transport } from "./Transport";
+import { Accommodation } from "./Accommodation";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -136,15 +138,13 @@ export function OverviewTab({
         <SortableContext items={activeOrder} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-3">
             {orderedStops.map((stop, index) => (
-              <SortableStopCard key={stop.id} stop={stop} index={index + 1}>
+              <SortableStopCard key={stop.id} stop={stop}>
                 <div className="flex flex-col gap-2">
                   <details className="bg-muted/40 rounded-xl p-3">
                     <summary className="text-sm font-medium">Accommodations</summary>
                     <div className="mt-2 flex flex-col gap-2">
                       {(accommodationsByStop[stop.id] || []).map((item) => (
-                        <p key={item.id} className="text-muted-foreground text-sm">
-                          {item.name}
-                        </p>
+                        <Accommodation key={item.id} accommodation={item} />
                       ))}
                       <StopItemForm
                         kind="accommodation"
@@ -173,9 +173,7 @@ export function OverviewTab({
                     <summary className="text-sm font-medium">Transports</summary>
                     <div className="mt-2 flex flex-col gap-2">
                       {(transportsByStop[stop.id] || []).map((item) => (
-                        <p key={item.id} className="text-muted-foreground text-sm">
-                          {item.name}
-                        </p>
+                        <Transport key={item.id} transport={item} />
                       ))}
                       <StopItemForm
                         kind="transport"

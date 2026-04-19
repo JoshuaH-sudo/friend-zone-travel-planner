@@ -20,7 +20,7 @@ import { BudgetTab } from "./components/BudgetTab";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
-import { convert, formatMoney } from "@/lib/format";
+import { convert, daysBetween, formatDateShort, formatMoney } from "@/lib/format";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
 import {
@@ -33,6 +33,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import { ArrowLeft, Bed, Calendar, MapPin, Plane, Wallet } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
@@ -44,27 +47,40 @@ export default function TripPage() {
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const { trip, stops, accommodationsByStop, transportsByStop, expenses, loading } =
-    useTripData(tripId, { database: db });
+  const {
+    trip,
+    stops,
+    accommodationsByStop,
+    transportsByStop,
+    expenses,
+    loading,
+  } = useTripData(tripId, { database: db });
 
   const totals = useMemo(() => {
     const accommodationTotal = Object.values(accommodationsByStop)
       .flat()
       .reduce(
-        (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
+        (sum, item) =>
+          sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
     const transportTotal = Object.values(transportsByStop)
       .flat()
       .reduce(
-        (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
+        (sum, item) =>
+          sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
     const expenseTotal = expenses.reduce(
       (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
       0,
     );
-    return accommodationTotal + transportTotal + expenseTotal;
+    return {
+      accommodationTotal,
+      transportTotal,
+      expenseTotal,
+      total: accommodationTotal + transportTotal + expenseTotal,
+    };
   }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
 
   const tripDates = useMemo(() => {
@@ -135,6 +151,15 @@ export default function TripPage() {
     });
   };
 
+  const range = (() => {
+    if (!stops.length)
+      return { start: null as string | null, end: null as string | null };
+    const sorted = [...stops].sort((a, b) => a.date.localeCompare(b.date));
+    return { start: sorted[0].date, end: sorted[sorted.length - 1].date };
+  })();
+  
+    const totalDays = range.start && range.end ? daysBetween(range.start, range.end) + 1 : 0;
+
   if (loading) {
     return <p className="text-muted-foreground">Loading trip...</p>;
   }
@@ -144,111 +169,133 @@ export default function TripPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="gradient-hero text-primary-foreground rounded-3xl p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <EditableText
-              value={trip.name}
-              onSave={async (nextName) => {
-                await trip.patch({ name: nextName, updatedAt: Date.now() });
-              }}
-              className="font-serif text-4xl font-semibold"
-            />
-            <p className="text-primary-foreground/90">{tripDates}</p>
-            <div className="flex flex-wrap gap-2 text-sm">
-              <span className="bg-primary-foreground/15 rounded-full px-3 py-1">
-                {stops.length} stops
-              </span>
-              <span className="bg-primary-foreground/15 rounded-full px-3 py-1">
-                {Object.values(transportsByStop).flat().length} transports
-              </span>
-              <span className="bg-primary-foreground/15 rounded-full px-3 py-1">
-                {formatMoney(totals, defaultCurrency)}
-              </span>
+    <div>
+      <section className="gradient-hero text-primary-foreground">
+        <div className="container py-8 sm:py-12">
+          <Link
+            href="/"
+            className="text-primary-foreground/80 hover:text-primary-foreground mb-6 inline-flex items-center gap-1.5 text-sm"
+          >
+            <ArrowLeft className="h-4 w-4" /> All trips
+          </Link>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-primary-foreground/70 mb-2 text-xs tracking-widest uppercase">
+                Trip
+              </p>
+              <EditableText
+                value={trip.name}
+                onSave={async (nextName) => {
+                  await trip.patch({ name: nextName, updatedAt: Date.now() });
+                }}
+                className="font-serif text-4xl leading-tight font-semibold sm:text-6xl"
+              />
+              <div className="text-primary-foreground/85 mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  {range.start
+                    ? `${formatDateShort(range.start)} – ${formatDateShort(range.end!)}`
+                    : "No dates"}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4" /> {stops.length} stops
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Bed className="h-4 w-4" /> {totals.accommodationTotal} stays
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Plane className="h-4 w-4" /> {totals.transportTotal} journeys
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Wallet className="h-4 w-4" /> ~$
+                  {Math.round(totals.expenseTotal).toLocaleString()}
+                </span>
+                {totalDays > 0 && (
+                  <span className="opacity-80">{totalDays} days</span>
+                )}
+              </div>
             </div>
+            <DropdownMenu data-cy="trip-actions">
+              <DropdownMenuTrigger
+                render={<Button variant="secondary">Actions</Button>}
+              />
+              <DropdownMenuContent align="end">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await exportTripJson(db, trip.id);
+                    }}
+                  >
+                    Export JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await copyShareLink(db, trip.id);
+                      toast.success("Share link copied.");
+                    }}
+                  >
+                    Copy share link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await exportTripToIcal(db, trip.id, timezone);
+                    }}
+                  >
+                    Export iCal
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    Delete trip
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger render={<Button variant="secondary">Actions</Button>} />
-            <DropdownMenuContent align="end">
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await exportTripJson(db, trip.id);
-                  }}
-                >
-                  Export JSON
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await copyShareLink(db, trip.id);
-                    toast.success("Share link copied.");
-                  }}
-                >
-                  Copy share link
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={async () => {
-                    await exportTripToIcal(db, trip.id, timezone);
-                  }}
-                >
-                  Export iCal
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() => setDeleteDialogOpen(true)}
-                >
-                  Delete trip
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </section>
 
-      <section className="flex flex-wrap gap-2">
-        {(["overview", "itinerary", "map", "budget"] as TabId[]).map((tabId) => (
-          <Button
-            key={tabId}
-            variant={tabId === tab ? "default" : "outline"}
-            onClick={() => setTab(tabId)}
-            className="capitalize"
-          >
-            {tabId}
-          </Button>
-        ))}
-      </section>
+      <div className="container py-8">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <TabsList className="mb-6 grid w-full grid-cols-4 sm:inline-grid sm:w-auto">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
+            <TabsTrigger value="map">Map</TabsTrigger>
+            <TabsTrigger value="budget">Budget</TabsTrigger>
+          </TabsList>
 
-      {tab === "overview" ? (
-        <OverviewTab
-          stops={stops}
-          accommodationsByStop={accommodationsByStop}
-          transportsByStop={transportsByStop}
-          onAddStop={addStop}
-          onAddAccommodation={onAddAccommodation}
-          onAddTransport={onAddTransport}
-        />
-      ) : null}
-
-      {tab === "itinerary" ? (
-        <ItineraryTab
-          stops={stops}
-          accommodationsByStop={accommodationsByStop}
-          transportsByStop={transportsByStop}
-          expenses={expenses}
-        />
-      ) : null}
-
-      {tab === "map" ? <MapTab stops={stops} /> : null}
-
-      {tab === "budget" ? (
-        <BudgetTab
-          trip={trip}
-          accommodationsByStop={accommodationsByStop}
-          transportsByStop={transportsByStop}
-          expenses={expenses}
-        />
-      ) : null}
+          <TabsContent value="overview">
+            <OverviewTab
+              stops={stops}
+              accommodationsByStop={accommodationsByStop}
+              transportsByStop={transportsByStop}
+              onAddStop={addStop}
+              onAddAccommodation={onAddAccommodation}
+              onAddTransport={onAddTransport}
+            />
+          </TabsContent>
+          <TabsContent value="itinerary">
+            <ItineraryTab
+              stops={stops}
+              accommodationsByStop={accommodationsByStop}
+              transportsByStop={transportsByStop}
+              expenses={expenses}
+            />
+          </TabsContent>
+          <TabsContent value="map">
+            <MapTab stops={stops} />
+          </TabsContent>
+          <TabsContent value="budget">
+            <BudgetTab
+              trip={trip}
+              accommodationsByStop={accommodationsByStop}
+              transportsByStop={transportsByStop}
+              expenses={expenses}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

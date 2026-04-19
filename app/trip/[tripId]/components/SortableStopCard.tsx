@@ -5,14 +5,14 @@ import { CSS } from "@dnd-kit/utilities";
 import type { StopDocumentType } from "@/lib/rxdb-schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GripVertical } from "lucide-react";
+import { capitalize } from "@/lib/utils";
 
 type SortableStopCardProps = {
   stop: StopDocumentType;
-  index: number;
   children: React.ReactNode;
 };
 
-export function SortableStopCard({ stop, index, children }: SortableStopCardProps) {
+export function SortableStopCard({ stop, children }: SortableStopCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: stop.id,
   });
@@ -25,8 +25,7 @@ export function SortableStopCard({ stop, index, children }: SortableStopCardProp
     >
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex flex-col gap-1">
-          <p className="text-muted-foreground text-xs uppercase">Day {index}</p>
-          <CardTitle className="font-serif text-2xl">{stop.name}</CardTitle>
+          <CardTitle className="font-serif text-2xl">{capitalize(stop.name)}</CardTitle>
           <p className="text-muted-foreground text-sm">{stop.date}</p>
         </div>
         <button
