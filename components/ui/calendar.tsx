@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useLocale } from "next-intl";
+import { de, enUS } from "date-fns/locale";
 import {
   DayPicker,
   getDefaultClassNames,
@@ -17,10 +19,13 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const locale = useLocale();
   const defaultClassNames = getDefaultClassNames();
+  const dayPickerLocale = locale === "de" ? de : enUS;
 
   return (
     <DayPicker
+      locale={dayPickerLocale}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
