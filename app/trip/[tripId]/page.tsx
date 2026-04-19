@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { ArrowLeft, Bed, Calendar, MapPin, Plane, Wallet } from "lucide-react";
+import { ArrowLeft, Bed, Calendar, MapPin, MoreHorizontal, Plane, Wallet } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
@@ -216,9 +216,11 @@ export default function TripPage() {
               </div>
             </div>
             <DropdownMenu data-cy="trip-actions">
-              <DropdownMenuTrigger
-                render={<Button variant="secondary">Actions</Button>}
-              />
+              <DropdownMenuTrigger>
+                <Button variant="secondary" size="icon" className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
                   <DropdownMenuItem
