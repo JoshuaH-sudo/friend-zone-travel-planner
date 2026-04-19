@@ -30,6 +30,8 @@ import { Transport } from "./Transport";
 import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
+import { Bed, Bus, Plane } from "lucide-react";
+import { Flight } from "@hugeicons/core-free-icons";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -81,8 +83,9 @@ export function OverviewTab({
   const [order, setOrder] = useState<string[]>([]);
   const [addingAccommodationForStopId, setAddingAccommodationForStopId] =
     useState<string | null>(null);
-  const [addingTransportForStopId, setAddingTransportForStopId] =
-    useState<string | null>(null);
+  const [addingTransportForStopId, setAddingTransportForStopId] = useState<
+    string | null
+  >(null);
   const [showAddTripForm, setShowAddTripForm] = useState(false);
   const [newStopName, setNewStopName] = useState("");
   const [newStopDate, setNewStopDate] = useState(getTodayDate());
@@ -166,11 +169,20 @@ export function OverviewTab({
               <SortableStopCard key={stop.id} index={index + 1} stop={stop}>
                 <div className="flex flex-col gap-4">
                   <div className="mt-2 flex flex-col gap-2">
+                    <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+                      <Bed className="text-muted-foreground h-4 w-4" />
+                      <p>Stays</p>
+                    </div>
+                    {accommodationsByStop[stop.id]?.length === 0 && (
+                      <p className="text-muted-foreground">
+                        No stays for this stop.
+                      </p>
+                    )}
                     {(accommodationsByStop[stop.id] || []).map((item) => (
                       <Accommodation key={item.id} accommodation={item} />
                     ))}
                     {addingAccommodationForStopId === stop.id ? (
-                      <div className="rounded-xl border border-border/50 bg-muted/30 p-3">
+                      <div className="border-border/50 bg-muted/30 rounded-xl border p-3">
                         <AccommodationForm
                           initialValues={{
                             name: "",
@@ -201,19 +213,30 @@ export function OverviewTab({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setAddingAccommodationForStopId(stop.id)}
+                          onClick={() =>
+                            setAddingAccommodationForStopId(stop.id)
+                          }
                         >
                           Add trip
                         </Button>
                       </div>
                     )}
                   </div>
+                  <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+                    <Plane className="text-muted-foreground h-4 w-4" />
+                    <p>Journeys</p>
+                  </div>
+                  {transportsByStop[stop.id]?.length === 0 && (
+                    <p className="text-muted-foreground">
+                      No journeys for this stop.
+                    </p>
+                  )}
                   <div className="mt-2 flex flex-col gap-2">
                     {(transportsByStop[stop.id] || []).map((item) => (
                       <Transport key={item.id} transport={item} />
                     ))}
                     {addingTransportForStopId === stop.id ? (
-                      <div className="rounded-xl border border-border/50 bg-muted/30 p-3">
+                      <div className="border-border/50 bg-muted/30 rounded-xl border p-3">
                         <TransportForm
                           initialValues={{
                             name: "",
@@ -235,7 +258,7 @@ export function OverviewTab({
                             setAddingTransportForStopId(null);
                           }}
                           onCancel={() => setAddingTransportForStopId(null)}
-                          submitLabel="Add transport"
+                          submitLabel="Add journey"
                           cancelLabel="Cancel"
                           autoFocusName
                         />
@@ -247,7 +270,7 @@ export function OverviewTab({
                           size="sm"
                           onClick={() => setAddingTransportForStopId(stop.id)}
                         >
-                          Add transport
+                          Add journey
                         </Button>
                       </div>
                     )}

@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { TransportForm } from "./TransportForm";
+import { formatDate } from "date-fns";
 
 export const Transport = ({
   transport,
@@ -124,11 +125,11 @@ export const Transport = ({
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate font-medium">{name}</p>
         <p className="text-muted-foreground text-xs capitalize">
-          {t(`type.${type}`)} · {formatDateTime(departureDateTime)}
+          {t(`type.${type}`)} · {formatDate(new Date(departureDateTime), "LLLL p")}
         </p>
         {arrivalDateTime && (
           <p className="text-muted-foreground mt-0.5 text-xs">
-            {t("arrivalDisplay", { value: formatDateTime(arrivalDateTime) })}
+            {t("arrivalDisplay", { value: formatDate(new Date(arrivalDateTime), "LLLL p") })}
           </p>
         )}
         {timezone && (

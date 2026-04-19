@@ -102,7 +102,7 @@ export const Accommodation = ({
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-foreground">{name}</p>
         <p className="text-xs text-muted-foreground">
-          {formatDateTime(checkIn)}{"→"}{formatDateTime(checkOut)}
+          {formatDateTime(checkIn)}{" → "}{formatDateTime(checkOut)}
         </p>
         {timezone && (
           <p className="mt-0.5 text-xs text-muted-foreground">
