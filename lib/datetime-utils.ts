@@ -13,17 +13,40 @@ const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const END_OF_DAY = { hour: 23, minute: 59, second: 59, ms: 999 };
 const START_OF_DAY = { hour: 0, minute: 0, second: 0, ms: 0 };
 
+function parseDateOnlyParts(value: string) {
+  if (!DATE_ONLY_REGEX.test(value)) {
+    return undefined;
+  }
+
+  const [y, m, d] = value.split("-").map(Number);
+  const candidate = new Date(y, m - 1, d, 12, 0, 0, 0);
+  const isValid =
+    candidate.getFullYear() === y &&
+    candidate.getMonth() === m - 1 &&
+    candidate.getDate() === d;
+
+  return isValid ? { y, m, d } : undefined;
+}
+
 /** Parse stored date/datetime values in local time. */
 export function parseStoredDateTime(value: string): Date | undefined {
   if (DATETIME_REGEX.test(value)) {
     const [datePart, timePart] = value.split("T");
     const [y, m, d] = datePart.split("-").map(Number);
     const [h, min] = timePart.split(":").map(Number);
-    return new Date(y, m - 1, d, h, min, 0, 0);
+    const candidate = new Date(y, m - 1, d, h, min, 0, 0);
+    const isValid =
+      candidate.getFullYear() === y &&
+      candidate.getMonth() === m - 1 &&
+      candidate.getDate() === d &&
+      candidate.getHours() === h &&
+      candidate.getMinutes() === min;
+    return isValid ? candidate : undefined;
   }
 
-  if (DATE_ONLY_REGEX.test(value)) {
-    const [y, m, d] = value.split("-").map(Number);
+  const dateOnlyParts = parseDateOnlyParts(value);
+  if (dateOnlyParts) {
+    const { y, m, d } = dateOnlyParts;
     // Use noon for date-only values to avoid accidental day shifts in
     // timezone formatting while still keeping the calendar date stable.
     return new Date(y, m - 1, d, 12, 0, 0, 0);
@@ -40,8 +63,9 @@ export function getStoredDateTimeTimestamp(
   value: string,
   options?: { dateOnlyBoundary?: "start" | "end" },
 ): number {
-  if (DATE_ONLY_REGEX.test(value)) {
-    const [y, m, d] = value.split("-").map(Number);
+  const dateOnlyParts = parseDateOnlyParts(value);
+  if (dateOnlyParts) {
+    const { y, m, d } = dateOnlyParts;
     const isEnd = options?.dateOnlyBoundary === "end";
     const boundary = isEnd ? END_OF_DAY : START_OF_DAY;
     return new Date(

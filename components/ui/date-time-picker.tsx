@@ -76,15 +76,13 @@ export function DateTimePicker({
       [...new Set(highlightedDates ?? [])]
         .filter(Boolean)
         .map((highlightedDate) => parseDateTimeValue(highlightedDate))
-        .filter(
-          (d): d is Date => d !== undefined && !Number.isNaN(d.getTime()),
-        ),
+        .filter((d): d is Date => d !== undefined),
     [highlightedDates],
   );
   const pairedDay = React.useMemo(() => {
     if (!pairedHighlightDate) return undefined;
     const parsed = parseDateTimeValue(pairedHighlightDate);
-    return parsed && !Number.isNaN(parsed.getTime()) ? parsed : undefined;
+    return parsed;
   }, [pairedHighlightDate]);
   const datePresets = React.useMemo(
     () =>
