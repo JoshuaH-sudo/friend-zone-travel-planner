@@ -16,6 +16,10 @@ import { Plus } from "@hugeicons/core-free-icons";
 import { useTripData } from "@/components/hooks/useTripData";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
+import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
 
 function TripDetails() {
   const t = useTranslations("tripPage");
@@ -34,7 +38,11 @@ function TripDetails() {
   const { trip, stops, accommodationsByStop, transportsByStop, loading } =
     tripData;
   const formatRangeDate = (value: string) => {
-    const date = new Date(value);
+    const date = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
     if (value.includes("T")) {
       return date.toLocaleString(undefined, {
         month: "short",
@@ -83,12 +91,14 @@ function TripDetails() {
 
       nextStopRangeById[stop.id] = {
         start: itemDates.reduce((earliest, current) =>
-          new Date(current).getTime() < new Date(earliest).getTime()
+          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "start" }) <
+          getStoredDateTimeTimestamp(earliest, { dateOnlyBoundary: "start" })
             ? current
             : earliest,
         ),
         end: itemDates.reduce((latest, current) =>
-          new Date(current).getTime() > new Date(latest).getTime()
+          getStoredDateTimeTimestamp(current, { dateOnlyBoundary: "end" }) >
+          getStoredDateTimeTimestamp(latest, { dateOnlyBoundary: "end" })
             ? current
             : latest,
         ),
@@ -103,11 +113,19 @@ function TripDetails() {
         const firstRange = stopRangeById[firstStop.id];
         const secondRange = stopRangeById[secondStop.id];
         const firstStartTime = firstRange
-          ? new Date(firstRange.start).getTime()
-          : new Date(firstStop.date).getTime();
+          ? getStoredDateTimeTimestamp(firstRange.start, {
+              dateOnlyBoundary: "start",
+            })
+          : getStoredDateTimeTimestamp(firstStop.date, {
+              dateOnlyBoundary: "start",
+            });
         const secondStartTime = secondRange
-          ? new Date(secondRange.start).getTime()
-          : new Date(secondStop.date).getTime();
+          ? getStoredDateTimeTimestamp(secondRange.start, {
+              dateOnlyBoundary: "start",
+            })
+          : getStoredDateTimeTimestamp(secondStop.date, {
+              dateOnlyBoundary: "start",
+            });
 
         if (firstStartTime !== secondStartTime) {
           return firstStartTime - secondStartTime;

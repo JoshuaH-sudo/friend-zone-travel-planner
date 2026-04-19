@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea, ScrollAreaScrollbar } from "@/components/ui/scroll-area";
 import { MS_PER_DAY } from "@/lib/constants/time";
+import { parseStoredDateTime } from "@/lib/datetime-utils";
 import {
   PopoverRoot,
   PopoverTrigger,
@@ -18,25 +19,16 @@ import {
 /** Parse an ISO date or datetime string into a Date.
  * Parses in local time to avoid UTC midnight shifts.
  */
-function parseIsoString(value: string): Date {
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const [y, m, d] = value.split("-").map(Number);
-    return new Date(y, m - 1, d, 12, 0, 0, 0);
+function parseIsoString(value: string): Date | undefined {
+  const parsedStoredDate = parseStoredDateTime(value);
+  if (parsedStoredDate) {
+    return parsedStoredDate;
   }
-
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
-    const [datePart, timePart] = value.split("T");
-    const [y, m, d] = datePart.split("-").map(Number);
-    const [h, min] = timePart.split(":").map(Number);
-    return new Date(y, m - 1, d, h, min, 0, 0);
-  }
-
   const parsedDate = new Date(value);
   if (!Number.isNaN(parsedDate.getTime())) {
     return parsedDate;
   }
-
-  return new Date(NaN);
+  return undefined;
 }
 
 /** Format a Date to "YYYY-MM-DDTHH:MM" */
@@ -83,13 +75,15 @@ export function DateTimePicker({
       [...new Set(highlightedDates ?? [])]
         .filter(Boolean)
         .map((highlightedDate) => parseIsoString(highlightedDate))
-        .filter((d) => !Number.isNaN(d.getTime())),
+        .filter((d): d is Date => Boolean(d)),
     [highlightedDates],
   );
   const pairedDay = React.useMemo(() => {
     if (!pairedHighlightDate) return undefined;
     const parsedDate = parseIsoString(pairedHighlightDate);
-    return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate;
+    return parsedDate && !Number.isNaN(parsedDate.getTime())
+      ? parsedDate
+      : undefined;
   }, [pairedHighlightDate]);
   const datePresets = React.useMemo(
     () =>
@@ -181,7 +175,7 @@ export function DateTimePicker({
         }
       >
         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-        {value && date ? (
+        {value && date && !Number.isNaN(date.getTime()) ? (
           format(date, "MM/dd/yyyy hh:mm aa")
         ) : (
           <span>{placeholder}</span>

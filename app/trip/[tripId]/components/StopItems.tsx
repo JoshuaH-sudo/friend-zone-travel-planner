@@ -5,6 +5,10 @@ import {
   StopDocumentType,
 } from "@/lib/rxdb-schema";
 import { useTranslations } from "next-intl";
+import {
+  getStoredDateTimeTimestamp,
+  parseStoredDateTime,
+} from "@/lib/datetime-utils";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Timeline } from "./Timeline";
@@ -40,29 +44,15 @@ export function StopItems({
     date: string;
   };
 
-  const toTime = (value: string, isEndBoundary = false) => {
-    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-    if (dateOnlyMatch) {
-      const [, year, month, day] = dateOnlyMatch;
-      return new Date(
-        Number(year),
-        Number(month) - 1,
-        Number(day),
-        isEndBoundary ? 23 : 0,
-        isEndBoundary ? 59 : 0,
-        isEndBoundary ? 59 : 0,
-        isEndBoundary ? 999 : 0,
-      ).getTime();
-    }
-
-    return new Date(value).getTime();
-  };
-
   const getItemRange = (item: TripItem) => {
     if (item.type === "accommodation") {
       const accommodation = item.model as AccommodationDocumentType;
-      const startTime = toTime(accommodation.checkIn);
-      const endTime = toTime(accommodation.checkOut, true);
+      const startTime = getStoredDateTimeTimestamp(accommodation.checkIn, {
+        dateOnlyBoundary: "start",
+      });
+      const endTime = getStoredDateTimeTimestamp(accommodation.checkOut, {
+        dateOnlyBoundary: "end",
+      });
       return startTime <= endTime
         ? {
             start: accommodation.checkIn,
@@ -73,15 +63,23 @@ export function StopItems({
         : {
             start: accommodation.checkOut,
             end: accommodation.checkIn,
-            startTime: toTime(accommodation.checkOut),
-            endTime: toTime(accommodation.checkIn, true),
+            startTime: getStoredDateTimeTimestamp(accommodation.checkOut, {
+              dateOnlyBoundary: "start",
+            }),
+            endTime: getStoredDateTimeTimestamp(accommodation.checkIn, {
+              dateOnlyBoundary: "end",
+            }),
           };
     }
 
     const transport = item.model as TransportDocumentType;
-    const startTime = toTime(transport.departureDateTime);
+    const startTime = getStoredDateTimeTimestamp(transport.departureDateTime, {
+      dateOnlyBoundary: "start",
+    });
     const arrival = transport.arrivalDateTime || transport.departureDateTime;
-    const endTime = toTime(arrival, true);
+    const endTime = getStoredDateTimeTimestamp(arrival, {
+      dateOnlyBoundary: "end",
+    });
     return {
       start: startTime <= endTime ? transport.departureDateTime : arrival,
       end: startTime <= endTime ? arrival : transport.departureDateTime,
@@ -91,7 +89,11 @@ export function StopItems({
   };
 
   const formatDateLabel = (value: string) => {
-    const date = new Date(value);
+    const date = parseStoredDateTime(value) ?? new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
     if (value.includes("T")) {
       return date.toLocaleString(undefined, {
         month: "short",
@@ -133,7 +135,11 @@ export function StopItems({
       type: "accommodation" as const,
       date: acc.checkIn,
     })),
-  ].sort((a, b) => toTime(a.date) - toTime(b.date));
+  ].sort(
+    (a, b) =>
+      getStoredDateTimeTimestamp(a.date, { dateOnlyBoundary: "start" }) -
+      getStoredDateTimeTimestamp(b.date, { dateOnlyBoundary: "start" }),
+  );
 
   const overlapWarnings: Record<string, string[]> = {};
   for (let i = 0; i < items.length; i++) {
