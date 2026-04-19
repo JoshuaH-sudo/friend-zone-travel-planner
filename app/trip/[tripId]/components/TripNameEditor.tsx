@@ -45,6 +45,9 @@ export function TripNameEditor({
     setIsEditingTripName(false);
   };
 
+  const tripNameEditButtonClassName =
+    "bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary ml-2 shrink-0 translate-x-2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 focus-visible:translate-x-0 focus-visible:opacity-100";
+
   if (isEditingTripName) {
     return (
       <form
@@ -100,7 +103,7 @@ export function TripNameEditor({
           type="button"
           variant="ghost"
           size="icon-sm"
-          className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary ml-2 shrink-0 translate-x-2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 focus-visible:translate-x-0 focus-visible:opacity-100"
+          className={tripNameEditButtonClassName}
           aria-label={t("editAriaLabel")}
           onClick={startEditingTripName}
         >
