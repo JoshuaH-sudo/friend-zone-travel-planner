@@ -19,7 +19,7 @@ import {
 /** Parse an ISO date or datetime string into a Date.
  * Parses in local time to avoid UTC midnight shifts.
  */
-function parseIsoString(value: string): Date | undefined {
+function parseDateTimeValue(value: string): Date | undefined {
   const parsedStoredDate = parseStoredDateTime(value);
   if (parsedStoredDate) {
     return parsedStoredDate;
@@ -67,14 +67,14 @@ export function DateTimePicker({
 
   // Derive Date from the controlled string value
   const date = React.useMemo(
-    () => (value ? parseIsoString(value) : undefined),
+    () => (value ? parseDateTimeValue(value) : undefined),
     [value],
   );
   const highlightedDays = React.useMemo(
     () =>
       [...new Set(highlightedDates ?? [])]
         .filter(Boolean)
-        .map((highlightedDate) => parseIsoString(highlightedDate))
+        .map((highlightedDate) => parseDateTimeValue(highlightedDate))
         .filter(
           (d): d is Date => d !== undefined && !Number.isNaN(d.getTime()),
         ),
@@ -82,7 +82,7 @@ export function DateTimePicker({
   );
   const pairedDay = React.useMemo(() => {
     if (!pairedHighlightDate) return undefined;
-    const parsed = parseIsoString(pairedHighlightDate);
+    const parsed = parseDateTimeValue(pairedHighlightDate);
     return parsed && !Number.isNaN(parsed.getTime()) ? parsed : undefined;
   }, [pairedHighlightDate]);
   const datePresets = React.useMemo(

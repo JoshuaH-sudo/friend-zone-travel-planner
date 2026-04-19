@@ -59,7 +59,7 @@ export function getStoredDateTimeTimestamp(
   if (parsed) {
     return parsed.getTime();
   }
-  return Number.NaN;
+  return NaN;
 }
 
 /**
