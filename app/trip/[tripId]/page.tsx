@@ -57,29 +57,33 @@ export default function TripPage() {
   } = useTripData(tripId, { database: db });
 
   const totals = useMemo(() => {
-    const accommodationTotal = Object.values(accommodationsByStop)
+    const accommodationCost = Object.values(accommodationsByStop)
       .flat()
       .reduce(
         (sum, item) =>
           sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
-    const transportTotal = Object.values(transportsByStop)
+    const transportCost = Object.values(transportsByStop)
       .flat()
       .reduce(
         (sum, item) =>
           sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
-    const expenseTotal = expenses.reduce(
+    const expenseCost = expenses.reduce(
       (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
       0,
     );
+    const totalStays = Object.values(accommodationsByStop).flat().length;
+    const totalJourneys = Object.values(transportsByStop).flat().length;
     return {
-      accommodationTotal,
-      transportTotal,
-      expenseTotal,
-      total: accommodationTotal + transportTotal + expenseTotal,
+      accommodationCost,
+      transportCost,
+      expenseCost,
+      grandCost: accommodationCost + transportCost + expenseCost,
+      totalStays,
+      totalJourneys,
     };
   }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
 
@@ -201,14 +205,14 @@ export default function TripPage() {
                   <MapPin className="h-4 w-4" /> {stops.length} stops
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Bed className="h-4 w-4" /> {totals.accommodationTotal} stays
+                  <Bed className="h-4 w-4" /> {totals.totalStays} stays
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Plane className="h-4 w-4" /> {totals.transportTotal} journeys
+                  <Plane className="h-4 w-4" /> {totals.totalJourneys} journeys
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Wallet className="h-4 w-4" /> ~$
-                  {Math.round(totals.expenseTotal).toLocaleString()}
+                  {Math.round(totals.grandCost).toLocaleString()}
                 </span>
                 {totalDays > 0 && (
                   <span className="opacity-80">{totalDays} days</span>
