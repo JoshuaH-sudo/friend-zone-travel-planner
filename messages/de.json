@@ -82,6 +82,7 @@
   "tripNameEditor": {
     "saveAriaLabel": "Reisename speichern",
     "cancelAriaLabel": "Bearbeiten des Reisennamens abbrechen",
+    "editAriaLabel": "Reisename bearbeiten",
     "exportAriaLabel": "Reise als iCal exportieren"
   },
   "stopItems": {

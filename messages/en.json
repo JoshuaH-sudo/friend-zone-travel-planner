@@ -82,6 +82,7 @@
   "tripNameEditor": {
     "saveAriaLabel": "Save trip name",
     "cancelAriaLabel": "Cancel editing trip name",
+    "editAriaLabel": "Edit trip name",
     "exportAriaLabel": "Export trip to iCal"
   },
   "stopItems": {
