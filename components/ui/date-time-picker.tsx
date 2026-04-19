@@ -52,6 +52,7 @@ export interface DateTimePickerProps {
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
 const minutes = Array.from({ length: 60 }, (_, i) => i); // 0-59
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 export function DateTimePicker({
   value,
@@ -85,10 +86,10 @@ export function DateTimePicker({
     () =>
       presets ?? [
         { label: "Today", date: new Date() },
-        { label: "Tomorrow", date: new Date(Date.now() + 24 * 60 * 60 * 1000) },
+        { label: "Tomorrow", date: new Date(Date.now() + MS_PER_DAY) },
         {
           label: "In 7 days",
-          date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          date: new Date(Date.now() + 7 * MS_PER_DAY),
         },
       ],
     [presets],
