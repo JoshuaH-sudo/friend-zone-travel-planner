@@ -66,11 +66,6 @@ export function formatStoredDateTime(dt: string): string {
       return format(parsed, "MM/dd/yyyy hh:mm aa");
     }
 
-    const fallback = new Date(dt);
-    if (!Number.isNaN(fallback.getTime())) {
-      return format(fallback, "MM/dd/yyyy hh:mm aa");
-    }
-
     return dt;
   } catch {
     return dt;
