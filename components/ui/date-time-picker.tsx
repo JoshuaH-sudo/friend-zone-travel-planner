@@ -42,6 +42,8 @@ function toIsoDateTimeString(date: Date): string {
   return `${y}-${mo}-${d}T${h}:${mi}`;
 }
 
+type DateFormatOption = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
+
 export interface DateTimePickerProps {
   /** ISO date string "YYYY-MM-DD" or datetime string "YYYY-MM-DDTHH:MM" */
   value?: string;
@@ -51,6 +53,8 @@ export interface DateTimePickerProps {
   highlightedDates?: string[];
   pairedHighlightDate?: string;
   presets?: Array<{ label: string; date: Date }>;
+  /** User's preferred date format */
+  dateFormat?: DateFormatOption;
 }
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
@@ -63,6 +67,7 @@ export function DateTimePicker({
   highlightedDates,
   pairedHighlightDate,
   presets,
+  dateFormat = "MM/dd/yyyy",
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -175,7 +180,7 @@ export function DateTimePicker({
       >
         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
         {value && date && !Number.isNaN(date.getTime()) ? (
-          format(date, "MM/dd/yyyy hh:mm aa")
+          format(date, `${dateFormat} hh:mm aa`)
         ) : (
           <span>{placeholder}</span>
         )}

@@ -7,7 +7,49 @@ import {
   TripDocument,
   USER_SETTINGS_ID,
   UserSettingsDocument,
+  DateFormat,
 } from "@/lib/rxdb-schema";
+
+/**
+ * Detects the user's timezone from the browser.
+ */
+export function detectBrowserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
+/**
+ * Detects the user's preferred date format based on their browser locale.
+ * Uses a sample date to determine the order of day/month/year.
+ */
+export function detectBrowserDateFormat(): DateFormat {
+  try {
+    // Use a date where day, month, and year are all different to detect format
+    const sampleDate = new Date(2024, 11, 25); // Dec 25, 2024
+    const formatted = new Intl.DateTimeFormat(undefined, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(sampleDate);
+
+    // Check the position of "25" (day) and "12" (month) to determine format
+    const dayIndex = formatted.indexOf("25");
+    const monthIndex = formatted.indexOf("12");
+
+    if (dayIndex < monthIndex) {
+      return "dd/MM/yyyy"; // Day comes first (e.g., UK, Europe)
+    } else if (formatted.startsWith("2024")) {
+      return "yyyy-MM-dd"; // Year comes first (e.g., ISO, some Asian countries)
+    } else {
+      return "MM/dd/yyyy"; // Month comes first (e.g., US)
+    }
+  } catch {
+    return "MM/dd/yyyy";
+  }
+}
 
 export const APP_DATA_EXPORT_VERSION = 1;
 export const ALLOWED_THEME_VALUES = ["light", "dark", "system"] as const;
@@ -179,7 +221,8 @@ export async function resetAppData(db: MyDatabase) {
     id: USER_SETTINGS_ID,
     defaultCurrency: "USD",
     language: "en",
-    timezone: "UTC",
+    timezone: detectBrowserTimezone(),
+    dateFormat: detectBrowserDateFormat(),
   });
 }
 

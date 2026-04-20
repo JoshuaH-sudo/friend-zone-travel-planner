@@ -8,41 +8,61 @@ import {
   useEffect,
 } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
-import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
+import { USER_SETTINGS_ID, DateFormat } from "@/lib/rxdb-schema";
+import {
+  detectBrowserTimezone,
+  detectBrowserDateFormat,
+} from "@/lib/app-data-transfer";
 
 interface Settings {
   defaultCurrency: string;
   language: string;
   timezone: string;
+  dateFormat: DateFormat;
 }
 
 interface SettingsContextValue extends Settings {
   setDefaultCurrency: (currency: string) => void;
   setLanguage: (language: string) => void;
   setTimezone: (timezone: string) => void;
+  setDateFormat: (dateFormat: DateFormat) => void;
 }
 
-const defaultSettings: Settings = {
-  defaultCurrency: "USD",
-  language: "en",
-  timezone: "UTC",
-};
+function getDefaultSettings(): Settings {
+  return {
+    defaultCurrency: "USD",
+    language: "en",
+    timezone: typeof window !== "undefined" ? detectBrowserTimezone() : "UTC",
+    dateFormat:
+      typeof window !== "undefined" ? detectBrowserDateFormat() : "MM/dd/yyyy",
+  };
+}
 
 const supportedLanguages = new Set(["en", "de"]);
 
+// Static fallback for SSR context (actual values detected client-side)
+const ssrFallbackSettings: Settings = {
+  defaultCurrency: "USD",
+  language: "en",
+  timezone: "UTC",
+  dateFormat: "MM/dd/yyyy",
+};
+
 const SettingsContext = createContext<SettingsContextValue>({
-  ...defaultSettings,
+  ...ssrFallbackSettings,
   setDefaultCurrency: () => {},
   setLanguage: () => {},
   setTimezone: () => {},
+  setDateFormat: () => {},
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const db = useDatabase();
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [settings, setSettings] = useState<Settings>(getDefaultSettings);
 
   // Subscribe to settings document in RxDB
   useEffect(() => {
+    const defaults = getDefaultSettings();
     const subscription = db.settings
       .findOne(USER_SETTINGS_ID)
       .$.subscribe((doc) => {
@@ -51,6 +71,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             defaultCurrency: doc.defaultCurrency,
             language: doc.language,
             timezone: doc.timezone,
+            dateFormat: doc.dateFormat ?? defaults.dateFormat,
           });
         }
       });
@@ -60,13 +81,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const updateSettings = async (partial: Partial<Settings>) => {
     const currentDoc = await db.settings.findOne(USER_SETTINGS_ID).exec();
+    const defaults = getDefaultSettings();
     const current: Settings = currentDoc
       ? {
           defaultCurrency: currentDoc.defaultCurrency,
           language: currentDoc.language,
           timezone: currentDoc.timezone,
+          dateFormat: currentDoc.dateFormat ?? defaults.dateFormat,
         }
-      : defaultSettings;
+      : defaults;
     await db.settings.upsert({
       id: USER_SETTINGS_ID,
       ...current,
@@ -87,6 +110,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       updateSettings({ language });
     },
     setTimezone: (timezone) => updateSettings({ timezone }),
+    setDateFormat: (dateFormat) => updateSettings({ dateFormat }),
   };
 
   return (

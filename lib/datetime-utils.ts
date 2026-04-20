@@ -87,16 +87,38 @@ export function getStoredDateTimeTimestamp(
   return 0;
 }
 
+export type DateFormatOption = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
+
+/**
+ * Maps user-friendly date format options to date-fns format strings.
+ */
+const dateFormatPatterns: Record<DateFormatOption, string> = {
+  "MM/dd/yyyy": "MM/dd/yyyy",
+  "dd/MM/yyyy": "dd/MM/yyyy",
+  "yyyy-MM-dd": "yyyy-MM-dd",
+};
+
 /**
  * Format a stored ISO date ("YYYY-MM-DD") or datetime ("YYYY-MM-DDTHH:MM") string
  * for human-readable display (e.g. "01/18/2026 02:30 PM").
  * Falls back to the raw string on any parse error.
+ *
+ * @param dt - The stored date/datetime string
+ * @param dateFormat - The user's preferred date format (defaults to "MM/dd/yyyy")
  */
-export function formatStoredDateTime(dt: string): string {
+export function formatStoredDateTime(
+  dt: string,
+  dateFormat: DateFormatOption = "MM/dd/yyyy",
+): string {
   try {
     const parsed = parseStoredDateTime(dt);
     if (parsed) {
-      return format(parsed, "L LLL");
+      const datePattern = dateFormatPatterns[dateFormat];
+      // For datetime strings, include time; for date-only, just show the date
+      if (DATETIME_REGEX.test(dt)) {
+        return format(parsed, `${datePattern} h:mm a`);
+      }
+      return format(parsed, datePattern);
     }
 
     return dt;

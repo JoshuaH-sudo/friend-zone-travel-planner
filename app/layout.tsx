@@ -42,6 +42,10 @@ export default async function RootLayout({
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         />
+        <link
+          rel="icon"
+          href="/favicon.svg"
+        />
       </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>

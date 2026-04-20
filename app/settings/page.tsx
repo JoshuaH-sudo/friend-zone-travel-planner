@@ -17,6 +17,7 @@ import { TimezonePicker } from "@/components/ui/timezone-picker";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useSettings } from "@/lib/SettingsProvider";
+import { dateFormats, DateFormat } from "@/lib/rxdb-schema";
 import {
   exportAppData,
   importAppData,
@@ -38,6 +39,8 @@ export default function SettingsPage() {
     setLanguage,
     timezone,
     setTimezone,
+    dateFormat,
+    setDateFormat,
   } = useSettings();
   const importInputRef = useRef<HTMLInputElement>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -212,6 +215,30 @@ export default function SettingsPage() {
               onValueChange={(v) => v && setTimezone(v)}
               className="max-w-56"
             />
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">{t("general.dateFormat.label")}</p>
+              <p className="text-muted-foreground text-sm">
+                {t("general.dateFormat.description")}
+              </p>
+            </div>
+            <Select
+              value={dateFormat}
+              onValueChange={(v) => v && setDateFormat(v as DateFormat)}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder={t("general.dateFormat.placeholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {dateFormats.map((format) => (
+                  <SelectItem key={format} value={format}>
+                    {format}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </section>

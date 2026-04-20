@@ -66,11 +66,20 @@ export type ExpenseDocument = {
   updatedAt: number;
 };
 
+export type DateFormat = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
+
+export const dateFormats: DateFormat[] = [
+  "MM/dd/yyyy",
+  "dd/MM/yyyy",
+  "yyyy-MM-dd",
+];
+
 export type UserSettingsDocument = {
   id: string;
   defaultCurrency: string;
   language: string;
   timezone: string;
+  dateFormat: DateFormat;
 };
 
 // RxDB Schemas
@@ -412,7 +421,7 @@ export type ExpenseCollection = RxCollection<
 export const USER_SETTINGS_ID = "user-settings";
 
 export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
-  version: 1,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -432,8 +441,12 @@ export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
       type: "string",
       maxLength: 100,
     },
+    dateFormat: {
+      type: "string",
+      enum: dateFormats,
+    },
   },
-  required: ["id", "defaultCurrency", "language", "timezone"],
+  required: ["id", "defaultCurrency", "language", "timezone", "dateFormat"],
 };
 
 export type UserSettingsDocMethods = Record<string, never>;
