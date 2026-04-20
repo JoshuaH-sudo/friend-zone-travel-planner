@@ -58,7 +58,7 @@ export function TransportForm({
   highlightNameInput = false,
 }: TransportFormProps) {
   const t = useTranslations("transport");
-  const { timezone: settingsTimezone } = useSettings();
+  const { timezone: settingsTimezone, dateFormat } = useSettings();
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   const transportSchema = useMemo(
@@ -238,6 +238,7 @@ export function TransportForm({
               highlightedDates={highlightedDates}
               pairedHighlightDate={watchedArrivalDateTime || undefined}
               presets={datePresets}
+              dateFormat={dateFormat}
             />
           )}
         />
@@ -260,6 +261,7 @@ export function TransportForm({
               className="w-full"
               highlightedDates={highlightedDates}
               presets={datePresets}
+              dateFormat={dateFormat}
             />
           )}
         />

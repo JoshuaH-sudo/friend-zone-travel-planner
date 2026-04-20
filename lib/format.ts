@@ -62,3 +62,31 @@ export const formatDateShort = (iso: string) => {
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 };
+
+type DateFormatOption = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
+
+/**
+ * Format a date string using the user's preferred date format.
+ * For short display (no year), we just use month/day in the appropriate order.
+ */
+export const formatDateShortWithFormat = (
+  iso: string,
+  dateFormat: DateFormatOption,
+) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const day = d.getDate().toString().padStart(2, "0");
+
+  switch (dateFormat) {
+    case "dd/MM/yyyy":
+      return `${day}/${month}`;
+    case "yyyy-MM-dd":
+      return `${month}-${day}`;
+    case "MM/dd/yyyy":
+    default:
+      return `${month}/${day}`;
+  }
+};

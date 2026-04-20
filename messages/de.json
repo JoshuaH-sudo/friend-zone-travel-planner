@@ -75,6 +75,11 @@
       "defaultTimezone": {
         "label": "Standardzeitzone",
         "description": "Wird standardmäßig für den iCal-Export von Reisedaten sowie für neue Transport- und Unterkunftseinträge verwendet."
+      },
+      "dateFormat": {
+        "label": "Datumsformat",
+        "description": "Wie Daten in der gesamten App angezeigt werden.",
+        "placeholder": "Format auswählen"
       }
     },
     "backup": {

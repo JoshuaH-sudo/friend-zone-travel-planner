@@ -50,7 +50,7 @@ export function AccommodationForm({
   highlightNameInput = false,
 }: AccommodationFormProps) {
   const t = useTranslations("accommodation");
-  const { timezone: settingsTimezone } = useSettings();
+  const { timezone: settingsTimezone, dateFormat } = useSettings();
   const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   const accommodationSchema = useMemo(
@@ -217,6 +217,7 @@ export function AccommodationForm({
               className="w-full"
               highlightedDates={highlightedDates}
               presets={datePresets}
+              dateFormat={dateFormat}
             />
           )}
         />
@@ -238,6 +239,7 @@ export function AccommodationForm({
               highlightedDates={highlightedDates}
               pairedHighlightDate={watchedCheckIn}
               presets={datePresets}
+              dateFormat={dateFormat}
             />
           )}
         />
