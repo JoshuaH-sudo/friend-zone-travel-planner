@@ -7,8 +7,9 @@ import {
 import { useTranslations } from "next-intl";
 import {
   getStoredDateTimeTimestamp,
-  parseStoredDateTime,
+  formatStoredDateTime,
 } from "@/lib/datetime-utils";
+import { useSettings } from "@/lib/SettingsProvider";
 import { Accommodation } from "./Accommodation";
 import { Transport } from "./Transport";
 import { Timeline } from "./Timeline";
@@ -37,6 +38,7 @@ export function StopItems({
   pendingNewTransportId,
 }: StopItemsProps) {
   const t = useTranslations("stopItems");
+  const { dateFormat } = useSettings();
   type TripItem = {
     model: TransportDocumentType | AccommodationDocumentType;
     id: string;
@@ -89,26 +91,7 @@ export function StopItems({
   };
 
   const formatDateLabel = (value: string) => {
-    const date = parseStoredDateTime(value) ?? new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    if (value.includes("T")) {
-      return date.toLocaleString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
-    }
-
-    return date.toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return formatStoredDateTime(value, dateFormat);
   };
 
   const formatRangeLabel = (start: string, end: string) => {

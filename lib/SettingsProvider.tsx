@@ -8,24 +8,27 @@ import {
   useEffect,
 } from "react";
 import { useDatabase } from "@/lib/DatabaseProvider";
-import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
+import { USER_SETTINGS_ID, DateFormat } from "@/lib/rxdb-schema";
 
 interface Settings {
   defaultCurrency: string;
   language: string;
   timezone: string;
+  dateFormat: DateFormat;
 }
 
 interface SettingsContextValue extends Settings {
   setDefaultCurrency: (currency: string) => void;
   setLanguage: (language: string) => void;
   setTimezone: (timezone: string) => void;
+  setDateFormat: (dateFormat: DateFormat) => void;
 }
 
 const defaultSettings: Settings = {
   defaultCurrency: "USD",
   language: "en",
   timezone: "UTC",
+  dateFormat: "MM/dd/yyyy",
 };
 
 const supportedLanguages = new Set(["en", "de"]);
@@ -35,6 +38,7 @@ const SettingsContext = createContext<SettingsContextValue>({
   setDefaultCurrency: () => {},
   setLanguage: () => {},
   setTimezone: () => {},
+  setDateFormat: () => {},
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
@@ -51,6 +55,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             defaultCurrency: doc.defaultCurrency,
             language: doc.language,
             timezone: doc.timezone,
+            dateFormat: doc.dateFormat ?? defaultSettings.dateFormat,
           });
         }
       });
@@ -65,6 +70,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           defaultCurrency: currentDoc.defaultCurrency,
           language: currentDoc.language,
           timezone: currentDoc.timezone,
+          dateFormat: currentDoc.dateFormat ?? defaultSettings.dateFormat,
         }
       : defaultSettings;
     await db.settings.upsert({
@@ -87,6 +93,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       updateSettings({ language });
     },
     setTimezone: (timezone) => updateSettings({ timezone }),
+    setDateFormat: (dateFormat) => updateSettings({ dateFormat }),
   };
 
   return (

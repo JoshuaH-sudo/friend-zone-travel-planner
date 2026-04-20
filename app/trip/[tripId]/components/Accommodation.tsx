@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import useTime from "@/components/hooks/useTime";
 import { formatMoney } from "@/lib/format";
 import { formatStoredDateTime } from "@/lib/datetime-utils";
+import { useSettings } from "@/lib/SettingsProvider";
 import { AlertTriangle, Bed, Pencil, Trash2 } from "lucide-react";
 import { AccommodationForm } from "./AccommodationForm";
 
@@ -23,6 +24,7 @@ export const Accommodation = ({
 }) => {
   const t = useTranslations("accommodation");
   const time = useTime();
+  const { dateFormat } = useSettings();
   const { name, price, currency, checkIn, checkOut, timezone } = accommodation;
   const [isEditing, setIsEditing] = useState(false);
   const [highlightNameInput, setHighlightNameInput] = useState(false);
@@ -67,7 +69,7 @@ export const Accommodation = ({
   };
 
   /** Format a stored ISO datetime string for display. */
-  const formatDateTime = formatStoredDateTime;
+  const formatDateTime = (dt: string) => formatStoredDateTime(dt, dateFormat);
 
   if (isEditing) {
     return (

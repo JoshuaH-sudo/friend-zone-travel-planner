@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus, Search, MapPin, CalendarIcon } from "lucide-react";
-import { formatMoney, convert, formatDateShort } from "@/lib/format";
+import { formatMoney, convert, formatDateShortWithFormat } from "@/lib/format";
 import type {
   ExpenseDocument,
   StopDocument,
@@ -34,7 +34,7 @@ export default function HomePage() {
   const t = useTranslations("home");
   const db = useDatabase();
   const router = useRouter();
-  const { defaultCurrency } = useSettings();
+  const { defaultCurrency, dateFormat } = useSettings();
   const trips = useRxQuery<TripDocument>(
     db.trips.find().sort({ updatedAt: "desc" }),
   );
@@ -238,8 +238,8 @@ export default function HomePage() {
                   <CalendarIcon className="h-3.5 w-3.5" />
                   {card.startDate
                     ? card.endDate
-                      ? `${formatDateShort(card.startDate)} - ${formatDateShort(card.endDate)}`
-                      : formatDateShort(card.startDate)
+                      ? `${formatDateShortWithFormat(card.startDate, dateFormat)} - ${formatDateShortWithFormat(card.endDate, dateFormat)}`
+                      : formatDateShortWithFormat(card.startDate, dateFormat)
                     : t("noDatesYet")}
                 </div>
                 {card.stopCount > 0 && (

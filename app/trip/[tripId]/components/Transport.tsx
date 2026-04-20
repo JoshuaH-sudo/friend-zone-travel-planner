@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import useTime from "@/components/hooks/useTime";
 import { formatMoney } from "@/lib/format";
 import { formatStoredDateTime } from "@/lib/datetime-utils";
+import { useSettings } from "@/lib/SettingsProvider";
 import {
   AlertTriangle,
   Bus,
@@ -17,7 +18,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { TransportForm } from "./TransportForm";
-import { formatDate } from "date-fns";
 
 export const Transport = ({
   transport,
@@ -32,6 +32,7 @@ export const Transport = ({
 }) => {
   const t = useTranslations("transport");
   const time = useTime();
+  const { dateFormat } = useSettings();
   const {
     name,
     type,
@@ -86,7 +87,7 @@ export const Transport = ({
   };
 
   /** Format a stored ISO datetime string for display. */
-  const formatDateTime = formatStoredDateTime;
+  const formatDateTime = (dt: string) => formatStoredDateTime(dt, dateFormat);
 
   if (isEditing) {
     return (
@@ -125,11 +126,11 @@ export const Transport = ({
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate font-medium">{name}</p>
         <p className="text-muted-foreground text-xs capitalize">
-          {t(`type.${type}`)} · {formatDate(new Date(departureDateTime), "LLLL p")}
+          {t(`type.${type}`)} · {formatDateTime(departureDateTime)}
         </p>
         {arrivalDateTime && (
           <p className="text-muted-foreground mt-0.5 text-xs">
-            {t("arrivalDisplay", { value: formatDate(new Date(arrivalDateTime), "LLLL p") })}
+            {t("arrivalDisplay", { value: formatDateTime(arrivalDateTime) })}
           </p>
         )}
         {timezone && (

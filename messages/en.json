@@ -75,6 +75,11 @@
       "defaultTimezone": {
         "label": "Default Timezone",
         "description": "Used as the default when exporting trip data to iCal and when adding new transport or accommodation items."
+      },
+      "dateFormat": {
+        "label": "Date Format",
+        "description": "How dates are displayed throughout the app.",
+        "placeholder": "Select format"
       }
     },
     "backup": {
