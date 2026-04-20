@@ -98,7 +98,6 @@ export function TransportForm({
     handleSubmit,
     watch,
     control,
-    reset,
     formState: { errors },
   } = useForm<TransportFormValues>({
     resolver: zodResolver(transportSchema),
@@ -108,14 +107,6 @@ export function TransportForm({
       timezone: initialValues.timezone ?? settingsTimezone,
     },
   });
-
-  useEffect(() => {
-    reset({
-      ...initialValues,
-      arrivalDateTime: initialValues.arrivalDateTime ?? "",
-      timezone: initialValues.timezone ?? settingsTimezone,
-    });
-  }, [initialValues, reset, settingsTimezone]);
 
   useEffect(() => {
     if (!autoFocusName) return;

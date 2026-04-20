@@ -90,7 +90,6 @@ export function AccommodationForm({
     watch,
     control,
     setValue,
-    reset,
     formState: { errors },
   } = useForm<AccommodationFormValues>({
     resolver: zodResolver(accommodationSchema),
@@ -99,13 +98,6 @@ export function AccommodationForm({
       timezone: initialValues.timezone ?? settingsTimezone,
     },
   });
-
-  useEffect(() => {
-    reset({
-      ...initialValues,
-      timezone: initialValues.timezone ?? settingsTimezone,
-    });
-  }, [initialValues, reset, settingsTimezone]);
 
   useEffect(() => {
     if (!autoFocusName) return;
