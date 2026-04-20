@@ -14,9 +14,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <header className="bg-background/90 border-border sticky top-0 z-50 border-b backdrop-blur">
         <div className="container flex w-full items-center justify-between gap-4 px-4 py-4">
           <Link href="/" className="flex items-center gap-3">
-            <span className="gradient-hero text-primary-foreground inline-flex size-9 items-center justify-center rounded-xl">
-              <Compass />
-            </span>
+              <img
+                src="/favicon.svg"
+                alt="Friend Zone Travel Planner"
+                className="h-10 w-10 antialiased"
+              /> 
             <span className="text-foreground text-lg font-semibold">
               Friend Zone <em className="font-serif">travel</em>
             </span>
