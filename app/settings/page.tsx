@@ -24,6 +24,7 @@ import {
   isValidTheme,
   resetAppData,
 } from "@/lib/app-data-transfer";
+import posthog from "posthog-js";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -55,6 +56,7 @@ export default function SettingsPage() {
       await exportAppData(database, {
         theme: isValidTheme(theme) ? theme : null,
       });
+      posthog.capture("data_exported");
       setStatusMessage(t("backup.status.exported"));
     } catch (error) {
       const errorMessage =
@@ -89,6 +91,7 @@ export default function SettingsPage() {
       if (importedTheme) {
         setTheme(importedTheme);
       }
+      posthog.capture("data_imported", { file_size_bytes: file.size });
       setStatusMessage(t("backup.status.imported"));
     } catch (error) {
       const errorMessage =
@@ -116,7 +119,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8 container py-8 sm:py-12">
+    <div className="container flex flex-col gap-8 py-8 sm:py-12">
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
         <p className="text-muted-foreground">
@@ -229,7 +232,9 @@ export default function SettingsPage() {
               onValueChange={(v) => v && setDateFormat(v as DateFormat)}
             >
               <SelectTrigger className="w-40">
-                <SelectValue placeholder={t("general.dateFormat.placeholder")} />
+                <SelectValue
+                  placeholder={t("general.dateFormat.placeholder")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {dateFormats.map((format) => (

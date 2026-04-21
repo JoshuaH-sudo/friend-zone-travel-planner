@@ -27,6 +27,7 @@ import { useSettings } from "@/lib/SettingsProvider";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
@@ -90,9 +91,9 @@ export default function HomePage() {
     const nextTripId = generateId();
     let createdTrip: Awaited<ReturnType<typeof db.trips.insert>> | null = null;
     try {
-        createdTrip = await db.trips.insert({
-          id: nextTripId,
-          name: tripName.trim() || t("newTripName"),
+      createdTrip = await db.trips.insert({
+        id: nextTripId,
+        name: tripName.trim() || t("newTripName"),
         createdAt: now,
         updatedAt: now,
       });
@@ -116,6 +117,10 @@ export default function HomePage() {
       return;
     }
 
+    posthog.capture("trip_created", {
+      has_first_stop: Boolean(firstStopName.trim()),
+      has_first_stop_date: Boolean(firstStopDate),
+    });
     setTripName("");
     setFirstStopName("");
     setFirstStopDate("");
@@ -125,16 +130,15 @@ export default function HomePage() {
 
   return (
     <div className="container flex flex-col gap-8 py-8 sm:py-12">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-
-      28">
+      <div className="mb- 28 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <section className="animate-fade-in flex flex-col gap-3">
           <p className="text-accent text-2xs font-medium tracking-[0.2em] uppercase">
             {t("heroEyebrow")}
           </p>
-          <h1 className="font-serif text-4xl font-semibold">{t("heroTitle")}</h1>
-          <p className="text-muted-foreground">
-            {t("heroDescription")}
-          </p>
+          <h1 className="font-serif text-4xl font-semibold">
+            {t("heroTitle")}
+          </h1>
+          <p className="text-muted-foreground">{t("heroDescription")}</p>
         </section>
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
           <DialogTrigger

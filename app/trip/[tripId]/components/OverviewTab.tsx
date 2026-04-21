@@ -33,6 +33,7 @@ import { TransportForm } from "./TransportForm";
 import { Bed, Plane, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSettings } from "@/lib/SettingsProvider";
+import posthog from "posthog-js";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -141,6 +142,7 @@ export function OverviewTab({
       toast.error(t("toast.reorderFailed"));
       return;
     }
+    posthog.capture("stop_reordered", { stop_count: stops.length });
     toast(t("toast.reorderUpdated"), {
       action: {
         label: t("toast.undo"),
@@ -161,19 +163,23 @@ export function OverviewTab({
     const stop = stops.find((s) => s.id === stopId);
     if (!stop) return;
     await stop.patch({ name: newName, updatedAt: Date.now() });
-  }
+  };
 
   const handleDeleteStop = async (stopId: string) => {
     const stop = stops.find((s) => s.id === stopId);
     if (!stop) return;
     // Delete related accommodations and transports first
-    const accoms = await accommodationsByStop[stopId] || [];
-    const trans = await transportsByStop[stopId] || [];
+    const accoms = accommodationsByStop[stopId] || [];
+    const trans = transportsByStop[stopId] || [];
     await Promise.all([
       ...accoms.map((a) => a.remove()),
       ...trans.map((t) => t.remove()),
       stop.remove(),
     ]);
+    posthog.capture("stop_deleted", {
+      accommodations_deleted: accoms.length,
+      transports_deleted: trans.length,
+    });
   };
 
   return (
@@ -196,7 +202,9 @@ export function OverviewTab({
                 accommodations={accommodationsByStop[stop.id] || []}
                 transports={transportsByStop[stop.id] || []}
                 onDeleteStop={() => handleDeleteStop(stop.id)}
-                onEditStopName={(newName) => handleEditStopName(stop.id, newName)}
+                onEditStopName={(newName) =>
+                  handleEditStopName(stop.id, newName)
+                }
               >
                 <div className="flex flex-col gap-4">
                   <section>

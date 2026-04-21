@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useTripData } from "@/components/hooks/useTripData";
@@ -50,6 +50,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import posthog from "posthog-js";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
@@ -69,6 +70,16 @@ export default function TripPage() {
     expenses,
     loading,
   } = useTripData(tripId, { database: db });
+
+  useEffect(() => {
+    if (!loading && trip) {
+      posthog.capture("trip_viewed", {
+        trip_id: tripId,
+        stop_count: stops.length,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const totals = useMemo(() => {
     const accommodationCost = Object.values(accommodationsByStop)
@@ -120,6 +131,7 @@ export default function TripPage() {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
+    posthog.capture("stop_added", { trip_id: tripId });
   };
 
   const onAddAccommodation = async (
@@ -144,6 +156,10 @@ export default function TripPage() {
       timezone: payload.timezone,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+    });
+    posthog.capture("accommodation_added", {
+      trip_id: tripId,
+      currency: payload.currency || defaultCurrency,
     });
   };
 
@@ -170,6 +186,10 @@ export default function TripPage() {
       timezone: payload.timezone,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+    });
+    posthog.capture("transport_added", {
+      trip_id: tripId,
+      currency: payload.currency || defaultCurrency,
     });
   };
 
@@ -258,6 +278,9 @@ export default function TripPage() {
                   <DropdownMenuItem
                     onClick={async () => {
                       await exportTripJson(db, trip.id);
+                      posthog.capture("trip_exported_json", {
+                        trip_id: trip.id,
+                      });
                     }}
                   >
                     Export JSON
@@ -265,6 +288,9 @@ export default function TripPage() {
                   <DropdownMenuItem
                     onClick={async () => {
                       await copyShareLink(db, trip.id);
+                      posthog.capture("share_link_copied", {
+                        trip_id: trip.id,
+                      });
                       toast.success("Share link copied.");
                     }}
                   >
@@ -344,6 +370,10 @@ export default function TripPage() {
             <AlertDialogAction
               variant="destructive"
               onClick={async () => {
+                posthog.capture("trip_deleted", {
+                  trip_id: trip.id,
+                  stop_count: stops.length,
+                });
                 await trip.remove();
                 router.push("/");
               }}

@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { useSettings } from "@/lib/SettingsProvider";
 import { generateId } from "@/lib/rxdb-database";
 import { useDatabase } from "@/lib/DatabaseProvider";
+import posthog from "posthog-js";
 
 type BudgetTabProps = {
   trip: TripDocumentType;
@@ -35,7 +36,9 @@ export function BudgetTab({
   const [expenseDescription, setExpenseDescription] = useState("");
   const [expensePrice, setExpensePrice] = useState("0");
   const [expenseCurrency, setExpenseCurrency] = useState(defaultCurrency);
-  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().slice(0, 10));
+  const [expenseDate, setExpenseDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
 
   useEffect(() => {
     setBudgetValue(String(trip.budget ?? 0));
@@ -45,13 +48,15 @@ export function BudgetTab({
     const accommodationTotal = Object.values(accommodationsByStop)
       .flat()
       .reduce(
-        (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
+        (sum, item) =>
+          sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
     const transportTotal = Object.values(transportsByStop)
       .flat()
       .reduce(
-        (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
+        (sum, item) =>
+          sum + convert(item.price, item.currency, defaultCurrency),
         0,
       );
     const expensesTotal = expenses.reduce(
@@ -63,12 +68,15 @@ export function BudgetTab({
   }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
 
   const numericBudget = Number(budgetValue) || 0;
-  const progress = numericBudget > 0 ? Math.min(100, (totals.total / numericBudget) * 100) : 0;
+  const progress =
+    numericBudget > 0 ? Math.min(100, (totals.total / numericBudget) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-4">
       <section className="rounded-2xl border p-4">
-        <p className="text-muted-foreground text-sm">Trip budget ({defaultCurrency})</p>
+        <p className="text-muted-foreground text-sm">
+          Trip budget ({defaultCurrency})
+        </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Input
             type="number"
@@ -79,9 +87,15 @@ export function BudgetTab({
           />
           <Button
             onClick={async () => {
+              const budget = Number(budgetValue) || 0;
               await trip.patch({
-                budget: Number(budgetValue) || 0,
+                budget,
                 updatedAt: Date.now(),
+              });
+              posthog.capture("budget_set", {
+                trip_id: trip.id,
+                currency: defaultCurrency,
+                budget_amount: budget,
               });
             }}
           >
@@ -100,8 +114,13 @@ export function BudgetTab({
       <section className="rounded-2xl border p-4">
         <h3 className="font-serif text-2xl">Category breakdown</h3>
         <div className="mt-2 flex flex-col gap-1 text-sm">
-          <p>Accommodations: {formatMoney(totals.accommodationTotal, defaultCurrency)}</p>
-          <p>Transports: {formatMoney(totals.transportTotal, defaultCurrency)}</p>
+          <p>
+            Accommodations:{" "}
+            {formatMoney(totals.accommodationTotal, defaultCurrency)}
+          </p>
+          <p>
+            Transports: {formatMoney(totals.transportTotal, defaultCurrency)}
+          </p>
           <p>Expenses: {formatMoney(totals.expensesTotal, defaultCurrency)}</p>
         </div>
       </section>
@@ -113,17 +132,23 @@ export function BudgetTab({
           onSubmit={async (event) => {
             event.preventDefault();
             if (!expenseDescription.trim()) return;
+            const price = Number(expensePrice) || 0;
             await db.expenses.insert({
               id: generateId(),
               tripId: trip.id,
               stopId: undefined,
               category: "other",
               description: expenseDescription.trim(),
-              price: Number(expensePrice) || 0,
+              price,
               currency: expenseCurrency,
               date: expenseDate,
               createdAt: Date.now(),
               updatedAt: Date.now(),
+            });
+            posthog.capture("expense_added", {
+              trip_id: trip.id,
+              currency: expenseCurrency,
+              price,
             });
             setExpenseDescription("");
             setExpensePrice("0");
