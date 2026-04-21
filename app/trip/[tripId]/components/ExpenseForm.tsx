@@ -147,7 +147,27 @@ export function ExpenseForm({
                 onValueChange={field.onChange}
               >
                 <SelectTrigger className="w-45">
-                  <SelectValue placeholder={t("categoryPlaceholder")} />
+                  <SelectValue
+                    placeholder={t("categoryPlaceholder")}
+                    render={(props, item) => {
+                      return (
+                        <div className="flex items-center gap-2">
+                          {
+                            activityOptions.find(
+                              (option) => option.value === item.value,
+                            )?.icon
+                          }
+                          <span>
+                            {
+                              activityOptions.find(
+                                (option) => option.value === item.value,
+                              )?.label
+                            }
+                          </span>
+                        </div>
+                      );
+                    }}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -218,7 +238,6 @@ export function ExpenseForm({
           )}
         </div>
       </div>
-
       <div className="flex gap-2">
         <Button type="submit">{submitLabel ?? t("save")}</Button>
         {onCancel ? (
