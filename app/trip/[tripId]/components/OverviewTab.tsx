@@ -157,6 +157,25 @@ export function OverviewTab({
     });
   };
 
+  const handleEditStopName = async (stopId: string, newName: string) => {
+    const stop = stops.find((s) => s.id === stopId);
+    if (!stop) return;
+    await stop.patch({ name: newName, updatedAt: Date.now() });
+  }
+
+  const handleDeleteStop = async (stopId: string) => {
+    const stop = stops.find((s) => s.id === stopId);
+    if (!stop) return;
+    // Delete related accommodations and transports first
+    const accoms = await accommodationsByStop[stopId] || [];
+    const trans = await transportsByStop[stopId] || [];
+    await Promise.all([
+      ...accoms.map((a) => a.remove()),
+      ...trans.map((t) => t.remove()),
+      stop.remove(),
+    ]);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <DndContext
@@ -176,6 +195,8 @@ export function OverviewTab({
                 stop={stop}
                 accommodations={accommodationsByStop[stop.id] || []}
                 transports={transportsByStop[stop.id] || []}
+                onDeleteStop={() => handleDeleteStop(stop.id)}
+                onEditStopName={(newName) => handleEditStopName(stop.id, newName)}
               >
                 <div className="flex flex-col gap-4">
                   <section>
