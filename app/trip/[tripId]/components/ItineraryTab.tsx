@@ -6,6 +6,7 @@ import type {
   StopDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
+import { parseISO, format as formatDate } from "date-fns";
 
 type ItineraryTabProps = {
   stops: StopDocumentType[];
@@ -20,83 +21,66 @@ export function ItineraryTab({
   transportsByStop,
   expenses,
 }: ItineraryTabProps) {
-  const grouped = new Map<
-    string,
-    {
-      stops: StopDocumentType[];
-      accommodations: AccommodationDocumentType[];
-      transports: TransportDocumentType[];
-      expenses: ExpenseDocumentType[];
-    }
-  >();
+  // Build a flat list of all items with their stop context and their own date
+  type ItineraryItem =
+    | { type: "accommodation"; item: AccommodationDocumentType; stop: StopDocumentType | undefined; date: string }
+    | { type: "transport"; item: TransportDocumentType; stop: StopDocumentType | undefined; date: string }
+    | { type: "expense"; item: ExpenseDocumentType; stop: StopDocumentType | undefined; date: string };
 
-  const register = (date: string) => {
-    const key = date.slice(0, 10);
-    if (!grouped.has(key)) {
-      grouped.set(key, {
-        stops: [],
-        accommodations: [],
-        transports: [],
-        expenses: [],
-      });
-    }
-    return grouped.get(key)!;
-  };
-
+  const items: ItineraryItem[] = [];
   for (const stop of stops) {
-    register(stop.date).stops.push(stop);
     for (const accommodation of accommodationsByStop[stop.id] || []) {
-      register(accommodation.checkIn).accommodations.push(accommodation);
+      items.push({ type: "accommodation", item: accommodation, stop, date: accommodation.checkIn });
     }
     for (const transport of transportsByStop[stop.id] || []) {
-      register(transport.departureDateTime).transports.push(transport);
+      items.push({ type: "transport", item: transport, stop, date: transport.departureDateTime });
     }
   }
-
   for (const expense of expenses) {
-    register(expense.date).expenses.push(expense);
+    // Try to associate expense with a stop if possible
+    const stop = expense.stopId ? stops.find(s => s.id === expense.stopId) : undefined;
+    items.push({ type: "expense", item: expense, stop, date: expense.date });
   }
 
-  const days = [...grouped.entries()].sort(([left], [right]) =>
-    left.localeCompare(right),
-  );
+  // Sort items by their own date (preserve order for same date)
+  items.sort((a, b) => a.date.localeCompare(b.date));
   const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="flex flex-col gap-4">
-      {days.map(([date, day]) => (
-        <section
-          key={date}
-          className={`rounded-2xl border p-4 ${date === today ? "bg-primary/10 border-primary/30" : "bg-card border-border"}`}
-        >
-          <h3 className="font-serif text-2xl">
-            {new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-            })}
-          </h3>
-          <div className="mt-3 flex flex-col gap-2 text-sm">
-            {day.stops.map((item) => (
-              <p key={item.id}>📍 {item.name}</p>
-            ))}
-            {day.accommodations.map((item) => (
-              <p key={item.id}>🏨 {item.name}</p>
-            ))}
-            {day.transports.map((item) => (
-              <p key={item.id}>🚆 {item.name}</p>
-            ))}
-            {day.expenses.map((item) => (
-              <p key={item.id}>💳 {item.description}</p>
-            ))}
-          </div>
-        </section>
-      ))}
-      {days.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-muted-foreground rounded-2xl border border-dashed p-8 text-center">
           Add stops to build your itinerary.
         </p>
-      ) : null}
+      ) : (
+        <section className="rounded-2xl border p-4 bg-card border-border">
+          <div className="flex flex-col gap-2 text-sm">
+            {items.map((entry) => {
+              let icon = "";
+              let label = "";
+              if (entry.type === "accommodation") {
+                icon = "🏨";
+                label = entry.item.name;
+              } else if (entry.type === "transport") {
+                icon = "🚆";
+                label = entry.item.name;
+              } else if (entry.type === "expense") {
+                icon = "💳";
+                label = entry.item.description;
+              }
+              const dateStr = formatDate(parseISO(entry.date), "MMM d, yyyy");
+              const stopStr = entry.stop ? `📍 ${entry.stop.name}` : "";
+              return (
+                <div key={entry.item.id} className={`flex items-center gap-2 ${entry.date.slice(0,10) === today ? "bg-primary/10 border-primary/30 rounded px-2" : ""}`}>
+                  <span className="text-muted-foreground text-xs min-w-[110px]">{dateStr}</span>
+                  {stopStr && <span className="text-xs text-primary font-serif font-semibold">{stopStr}</span>}
+                  <span>{icon} {label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
