@@ -143,7 +143,6 @@ export async function importSharedTrip(db: MyDatabase, encoded: string) {
       ...expense,
       id: nanoid(),
       tripId,
-      stopId: expense.stopId ? stopIdMap.get(expense.stopId) : undefined,
       createdAt: now,
       updatedAt: now,
     });
