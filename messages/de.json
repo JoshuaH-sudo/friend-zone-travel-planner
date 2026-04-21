@@ -274,6 +274,9 @@
       "priceMustBePositive": "Preis muss positiv sein",
       "priceTooHigh": "Preis ist zu hoch"
     },
+    "actions": {
+      "addExpense": "Ausgabe hinzufügen"
+    },
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
