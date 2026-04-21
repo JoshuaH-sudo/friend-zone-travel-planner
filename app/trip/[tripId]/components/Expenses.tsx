@@ -116,7 +116,7 @@ export function Expenses({
                   category: expense.category,
                   price: expense.price,
                   currency: expense.currency,
-                  date: expense.date || "",
+                  date: expense.date,
                 }}
                 onSubmit={(data) => handleEdit(expense.id, data)}
                 onCancel={() => setEditingId(null)}
@@ -140,9 +140,11 @@ export function Expenses({
                   )}
                   <div>
                     <div className="font-medium">{expense.name}</div>
-                    <div className="text-muted-foreground text-xs">
-                      {expense.description}
-                    </div>
+                    {expense.description && (
+                      <div className="text-muted-foreground text-xs">
+                        {expense.description}
+                      </div>
+                    )}
                     {expense.date && (
                       <div className="text-muted-foreground text-xs">
                         {expense.date}

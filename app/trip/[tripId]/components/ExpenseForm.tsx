@@ -19,7 +19,7 @@ import {
 
 export type ExpenseFormValues = {
   name: string;
-  description: string;
+  description?: string;
   category: "food" | "activity" | "shopping" | "other";
   price: number;
   currency: string;
@@ -52,7 +52,8 @@ export function ExpenseForm({
     description: z
       .string()
       .min(1, t("errors.descriptionRequired"))
-      .max(300, t("errors.descriptionTooLong")),
+      .max(300, t("errors.descriptionTooLong"))
+      .optional(),
     category: z.enum(["food", "activity", "shopping", "other"]),
     price: z
       .number()
