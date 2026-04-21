@@ -15,30 +15,33 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type {
   AccommodationDocumentType,
+  ExpenseDocumentType,
   StopDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
 import { useMemo, useState } from "react";
-import { SortableStopCard } from "./SortableStopCard";
 import { toast } from "sonner";
 import { addDays, format } from "date-fns";
 import { Transport } from "./Transport";
-import { Accommodation } from "./Accommodation";
-import { AccommodationForm } from "./AccommodationForm";
-import { TransportForm } from "./TransportForm";
-import { Bed, Plane, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSettings } from "@/lib/SettingsProvider";
 import posthog from "posthog-js";
+import { Expenses } from "./Expenses";
+import { SortableStopCard } from "./SortableStopCard";
+import { Input } from "@base-ui/react";
+import { Bed, Plus, Plane, CreditCard } from "lucide-react";
+import { Accommodation } from "./Accommodation";
+import { AccommodationForm } from "./AccommodationForm";
+import { TransportForm } from "./TransportForm";
+import { Button } from "@/components/ui/button";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
+  expensesByStop?: Record<string, ExpenseDocumentType[]>;
   onAddStop: (name: string, date: string) => Promise<void>;
   onAddAccommodation: (
     stopId: string,
@@ -72,14 +75,17 @@ function getTodayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function OverviewTab({
+export const OverviewTab = ({
   stops,
   accommodationsByStop,
   transportsByStop,
+  expensesByStop = {},
   onAddStop,
   onAddAccommodation,
   onAddTransport,
-}: OverviewTabProps) {
+}: OverviewTabProps & {
+  expensesByStop?: Record<string, ExpenseDocumentType[]>;
+}) => {
   const t = useTranslations("overviewTab");
   const { defaultCurrency, timezone } = useSettings();
   const sortedStops = useMemo(
@@ -322,6 +328,18 @@ export function OverviewTab({
                       )}
                     </div>
                   </section>
+                  <section>
+                    <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+                      <CreditCard className="text-muted-foreground h-4 w-4" />
+                      <p>{t("sections.expenses")}</p>
+                    </div>
+                    <Expenses
+                      stopId={stop.id}
+                      tripId={stop.tripId}
+                      expenses={expensesByStop[stop.id] || []}
+                      defaultCurrency={defaultCurrency}
+                    />
+                  </section>
                 </div>
               </SortableStopCard>
             ))}
@@ -373,4 +391,4 @@ export function OverviewTab({
       </div>
     </div>
   );
-}
+};

@@ -56,14 +56,15 @@ export type TransportDocument = {
 export type ExpenseDocument = {
   id: string;
   tripId: string;
-  stopId?: string;
   category: "food" | "activity" | "shopping" | "other";
   description: string;
   price: number;
   currency: Currency;
-  date: string;
   createdAt: number;
   updatedAt: number;
+  stopId: string;
+  name: string;
+  date?: string;
 };
 
 export type DateFormat = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
@@ -306,11 +307,6 @@ export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
       maxLength: 100,
       ref: "trips",
     },
-    stopId: {
-      type: "string",
-      maxLength: 100,
-      ref: "stops",
-    },
     category: {
       type: "string",
       enum: ["food", "activity", "shopping", "other"],
@@ -329,10 +325,6 @@ export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
       type: "string",
       enum: allCurrencyCodes,
     },
-    date: {
-      type: "string",
-      maxLength: 100,
-    },
     createdAt: {
       type: "number",
       multipleOf: 1,
@@ -345,19 +337,31 @@ export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
       minimum: 0,
       maximum: 8640000000000000,
     },
+    name: {
+      type: "string",
+      maxLength: 200,
+    },
+    date: {
+      type: "string",
+      maxLength: 100,
+    },
+    stopId: {
+      type: "string",
+      maxLength: 100,
+      ref: "stops",
+    },
   },
   required: [
     "id",
     "tripId",
-    "category",
-    "description",
+    "stopId",
+    "name",
     "price",
     "currency",
-    "date",
     "createdAt",
     "updatedAt",
   ],
-  indexes: ["tripId", "date"],
+  indexes: ["tripId"],
 };
 
 // RxDocument types

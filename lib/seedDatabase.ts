@@ -89,6 +89,34 @@ export async function seedDatabase() {
       updatedAt: Date.now(),
     });
 
+    // Create expenses for Tokyo
+    await database.expenses.insert({
+      id: generateId(),
+      tripId: trip1Id,
+      stopId: tokyoStopId,
+      name: "Sushi dinner",
+      price: 40,
+      currency: "USD",
+      date: "2024-01-02",
+      category: "food",
+      description: "Dinner at sushi restaurant",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    await database.expenses.insert({
+      id: generateId(),
+      tripId: trip1Id,
+      stopId: tokyoStopId,
+      name: "Museum tickets",
+      price: 20,
+      currency: "USD",
+      date: "2024-01-03",
+      category: "activity",
+      description: "Tickets for museum entry",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
     // Create accommodations for Kyoto
     await database.accommodations.insert({
       id: generateId(),
@@ -115,6 +143,21 @@ export async function seedDatabase() {
       updatedAt: Date.now(),
     });
 
+    // Create expenses for Kyoto
+    await database.expenses.insert({
+      id: generateId(),
+      tripId: trip1Id,
+      stopId: kyotoStopId,
+      name: "Temple entry",
+      price: 15,
+      currency: "USD",
+      date: "2024-01-06",
+      category: "activity",
+      description: "Entry to temple",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
     // Create accommodations for Osaka
     await database.accommodations.insert({
       id: generateId(),
@@ -124,6 +167,21 @@ export async function seedDatabase() {
       checkIn: "2024-01-10T14:00",
       checkOut: "2024-01-15T11:00",
       stopId: osakaStopId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Create expenses for Osaka
+    await database.expenses.insert({
+      id: generateId(),
+      tripId: trip1Id,
+      stopId: osakaStopId,
+      name: "Street food",
+      price: 25,
+      currency: "USD",
+      date: "2024-01-11",
+      category: "food",
+      description: "Various street food snacks",
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });

@@ -6,15 +6,11 @@ import type {
   TransportDocumentType,
   TripDocumentType,
 } from "@/lib/rxdb-schema";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { CurrencySelect } from "@/components/ui/currency-select";
 import { convert, formatMoney } from "@/lib/format";
 import { Progress } from "@/components/ui/progress";
 import { useSettings } from "@/lib/SettingsProvider";
-import { generateId } from "@/lib/rxdb-database";
-import { useDatabase } from "@/lib/DatabaseProvider";
 import posthog from "posthog-js";
 
 type BudgetTabProps = {
@@ -30,15 +26,8 @@ export function BudgetTab({
   transportsByStop,
   expenses,
 }: BudgetTabProps) {
-  const db = useDatabase();
   const { defaultCurrency } = useSettings();
   const [budgetValue, setBudgetValue] = useState(String(trip.budget ?? 0));
-  const [expenseDescription, setExpenseDescription] = useState("");
-  const [expensePrice, setExpensePrice] = useState("0");
-  const [expenseCurrency, setExpenseCurrency] = useState(defaultCurrency);
-  const [expenseDate, setExpenseDate] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
 
   useEffect(() => {
     setBudgetValue(String(trip.budget ?? 0));
@@ -71,6 +60,31 @@ export function BudgetTab({
   const progress =
     numericBudget > 0 ? Math.min(100, (totals.total / numericBudget) * 100) : 0;
 
+
+  // Debounced updateBudget
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const lastBudgetValue = useRef<number>(trip.budget ?? 0);
+
+  const updateBudget = (newBudget: number) => {
+    setBudgetValue(String(newBudget));
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+    debounceTimeout.current = setTimeout(async () => {
+      if (lastBudgetValue.current !== newBudget) {
+        await trip.patch({
+          budget: newBudget,
+          updatedAt: Date.now(),
+        });
+        posthog.capture("budget_updated", {
+          trip_id: trip.id,
+          budget: newBudget,
+        });
+        lastBudgetValue.current = newBudget;
+      }
+    }, 500);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <section className="rounded-2xl border p-4">
@@ -82,25 +96,9 @@ export function BudgetTab({
             type="number"
             min="0"
             value={budgetValue}
-            onChange={(event) => setBudgetValue(event.target.value)}
+            onChange={(event) => updateBudget(Number(event.target.value) || 0)}
             className="w-36"
           />
-          <Button
-            onClick={async () => {
-              const budget = Number(budgetValue) || 0;
-              await trip.patch({
-                budget,
-                updatedAt: Date.now(),
-              });
-              posthog.capture("budget_set", {
-                trip_id: trip.id,
-                currency: defaultCurrency,
-                budget_amount: budget,
-              });
-            }}
-          >
-            Save budget
-          </Button>
         </div>
         <div className="mt-4 flex flex-col gap-2">
           <Progress value={progress} />
@@ -125,62 +123,7 @@ export function BudgetTab({
         </div>
       </section>
 
-      <section className="rounded-2xl border p-4">
-        <h3 className="font-serif text-2xl">Add expense</h3>
-        <form
-          className="mt-3 flex flex-wrap items-end gap-2"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            if (!expenseDescription.trim()) return;
-            const price = Number(expensePrice) || 0;
-            await db.expenses.insert({
-              id: generateId(),
-              tripId: trip.id,
-              stopId: undefined,
-              category: "other",
-              description: expenseDescription.trim(),
-              price,
-              currency: expenseCurrency,
-              date: expenseDate,
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-            });
-            posthog.capture("expense_added", {
-              trip_id: trip.id,
-              currency: expenseCurrency,
-              price,
-            });
-            setExpenseDescription("");
-            setExpensePrice("0");
-          }}
-        >
-          <Input
-            value={expenseDescription}
-            onChange={(event) => setExpenseDescription(event.target.value)}
-            placeholder="Expense description"
-            className="min-w-48 flex-1"
-          />
-          <Input
-            type="number"
-            min="0"
-            value={expensePrice}
-            onChange={(event) => setExpensePrice(event.target.value)}
-            className="w-24"
-          />
-          <CurrencySelect
-            name="expenseCurrency"
-            value={expenseCurrency}
-            onValueChange={(value) => value && setExpenseCurrency(value)}
-            currencies="custom"
-          />
-          <Input
-            type="date"
-            value={expenseDate}
-            onChange={(event) => setExpenseDate(event.target.value)}
-          />
-          <Button type="submit">Save expense</Button>
-        </form>
-      </section>
+
     </div>
   );
 }

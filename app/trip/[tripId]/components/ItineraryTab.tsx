@@ -39,7 +39,7 @@ export function ItineraryTab({
   for (const expense of expenses) {
     // Try to associate expense with a stop if possible
     const stop = expense.stopId ? stops.find(s => s.id === expense.stopId) : undefined;
-    items.push({ type: "expense", item: expense, stop, date: expense.date });
+    items.push({ type: "expense", item: expense, stop, date: expense.date || "9999-12-31" }); // Put undated expenses at the end
   }
 
   // Sort items by their own date (preserve order for same date)
