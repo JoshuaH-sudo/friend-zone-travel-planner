@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Check, Cross, GripVertical, Pencil, Trash2, X } from "lucide-react";
 import { capitalize } from "@/lib/utils";
-import { format as formatDate, parseISO, isEqual, differenceInDays, differenceInYears } from "date-fns";
+import { format as formatDate, parseISO, isEqual, differenceInDays, differenceInYears, differenceInMonths } from "date-fns";
 import { useState, useRef } from "react";
 
 type SortableStopCardProps = {
@@ -73,7 +73,7 @@ export function SortableStopCard({
     const end = parseISO(latestDate);
     if (isEqual(start, end)) {
       dateRangeSummary = formatDate(start, "MMM d, yyyy");
-    } else if (differenceInDays(end, start) < 2) {
+    } else if (differenceInMonths(end, start) < 1) {
       dateRangeSummary =
         formatDate(start, "MMM d") + " - " + formatDate(end, "d");
     } else if (differenceInYears(end, start) >= 1) {
