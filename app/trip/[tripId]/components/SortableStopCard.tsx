@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Check, Cross, GripVertical, Pencil, Trash2, X } from "lucide-react";
 import { capitalize } from "@/lib/utils";
-import { formatDate } from "date-fns";
+import { format as formatDate, parseISO, isEqual, differenceInDays, differenceInYears } from "date-fns";
 import { useState, useRef } from "react";
 
 type SortableStopCardProps = {
@@ -55,17 +55,34 @@ export function SortableStopCard({
 
   //Earliest date from all items in the stop, used for calculating the date range summary
   const dates = [
-    ...accommodations.map((a) => a.startDate),
-    ...transports.map((t) => t.date),
-  ].sort();
-  const earliestDate = dates[0];
-  const latestDate = dates[dates.length - 1];
+    ...accommodations.map((a) => a.checkIn),
+    ...accommodations.map((a) => a.checkOut),
+    ...transports.map((t) => t.departureDateTime),
+    ...transports.map((t) => t.arrivalDateTime),
+  ];
+  let earliestDate: string | null = null;
+  let latestDate: string | null = null;
+  dates.forEach((date) => {
+    if (!date) return;
+    if (!earliestDate || date < earliestDate) earliestDate = date;
+    if (!latestDate || date > latestDate) latestDate = date;
+  });
   let dateRangeSummary = "";
   if (earliestDate && latestDate) {
-    dateRangeSummary =
-      formatDate(new Date(earliestDate), "MMM d") +
-      " - " +
-      formatDate(new Date(latestDate), "MMM d, yyyy");
+    const start = parseISO(earliestDate);
+    const end = parseISO(latestDate);
+    if (isEqual(start, end)) {
+      dateRangeSummary = formatDate(start, "MMM d, yyyy");
+    } else if (differenceInDays(end, start) < 2) {
+      dateRangeSummary =
+        formatDate(start, "MMM d") + " - " + formatDate(end, "d");
+    } else if (differenceInYears(end, start) >= 1) {
+      dateRangeSummary =
+        formatDate(start, "MMM d, yyyy") + " - " + formatDate(end, "MMM d, yyyy");
+    } else {
+      dateRangeSummary =
+        formatDate(start, "MMM d") + " - " + formatDate(end, "MMM d");
+    }
   }
 
   // Edit stop name handlers

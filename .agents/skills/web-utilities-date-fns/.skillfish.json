@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "web-utilities-date-fns",
+  "owner": "agents-inc",
+  "repo": "skills",
+  "path": "dist/plugins/web-utilities-date-fns/skills/web-utilities-date-fns",
+  "branch": "main",
+  "sha": "e3e80754da75bce9937a0847f74e65b0d8f823cd",
+  "source": "manual"
+}
