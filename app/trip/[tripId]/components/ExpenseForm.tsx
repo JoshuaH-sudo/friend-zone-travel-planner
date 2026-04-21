@@ -7,6 +7,15 @@ import { useSettings } from "@/lib/SettingsProvider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CurrencySelect } from "@/components/ui/currency-select";
+import { Apple, MoreHorizontal, ShoppingBag, Ticket } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type ExpenseFormValues = {
   name: string;
@@ -36,10 +45,19 @@ export function ExpenseForm({
   const { defaultCurrency } = useSettings();
 
   const schema = z.object({
-    name: z.string().min(1, t("errors.nameRequired")).max(200, t("errors.nameTooLong")),
-    description: z.string().min(1, t("errors.descriptionRequired")).max(300, t("errors.descriptionTooLong")),
+    name: z
+      .string()
+      .min(1, t("errors.nameRequired"))
+      .max(200, t("errors.nameTooLong")),
+    description: z
+      .string()
+      .min(1, t("errors.descriptionRequired"))
+      .max(300, t("errors.descriptionTooLong")),
     category: z.enum(["food", "activity", "shopping", "other"]),
-    price: z.number().min(0, t("errors.priceMustBePositive")).max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
+    price: z
+      .number()
+      .min(0, t("errors.priceMustBePositive"))
+      .max(Number.MAX_SAFE_INTEGER, t("errors.priceTooHigh")),
     currency: z.string(),
     date: z.string().optional(),
   });
@@ -53,6 +71,29 @@ export function ExpenseForm({
     resolver: zodResolver(schema),
     defaultValues: initialValues,
   });
+
+  const activityOptions = [
+    {
+      value: "food",
+      label: t("category.food"),
+      icon: <Apple className="text-primary h-4 w-4" />,
+    },
+    {
+      value: "activity",
+      label: t("category.activity"),
+      icon: <Ticket className="text-primary h-4 w-4" />,
+    },
+    {
+      value: "shopping",
+      label: t("category.shopping"),
+      icon: <ShoppingBag className="text-primary h-4 w-4" />,
+    },
+    {
+      value: "other",
+      label: t("category.other"),
+      icon: <MoreHorizontal className="text-primary h-4 w-4" />,
+    },
+  ];
 
   return (
     <form
@@ -69,43 +110,79 @@ export function ExpenseForm({
           control={control}
           name="name"
           render={({ field }) => (
-            <Input
-              {...field}
-              type="text"
-              placeholder={t("namePlaceholder")}
-            />
+            <Input {...field} type="text" placeholder={t("namePlaceholder")} />
           )}
         />
-        {errors.name && <p className="text-destructive text-sm">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-destructive text-sm">{errors.name.message}</p>
+        )}
       </div>
-      <div className="space-y-2">
-        <Controller
-          control={control}
-          name="description"
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="text"
-              placeholder={t("descriptionPlaceholder")}
-            />
+      <div className="flex gap-4">
+        <div className="flex-1 space-y-2">
+          <Controller
+            control={control}
+            name="description"
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="text"
+                placeholder={t("descriptionPlaceholder")}
+              />
+            )}
+          />
+          {errors.description && (
+            <p className="text-destructive text-sm">
+              {errors.description.message}
+            </p>
           )}
-        />
-        {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
-      </div>
-      <div className="space-y-2">
-        <Controller
-          control={control}
-          name="category"
-          render={({ field }) => (
-            <select {...field} className="w-full border rounded px-2 py-1">
-              <option value="food">{t("category.food")}</option>
-              <option value="activity">{t("category.activity")}</option>
-              <option value="shopping">{t("category.shopping")}</option>
-              <option value="other">{t("category.other")}</option>
-            </select>
+        </div>
+        <div className="space-y-2">
+          <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <Select
+                {...field}
+                items={activityOptions}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger className="w-45">
+                  <SelectValue placeholder={t("categoryPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {activityOptions.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.icon} {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.category && (
+            <p className="text-destructive text-sm">
+              {errors.category.message}
+            </p>
           )}
-        />
-        {errors.category && <p className="text-destructive text-sm">{errors.category.message}</p>}
+        </div>
+        <div className="space-y-2">
+          <Controller
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <Input
+                {...field}
+                type="date"
+                placeholder={t("datePlaceholder")}
+              />
+            )}
+          />
+          {errors.date && (
+            <p className="text-destructive text-sm">{errors.date.message}</p>
+          )}
+        </div>
       </div>
       <div className="flex gap-4">
         <div className="space-y-2">
@@ -115,38 +192,33 @@ export function ExpenseForm({
             render={({ field }) => (
               <Input
                 {...field}
-                onChange={e => field.onChange(parseFloat(e.target.value))}
+                onChange={(e) => field.onChange(parseFloat(e.target.value))}
                 type="number"
                 step="0.01"
                 placeholder={t("pricePlaceholder")}
               />
             )}
           />
-          {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
+          {errors.price && (
+            <p className="text-destructive text-sm">{errors.price.message}</p>
+          )}
         </div>
         <div className="w-24 space-y-2">
           <CurrencySelect
             name="currency"
             value={control._formValues.currency || defaultCurrency}
-            onValueChange={value => value && setValue("currency", value, { shouldValidate: true })}
+            onValueChange={(value) =>
+              value && setValue("currency", value, { shouldValidate: true })
+            }
           />
-          {errors.currency && <p className="text-destructive text-sm">{errors.currency.message}</p>}
+          {errors.currency && (
+            <p className="text-destructive text-sm">
+              {errors.currency.message}
+            </p>
+          )}
         </div>
       </div>
-      <div className="space-y-2">
-        <Controller
-          control={control}
-          name="date"
-          render={({ field }) => (
-            <Input
-              {...field}
-              type="date"
-              placeholder={t("datePlaceholder")}
-            />
-          )}
-        />
-        {errors.date && <p className="text-destructive text-sm">{errors.date.message}</p>}
-      </div>
+
       <div className="flex gap-2">
         <Button type="submit">{submitLabel ?? t("save")}</Button>
         {onCancel ? (

@@ -112,7 +112,10 @@ export function AccommodationForm({
   const datePresets = [
     { label: t("datePresetToday"), date: new Date() },
     { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
-    { label: t("datePresetIn7Days"), date: new Date(Date.now() + 7 * MS_PER_DAY) },
+    {
+      label: t("datePresetIn7Days"),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
+    },
   ];
 
   return (
@@ -158,6 +161,73 @@ export function AccommodationForm({
           <p className="text-destructive text-sm">{errors.name.message}</p>
         )}
       </div>
+
+      <div className="flex gap-4">
+        <div className="space-y-2">
+          <Label>{t("checkInLabel")}</Label>
+          <Controller
+            control={control}
+            name="checkIn"
+            render={({ field }) => (
+              <DateTimePicker
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t("checkInPlaceholder")}
+                className="w-full"
+                highlightedDates={highlightedDates}
+                presets={datePresets}
+                dateFormat={dateFormat}
+              />
+            )}
+          />
+          {errors.checkIn && (
+            <p className="text-destructive text-sm">{errors.checkIn.message}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>{t("checkOutLabel")}</Label>
+          <Controller
+            control={control}
+            name="checkOut"
+            render={({ field }) => (
+              <DateTimePicker
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t("checkOutPlaceholder")}
+                className="w-full"
+                highlightedDates={highlightedDates}
+                pairedHighlightDate={watchedCheckIn}
+                presets={datePresets}
+                dateFormat={dateFormat}
+              />
+            )}
+          />
+          {errors.checkOut && (
+            <p className="text-destructive text-sm">
+              {errors.checkOut.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>
+            {t("timezoneLabel")}{" "}
+            <span className="text-muted-foreground text-xs">
+              {t("optional")}
+            </span>
+          </Label>
+          <Controller
+            control={control}
+            name="timezone"
+            render={({ field }) => (
+              <TimezonePicker
+                value={field.value || settingsTimezone}
+                onValueChange={field.onChange}
+                className="w-full"
+              />
+            )}
+          />
+        </div>
+      </div>
       <div className="flex gap-4">
         <div className="space-y-2">
           <Controller
@@ -192,68 +262,11 @@ export function AccommodationForm({
             }}
           />
           {errors.currency && (
-            <p className="text-destructive text-sm">{errors.currency.message}</p>
+            <p className="text-destructive text-sm">
+              {errors.currency.message}
+            </p>
           )}
         </div>
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkInLabel")}</Label>
-        <Controller
-          control={control}
-          name="checkIn"
-          render={({ field }) => (
-            <DateTimePicker
-              value={field.value}
-              onChange={field.onChange}
-              placeholder={t("checkInPlaceholder")}
-              className="w-full"
-              highlightedDates={highlightedDates}
-              presets={datePresets}
-              dateFormat={dateFormat}
-            />
-          )}
-        />
-        {errors.checkIn && (
-          <p className="text-destructive text-sm">{errors.checkIn.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkOutLabel")}</Label>
-        <Controller
-          control={control}
-          name="checkOut"
-          render={({ field }) => (
-            <DateTimePicker
-              value={field.value}
-              onChange={field.onChange}
-              placeholder={t("checkOutPlaceholder")}
-              className="w-full"
-              highlightedDates={highlightedDates}
-              pairedHighlightDate={watchedCheckIn}
-              presets={datePresets}
-              dateFormat={dateFormat}
-            />
-          )}
-        />
-        {errors.checkOut && (
-          <p className="text-destructive text-sm">{errors.checkOut.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>
-          {t("timezoneLabel")} <span className="text-muted-foreground text-xs">{t("optional")}</span>
-        </Label>
-        <Controller
-          control={control}
-          name="timezone"
-          render={({ field }) => (
-            <TimezonePicker
-              value={field.value || settingsTimezone}
-              onValueChange={field.onChange}
-              className="w-full"
-            />
-          )}
-        />
       </div>
       <div className="flex gap-2">
         <Button type="submit">{submitLabel ?? t("save")}</Button>

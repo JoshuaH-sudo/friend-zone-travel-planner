@@ -8,7 +8,15 @@ import { formatMoney } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExpenseForm, ExpenseFormValues } from "./ExpenseForm";
-import { Utensils, ShoppingBag, Ticket, MoreHorizontal } from "lucide-react";
+import {
+  Utensils,
+  ShoppingBag,
+  Ticket,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Plus,
+} from "lucide-react";
 
 export function Expenses({
   stopId,
@@ -67,14 +75,28 @@ export function Expenses({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h4 className="font-serif text-lg">{t("miscExpensesTitle")}</h4>
-        <Button size="sm" onClick={() => setIsAdding(true)}>{t("add")}</Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsAdding(true)}
+          className="text-muted-foreground w-fit px-0"
+        >
+          <Plus className="h-4 w-4" />
+          {t("actions.addExpense")}
+        </Button>
       </div>
       {isAdding && (
         <Card>
           <CardContent className="p-4">
             <ExpenseForm
-              initialValues={{ name: "", description: "", category: "other", price: 0, currency: defaultCurrency, date: "" }}
+              initialValues={{
+                name: "",
+                description: "",
+                category: "other",
+                price: 0,
+                currency: defaultCurrency,
+                date: "",
+              }}
               onSubmit={handleAdd}
               onCancel={() => setIsAdding(false)}
               submitLabel={t("save")}
@@ -104,15 +126,27 @@ export function Expenses({
             ) : (
               <>
                 <div className="flex items-center gap-2">
-                  {expense.category === "food" && <Utensils className="h-4 w-4 text-primary" />}
-                  {expense.category === "activity" && <Ticket className="h-4 w-4 text-primary" />}
-                  {expense.category === "shopping" && <ShoppingBag className="h-4 w-4 text-primary" />}
-                  {expense.category === "other" && <MoreHorizontal className="h-4 w-4 text-primary" />}
+                  {expense.category === "food" && (
+                    <Utensils className="text-primary h-4 w-4" />
+                  )}
+                  {expense.category === "activity" && (
+                    <Ticket className="text-primary h-4 w-4" />
+                  )}
+                  {expense.category === "shopping" && (
+                    <ShoppingBag className="text-primary h-4 w-4" />
+                  )}
+                  {expense.category === "other" && (
+                    <MoreHorizontal className="text-primary h-4 w-4" />
+                  )}
                   <div>
                     <div className="font-medium">{expense.name}</div>
-                    <div className="text-xs text-muted-foreground">{expense.description}</div>
+                    <div className="text-muted-foreground text-xs">
+                      {expense.description}
+                    </div>
                     {expense.date && (
-                      <div className="text-xs text-muted-foreground">{expense.date}</div>
+                      <div className="text-muted-foreground text-xs">
+                        {expense.date}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -120,11 +154,19 @@ export function Expenses({
                   <span className="text-sm font-medium">
                     {formatMoney(expense.price, expense.currency)}
                   </span>
-                  <Button size="icon" variant="ghost" onClick={() => setEditingId(expense.id)}>
-                    ✏️
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditingId(expense.id)}
+                  >
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" onClick={() => handleDelete(expense.id)}>
-                    🗑️
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleDelete(expense.id)}
+                  >
+                    <Trash2 className="text-destructive h-4 w-4" />
                   </Button>
                 </div>
               </>

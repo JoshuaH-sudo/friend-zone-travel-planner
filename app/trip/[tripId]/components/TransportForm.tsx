@@ -123,7 +123,10 @@ export function TransportForm({
   const datePresets = [
     { label: t("datePresetToday"), date: new Date() },
     { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
-    { label: t("datePresetIn7Days"), date: new Date(Date.now() + 7 * MS_PER_DAY) },
+    {
+      label: t("datePresetIn7Days"),
+      date: new Date(Date.now() + 7 * MS_PER_DAY),
+    },
   ];
 
   return (
@@ -144,46 +147,123 @@ export function TransportForm({
           {warningSummary}
         </p>
       )}
-      <div className="space-y-2">
-        <Label htmlFor="transport-name">{t("nameLabel")}</Label>
-        <Input
-          id="transport-name"
-          {...nameRegistration}
-          ref={(element) => {
-            nameRegistration.ref(element);
-            nameInputRef.current = element;
-          }}
-          type="text"
-          autoFocus={autoFocusName}
-          placeholder={t("namePlaceholder")}
-          className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
-        />
-        {errors.name && (
-          <p className="text-destructive text-sm">{errors.name.message}</p>
-        )}
+      <div className="flex gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="transport-type">{t("typeLabel")}</Label>
+          <Select
+            value={watchedType}
+            onValueChange={(value) => {
+              const event = {
+                target: { name: "type", value },
+              };
+              register("type").onChange(event);
+            }}
+          >
+            <SelectTrigger id="transport-type">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="flight">{t("type.flight")}</SelectItem>
+              <SelectItem value="bus">{t("type.bus")}</SelectItem>
+              <SelectItem value="car">{t("type.car")}</SelectItem>
+              <SelectItem value="train">{t("type.train")}</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.type && (
+            <p className="text-destructive text-sm">{errors.type.message}</p>
+          )}
+        </div>
+        <div className="space-y-2 w-xl">
+          <Label htmlFor="transport-name">{t("nameLabel")}</Label>
+          <Input
+            id="transport-name"
+            {...nameRegistration}
+            ref={(element) => {
+              nameRegistration.ref(element);
+              nameInputRef.current = element;
+            }}
+            type="text"
+            autoFocus={autoFocusName}
+            placeholder={t("namePlaceholder")}
+            className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
+          />
+          {errors.name && (
+            <p className="text-destructive text-sm">{errors.name.message}</p>
+          )}
+        </div>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="transport-type">{t("typeLabel")}</Label>
-        <Select
-          value={watchedType}
-          onValueChange={(value) => {
-            const event = {
-              target: { name: "type", value },
-            };
-            register("type").onChange(event);
-          }}
-        >
-          <SelectTrigger id="transport-type">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="flight">{t("type.flight")}</SelectItem>
-            <SelectItem value="bus">{t("type.bus")}</SelectItem>
-            <SelectItem value="car">{t("type.car")}</SelectItem>
-            <SelectItem value="train">{t("type.train")}</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.type && <p className="text-destructive text-sm">{errors.type.message}</p>}
+      <div className="flex gap-4">
+        <div className="space-y-2">
+          <Label>{t("departureLabel")}</Label>
+          <Controller
+            control={control}
+            name="departureDateTime"
+            render={({ field }) => (
+              <DateTimePicker
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={t("departurePlaceholder")}
+                className="w-full"
+                highlightedDates={highlightedDates}
+                pairedHighlightDate={watchedArrivalDateTime || undefined}
+                presets={datePresets}
+                dateFormat={dateFormat}
+              />
+            )}
+          />
+          {errors.departureDateTime && (
+            <p className="text-destructive text-sm">
+              {errors.departureDateTime.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>
+            {t("arrivalLabel")}{" "}
+            <span className="text-muted-foreground text-xs">
+              {t("optional")}
+            </span>
+          </Label>
+          <Controller
+            control={control}
+            name="arrivalDateTime"
+            render={({ field }) => (
+              <DateTimePicker
+                value={field.value || undefined}
+                onChange={field.onChange}
+                placeholder={t("arrivalPlaceholder")}
+                className="w-full"
+                highlightedDates={highlightedDates}
+                presets={datePresets}
+                dateFormat={dateFormat}
+              />
+            )}
+          />
+          {errors.arrivalDateTime && (
+            <p className="text-destructive text-sm">
+              {errors.arrivalDateTime.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>
+            {t("timezoneLabel")}{" "}
+            <span className="text-muted-foreground text-xs">
+              {t("optional")}
+            </span>
+          </Label>
+          <Controller
+            control={control}
+            name="timezone"
+            render={({ field }) => (
+              <TimezonePicker
+                value={field.value || settingsTimezone}
+                onValueChange={field.onChange}
+                className="w-full"
+              />
+            )}
+          />
+        </div>
       </div>
       <div className="flex gap-4">
         <div className="space-y-2">
@@ -194,7 +274,9 @@ export function TransportForm({
             type="number"
             step="0.01"
           />
-          {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
+          {errors.price && (
+            <p className="text-destructive text-sm">{errors.price.message}</p>
+          )}
         </div>
         <div className="w-24 space-y-2">
           <Label htmlFor="transport-currency">{t("currencyLabel")}</Label>
@@ -211,71 +293,13 @@ export function TransportForm({
             }}
           />
           {errors.currency && (
-            <p className="text-destructive text-sm">{errors.currency.message}</p>
+            <p className="text-destructive text-sm">
+              {errors.currency.message}
+            </p>
           )}
         </div>
       </div>
-      <div className="space-y-2">
-        <Label>{t("departureLabel")}</Label>
-        <Controller
-          control={control}
-          name="departureDateTime"
-          render={({ field }) => (
-            <DateTimePicker
-              value={field.value}
-              onChange={field.onChange}
-              placeholder={t("departurePlaceholder")}
-              className="w-full"
-              highlightedDates={highlightedDates}
-              pairedHighlightDate={watchedArrivalDateTime || undefined}
-              presets={datePresets}
-              dateFormat={dateFormat}
-            />
-          )}
-        />
-        {errors.departureDateTime && (
-          <p className="text-destructive text-sm">{errors.departureDateTime.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>
-          {t("arrivalLabel")} <span className="text-muted-foreground text-xs">{t("optional")}</span>
-        </Label>
-        <Controller
-          control={control}
-          name="arrivalDateTime"
-          render={({ field }) => (
-            <DateTimePicker
-              value={field.value || undefined}
-              onChange={field.onChange}
-              placeholder={t("arrivalPlaceholder")}
-              className="w-full"
-              highlightedDates={highlightedDates}
-              presets={datePresets}
-              dateFormat={dateFormat}
-            />
-          )}
-        />
-        {errors.arrivalDateTime && (
-          <p className="text-destructive text-sm">{errors.arrivalDateTime.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <Label>
-          {t("timezoneLabel")} <span className="text-muted-foreground text-xs">{t("optional")}</span>
-        </Label>
-        <Controller
-          control={control}
-          name="timezone"
-          render={({ field }) => (
-            <TimezonePicker
-              value={field.value || settingsTimezone}
-              onValueChange={field.onChange}
-              className="w-full"
-            />
-          )}
-        />
-      </div>
+
       <div className="flex gap-2">
         <Button type="submit">{submitLabel ?? t("save")}</Button>
         {onCancel ? (

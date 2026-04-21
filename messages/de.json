@@ -123,8 +123,10 @@
     "sections": {
       "stays": "Unterkünfte",
       "journeys": "Reisen",
+      "expenses": "Ausgaben",
       "noStays": "Keine Unterkünfte für diesen Stopp.",
-      "noJourneys": "Keine Reisen für diesen Stopp."
+      "noJourneys": "Keine Reisen für diesen Stopp.",
+      "noExpenses": "Keine Ausgaben für diesen Stopp."
     },
     "actions": {
       "addStay": "Unterkunft hinzufügen",
@@ -252,6 +254,28 @@
       "selectDepartureDateTime": "Wähle ein Abfahrtsdatum und eine Uhrzeit",
       "invalidArrivalDateTime": "Ungültiges Ankunftsdatum/-uhrzeit"
     }
+  },
+  "expense": {
+    "namePlaceholder": "Ausgabenname",
+    "descriptionPlaceholder": "Beschreibung",
+    "category": {
+      "food": "Essen",
+      "activity": "Aktivität",
+      "shopping": "Einkaufen",
+      "other": "Sonstiges"
+    },
+    "pricePlaceholder": "Betrag",
+    "datePlaceholder": "Datum",
+    "errors": {
+      "nameRequired": "Name ist erforderlich",
+      "nameTooLong": "Name ist zu lang",
+      "descriptionRequired": "Beschreibung ist erforderlich",
+      "descriptionTooLong": "Beschreibung ist zu lang",
+      "priceMustBePositive": "Preis muss positiv sein",
+      "priceTooHigh": "Preis ist zu hoch"
+    },
+    "save": "Speichern",
+    "cancel": "Abbrechen"
   },
   "confirmationDialog": {
     "confirm": "Bestätigen",

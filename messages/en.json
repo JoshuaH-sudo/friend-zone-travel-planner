@@ -123,8 +123,10 @@
     "sections": {
       "stays": "Stays",
       "journeys": "Journeys",
+      "expenses": "Expenses",
       "noStays": "No stays for this stop.",
-      "noJourneys": "No journeys for this stop."
+      "noJourneys": "No journeys for this stop.",
+      "noExpenses": "No expenses for this stop."
     },
     "actions": {
       "addStay": "Add stay",
@@ -252,6 +254,28 @@
       "selectDepartureDateTime": "Select a departure date and time",
       "invalidArrivalDateTime": "Invalid arrival date/time"
     }
+  },
+  "expense": {
+    "namePlaceholder": "Expense name",
+    "descriptionPlaceholder": "Description",
+    "category": {
+      "food": "Food",
+      "activity": "Activity",
+      "shopping": "Shopping",
+      "other": "Other"
+    },
+    "pricePlaceholder": "Amount",
+    "datePlaceholder": "Date",
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name is too long",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Description is too long",
+      "priceMustBePositive": "Price must be positive",
+      "priceTooHigh": "Price is too high"
+    },
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "confirmationDialog": {
     "confirm": "Confirm",
