@@ -57,7 +57,7 @@ export type ExpenseDocument = {
   id: string;
   tripId: string;
   category: "food" | "activity" | "shopping" | "other";
-  description: string;
+  description?: string;
   price: number;
   currency: Currency;
   createdAt: number;

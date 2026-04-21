@@ -51,7 +51,7 @@ export function ExpenseForm({
       .max(200, t("errors.nameTooLong")),
     description: z
       .string()
-      .min(1, t("errors.descriptionRequired"))
+      .min(0, t("errors.descriptionRequired"))
       .max(300, t("errors.descriptionTooLong"))
       .optional(),
     category: z.enum(["food", "activity", "shopping", "other"]),

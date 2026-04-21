@@ -66,7 +66,7 @@ export function ItineraryTab({
                 label = entry.item.name;
               } else if (entry.type === "expense") {
                 icon = "💳";
-                label = entry.item.description;
+                label = entry.item.name;
               }
               const dateStr = formatDate(parseISO(entry.date), "MMM d, yyyy");
               const stopStr = entry.stop ? `📍 ${entry.stop.name}` : "";
