@@ -127,7 +127,8 @@
       "expenses": "Expenses",
       "noStays": "No stays for this stop.",
       "noJourneys": "No journeys for this stop.",
-      "noExpenses": "No expenses for this stop."
+      "noExpenses": "No expenses for this stop.",
+      "stopTotal": "Stop total"
     },
     "actions": {
       "addStay": "Add stay",
@@ -163,7 +164,9 @@
     "durationLabel": "Duration:",
     "daysLabel": "Days:",
     "notAvailable": "N/A",
-    "totalCostLabel": "Total Cost:"
+    "totalCostLabel": "Total Cost:",
+    "estimatedTotal": "Estimated total",
+    "estimationTooltip": "This total is an estimate based on current exchange rates and may not reflect actual costs."
   },
   "tripItemCard": {
     "editItem": "Edit item",

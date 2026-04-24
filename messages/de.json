@@ -127,7 +127,8 @@
       "expenses": "Ausgaben",
       "noStays": "Keine Unterkünfte für diesen Stopp.",
       "noJourneys": "Keine Reisen für diesen Stopp.",
-      "noExpenses": "Keine Ausgaben für diesen Stopp."
+      "noExpenses": "Keine Ausgaben für diesen Stopp.",
+      "stopTotal": "Stopp-Gesamt"
     },
     "actions": {
       "addStay": "Unterkunft hinzufügen",
@@ -163,7 +164,9 @@
     "durationLabel": "Dauer:",
     "daysLabel": "Tage:",
     "notAvailable": "k. A.",
-    "totalCostLabel": "Gesamtkosten:"
+    "totalCostLabel": "Gesamtkosten:",
+    "estimatedTotal": "Geschätzter Gesamtbetrag",
+    "estimationTooltip": "Dieser Betrag ist eine Schätzung basierend auf aktuellen Wechselkursen und entspricht möglicherweise nicht den tatsächlichen Kosten."
   },
   "tripItemCard": {
     "editItem": "Eintrag bearbeiten",

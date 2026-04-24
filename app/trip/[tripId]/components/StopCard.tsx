@@ -6,7 +6,7 @@ import type {
   StopDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { Transport } from "./Transport";
 import { useTranslations } from "next-intl";
@@ -19,6 +19,16 @@ import { TransportForm } from "./TransportForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { capitalize } from "@/lib/utils";
+import { convert, formatMoney } from "@/lib/format";
+import { useSettings } from "@/lib/SettingsProvider";
+import { useExchangeRates } from "@/lib/useExchangeRates";
+import {
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 export type StopCardProps = {
   index: number;
@@ -96,8 +106,26 @@ export function StopCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
   const t = useTranslations("overviewTab");
+  const { rates } = useExchangeRates();
 
   const today = getTodayDate();
+
+  // Per-currency totals for this stop
+  const stopCurrencyTotals = useMemo(() => {
+    const totals: Record<string, number> = {};
+    [...accommodations, ...transports, ...expenses].forEach((item) => {
+      totals[item.currency] = (totals[item.currency] || 0) + item.price;
+    });
+    return totals;
+  }, [accommodations, transports, expenses]);
+
+  const stopEstimatedTotal = useMemo(() => {
+    return Object.entries(stopCurrencyTotals).reduce(
+      (sum, [currency, amount]) =>
+        sum + convert(amount, currency, defaultCurrency, rates),
+      0,
+    );
+  }, [stopCurrencyTotals, defaultCurrency, rates]);
 
   // Compute a date range summary from item dates for display in the stop card header.
   const allItemDates = getAllItemDates(accommodations, transports);
@@ -321,6 +349,40 @@ export function StopCard({
               defaultCurrency={defaultCurrency}
             />
           </section>
+          {Object.keys(stopCurrencyTotals).length > 0 && (
+            <section className="border-t pt-3">
+              <div className="text-muted-foreground mb-1.5 flex items-center gap-1 text-xs font-light uppercase">
+                {t("sections.stopTotal")}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {Object.entries(stopCurrencyTotals).map(([currency, amount]) => (
+                  <span
+                    key={currency}
+                    className="bg-muted rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  >
+                    {formatMoney(amount, currency)}
+                  </span>
+                ))}
+                <span className="text-muted-foreground flex items-center gap-1 text-xs">
+                  ≈ {formatMoney(stopEstimatedTotal, defaultCurrency)}
+                  <TooltipProvider>
+                    <TooltipRoot>
+                      <TooltipTrigger
+                        className="cursor-default"
+                        aria-label="Exchange rate estimate"
+                      >
+                        <Info className="h-3 w-3" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Estimated total based on current exchange rates. May not
+                        reflect actual costs.
+                      </TooltipContent>
+                    </TooltipRoot>
+                  </TooltipProvider>
+                </span>
+              </div>
+            </section>
+          )}
         </div>
       </CardContent>
     </Card>

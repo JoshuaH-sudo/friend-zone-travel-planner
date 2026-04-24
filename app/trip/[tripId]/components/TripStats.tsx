@@ -11,6 +11,16 @@ import {
   useTripData,
   type UseTripDataResult,
 } from "@/components/hooks/useTripData";
+import { convert, formatMoney } from "@/lib/format";
+import { useSettings } from "@/lib/SettingsProvider";
+import { useExchangeRates } from "@/lib/useExchangeRates";
+import {
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 const toStartTimestamp = (value: string) =>
   getStoredDateTimeTimestamp(value, { dateOnlyBoundary: "start" });
@@ -28,9 +38,11 @@ export function TripStats({
 }) {
   const t = useTranslations("tripStats");
   const locale = useLocale();
+  const { defaultCurrency } = useSettings();
+  const { rates } = useExchangeRates();
   const internalTripData = useTripData(tripId, { enabled: !tripData });
   const resolvedTripData = tripData ?? internalTripData;
-  const { trip, stops, accommodationsByStop, transportsByStop } =
+  const { trip, stops, accommodationsByStop, transportsByStop, expenses } =
     resolvedTripData;
 
   const formatDate = (value: string) => {
@@ -55,6 +67,7 @@ export function TripStats({
     if (!trip) {
       return {
         currencyTotals,
+        estimatedTotal: 0,
         stopCount,
         accommodationCount,
         transportCount,
@@ -120,6 +133,12 @@ export function TripStats({
       });
     });
 
+    // Include expenses in per-currency totals
+    (expenses || []).forEach((expense) => {
+      currencyTotals[expense.currency] =
+        (currencyTotals[expense.currency] || 0) + expense.price;
+    });
+
     const startDay = startDate ? toStoredDatePart(startDate) : null;
     const endDay = endDate ? toStoredDatePart(endDate) : null;
     totalDays =
@@ -130,8 +149,16 @@ export function TripStats({
         : 0;
     totalDays = Math.max(0, Math.round(totalDays));
 
+    // Estimated grand total in user's preferred currency
+    const estimatedTotal = Object.entries(currencyTotals).reduce(
+      (sum, [currency, amount]) =>
+        sum + convert(amount, currency, defaultCurrency, rates),
+      0,
+    );
+
     return {
       currencyTotals,
+      estimatedTotal,
       stopCount,
       accommodationCount,
       transportCount,
@@ -139,7 +166,15 @@ export function TripStats({
       endDate,
       totalDays,
     };
-  }, [trip, stops, accommodationsByStop, transportsByStop]);
+  }, [
+    trip,
+    stops,
+    accommodationsByStop,
+    transportsByStop,
+    expenses,
+    defaultCurrency,
+    rates,
+  ]);
 
   return (
     <Card className="w-full">
@@ -182,6 +217,27 @@ export function TripStats({
                   {currency}: {total.toFixed(2)}
                 </Badge>
               ))}
+            </div>
+            <div className="mt-1 flex items-center gap-1.5">
+              <span className="text-muted-foreground text-sm">
+                {t("estimatedTotal")}:{" "}
+                <span className="text-foreground font-medium">
+                  ~{formatMoney(stats.estimatedTotal, defaultCurrency)}
+                </span>
+              </span>
+              <TooltipProvider>
+                <TooltipRoot>
+                  <TooltipTrigger
+                    className="text-muted-foreground hover:text-foreground cursor-default"
+                    aria-label={t("estimationTooltip")}
+                  >
+                    <Info className="h-3.5 w-3.5" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t("estimationTooltip")}
+                  </TooltipContent>
+                </TooltipRoot>
+              </TooltipProvider>
             </div>
           </div>
         )}
