@@ -12,6 +12,7 @@ import {
   userSettingsSchema,
   TripCollection,
   StopCollection,
+  StopDocument,
   AccommodationCollection,
   TransportCollection,
   ExpenseCollection,
@@ -91,8 +92,8 @@ async function createDatabase(): Promise<MyDatabase> {
       schema: stopSchema,
       migrationStrategies: {
         1: (oldDoc) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { date: _date, ...rest } = oldDoc as { date: unknown; [key: string]: unknown };
+          type OldStopDocument = StopDocument & { date: string };
+          const { date: _date, ...rest } = oldDoc as OldStopDocument;
           return rest;
         },
       },

@@ -138,7 +138,6 @@ export const OverviewTab = ({
             expenses={expensesByStop[stop.id] || []}
             defaultCurrency={defaultCurrency}
             timezone={timezone}
-            t={t}
             addingAccommodation={addingAccommodationForStopId === stop.id}
             addingTransport={addingTransportForStopId === stop.id}
             onStartAddAccommodation={() =>
@@ -207,7 +206,6 @@ function StopCard({
   expenses,
   defaultCurrency,
   timezone,
-  t,
   addingAccommodation,
   addingTransport,
   onStartAddAccommodation,
@@ -226,8 +224,6 @@ function StopCard({
   expenses: ExpenseDocumentType[];
   defaultCurrency: string;
   timezone: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t: (key: string) => string;
   addingAccommodation: boolean;
   addingTransport: boolean;
   onStartAddAccommodation: () => void;
@@ -255,6 +251,7 @@ function StopCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
+  const t = useTranslations("overviewTab");
 
   const today = getTodayDate();
 
@@ -262,8 +259,8 @@ function StopCard({
   const allItemDates = [
     ...accommodations.map((a) => a.checkIn),
     ...accommodations.map((a) => a.checkOut),
-    ...transports.map((t) => t.departureDateTime),
-    ...transports.map((t) => t.arrivalDateTime),
+    ...transports.map((tr) => tr.departureDateTime),
+    ...transports.map((tr) => tr.arrivalDateTime),
   ].filter((d): d is string => Boolean(d));
 
   let dateRangeSummary = "";
@@ -271,11 +268,15 @@ function StopCard({
     const sorted = [...allItemDates].sort();
     const earliest = sorted[0].slice(0, 10);
     const latest = sorted[sorted.length - 1].slice(0, 10);
+    const earliestYear = earliest.slice(0, 4);
+    const latestYear = latest.slice(0, 4);
     if (earliest === latest) {
       dateRangeSummary = format(
         new Date(`${earliest}T00:00:00`),
         "MMM d, yyyy",
       );
+    } else if (earliestYear !== latestYear) {
+      dateRangeSummary = `${format(new Date(`${earliest}T00:00:00`), "MMM d, yyyy")} – ${format(new Date(`${latest}T00:00:00`), "MMM d, yyyy")}`;
     } else {
       dateRangeSummary = `${format(new Date(`${earliest}T00:00:00`), "MMM d")} – ${format(new Date(`${latest}T00:00:00`), "MMM d")}`;
     }

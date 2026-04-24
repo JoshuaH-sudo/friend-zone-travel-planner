@@ -56,7 +56,10 @@ import { addDays, format as formatDateFns } from "date-fns";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
-/** Shift a stored "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM" string by `deltaDays`. */
+/**
+ * Shift a stored "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM" string by `deltaDays`.
+ * Assumes a well-formed date string matching the repo's storage format.
+ */
 function shiftDateTimeByDays(value: string, deltaDays: number): string {
   const [datePart, timePart] = value.split("T");
   const [y, m, d] = datePart.split("-").map(Number);
@@ -197,7 +200,7 @@ export default function TripPage() {
       ),
       ...expensesWithDate.map((exp) =>
         exp.patch({
-          date: shiftDateTimeByDays(exp.date!, deltaDays),
+          date: exp.date ? shiftDateTimeByDays(exp.date, deltaDays) : undefined,
           updatedAt: Date.now(),
         }),
       ),
