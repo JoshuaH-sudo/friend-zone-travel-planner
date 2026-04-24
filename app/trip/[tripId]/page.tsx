@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useTripData } from "@/components/hooks/useTripData";
@@ -46,13 +46,24 @@ import {
   CalendarDays,
   MapPin,
   MoreHorizontal,
+  Pencil,
   Plane,
   Wallet,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import posthog from "posthog-js";
+import { addDays, format as formatDateFns } from "date-fns";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
+
+/** Shift a stored "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM" string by `deltaDays`. */
+function shiftDateTimeByDays(value: string, deltaDays: number): string {
+  const [datePart, timePart] = value.split("T");
+  const [y, m, d] = datePart.split("-").map(Number);
+  const shifted = addDays(new Date(y, m - 1, d), deltaDays);
+  const newDate = formatDateFns(shifted, "yyyy-MM-dd");
+  return timePart ? `${newDate}T${timePart}` : newDate;
+}
 
 export default function TripPage() {
   const params = useParams();
@@ -62,6 +73,9 @@ export default function TripPage() {
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isEditingStartDate, setIsEditingStartDate] = useState(false);
+  const [startDateDraft, setStartDateDraft] = useState("");
+  const startDateInputRef = useRef<HTMLInputElement | null>(null);
   const {
     trip,
     stops,
@@ -112,21 +126,108 @@ export default function TripPage() {
     };
   }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
 
-  const tripDates = useMemo(() => {
-    if (stops.length === 0) {
-      return "No dates yet";
-    }
-    const sorted = [...stops].sort((a, b) => a.date.localeCompare(b.date));
-    const first = sorted[0]?.date;
-    const last = sorted[sorted.length - 1]?.date;
-    return first === last ? first : `${first} → ${last}`;
-  }, [stops]);
+  /** Date range derived from all item dates (accommodations + transports). */
+  const range = useMemo(() => {
+    const allDates: string[] = [
+      ...Object.values(accommodationsByStop)
+        .flat()
+        .flatMap((a) => [a.checkIn.slice(0, 10), a.checkOut.slice(0, 10)]),
+      ...Object.values(transportsByStop)
+        .flat()
+        .map((t) => t.departureDateTime.slice(0, 10)),
+    ].filter(Boolean);
 
-  const addStop = async (name: string, date: string) => {
+    if (allDates.length === 0) {
+      return { start: null as string | null, end: null as string | null };
+    }
+    const sorted = [...allDates].sort();
+    return { start: sorted[0], end: sorted[sorted.length - 1] };
+  }, [accommodationsByStop, transportsByStop]);
+
+  const totalDays =
+    range.start && range.end ? daysBetween(range.start, range.end) + 1 : 0;
+
+  /** Shift all item dates so that the trip begins on `newStartDate`. */
+  const shiftAllItems = async (newStartDate: string) => {
+    const currentStart =
+      trip?.startDate ??
+      (range.start || null);
+
+    if (!currentStart) {
+      // No existing reference point — just update startDate.
+      await trip?.patch({ startDate: newStartDate, updatedAt: Date.now() });
+      return;
+    }
+
+    const [cy, cm, cd] = currentStart.split("-").map(Number);
+    const [ny, nm, nd] = newStartDate.split("-").map(Number);
+    const currentMs = new Date(cy, cm - 1, cd).getTime();
+    const newMs = new Date(ny, nm - 1, nd).getTime();
+    const deltaDays = Math.round((newMs - currentMs) / (1000 * 60 * 60 * 24));
+
+    if (deltaDays === 0) {
+      await trip?.patch({ startDate: newStartDate, updatedAt: Date.now() });
+      return;
+    }
+
+    const allAccommodations = Object.values(accommodationsByStop).flat();
+    const allTransports = Object.values(transportsByStop).flat();
+    const expensesWithDate = expenses.filter((e) => e.date);
+
+    await Promise.all([
+      trip?.patch({ startDate: newStartDate, updatedAt: Date.now() }),
+      ...allAccommodations.map((acc) =>
+        acc.patch({
+          checkIn: shiftDateTimeByDays(acc.checkIn, deltaDays),
+          checkOut: shiftDateTimeByDays(acc.checkOut, deltaDays),
+          updatedAt: Date.now(),
+        }),
+      ),
+      ...allTransports.map((trans) =>
+        trans.patch({
+          departureDateTime: shiftDateTimeByDays(
+            trans.departureDateTime,
+            deltaDays,
+          ),
+          arrivalDateTime: trans.arrivalDateTime
+            ? shiftDateTimeByDays(trans.arrivalDateTime, deltaDays)
+            : undefined,
+          updatedAt: Date.now(),
+        }),
+      ),
+      ...expensesWithDate.map((exp) =>
+        exp.patch({
+          date: shiftDateTimeByDays(exp.date!, deltaDays),
+          updatedAt: Date.now(),
+        }),
+      ),
+    ]);
+  };
+
+  const handleStartDateSave = async () => {
+    if (!startDateDraft) {
+      setIsEditingStartDate(false);
+      return;
+    }
+    await shiftAllItems(startDateDraft);
+    setIsEditingStartDate(false);
+    posthog.capture("trip_start_date_set", {
+      trip_id: tripId,
+    });
+  };
+
+  const beginEditingStartDate = () => {
+    setStartDateDraft(
+      trip?.startDate ?? range.start ?? new Date().toISOString().slice(0, 10),
+    );
+    setIsEditingStartDate(true);
+    setTimeout(() => startDateInputRef.current?.focus(), 50);
+  };
+
+  const addStop = async (name: string) => {
     await db.stops.insert({
       id: generateId(),
       name,
-      date,
       tripId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -193,16 +294,6 @@ export default function TripPage() {
     });
   };
 
-  const range = (() => {
-    if (!stops.length)
-      return { start: null as string | null, end: null as string | null };
-    const sorted = [...stops].sort((a, b) => a.date.localeCompare(b.date));
-    return { start: sorted[0].date, end: sorted[sorted.length - 1].date };
-  })();
-
-  const totalDays =
-    range.start && range.end ? daysBetween(range.start, range.end) + 1 : 0;
-
   if (loading) {
     return <p className="text-muted-foreground">Loading trip...</p>;
   }
@@ -210,6 +301,8 @@ export default function TripPage() {
   if (!trip) {
     return <p className="text-muted-foreground">Trip not found.</p>;
   }
+
+  const displayStartDate = trip.startDate ?? range.start;
 
   return (
     <div>
@@ -236,9 +329,52 @@ export default function TripPage() {
               <div className="text-foreground/85 mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                 <span className="inline-flex items-center gap-1.5">
                   <Calendar className="h-4 w-4" />
-                  {range.start
-                    ? `${formatDateShort(range.start)} – ${formatDateShort(range.end!)}`
-                    : "No dates"}
+                  {isEditingStartDate ? (
+                    <form
+                      className="inline-flex items-center gap-1"
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        await handleStartDateSave();
+                      }}
+                    >
+                      <input
+                        ref={startDateInputRef}
+                        type="date"
+                        value={startDateDraft}
+                        onChange={(e) => setStartDateDraft(e.target.value)}
+                        className="bg-background/20 text-foreground rounded px-1 py-0.5 text-sm"
+                      />
+                      <Button
+                        type="submit"
+                        size="sm"
+                        variant="ghost"
+                        className="text-foreground/80 h-6 px-1 text-xs"
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="text-foreground/60 h-6 px-1 text-xs"
+                        onClick={() => setIsEditingStartDate(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      className="hover:text-primary-foreground inline-flex items-center gap-1 text-left"
+                      onClick={beginEditingStartDate}
+                      title="Set start date to move the entire trip"
+                    >
+                      {displayStartDate
+                        ? `${formatDateShort(displayStartDate)}${range.end && range.end !== displayStartDate ? ` – ${formatDateShort(range.end)}` : ""}`
+                        : "Set start date"}
+                      <Pencil className="h-3 w-3 opacity-60" />
+                    </button>
+                  )}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> {stops.length} stops

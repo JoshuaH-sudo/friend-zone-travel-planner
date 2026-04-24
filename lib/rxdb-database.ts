@@ -84,10 +84,18 @@ async function createDatabase(): Promise<MyDatabase> {
       schema: tripSchema,
       migrationStrategies: {
         1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
+        2: (oldDoc) => ({ ...oldDoc, startDate: undefined }),
       },
     },
     stops: {
       schema: stopSchema,
+      migrationStrategies: {
+        1: (oldDoc) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { date: _date, ...rest } = oldDoc as { date: unknown; [key: string]: unknown };
+          return rest;
+        },
+      },
     },
     accommodations: {
       schema: accommodationSchema,

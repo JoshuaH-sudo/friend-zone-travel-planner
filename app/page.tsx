@@ -46,23 +46,18 @@ export default function HomePage() {
   const [isCreating, setIsCreating] = useState(false);
   const [tripName, setTripName] = useState("");
   const [firstStopName, setFirstStopName] = useState("");
-  const [firstStopDate, setFirstStopDate] = useState("");
+  const [tripStartDate, setTripStartDate] = useState("");
 
   const cards = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     return trips
       .map((trip) => {
-        const tripStops = stops
-          .filter((stop) => stop.tripId === trip.id)
-          .sort((a, b) => a.date.localeCompare(b.date));
-        const minDate = tripStops[0]?.date;
-        const maxDate = tripStops[tripStops.length - 1]?.date;
+        const tripStops = stops.filter((stop) => stop.tripId === trip.id);
+        const startDate = trip.startDate;
         const status: Exclude<TripStatusFilter, "all"> =
-          !minDate || minDate > today
+          !startDate || startDate > today
             ? "upcoming"
-            : maxDate && maxDate < today
-              ? "past"
-              : "ongoing";
+            : "ongoing";
         const total = expenses
           .filter((expense) => expense.tripId === trip.id)
           .reduce(
@@ -74,8 +69,8 @@ export default function HomePage() {
           trip,
           status,
           stopCount: tripStops.length,
-          startDate: minDate,
-          endDate: maxDate,
+          startDate,
+          endDate: undefined as string | undefined,
           stopNames: tripStops.map((stop) => stop.name).join(" · "),
           total,
         };
@@ -94,6 +89,7 @@ export default function HomePage() {
       createdTrip = await db.trips.insert({
         id: nextTripId,
         name: tripName.trim() || t("newTripName"),
+        startDate: tripStartDate || undefined,
         createdAt: now,
         updatedAt: now,
       });
@@ -102,7 +98,6 @@ export default function HomePage() {
         await db.stops.insert({
           id: generateId(),
           name: firstStopName.trim(),
-          date: firstStopDate || new Date().toISOString().slice(0, 10),
           tripId: nextTripId,
           createdAt: now,
           updatedAt: now,
@@ -119,11 +114,11 @@ export default function HomePage() {
 
     posthog.capture("trip_created", {
       has_first_stop: Boolean(firstStopName.trim()),
-      has_first_stop_date: Boolean(firstStopDate),
+      has_start_date: Boolean(tripStartDate),
     });
     setTripName("");
     setFirstStopName("");
-    setFirstStopDate("");
+    setTripStartDate("");
     setIsCreating(false);
     router.push(`/trip/${nextTripId}`);
   };
@@ -168,9 +163,10 @@ export default function HomePage() {
                 placeholder={t("firstStopPlaceholder")}
               />
               <Input
-                value={firstStopDate}
-                onChange={(event) => setFirstStopDate(event.target.value)}
+                value={tripStartDate}
+                onChange={(event) => setTripStartDate(event.target.value)}
                 type="date"
+                placeholder={t("tripStartDatePlaceholder")}
               />
               <Button onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>
