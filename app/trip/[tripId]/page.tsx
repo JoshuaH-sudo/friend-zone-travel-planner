@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useTripData } from "@/components/hooks/useTripData";
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditableText } from "./components/EditableText";
+import { TripStartDateEditor } from "./components/TripStartDateEditor";
 import { OverviewTab } from "./components/OverviewTab";
 import { ItineraryTab } from "./components/ItineraryTab";
 import { MapTab } from "./components/MapTab";
@@ -23,7 +24,6 @@ import { useSettings } from "@/lib/SettingsProvider";
 import {
   convert,
   daysBetween,
-  formatDateShort,
   formatMoney,
 } from "@/lib/format";
 import { generateId } from "@/lib/rxdb-database";
@@ -42,11 +42,9 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Bed,
-  Calendar,
   CalendarDays,
   MapPin,
   MoreHorizontal,
-  Pencil,
   Plane,
   Wallet,
 } from "lucide-react";
@@ -80,9 +78,6 @@ export default function TripPage() {
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isEditingStartDate, setIsEditingStartDate] = useState(false);
-  const [startDateDraft, setStartDateDraft] = useState("");
-  const startDateInputRef = useRef<HTMLInputElement | null>(null);
   const {
     trip,
     stops,
@@ -211,24 +206,24 @@ export default function TripPage() {
     ]);
   };
 
-  const handleStartDateSave = async () => {
-    if (!startDateDraft) {
-      setIsEditingStartDate(false);
-      return;
-    }
-    await shiftAllItems(startDateDraft);
-    setIsEditingStartDate(false);
-    posthog.capture("trip_start_date_set", {
-      trip_id: tripId,
-    });
+  const setTripStartDateOnly = async (newStartDate: string) => {
+    await trip?.patch({ startDate: newStartDate, updatedAt: Date.now() });
   };
 
-  const beginEditingStartDate = () => {
-    setStartDateDraft(
-      trip?.startDate ?? range.start ?? new Date().toISOString().slice(0, 10),
-    );
-    setIsEditingStartDate(true);
-    setTimeout(() => startDateInputRef.current?.focus(), 50);
+  const commitStartDateChange = async (
+    newStartDate: string,
+    adjustAllDates: boolean,
+  ) => {
+    if (adjustAllDates) {
+      await shiftAllItems(newStartDate);
+    } else {
+      await setTripStartDateOnly(newStartDate);
+    }
+
+    posthog.capture("trip_start_date_set", {
+      trip_id: tripId,
+      adjust_all_dates: adjustAllDates,
+    });
   };
 
   const addStop = async (name: string) => {
@@ -310,6 +305,10 @@ export default function TripPage() {
   }
 
   const displayStartDate = trip.startDate ?? range.start;
+  const hasShiftableItems =
+    Object.values(accommodationsByStop).flat().length > 0 ||
+    Object.values(transportsByStop).flat().length > 0 ||
+    expenses.some((e) => Boolean(e.date));
 
   return (
     <div>
@@ -334,55 +333,13 @@ export default function TripPage() {
                 className="text-foreground font-serif text-4xl leading-tight font-semibold sm:text-6xl"
               />
               <div className="text-foreground/85 mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-                <span className="inline-flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
-                  {isEditingStartDate ? (
-                    <form
-                      className="inline-flex items-center gap-1"
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        await handleStartDateSave();
-                      }}
-                    >
-                      <input
-                        ref={startDateInputRef}
-                        type="date"
-                        value={startDateDraft}
-                        onChange={(e) => setStartDateDraft(e.target.value)}
-                        className="bg-background/20 text-foreground rounded px-1 py-0.5 text-sm"
-                      />
-                      <Button
-                        type="submit"
-                        size="sm"
-                        variant="ghost"
-                        className="text-foreground/80 h-6 px-1 text-xs"
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="text-foreground/60 h-6 px-1 text-xs"
-                        onClick={() => setIsEditingStartDate(false)}
-                      >
-                        Cancel
-                      </Button>
-                    </form>
-                  ) : (
-                    <button
-                      type="button"
-                      className="hover:text-primary-foreground inline-flex items-center gap-1 text-left"
-                      onClick={beginEditingStartDate}
-                      title="Set start date to move the entire trip"
-                    >
-                      {displayStartDate
-                        ? `${formatDateShort(displayStartDate)}${range.end && range.end !== displayStartDate ? ` – ${formatDateShort(range.end)}` : ""}`
-                        : "Set start date"}
-                      <Pencil className="h-3 w-3 opacity-60" />
-                    </button>
-                  )}
-                </span>
+                <TripStartDateEditor
+                  currentStartDate={trip.startDate ?? range.start}
+                  displayStartDate={displayStartDate}
+                  rangeEndDate={range.end}
+                  canAdjustAllDates={hasShiftableItems}
+                  onSaveStartDate={commitStartDateChange}
+                />
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> {stops.length} stops
                 </span>

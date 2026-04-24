@@ -20,7 +20,10 @@ type TripStartDateEditorProps = {
   displayStartDate: string | null;
   rangeEndDate: string | null;
   canAdjustAllDates: boolean;
-  onSaveStartDate: (newStartDate: string, adjustAllDates: boolean) => Promise<void>;
+  onSaveStartDate: (
+    newStartDate: string,
+    adjustAllDates: boolean,
+  ) => Promise<void>;
 };
 
 export function TripStartDateEditor({
@@ -141,6 +144,7 @@ export function TripStartDateEditor({
               onClick={() => {
                 setPendingStartDate(null);
                 setIsEditingStartDate(true);
+                setAdjustDatesDialogOpen(false);
                 setTimeout(() => startDateInputRef.current?.focus(), 50);
               }}
             >
@@ -152,18 +156,20 @@ export function TripStartDateEditor({
                 if (!pendingStartDate) return;
                 await onSaveStartDate(pendingStartDate, false);
                 setPendingStartDate(null);
+                setAdjustDatesDialogOpen(false);
               }}
             >
-              Keep existing item dates
+              Only update trip
             </AlertDialogAction>
             <AlertDialogAction
               onClick={async () => {
                 if (!pendingStartDate) return;
                 await onSaveStartDate(pendingStartDate, true);
                 setPendingStartDate(null);
+                setAdjustDatesDialogOpen(false);
               }}
             >
-              Shift all item dates
+              Update all items
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
