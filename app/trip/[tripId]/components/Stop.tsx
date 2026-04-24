@@ -38,9 +38,6 @@ export const Stop = ({
           .string()
           .min(1, t("errors.nameRequired"))
           .max(100, t("errors.nameTooLong")),
-        date: z
-          .string()
-          .regex(/^\d{4}-\d{2}-\d{2}$/, t("errors.invalidDateFormat")),
       }),
     [t],
   );
@@ -52,7 +49,7 @@ export const Stop = ({
     formState: { errors },
   } = useForm<StopFormData>({
     resolver: zodResolver(stopSchema),
-    defaultValues: { name: stop.name, date: stop.date },
+    defaultValues: { name: stop.name },
   });
   const nameRegistration = register("name");
 
@@ -77,7 +74,6 @@ export const Stop = ({
   const onSubmit = async (data: StopFormData) => {
     await stop.patch({
       name: data.name,
-      date: data.date,
       updatedAt: time.getUTCDate(),
     });
     setIsEditing(false);

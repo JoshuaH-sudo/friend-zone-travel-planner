@@ -18,10 +18,6 @@ type ShareBundle = {
   expenses: ExpenseDocument[];
 };
 
-function todayDate() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 async function getShareBundle(db: MyDatabase, tripId: string): Promise<ShareBundle> {
   const trip = await db.trips.findOne(tripId).exec();
   if (!trip) {
@@ -104,10 +100,6 @@ export async function importSharedTrip(db: MyDatabase, encoded: string) {
     await db.stops.insert({
       id: newStopId,
       name: typeof stop.name === "string" ? stop.name : "Stop",
-      date:
-        typeof stop.date === "string"
-          ? stop.date.slice(0, 10)
-          : todayDate(),
       tripId,
       createdAt: now,
       updatedAt: now,

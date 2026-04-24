@@ -16,6 +16,7 @@ export async function seedDatabase() {
     await database.trips.insert({
       id: trip1Id,
       name: "Japan Trip",
+      startDate: "2024-01-01",
       createdAt: Date.now(),
       updatedAt: Date.now(),
     });
@@ -25,7 +26,6 @@ export async function seedDatabase() {
     await database.stops.insert({
       id: tokyoStopId,
       name: "Tokyo",
-      date: "2024-01-01",
       tripId: trip1Id,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -35,7 +35,6 @@ export async function seedDatabase() {
     await database.stops.insert({
       id: kyotoStopId,
       name: "Kyoto",
-      date: "2024-01-05",
       tripId: trip1Id,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -45,7 +44,6 @@ export async function seedDatabase() {
     await database.stops.insert({
       id: osakaStopId,
       name: "Osaka",
-      date: "2024-01-10",
       tripId: trip1Id,
       createdAt: Date.now(),
       updatedAt: Date.now(),

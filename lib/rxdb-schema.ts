@@ -11,6 +11,8 @@ export type TripDocument = {
   id: string;
   name: string;
   budget?: number;
+  /** Optional trip start date ("YYYY-MM-DD"). Used to shift all item dates as a unit. */
+  startDate?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -18,7 +20,6 @@ export type TripDocument = {
 export type StopDocument = {
   id: string;
   name: string;
-  date: string;
   tripId: string;
   createdAt: number;
   updatedAt: number;
@@ -85,7 +86,7 @@ export type UserSettingsDocument = {
 
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
-  version: 1,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -101,6 +102,11 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
       multipleOf: 0.01,
       minimum: 0,
       maximum: 100000000,
+    },
+    startDate: {
+      type: "string",
+      maxLength: 10,
+      pattern: "^\\d{4}-\\d{2}-\\d{2}$",
     },
     createdAt: {
       type: "number",
@@ -120,7 +126,7 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
 };
 
 export const stopSchema: RxJsonSchema<StopDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -130,10 +136,6 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
     },
     name: {
       type: "string",
-    },
-    date: {
-      type: "string",
-      maxLength: 100,
     },
     tripId: {
       type: "string",
@@ -153,8 +155,8 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
       maximum: 8640000000000000,
     },
   },
-  required: ["id", "name", "date", "tripId", "createdAt", "updatedAt"],
-  indexes: ["tripId", "date"],
+  required: ["id", "name", "tripId", "createdAt", "updatedAt"],
+  indexes: ["tripId"],
 };
 
 export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {

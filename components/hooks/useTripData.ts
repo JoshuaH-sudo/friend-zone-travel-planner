@@ -94,7 +94,7 @@ export function useTripData(
 
     const subscription = database.stops
       .find({ selector: { tripId } })
-      .sort({ date: "asc", createdAt: "asc" })
+      .sort({ createdAt: "asc", id: "asc" })
       .$.subscribe((stopsRecords) => {
         setStops(stopsRecords);
       });

@@ -76,7 +76,7 @@ export function TripStats({
           ...(trans.arrivalDateTime ? [trans.arrivalDateTime] : []),
         ]),
       ].filter((value): value is string => Boolean(value));
-      const stopBounds = [stop.date, ...stopItemDates]
+      const stopBounds = [...stopItemDates]
         .filter((value): value is string => Boolean(value))
         .map((value) => ({
           value,

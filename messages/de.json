@@ -23,6 +23,7 @@
     "createTripDescription": "Starte mit einem Namen und optional deinem ersten Stopp.",
     "tripNamePlaceholder": "Reisename",
     "firstStopPlaceholder": "Erster Stopp (optional)",
+    "tripStartDatePlaceholder": "Startdatum (optional)",
     "createAndOpen": "Erstellen und öffnen",
     "searchPlaceholder": "Reisen suchen...",
     "noDatesYet": "Noch keine Daten",
@@ -140,9 +141,6 @@
     },
     "empty": {
       "noStops": "Noch keine Stopps."
-    },
-    "validation": {
-      "dateRequired": "Für diesen Stopp ist ein Datum erforderlich."
     },
     "toast": {
       "reorderFailed": "Stopps konnten nicht neu sortiert werden.",
