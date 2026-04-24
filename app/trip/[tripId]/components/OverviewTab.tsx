@@ -103,8 +103,16 @@ export const OverviewTab = ({
   // fall back to createdAt ordering (stable, predictable).
   const sortedStops = useMemo(() => {
     return [...stops].sort((a, b) => {
-      const aDate = getStopEarliestDate(a.id, accommodationsByStop, transportsByStop);
-      const bDate = getStopEarliestDate(b.id, accommodationsByStop, transportsByStop);
+      const aDate = getStopEarliestDate(
+        a.id,
+        accommodationsByStop,
+        transportsByStop,
+      );
+      const bDate = getStopEarliestDate(
+        b.id,
+        accommodationsByStop,
+        transportsByStop,
+      );
       if (aDate && bDate) return aDate.localeCompare(bDate);
       if (aDate) return -1;
       if (bDate) return 1;
@@ -183,7 +191,7 @@ export const OverviewTab = ({
         </div>
       ) : null}
       <form
-        className="bg-muted/30 flex flex-wrap items-end gap-2 rounded-2xl border p-3"
+        className="bg-muted/30 flex flex-wrap justify-center gap-2 rounded-2xl border p-3"
         onSubmit={async (event) => {
           event.preventDefault();
           if (!newStopName.trim()) return;
@@ -195,7 +203,8 @@ export const OverviewTab = ({
           value={newStopName}
           onChange={(event) => setNewStopName(event.target.value)}
           placeholder={t("addStop.placeholder")}
-          className="bg-input min-w-56 flex-1 rounded-xl"
+          type="text"
+          className="bg-input flex-1 rounded-xl px-4 py-2"
         />
         <Button type="submit" className="h-10 rounded-xl px-4">
           {t("addStop.submit")}
@@ -295,9 +304,7 @@ function StopCard({
 
   // Default date/time for new item forms: use earliest item date or today.
   const defaultDate =
-    allItemDates.length > 0
-      ? allItemDates.sort()[0].slice(0, 10)
-      : today;
+    allItemDates.length > 0 ? allItemDates.sort()[0].slice(0, 10) : today;
 
   return (
     <Card className="rounded-2xl pb-0 shadow-md">
