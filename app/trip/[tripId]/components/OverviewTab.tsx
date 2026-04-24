@@ -14,7 +14,7 @@ import { useSettings } from "@/lib/SettingsProvider";
 import posthog from "posthog-js";
 import { Expenses } from "./Expenses";
 import { Input } from "@base-ui/react";
-import { Bed, Plus, Plane, CreditCard, GripVertical } from "lucide-react";
+import { Bed, Plus, Plane, CreditCard } from "lucide-react";
 import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
@@ -62,11 +62,27 @@ function getStopEarliestDate(
   accommodationsByStop: Record<string, AccommodationDocumentType[]>,
   transportsByStop: Record<string, TransportDocumentType[]>,
 ): string {
-  const dates = [
-    ...(accommodationsByStop[stopId] || []).map((a) => a.checkIn),
-    ...(transportsByStop[stopId] || []).map((t) => t.departureDateTime),
-  ].filter(Boolean);
+  const dates = getAllItemDates(
+    accommodationsByStop[stopId] || [],
+    transportsByStop[stopId] || [],
+  );
   return dates.length > 0 ? dates.sort()[0] : "";
+}
+
+/**
+ * Collects all item date strings for a set of accommodations and transports.
+ * Used both for sorting stops and for computing date range summaries.
+ */
+function getAllItemDates(
+  accommodations: AccommodationDocumentType[],
+  transports: TransportDocumentType[],
+): string[] {
+  return [
+    ...accommodations.map((a) => a.checkIn),
+    ...accommodations.map((a) => a.checkOut),
+    ...transports.map((t) => t.departureDateTime),
+    ...transports.map((t) => t.arrivalDateTime),
+  ].filter((d): d is string => Boolean(d));
 }
 
 export const OverviewTab = ({
@@ -256,12 +272,7 @@ function StopCard({
   const today = getTodayDate();
 
   // Compute a date range summary from item dates for display in the stop card header.
-  const allItemDates = [
-    ...accommodations.map((a) => a.checkIn),
-    ...accommodations.map((a) => a.checkOut),
-    ...transports.map((tr) => tr.departureDateTime),
-    ...transports.map((tr) => tr.arrivalDateTime),
-  ].filter((d): d is string => Boolean(d));
+  const allItemDates = getAllItemDates(accommodations, transports);
 
   let dateRangeSummary = "";
   if (allItemDates.length > 0) {
@@ -292,7 +303,6 @@ function StopCard({
     <Card className="rounded-2xl pb-0 shadow-md">
       <CardHeader className="flex flex-row items-center gap-1 pb-4">
         <div className="flex w-full flex-row items-start gap-2">
-          <GripVertical className="text-muted-foreground mt-1 cursor-default opacity-30" />
           <div className="bg-primary-muted text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-serif font-semibold">
             {index}
           </div>

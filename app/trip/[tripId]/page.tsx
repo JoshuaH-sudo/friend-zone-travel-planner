@@ -59,9 +59,13 @@ type TabId = "overview" | "itinerary" | "map" | "budget";
 /**
  * Shift a stored "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM" string by `deltaDays`.
  * Assumes a well-formed date string matching the repo's storage format.
+ * Returns the original value unchanged if the format is not recognised.
  */
 function shiftDateTimeByDays(value: string, deltaDays: number): string {
   const [datePart, timePart] = value.split("T");
+  if (!datePart || !/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+    return value;
+  }
   const [y, m, d] = datePart.split("-").map(Number);
   const shifted = addDays(new Date(y, m - 1, d), deltaDays);
   const newDate = formatDateFns(shifted, "yyyy-MM-dd");

@@ -106,6 +106,7 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
     startDate: {
       type: "string",
       maxLength: 10,
+      pattern: "^\\d{4}-\\d{2}-\\d{2}$",
     },
     createdAt: {
       type: "number",
