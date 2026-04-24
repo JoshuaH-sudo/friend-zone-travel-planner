@@ -13,6 +13,8 @@ export type TripDocument = {
   budget?: number;
   /** Optional trip start date ("YYYY-MM-DD"). Used to shift all item dates as a unit. */
   startDate?: string;
+  /** Optional trip start location. */
+  startLocation?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -70,6 +72,8 @@ export type ExpenseDocument = {
 
 export type DateFormat = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
 
+export const TRIP_START_LOCATION_MAX_LENGTH = 200;
+
 export const dateFormats: DateFormat[] = [
   "MM/dd/yyyy",
   "dd/MM/yyyy",
@@ -86,7 +90,7 @@ export type UserSettingsDocument = {
 
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
-  version: 2,
+  version: 3,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -107,6 +111,10 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
       type: "string",
       maxLength: 10,
       pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+    },
+    startLocation: {
+      type: "string",
+      maxLength: TRIP_START_LOCATION_MAX_LENGTH,
     },
     createdAt: {
       type: "number",

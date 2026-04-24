@@ -47,6 +47,7 @@ export default function HomePage() {
   const [tripName, setTripName] = useState("");
   const [firstStopName, setFirstStopName] = useState("");
   const [tripStartDate, setTripStartDate] = useState("");
+  const [tripStartLocation, setTripStartLocation] = useState("");
 
   const cards = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -90,6 +91,7 @@ export default function HomePage() {
         id: nextTripId,
         name: tripName.trim() || t("newTripName"),
         startDate: tripStartDate || undefined,
+        startLocation: tripStartLocation.trim() || undefined,
         createdAt: now,
         updatedAt: now,
       });
@@ -115,10 +117,12 @@ export default function HomePage() {
     posthog.capture("trip_created", {
       has_first_stop: Boolean(firstStopName.trim()),
       has_start_date: Boolean(tripStartDate),
+      has_start_location: Boolean(tripStartLocation.trim()),
     });
     setTripName("");
     setFirstStopName("");
     setTripStartDate("");
+    setTripStartLocation("");
     setIsCreating(false);
     router.push(`/trip/${nextTripId}`);
   };
@@ -167,6 +171,11 @@ export default function HomePage() {
                 onChange={(event) => setTripStartDate(event.target.value)}
                 type="date"
                 placeholder={t("tripStartDatePlaceholder")}
+              />
+              <Input
+                value={tripStartLocation}
+                onChange={(event) => setTripStartLocation(event.target.value)}
+                placeholder={t("tripStartLocationPlaceholder")}
               />
               <Button onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>

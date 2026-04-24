@@ -24,6 +24,7 @@
     "tripNamePlaceholder": "Trip name",
     "firstStopPlaceholder": "First stop (optional)",
     "tripStartDatePlaceholder": "Start date (optional)",
+    "tripStartLocationPlaceholder": "Start location (optional)",
     "createAndOpen": "Create and open",
     "searchPlaceholder": "Search trips...",
     "noDatesYet": "No dates yet",

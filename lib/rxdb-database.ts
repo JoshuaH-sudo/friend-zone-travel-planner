@@ -86,6 +86,7 @@ async function createDatabase(): Promise<MyDatabase> {
       migrationStrategies: {
         1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
         2: (oldDoc) => ({ ...oldDoc, startDate: undefined }),
+        3: (oldDoc) => ({ ...oldDoc, startLocation: undefined }),
       },
     },
     stops: {

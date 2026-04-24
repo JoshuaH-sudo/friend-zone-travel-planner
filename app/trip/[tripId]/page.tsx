@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditableText } from "./components/EditableText";
 import { TripStartDateEditor } from "./components/TripStartDateEditor";
+import { TripStartLocationEditor } from "./components/TripStartLocationEditor";
 import { OverviewTab } from "./components/OverviewTab";
 import { ItineraryTab } from "./components/ItineraryTab";
 import { MapTab } from "./components/MapTab";
@@ -226,6 +227,19 @@ export default function TripPage() {
     });
   };
 
+  const commitStartLocationChange = async (
+    newStartLocation: string | null,
+  ) => {
+    await trip?.patch({
+      startLocation: newStartLocation ?? undefined,
+      updatedAt: Date.now(),
+    });
+    posthog.capture("trip_start_location_set", {
+      trip_id: tripId,
+      has_location: Boolean(newStartLocation),
+    });
+  };
+
   const addStop = async (name: string) => {
     await db.stops.insert({
       id: generateId(),
@@ -339,6 +353,10 @@ export default function TripPage() {
                   rangeEndDate={range.end}
                   canAdjustAllDates={hasShiftableItems}
                   onSaveStartDate={commitStartDateChange}
+                />
+                <TripStartLocationEditor
+                  currentStartLocation={trip.startLocation ?? null}
+                  onSaveStartLocation={commitStartLocationChange}
                 />
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" /> {stops.length} stops
