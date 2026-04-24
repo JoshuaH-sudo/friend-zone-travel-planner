@@ -7,6 +7,7 @@ import type {
   TripDocumentType,
 } from "@/lib/rxdb-schema";
 import { useEffect, useMemo, useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { convert, formatMoney } from "@/lib/format";
 import { Progress } from "@/components/ui/progress";
@@ -34,6 +35,7 @@ export function BudgetTab({
   transportsByStop,
   expenses,
 }: BudgetTabProps) {
+  const t = useTranslations("budgetTab");
   const { defaultCurrency } = useSettings();
   const { rates } = useExchangeRates();
   const [budgetValue, setBudgetValue] = useState(String(trip.budget ?? 0));
@@ -105,7 +107,7 @@ export function BudgetTab({
     <div className="flex flex-col gap-4">
       <section className="rounded-2xl border p-4">
         <p className="text-muted-foreground text-sm">
-          Trip budget ({defaultCurrency})
+          {t("tripBudgetLabel", { currency: defaultCurrency })}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Input
@@ -127,14 +129,11 @@ export function BudgetTab({
               <TooltipRoot>
                 <TooltipTrigger
                   className="text-muted-foreground hover:text-foreground cursor-default"
-                  aria-label="Exchange rate estimate"
+                  aria-label={t("estimationTooltip")}
                 >
                   <Info className="h-3.5 w-3.5" />
                 </TooltipTrigger>
-                <TooltipContent>
-                  Totals are estimated using current exchange rates and may not
-                  reflect actual costs.
-                </TooltipContent>
+                <TooltipContent>{t("estimationTooltip")}</TooltipContent>
               </TooltipRoot>
             </TooltipProvider>
           </div>
@@ -143,7 +142,9 @@ export function BudgetTab({
 
       {Object.keys(totals.byCurrency).length > 0 && (
         <section className="rounded-2xl border p-4">
-          <h3 className="font-serif text-2xl">Currency breakdown</h3>
+          <h3 className="font-serif text-2xl">
+            {t("currencyBreakdownTitle")}
+          </h3>
           <div className="mt-2 flex flex-wrap gap-2">
             {Object.entries(totals.byCurrency).map(([currency, amount]) => (
               <span
@@ -158,16 +159,18 @@ export function BudgetTab({
       )}
 
       <section className="rounded-2xl border p-4">
-        <h3 className="font-serif text-2xl">Category breakdown</h3>
+        <h3 className="font-serif text-2xl">
+          {t("categoryBreakdownTitle")}
+        </h3>
         <div className="mt-2 flex flex-col gap-1 text-sm">
           <p>
-            Accommodations:{" "}
+            {t("accommodations")}:{" "}
             ~{formatMoney(totals.accommodationTotal, defaultCurrency)}
           </p>
           <p>
-            Transports: ~{formatMoney(totals.transportTotal, defaultCurrency)}
+            {t("transports")}: ~{formatMoney(totals.transportTotal, defaultCurrency)}
           </p>
-          <p>Expenses: ~{formatMoney(totals.expensesTotal, defaultCurrency)}</p>
+          <p>{t("expenses")}: ~{formatMoney(totals.expensesTotal, defaultCurrency)}</p>
         </div>
       </section>
     </div>

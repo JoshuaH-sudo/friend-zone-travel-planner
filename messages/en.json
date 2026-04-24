@@ -295,5 +295,14 @@
   },
   "currencySelect": {
     "placeholder": "Select currency"
+  },
+  "budgetTab": {
+    "tripBudgetLabel": "Trip budget ({currency})",
+    "currencyBreakdownTitle": "Currency breakdown",
+    "categoryBreakdownTitle": "Category breakdown",
+    "accommodations": "Accommodations",
+    "transports": "Transports",
+    "expenses": "Expenses",
+    "estimationTooltip": "Totals are estimated using current exchange rates and may not reflect actual costs."
   }
 }

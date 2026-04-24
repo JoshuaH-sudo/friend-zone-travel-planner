@@ -295,5 +295,14 @@
   },
   "currencySelect": {
     "placeholder": "Währung auswählen"
+  },
+  "budgetTab": {
+    "tripBudgetLabel": "Reisebudget ({currency})",
+    "currencyBreakdownTitle": "Währungsaufschlüsselung",
+    "categoryBreakdownTitle": "Kategorienaufschlüsselung",
+    "accommodations": "Unterkünfte",
+    "transports": "Reisen",
+    "expenses": "Ausgaben",
+    "estimationTooltip": "Die Gesamtbeträge werden anhand aktueller Wechselkurse geschätzt und entsprechen möglicherweise nicht den tatsächlichen Kosten."
   }
 }

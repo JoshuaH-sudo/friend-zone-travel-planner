@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useTripData } from "@/components/hooks/useTripData";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,7 @@ export default function TripPage() {
   const params = useParams();
   const router = useRouter();
   const db = useDatabase();
+  const tStats = useTranslations("tripStats");
   const { timezone, defaultCurrency } = useSettings();
   const { rates } = useExchangeRates();
   const tripId = params.tripId as string;
@@ -378,13 +380,12 @@ export default function TripPage() {
                     <TooltipRoot>
                       <TooltipTrigger
                         className="opacity-70 hover:opacity-100 cursor-default"
-                        aria-label="Exchange rate estimate"
+                        aria-label={tStats("estimationTooltip")}
                       >
                         <Info className="h-3.5 w-3.5" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        This total is estimated using current exchange rates and
-                        may not reflect actual costs.
+                        {tStats("estimationTooltip")}
                       </TooltipContent>
                     </TooltipRoot>
                   </TooltipProvider>

@@ -106,6 +106,7 @@ export function StopCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
   const t = useTranslations("overviewTab");
+  const tStats = useTranslations("tripStats");
   const { rates } = useExchangeRates();
 
   const today = getTodayDate();
@@ -369,13 +370,12 @@ export function StopCard({
                     <TooltipRoot>
                       <TooltipTrigger
                         className="cursor-default"
-                        aria-label="Exchange rate estimate"
+                        aria-label={tStats("estimationTooltip")}
                       >
                         <Info className="h-3 w-3" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        Estimated total based on current exchange rates. May not
-                        reflect actual costs.
+                        {tStats("estimationTooltip")}
                       </TooltipContent>
                     </TooltipRoot>
                   </TooltipProvider>
