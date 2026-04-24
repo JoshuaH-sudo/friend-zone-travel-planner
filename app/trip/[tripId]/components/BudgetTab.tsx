@@ -3,6 +3,7 @@
 import type {
   AccommodationDocumentType,
   ExpenseDocumentType,
+  StopDocumentType,
   TransportDocumentType,
   TripDocumentType,
 } from "@/lib/rxdb-schema";
@@ -15,6 +16,7 @@ import posthog from "posthog-js";
 
 type BudgetTabProps = {
   trip: TripDocumentType;
+  stops: StopDocumentType[];
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
   expenses: ExpenseDocumentType[];
@@ -22,6 +24,7 @@ type BudgetTabProps = {
 
 export function BudgetTab({
   trip,
+  stops,
   accommodationsByStop,
   transportsByStop,
   expenses,
@@ -55,6 +58,47 @@ export function BudgetTab({
     const total = accommodationTotal + transportTotal + expensesTotal;
     return { accommodationTotal, transportTotal, expensesTotal, total };
   }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
+
+  const expensesByCategory = useMemo(() => {
+    const categories: Record<string, number> = {
+      food: 0,
+      activity: 0,
+      shopping: 0,
+      other: 0,
+    };
+    for (const expense of expenses) {
+      const cat = expense.category ?? "other";
+      categories[cat] =
+        (categories[cat] ?? 0) +
+        convert(expense.price, expense.currency, defaultCurrency);
+    }
+    return categories;
+  }, [expenses, defaultCurrency]);
+
+  const costByStop = useMemo(() => {
+    return stops
+      .map((stop) => {
+        const accTotal = (accommodationsByStop[stop.id] ?? []).reduce(
+          (sum, item) =>
+            sum + convert(item.price, item.currency, defaultCurrency),
+          0,
+        );
+        const transTotal = (transportsByStop[stop.id] ?? []).reduce(
+          (sum, item) =>
+            sum + convert(item.price, item.currency, defaultCurrency),
+          0,
+        );
+        const expTotal = expenses
+          .filter((e) => e.stopId === stop.id)
+          .reduce(
+            (sum, item) =>
+              sum + convert(item.price, item.currency, defaultCurrency),
+            0,
+          );
+        return { stopId: stop.id, name: stop.name, total: accTotal + transTotal + expTotal };
+      })
+      .sort((a, b) => b.total - a.total);
+  }, [stops, accommodationsByStop, transportsByStop, expenses, defaultCurrency]);
 
   const numericBudget = Number(budgetValue) || 0;
   const progress =
@@ -122,6 +166,35 @@ export function BudgetTab({
           <p>Expenses: {formatMoney(totals.expensesTotal, defaultCurrency)}</p>
         </div>
       </section>
+
+      <section className="rounded-2xl border p-4">
+        <h3 className="font-serif text-2xl">Expense breakdown</h3>
+        <div className="mt-2 flex flex-col gap-1 text-sm">
+          <p>Food: {formatMoney(expensesByCategory.food, defaultCurrency)}</p>
+          <p>
+            Activity:{" "}
+            {formatMoney(expensesByCategory.activity, defaultCurrency)}
+          </p>
+          <p>
+            Shopping:{" "}
+            {formatMoney(expensesByCategory.shopping, defaultCurrency)}
+          </p>
+          <p>Other: {formatMoney(expensesByCategory.other, defaultCurrency)}</p>
+        </div>
+      </section>
+
+      {costByStop.length > 0 && (
+        <section className="rounded-2xl border p-4">
+          <h3 className="font-serif text-2xl">Cost by stop</h3>
+          <div className="mt-2 flex flex-col gap-1 text-sm">
+            {costByStop.map((entry) => (
+              <p key={entry.stopId}>
+                {entry.name}: {formatMoney(entry.total, defaultCurrency)}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
 
 
     </div>
