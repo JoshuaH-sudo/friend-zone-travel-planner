@@ -134,10 +134,7 @@ export function ItineraryTab({
 
                 {/* Dated items */}
                 {datedItems.map((entry) => {
-                  const dateStr = formatDate(
-                    parseISO(entry.date.slice(0, 10)),
-                    "MMM d, yyyy",
-                  );
+                  const dateStr = formatDate(parseISO(entry.date), "MMM d, yyyy");
                   const isToday = entry.date.slice(0, 10) === today;
 
                   let icon: React.ReactNode;
@@ -165,7 +162,7 @@ export function ItineraryTab({
                   return (
                     <div
                       key={entry.item.id}
-                      className={`flex items-center gap-2 pl-5 ${isToday ? "bg-primary/10 border-primary/30 rounded px-2" : ""}`}
+                      className={`flex items-center gap-2 pl-5 ${isToday ? "bg-primary/10 border-primary/30 rounded pr-2" : ""}`}
                     >
                       <span className="text-muted-foreground min-w-[6.5rem] text-xs">
                         {dateStr}
