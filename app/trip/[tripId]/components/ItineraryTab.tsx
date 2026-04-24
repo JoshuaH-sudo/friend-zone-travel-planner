@@ -8,6 +8,7 @@ import type {
 } from "@/lib/rxdb-schema";
 import { parseISO, format as formatDate } from "date-fns";
 import { formatMoney } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import {
   MapPin,
   Hotel,
@@ -162,7 +163,10 @@ export function ItineraryTab({
                   return (
                     <div
                       key={entry.item.id}
-                      className={`flex items-center gap-2 pl-5 ${isToday ? "bg-primary/10 border-primary/30 rounded pr-2" : ""}`}
+                      className={cn(
+                        "flex items-center gap-2 pl-5",
+                        isToday && "bg-primary/10 border-primary/30 rounded pr-2",
+                      )}
                     >
                       <span className="text-muted-foreground min-w-[6.5rem] text-xs">
                         {dateStr}
