@@ -12,6 +12,7 @@ import {
   userSettingsSchema,
   TripCollection,
   StopCollection,
+  StopDocument,
   AccommodationCollection,
   TransportCollection,
   ExpenseCollection,
@@ -84,10 +85,18 @@ async function createDatabase(): Promise<MyDatabase> {
       schema: tripSchema,
       migrationStrategies: {
         1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
+        2: (oldDoc) => ({ ...oldDoc, startDate: undefined }),
       },
     },
     stops: {
       schema: stopSchema,
+      migrationStrategies: {
+        1: (oldDoc) => {
+          type OldStopDocument = StopDocument & { date: string };
+          const { date: _date, ...rest } = oldDoc as OldStopDocument;
+          return rest;
+        },
+      },
     },
     accommodations: {
       schema: accommodationSchema,

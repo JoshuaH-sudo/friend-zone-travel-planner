@@ -114,7 +114,6 @@ export async function exportTripToIcal(
 
   const stops = await database.stops
     .find({ selector: { tripId } })
-    .sort({ date: "asc" })
     .exec();
 
   const stopIds = stops.map((s) => s.id);
@@ -134,7 +133,6 @@ export async function exportTripToIcal(
       : [];
 
   const allDates: string[] = [
-    ...stops.map((s) => s.date),
     ...accommodations.flatMap((a) => [
       getDatePart(a.checkIn),
       getDatePart(a.checkOut),
