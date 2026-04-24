@@ -12,7 +12,7 @@ import { Transport } from "./Transport";
 import { useTranslations } from "next-intl";
 import { Expenses } from "./Expenses";
 import { Input } from "@base-ui/react";
-import { Bed, Plus, Plane, CreditCard } from "lucide-react";
+import { Bed, Plus, Plane, CreditCard, Pencil, Trash2 } from "lucide-react";
 import { Accommodation } from "./Accommodation";
 import { AccommodationForm } from "./AccommodationForm";
 import { TransportForm } from "./TransportForm";
@@ -186,7 +186,7 @@ export function StopCard({
                   setIsEditing(true);
                 }}
               >
-                ✏
+                <Pencil className="h-4 w-4" />
               </Button>
               <Button
                 type="button"
@@ -203,7 +203,7 @@ export function StopCard({
                   }
                 }}
               >
-                🗑
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           )}
