@@ -42,6 +42,10 @@ export default function SettingsPage() {
     setTimezone,
     dateFormat,
     setDateFormat,
+    analyticsConsent,
+    setAnalyticsConsent,
+    cookiesConsent,
+    setCookiesConsent,
   } = useSettings();
   const importInputRef = useRef<HTMLInputElement>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -244,6 +248,42 @@ export default function SettingsPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-medium">
+                {t("general.analyticsConsent.label")}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {t("general.analyticsConsent.description")}
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              className="accent-primary mt-0.5 size-4 shrink-0 cursor-pointer"
+              checked={analyticsConsent}
+              onChange={(e) => setAnalyticsConsent(e.target.checked)}
+              aria-label={t("general.analyticsConsent.label")}
+            />
+          </div>
+
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-medium">
+                {t("general.cookiesConsent.label")}
+              </p>
+              <p className="text-muted-foreground text-sm">
+                {t("general.cookiesConsent.description")}
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              className="accent-primary mt-0.5 size-4 shrink-0 cursor-pointer"
+              checked={cookiesConsent}
+              onChange={(e) => setCookiesConsent(e.target.checked)}
+              aria-label={t("general.cookiesConsent.label")}
+            />
           </div>
         </div>
       </section>

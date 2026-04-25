@@ -82,6 +82,14 @@
         "label": "Datumsformat",
         "description": "Wie Daten in der gesamten App angezeigt werden.",
         "placeholder": "Format auswählen"
+      },
+      "analyticsConsent": {
+        "label": "Nutzungsdaten teilen",
+        "description": "Hilf dabei, die App zu verbessern, indem du anonyme Nutzungsstatistiken teilst."
+      },
+      "cookiesConsent": {
+        "label": "Cookies akzeptieren",
+        "description": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
       }
     },
     "backup": {
@@ -296,6 +304,48 @@
   },
   "currencySelect": {
     "placeholder": "Währung auswählen"
+  },
+  "tutorial": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "getStarted": "Los geht's",
+    "steps": {
+      "welcome": {
+        "title": "Willkommen bei Friend Zone Travel",
+        "description": "Plane, organisiere und teile jeden Stopp, jede Unterkunft und jede Reise mit deinen Freunden — alles an einem Ort."
+      },
+      "createTrip": {
+        "title": "Erstelle deine erste Reise",
+        "description": "Tippe auf \"Reise planen\", um zu starten. Gib deiner Reise einen Namen und optional ein Startdatum."
+      },
+      "addStops": {
+        "title": "Erstelle dein Reiseprogramm mit Stopps",
+        "description": "Jede Reise besteht aus Stopps — Städte, Reiseziele oder jeder Ort, den du unterwegs besuchst."
+      },
+      "addDetails": {
+        "title": "Füge Unterkünfte, Reisen & Ausgaben hinzu",
+        "description": "Für jeden Stopp kannst du Unterkünfte, Transportabschnitte und Ausgaben hinzufügen, um alle Details zu erfassen."
+      },
+      "privacy": {
+        "title": "Deine Daten bleiben auf deinem Gerät",
+        "description": "Kein Konto, keine Cloud. Alles wird lokal auf deinem Gerät gespeichert und verlässt es nie."
+      },
+      "setup": {
+        "title": "Schnell-Einrichtung",
+        "description": "Passe ein paar Standardeinstellungen an, bevor du startest.",
+        "currency": "Währung",
+        "theme": "Design",
+        "themeSystem": "System",
+        "themeLight": "Hell",
+        "themeDark": "Dunkel",
+        "dateFormat": "Datumsformat",
+        "analyticsConsent": "Anonyme Nutzungsdaten teilen",
+        "analyticsConsentDescription": "Hilf dabei, die App zu verbessern, indem du anonyme Nutzungsstatistiken teilst.",
+        "cookiesConsent": "Cookies akzeptieren",
+        "cookiesConsentDescription": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
+      }
+    }
   },
   "budgetTab": {
     "tripBudgetLabel": "Reisebudget ({currency})",

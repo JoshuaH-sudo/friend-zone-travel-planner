@@ -6,5 +6,7 @@ if (process.env.NODE_ENV === "production") {
     ui_host: "https://eu.posthog.com",
     defaults: "2026-01-30",
     capture_exceptions: true,
+    // Disable capturing by default until the user gives analytics consent
+    opt_out_capturing_by_default: true,
   });
 }

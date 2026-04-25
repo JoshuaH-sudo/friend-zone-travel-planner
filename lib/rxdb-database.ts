@@ -145,6 +145,11 @@ async function createDatabase(): Promise<MyDatabase> {
       migrationStrategies: {
         1: (oldDoc) => ({ ...oldDoc, timezone: "UTC" }),
         2: (oldDoc) => ({ ...oldDoc, dateFormat: "MM/dd/yyyy" }),
+        3: (oldDoc) => ({
+          ...oldDoc,
+          analyticsConsent: false,
+          cookiesConsent: false,
+        }),
       },
     },
   });
