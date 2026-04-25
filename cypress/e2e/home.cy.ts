@@ -12,7 +12,12 @@ describe("Home page", () => {
       body: { rates: { EUR: 0.93, GBP: 0.79, USD: 1 } },
     }).as("exchangeRates");
 
-    cy.visit("/");
+    // Visit with localStorage set to prevent tutorial dialog from showing
+    cy.visit("/", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem("fzt-tutorial-seen", "true");
+      },
+    });
   });
 
   // ─── Hero section ───────────────────────────────────────────────────────
