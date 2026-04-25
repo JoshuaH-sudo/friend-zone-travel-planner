@@ -24,10 +24,7 @@ import { TripStats } from "./components/TripStats";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
-import {
-  convert,
-  daysBetween,
-} from "@/lib/format";
+import { convert, daysBetween, formatMoney } from "@/lib/format";
 import { useExchangeRates } from "@/lib/useExchangeRates";
 import {
   TooltipProvider,
@@ -150,7 +147,13 @@ export default function TripPage() {
       totalStays,
       totalJourneys,
     };
-  }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop, rates]);
+  }, [
+    accommodationsByStop,
+    defaultCurrency,
+    expenses,
+    transportsByStop,
+    rates,
+  ]);
 
   /** Date range derived from all item dates (accommodations + transports). */
   const range = useMemo(() => {
@@ -175,9 +178,7 @@ export default function TripPage() {
 
   /** Shift all item dates so that the trip begins on `newStartDate`. */
   const shiftAllItems = async (newStartDate: string) => {
-    const currentStart =
-      trip?.startDate ??
-      (range.start || null);
+    const currentStart = trip?.startDate ?? (range.start || null);
 
     if (!currentStart) {
       // No existing reference point — just update startDate.
@@ -250,9 +251,7 @@ export default function TripPage() {
     });
   };
 
-  const commitStartLocationChange = async (
-    newStartLocation: string | null,
-  ) => {
+  const commitStartLocationChange = async (newStartLocation: string | null) => {
     await trip?.patch({
       startLocation: newStartLocation ?? undefined,
       updatedAt: Date.now(),
@@ -391,12 +390,12 @@ export default function TripPage() {
                   <Plane className="h-4 w-4" /> {totals.totalJourneys} journeys
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Wallet className="h-4 w-4" />
-                  ~{formatMoney(totals.grandCost, defaultCurrency)}
+                  <Wallet className="h-4 w-4" />~
+                  {formatMoney(totals.grandCost, defaultCurrency)}
                   <TooltipProvider>
                     <TooltipRoot>
                       <TooltipTrigger
-                        className="opacity-70 hover:opacity-100 cursor-default"
+                        className="cursor-default opacity-70 hover:opacity-100"
                         aria-label={tStats("estimationTooltip")}
                       >
                         <Info className="h-3.5 w-3.5" />
