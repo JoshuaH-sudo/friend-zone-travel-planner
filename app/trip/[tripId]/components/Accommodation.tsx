@@ -119,7 +119,9 @@ export const Accommodation = ({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        <span className="mr-1 text-sm font-medium text-foreground">
+        <span className="mr-1 text-sm font-medium text-foreground" style={{
+          display: price && price > 0 ? 'inline' : 'none',
+        }}>
           {formatMoney(price, currency)}
         </span>
         <Button

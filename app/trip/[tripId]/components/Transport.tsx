@@ -125,12 +125,15 @@ export const Transport = ({
       {type === "train" && <Train className="text-primary h-5 w-5 shrink-0" />}
       <div className="min-w-0 flex-1">
         <p className="text-foreground truncate font-medium">{name}</p>
-        <p className="text-muted-foreground text-xs capitalize">
-          {t(`type.${type}`)} · {formatDateTime(departureDateTime)}
-        </p>
-        {arrivalDateTime && (
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            {t("arrivalDisplay", { value: formatDateTime(arrivalDateTime) })}
+        {!arrivalDateTime ? (
+          <p className="text-muted-foreground text-xs capitalize">
+            {t(`type.${type}`)} · {formatDateTime(departureDateTime)}
+          </p>
+        ) : (
+          <p className="text-muted-foreground text-xs">
+            {formatDateTime(departureDateTime)}
+            {" → "}
+            {formatDateTime(arrivalDateTime)}
           </p>
         )}
         {timezone && (

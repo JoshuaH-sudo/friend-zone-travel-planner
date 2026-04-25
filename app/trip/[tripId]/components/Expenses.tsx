@@ -74,17 +74,6 @@ export function Expenses({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsAdding(true)}
-          className="text-muted-foreground w-fit px-0"
-        >
-          <Plus className="h-4 w-4" />
-          {t("actions.addExpense")}
-        </Button>
-      </div>
       {isAdding && (
         <Card>
           <CardContent className="p-4">
@@ -106,8 +95,8 @@ export function Expenses({
         </Card>
       )}
       {expenses.map((expense) => (
-        <Card key={expense.id}>
-          <CardContent className="flex items-center justify-between p-4">
+        <Card key={expense.id} className="py-2 border-border/50 rounded-md ring-foreground/5">
+          <CardContent className="flex items-center justify-between px-3 py-2">
             {editingId === expense.id ? (
               <ExpenseForm
                 initialValues={{
@@ -152,7 +141,7 @@ export function Expenses({
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1">
                   <span className="text-sm font-medium">
                     {formatMoney(expense.price, expense.currency)}
                   </span>
@@ -160,15 +149,17 @@ export function Expenses({
                     size="icon"
                     variant="ghost"
                     onClick={() => setEditingId(expense.id)}
+                    className="text-muted-foreground hover:text-foreground h-7 w-7"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={() => handleDelete(expense.id)}
+                    className="text-muted-foreground hover:text-destructive h-7 w-7"
                   >
-                    <Trash2 className="text-destructive h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </>
@@ -176,6 +167,17 @@ export function Expenses({
           </CardContent>
         </Card>
       ))}
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsAdding(true)}
+          className="text-muted-foreground w-fit px-0"
+        >
+          <Plus className="h-4 w-4" />
+          {t("actions.addExpense")}
+        </Button>
+      </div>
     </div>
   );
 }
