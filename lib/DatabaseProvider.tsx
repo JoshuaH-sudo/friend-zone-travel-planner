@@ -26,7 +26,7 @@ import {
 import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
 import { getDatabase, deleteDatabaseData, MyDatabase } from "./rxdb-database";
 
-const DatabaseContext = createContext<MyDatabase | null>(null);
+export const DatabaseContext = createContext<MyDatabase | null>(null);
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [database, setDatabase] = useState<MyDatabase | null>(null);

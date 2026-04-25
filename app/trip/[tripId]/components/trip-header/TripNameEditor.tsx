@@ -64,6 +64,7 @@ export function TripNameEditor({
         }}
       >
         <Input
+          data-cy="trip-name-input"
           type="text"
           value={tripNameDraft}
           onChange={(event) => setTripNameDraft(event.target.value)}
@@ -72,6 +73,7 @@ export function TripNameEditor({
         />
         <div className="flex shrink-0 items-center gap-2">
           <Button
+            data-cy="trip-name-save"
             type="submit"
             variant="ghost"
             size="icon-sm"
@@ -82,6 +84,7 @@ export function TripNameEditor({
             <HugeiconsIcon icon={Tick02Icon} />
           </Button>
           <Button
+            data-cy="trip-name-cancel"
             type="button"
             variant="ghost"
             size="icon-sm"
@@ -100,12 +103,14 @@ export function TripNameEditor({
     <div className="flex w-full items-center justify-between gap-4">
       <div className="group flex min-w-0 items-center">
         <h5
+          data-cy="trip-name-display"
           className="cursor-pointer text-xl font-bold tracking-tight text-gray-900 hover:text-blue-600 sm:text-[5rem] dark:text-white dark:hover:text-blue-400"
           onClick={startEditingTripName}
         >
           {tripName}
         </h5>
         <Button
+          data-cy="trip-name-edit"
           type="button"
           variant="ghost"
           size="icon-sm"
@@ -117,6 +122,7 @@ export function TripNameEditor({
         </Button>
       </div>
       <Button
+        data-cy="trip-export"
         variant="ghost"
         size="icon-sm"
         className="bg-primary/10 text-primary hover:bg-primary/20 focus-visible:ring-primary/20 focus-visible:border-primary shrink-0"

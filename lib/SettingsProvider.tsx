@@ -57,7 +57,7 @@ const ssrFallbackSettings: Settings = {
   cookiesConsent: false,
 };
 
-const SettingsContext = createContext<SettingsContextValue>({
+export const SettingsContext = createContext<SettingsContextValue>({
   ...ssrFallbackSettings,
   setDefaultCurrency: () => {},
   setLanguage: () => {},

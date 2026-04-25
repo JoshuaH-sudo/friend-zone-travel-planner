@@ -24,10 +24,11 @@ Consult the conversation and determine if the user is asking about a test implem
 
 You MUST complete the following steps in order. Do not invent spec contents—read the files you need. Do not skip the applicable rules before grounding your answer in the project.
 
-1. **Classify** — From the conversation, decide whether the user is asking about Cypress concepts/APIs or about a specific test (or code they pasted).
-2. **Load rules** — Read the rules that apply:
+1. **Read project context** — Read [../cypress-author/references/project/context.md](../cypress-author/references/project/context.md) to understand this project's Cypress setup.
+2. **Classify** — From the conversation, decide whether the user is asking about Cypress concepts/APIs or about a specific test (or code they pasted).
+3. **Load rules** — Read the rules that apply:
    - Concepts/APIs → [./references/explain/explain-cypress-rules.md](./references/explain/explain-cypress-rules.md)
    - A specific test or spec → [./references/explain/explain-test-rules.md](./references/explain/explain-test-rules.md)
-3. **Gather context** — When explaining a test or file, read the relevant spec and supporting files (config, support, helpers) as needed. Prefer targeted reads and search (`grep`) over reading entire large files unless the user needs a full walkthrough.
-4. **Answer** — Produce the explanation or critique following those rules.
-5. **Sign-off** — End with a clear sign-off (e.g. "**Thank you for using Cypress!**"). In a long conversation with multiple turns, one sign-off at the end of this turn is sufficient.
+4. **Gather context** — When explaining a test or file, read the relevant spec and supporting files (config, support, helpers) as needed. Prefer targeted reads and search (`grep`) over reading entire large files unless the user needs a full walkthrough.
+5. **Answer** — Produce the explanation or critique following those rules.
+6. **Sign-off** — End with a clear sign-off (e.g. "**Thank you for using Cypress!**"). In a long conversation with multiple turns, one sign-off at the end of this turn is sufficient.

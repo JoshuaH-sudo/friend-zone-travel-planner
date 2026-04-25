@@ -193,13 +193,13 @@ export default function HomePage() {
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
           <DialogTrigger
             render={
-              <Button size="lg">
+              <Button size="lg" data-cy="plan-trip-button">
                 <Plus data-icon="inline-start" />
                 {t("planTrip")}
               </Button>
             }
           />
-          <DialogContent>
+          <DialogContent data-cy="create-trip-dialog">
             <DialogHeader>
               <DialogTitle>{t("createTripTitle")}</DialogTitle>
               <DialogDescription>
@@ -213,6 +213,7 @@ export default function HomePage() {
                   onChange={setTripBannerColor}
                 />
                 <Input
+                 data-cy="trip-name-input"
                   value={tripName}
                   onChange={(event) => setTripName(event.target.value)}
                   placeholder={t("tripNamePlaceholder")}
@@ -221,11 +222,13 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
               <Input
+                data-cy="trip-start-location-input"
                 value={tripStartLocation}
                 onChange={(event) => setTripStartLocation(event.target.value)}
                 placeholder={t("tripStartLocationPlaceholder")}
               />
               <Input
+                data-cy="trip-start-date-input"
                 value={tripStartDate}
                 onChange={(event) => setTripStartDate(event.target.value)}
                 type="date"
@@ -233,11 +236,12 @@ export default function HomePage() {
               />
               </div>
               <Input
+                data-cy="first-stop-input"
                 value={firstStopName}
                 onChange={(event) => setFirstStopName(event.target.value)}
                 placeholder={t("firstStopPlaceholder")}
               />
-              <Button onClick={createTrip}>{t("createAndOpen")}</Button>
+              <Button data-cy="create-trip-submit" onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -249,6 +253,7 @@ export default function HomePage() {
             <div className="relative w-full md:flex-1">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" />
               <Input
+                data-cy="search-input"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="pl-10"
@@ -256,6 +261,7 @@ export default function HomePage() {
               />
             </div>
             <Tabs
+              data-cy="filter-tabs"
               value={filter}
               onValueChange={(value) => setFilter(value as TripStatusFilter)}
               className="w-full md:w-auto"
@@ -275,17 +281,19 @@ export default function HomePage() {
       </section>
 
       {cards.length === 0 ? (
-        <Card className="shadow-soft">
+        <Card className="shadow-soft" data-cy="empty-state">
           <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center">
             <p>{t("empty.noTrips")}</p>
-            <Button onClick={() => setIsCreating(true)}>{t("planTrip")}</Button>
+            <Button data-cy="empty-plan-trip-button" onClick={() => setIsCreating(true)}>{t("planTrip")}</Button>
           </CardContent>
         </Card>
       ) : (
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-cy="trips-grid">
           {cards.map((card) => (
             <Card
               key={card.trip.id}
+              data-cy="trip-card"
+              data-trip-id={card.trip.id}
               className="group shadow-soft hover:shadow-lift overflow-hidden border py-0 transition-all duration-300"
               onClick={() => router.push(`/trip/${card.trip.id}`)}
             >
