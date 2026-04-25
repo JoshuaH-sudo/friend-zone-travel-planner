@@ -297,6 +297,34 @@
   "currencySelect": {
     "placeholder": "Währung auswählen"
   },
+  "tutorial": {
+    "skip": "Überspringen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "getStarted": "Los geht's",
+    "steps": {
+      "welcome": {
+        "title": "Willkommen bei Friend Zone Travel",
+        "description": "Plane, organisiere und teile jeden Stopp, jede Unterkunft und jede Reise mit deinen Freunden — alles an einem Ort."
+      },
+      "createTrip": {
+        "title": "Erstelle deine erste Reise",
+        "description": "Tippe auf \"Reise planen\", um zu starten. Gib deiner Reise einen Namen und optional ein Startdatum."
+      },
+      "addStops": {
+        "title": "Erstelle dein Reiseprogramm mit Stopps",
+        "description": "Jede Reise besteht aus Stopps — Städte, Reiseziele oder jeder Ort, den du unterwegs besuchst."
+      },
+      "addDetails": {
+        "title": "Füge Unterkünfte, Reisen & Ausgaben hinzu",
+        "description": "Für jeden Stopp kannst du Unterkünfte, Transportabschnitte und Ausgaben hinzufügen, um alle Details zu erfassen."
+      },
+      "privacy": {
+        "title": "Deine Daten bleiben auf deinem Gerät",
+        "description": "Kein Konto, keine Cloud. Alles wird lokal auf deinem Gerät gespeichert und verlässt es nie."
+      }
+    }
+  },
   "budgetTab": {
     "tripBudgetLabel": "Reisebudget ({currency})",
     "currencyBreakdownTitle": "Währungsaufschlüsselung",

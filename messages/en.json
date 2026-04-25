@@ -297,6 +297,34 @@
   "currencySelect": {
     "placeholder": "Select currency"
   },
+  "tutorial": {
+    "skip": "Skip",
+    "next": "Next",
+    "back": "Back",
+    "getStarted": "Get started",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Friend Zone Travel",
+        "description": "Plan, organise and share every stop, stay and journey with your friends — all in one place."
+      },
+      "createTrip": {
+        "title": "Create your first trip",
+        "description": "Tap \"Plan a trip\" to get started. Give your trip a name and an optional start date."
+      },
+      "addStops": {
+        "title": "Build your itinerary with stops",
+        "description": "Each trip is made up of stops — cities, destinations, or any place you visit along the way."
+      },
+      "addDetails": {
+        "title": "Add stays, journeys & expenses",
+        "description": "For each stop, add accommodations, transport legs, and expenses to track every detail."
+      },
+      "privacy": {
+        "title": "Your data stays on your device",
+        "description": "No account, no cloud. Everything is stored locally on your device and never leaves it."
+      }
+    }
+  },
   "budgetTab": {
     "tripBudgetLabel": "Trip budget ({currency})",
     "currencyBreakdownTitle": "Currency breakdown",

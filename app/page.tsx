@@ -37,6 +37,7 @@ import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import posthog from "posthog-js";
+import { TutorialDialog } from "@/components/TutorialDialog";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
@@ -169,6 +170,7 @@ export default function HomePage() {
 
   return (
     <div className="container flex flex-col gap-8 py-8 sm:py-12">
+      <TutorialDialog />
       <div className="mb- 28 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <section className="animate-fade-in flex flex-col gap-3">
           <p className="text-accent text-2xs font-medium tracking-[0.2em] uppercase">
