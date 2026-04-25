@@ -25,7 +25,6 @@ import { useSettings } from "@/lib/SettingsProvider";
 import {
   convert,
   daysBetween,
-  formatMoney,
 } from "@/lib/format";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";

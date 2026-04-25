@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MapPin, Pencil } from "lucide-react";
+import { FlagTriangleLeft, MapPin, Pencil } from "lucide-react";
 import { TRIP_START_LOCATION_MAX_LENGTH } from "@/lib/rxdb-schema";
 
 type TripStartLocationEditorProps = {
@@ -32,7 +32,7 @@ export function TripStartLocationEditor({
 
   return (
     <span className="inline-flex items-center gap-1.5">
-      <MapPin className="h-4 w-4" />
+      <FlagTriangleLeft className="h-4 w-4" />
       {isEditing ? (
         <form
           className="inline-flex items-center gap-1"
