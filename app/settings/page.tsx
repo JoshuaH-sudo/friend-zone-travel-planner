@@ -25,6 +25,7 @@ import {
   resetAppData,
 } from "@/lib/app-data-transfer";
 import posthog from "posthog-js";
+import { Download, Upload } from "lucide-react";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -127,7 +128,7 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
         <p className="text-muted-foreground">
-          Manage defaults for planning, backup, and local device data.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -302,6 +303,7 @@ export default function SettingsPage() {
               onClick={handleExport}
               disabled={isExporting || isImporting || isResetting}
             >
+              <Download data-icon="inline-start" />
               {isExporting ? t("backup.exporting") : t("backup.export")}
             </Button>
             <Button
@@ -310,6 +312,7 @@ export default function SettingsPage() {
               onClick={handleImportClick}
               disabled={isExporting || isImporting || isResetting}
             >
+              <Upload data-icon="inline-start" />
               {isImporting ? t("backup.importing") : t("backup.import")}
             </Button>
             <ConfirmationDialog
@@ -319,7 +322,7 @@ export default function SettingsPage() {
                   variant="destructive"
                   disabled={isExporting || isImporting || isResetting}
                 >
-                  Wipe all data
+                  {t("backup.reset")}
                 </Button>
               }
               title={t("backup.resetConfirmTitle")}

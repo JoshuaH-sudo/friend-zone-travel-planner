@@ -85,6 +85,7 @@ export function StopCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
   const t = useTranslations("overviewTab");
+  const tStop = useTranslations("stop");
   const tStats = useTranslations("tripStats");
 
   const { dateRangeSummary, defaultDate } = useStopDateRange(
@@ -172,9 +173,7 @@ export function StopCard({
                 className="text-destructive"
                 onClick={async () => {
                   if (
-                    confirm(
-                      "Delete this stop and all its items? This cannot be undone.",
-                    )
+                    confirm(tStop("deleteConfirm"))
                   ) {
                     await onDeleteStop();
                   }
