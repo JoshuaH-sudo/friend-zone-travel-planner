@@ -38,6 +38,10 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import posthog from "posthog-js";
 import { TutorialDialog } from "@/components/TutorialDialog";
+import { BannerColorPicker } from "@/components/BannerColorPicker";
+import {
+  generateRandomBannerColor,
+} from "@/lib/banner-color";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
@@ -64,6 +68,9 @@ export default function HomePage() {
   const [firstStopName, setFirstStopName] = useState("");
   const [tripStartDate, setTripStartDate] = useState("");
   const [tripStartLocation, setTripStartLocation] = useState("");
+  const [tripBannerColor, setTripBannerColor] = useState(
+    generateRandomBannerColor,
+  );
 
   const cards = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -133,6 +140,7 @@ export default function HomePage() {
         name: tripName.trim() || t("newTripName"),
         startDate: tripStartDate || undefined,
         startLocation: tripStartLocation.trim() || undefined,
+        bannerColor: tripBannerColor,
         createdAt: now,
         updatedAt: now,
       });
@@ -164,6 +172,7 @@ export default function HomePage() {
     setFirstStopName("");
     setTripStartDate("");
     setTripStartLocation("");
+    setTripBannerColor(generateRandomBannerColor());
     setIsCreating(false);
     router.push(`/trip/${nextTripId}`);
   };
@@ -198,11 +207,18 @@ export default function HomePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3">
-              <Input
-                value={tripName}
-                onChange={(event) => setTripName(event.target.value)}
-                placeholder={t("tripNamePlaceholder")}
-              />
+              <div className="flex items-center gap-2">
+                <BannerColorPicker
+                  value={tripBannerColor}
+                  onChange={setTripBannerColor}
+                />
+                <Input
+                  value={tripName}
+                  onChange={(event) => setTripName(event.target.value)}
+                  placeholder={t("tripNamePlaceholder")}
+                  className="flex-1"
+                />
+              </div>
               <div className="flex items-center gap-2">
               <Input
                 value={tripStartLocation}
@@ -273,7 +289,10 @@ export default function HomePage() {
               className="group shadow-soft hover:shadow-lift overflow-hidden border py-0 transition-all duration-300"
               onClick={() => router.push(`/trip/${card.trip.id}`)}
             >
-              <CardHeader className="gradient-hero relative h-32 p-0">
+              <CardHeader
+                className="relative h-32 p-0"
+                style={{ background: card.trip.bannerColor ?? "var(--gradient-hero)" }}
+              >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--accent)/0.4),transparent_60%)]" />
                 <span className="bg-background/90 text-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase">
                   {t(`filters.${card.status}`)}

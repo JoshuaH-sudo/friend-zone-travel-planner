@@ -48,6 +48,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -62,6 +68,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import posthog from "posthog-js";
 import { shiftDateTimeByDays } from "./components/utils/tripDateUtils";
+import { BannerColorPicker } from "@/components/BannerColorPicker";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
@@ -75,6 +82,7 @@ export default function TripPage() {
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const {
     trip,
     stops,
@@ -336,7 +344,12 @@ export default function TripPage() {
 
   return (
     <div>
-      <section className="gradient-hero text-primary-foreground">
+      <section
+        className="text-primary-foreground"
+        style={{
+          background: trip.bannerColor ?? "var(--gradient-hero)",
+        }}
+      >
         <div className="container py-8 sm:py-12">
           <Link
             href="/"
@@ -416,6 +429,11 @@ export default function TripPage() {
               ></DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={() => setColorPickerOpen(true)}
+                  >
+                    Change banner colour
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={async () => {
                       await exportTripJson(db, trip.id);
@@ -539,6 +557,22 @@ export default function TripPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={colorPickerOpen} onOpenChange={setColorPickerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Banner colour</DialogTitle>
+          </DialogHeader>
+          <div className="flex justify-center py-2">
+            <BannerColorPicker
+              value={trip.bannerColor ?? "#2d6a4f"}
+              onChange={async (color) => {
+                await trip.patch({ bannerColor: color, updatedAt: Date.now() });
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

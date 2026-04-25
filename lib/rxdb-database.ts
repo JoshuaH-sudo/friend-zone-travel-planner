@@ -87,6 +87,7 @@ async function createDatabase(): Promise<MyDatabase> {
         1: (oldDoc) => ({ ...oldDoc, budget: undefined }),
         2: (oldDoc) => ({ ...oldDoc, startDate: undefined }),
         3: (oldDoc) => ({ ...oldDoc, startLocation: undefined }),
+        4: (oldDoc) => ({ ...oldDoc, bannerColor: undefined }),
       },
     },
     stops: {
