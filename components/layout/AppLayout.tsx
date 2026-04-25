@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const tHeader = useTranslations("header");
+  const tLayout = useTranslations("layout");
 
   return (
     <div className="bg-background min-h-screen">
@@ -16,7 +18,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Link href="/" className="flex items-center gap-3">
               <img
                 src="/favicon.svg"
-                alt="Friend Zone Travel Planner"
+                alt={tHeader("logoAlt")}
                 className="h-10 w-10 antialiased"
               /> 
             <span className="text-foreground text-lg font-semibold">
@@ -31,7 +33,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 pathname === "/" ? "bg-secondary text-foreground" : "text-muted-foreground",
               )}
             >
-              Trips
+              {tHeader("trips")}
             </Link>
             <Link
               href="/settings"
@@ -42,7 +44,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   : "text-muted-foreground",
               )}
             >
-              Settings
+              {tHeader("settings")}
             </Link>
           </nav>
         </div>
@@ -50,7 +52,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full flex-1">{children}</main>
       <footer className="border-t mt-12">
         <div className="container py-6 text-xs text-muted-foreground text-center">
-          Your data lives only on this device. No account, no cloud.
+          {tLayout("dataPrivacy")}
         </div>
       </footer>
     </div>

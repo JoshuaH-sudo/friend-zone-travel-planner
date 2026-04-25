@@ -6,12 +6,14 @@ import { useDatabase } from "@/lib/DatabaseProvider";
 import { importSharedTrip } from "@/lib/share";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export function ImportListener() {
   const db = useDatabase();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations("importListener");
   const [pendingImport, setPendingImport] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -27,9 +29,9 @@ export function ImportListener() {
 
   return (
     <div className="bg-card border-border fixed right-4 bottom-4 left-4 z-50 rounded-2xl border p-4 shadow-lg md:left-auto md:w-[420px]">
-      <p className="text-sm font-medium">Import shared trip?</p>
+      <p className="text-sm font-medium">{t("title")}</p>
       <p className="text-muted-foreground mt-1 text-sm">
-        This will create a new local trip copy from the share link.
+        {t("description")}
       </p>
       <div className="mt-3 flex justify-end gap-2">
         <Button
@@ -40,7 +42,7 @@ export function ImportListener() {
             router.replace(pathname);
           }}
         >
-          Cancel
+          {t("cancel")}
         </Button>
         <Button
           disabled={isImporting}
@@ -49,12 +51,12 @@ export function ImportListener() {
             setIsImporting(true);
             try {
               const newTripId = await importSharedTrip(db, pendingImport);
-              toast.success("Trip imported.");
+              toast.success(t("success"));
               setPendingImport(null);
               router.replace(`/trip/${newTripId}`);
             } catch (error) {
               console.error(error);
-              toast.error("Import failed.");
+              toast.error(t("error"));
               setPendingImport(null);
               router.replace(pathname);
             } finally {
@@ -62,7 +64,7 @@ export function ImportListener() {
             }
           }}
         >
-          {isImporting ? "Importing..." : "Import"}
+          {isImporting ? t("importing") : t("import")}
         </Button>
       </div>
     </div>
