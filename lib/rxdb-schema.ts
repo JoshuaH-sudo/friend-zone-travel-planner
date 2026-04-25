@@ -86,6 +86,8 @@ export type UserSettingsDocument = {
   language: string;
   timezone: string;
   dateFormat: DateFormat;
+  analyticsConsent?: boolean;
+  cookiesConsent?: boolean;
 };
 
 // RxDB Schemas
@@ -435,7 +437,7 @@ export type ExpenseCollection = RxCollection<
 export const USER_SETTINGS_ID = "user-settings";
 
 export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
-  version: 2,
+  version: 3,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -458,6 +460,12 @@ export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
     dateFormat: {
       type: "string",
       enum: dateFormats,
+    },
+    analyticsConsent: {
+      type: "boolean",
+    },
+    cookiesConsent: {
+      type: "boolean",
     },
   },
   required: ["id", "defaultCurrency", "language", "timezone", "dateFormat"],

@@ -82,6 +82,14 @@
         "label": "Datumsformat",
         "description": "Wie Daten in der gesamten App angezeigt werden.",
         "placeholder": "Format auswählen"
+      },
+      "analyticsConsent": {
+        "label": "Nutzungsdaten teilen",
+        "description": "Hilf dabei, die App zu verbessern, indem du anonyme Nutzungsstatistiken teilst."
+      },
+      "cookiesConsent": {
+        "label": "Cookies akzeptieren",
+        "description": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
       }
     },
     "backup": {
@@ -322,6 +330,20 @@
       "privacy": {
         "title": "Deine Daten bleiben auf deinem Gerät",
         "description": "Kein Konto, keine Cloud. Alles wird lokal auf deinem Gerät gespeichert und verlässt es nie."
+      },
+      "setup": {
+        "title": "Schnell-Einrichtung",
+        "description": "Passe ein paar Standardeinstellungen an, bevor du startest.",
+        "currency": "Währung",
+        "theme": "Design",
+        "themeSystem": "System",
+        "themeLight": "Hell",
+        "themeDark": "Dunkel",
+        "dateFormat": "Datumsformat",
+        "analyticsConsent": "Anonyme Nutzungsdaten teilen",
+        "analyticsConsentDescription": "Hilf dabei, die App zu verbessern, indem du anonyme Nutzungsstatistiken teilst.",
+        "cookiesConsent": "Cookies akzeptieren",
+        "cookiesConsentDescription": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
       }
     }
   },

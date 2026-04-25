@@ -19,6 +19,8 @@ interface Settings {
   language: string;
   timezone: string;
   dateFormat: DateFormat;
+  analyticsConsent: boolean;
+  cookiesConsent: boolean;
 }
 
 interface SettingsContextValue extends Settings {
@@ -26,6 +28,8 @@ interface SettingsContextValue extends Settings {
   setLanguage: (language: string) => void;
   setTimezone: (timezone: string) => void;
   setDateFormat: (dateFormat: DateFormat) => void;
+  setAnalyticsConsent: (value: boolean) => void;
+  setCookiesConsent: (value: boolean) => void;
 }
 
 function getDefaultSettings(): Settings {
@@ -35,6 +39,8 @@ function getDefaultSettings(): Settings {
     timezone: typeof window !== "undefined" ? detectBrowserTimezone() : "UTC",
     dateFormat:
       typeof window !== "undefined" ? detectBrowserDateFormat() : "MM/dd/yyyy",
+    analyticsConsent: false,
+    cookiesConsent: false,
   };
 }
 
@@ -46,6 +52,8 @@ const ssrFallbackSettings: Settings = {
   language: "en",
   timezone: "UTC",
   dateFormat: "MM/dd/yyyy",
+  analyticsConsent: false,
+  cookiesConsent: false,
 };
 
 const SettingsContext = createContext<SettingsContextValue>({
@@ -54,6 +62,8 @@ const SettingsContext = createContext<SettingsContextValue>({
   setLanguage: () => {},
   setTimezone: () => {},
   setDateFormat: () => {},
+  setAnalyticsConsent: () => {},
+  setCookiesConsent: () => {},
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
@@ -72,6 +82,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             language: doc.language,
             timezone: doc.timezone,
             dateFormat: doc.dateFormat ?? defaults.dateFormat,
+            analyticsConsent: doc.analyticsConsent ?? false,
+            cookiesConsent: doc.cookiesConsent ?? false,
           });
         }
       });
@@ -88,6 +100,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           language: currentDoc.language,
           timezone: currentDoc.timezone,
           dateFormat: currentDoc.dateFormat ?? defaults.dateFormat,
+          analyticsConsent: currentDoc.analyticsConsent ?? false,
+          cookiesConsent: currentDoc.cookiesConsent ?? false,
         }
       : defaults;
     await db.settings.upsert({
@@ -111,6 +125,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     },
     setTimezone: (timezone) => updateSettings({ timezone }),
     setDateFormat: (dateFormat) => updateSettings({ dateFormat }),
+    setAnalyticsConsent: (value) => updateSettings({ analyticsConsent: value }),
+    setCookiesConsent: (value) => updateSettings({ cookiesConsent: value }),
   };
 
   return (

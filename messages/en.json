@@ -82,6 +82,14 @@
         "label": "Date Format",
         "description": "How dates are displayed throughout the app.",
         "placeholder": "Select format"
+      },
+      "analyticsConsent": {
+        "label": "Share usage data",
+        "description": "Help improve the app by sharing anonymous usage statistics."
+      },
+      "cookiesConsent": {
+        "label": "Accept cookies",
+        "description": "Allow cookies to be stored on your device for a better experience."
       }
     },
     "backup": {
@@ -322,6 +330,20 @@
       "privacy": {
         "title": "Your data stays on your device",
         "description": "No account, no cloud. Everything is stored locally on your device and never leaves it."
+      },
+      "setup": {
+        "title": "Quick setup",
+        "description": "Customise a few defaults before you dive in.",
+        "currency": "Currency",
+        "theme": "Theme",
+        "themeSystem": "System",
+        "themeLight": "Light",
+        "themeDark": "Dark",
+        "dateFormat": "Date format",
+        "analyticsConsent": "Share anonymous usage data",
+        "analyticsConsentDescription": "Help improve the app by sharing anonymous usage statistics.",
+        "cookiesConsent": "Accept cookies",
+        "cookiesConsentDescription": "Allow cookies to be stored on your device for a better experience."
       }
     }
   },
