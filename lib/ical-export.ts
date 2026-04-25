@@ -1,4 +1,5 @@
 import { MyDatabase } from "./rxdb-database";
+import { downloadOrShareFile } from "./file-download";
 
 /** Format a YYYY-MM-DD string as an iCal DATE value (YYYYMMDD). */
 function formatIcalDate(dateStr: string): string {
@@ -227,18 +228,13 @@ export async function exportTripToIcal(
   const icalContent = lines.map(foldLine).join("\r\n");
 
   const blob = new Blob([icalContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download =
-    trip.name
-      .replace(/[^\w\s-]/g, "")
-      .replace(/[\s-]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .trim() || "trip";
-  link.download += ".ics";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  const filename =
+    (
+      trip.name
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .trim() || "trip"
+    ) + ".ics";
+  await downloadOrShareFile(blob, filename);
 }

@@ -1,4 +1,5 @@
 import { MyDatabase, RXDB_DEXIE_DB_PREFIX, RXDB_DEXIE_DOCS_STORE } from "@/lib/rxdb-database";
+import { downloadOrShareFile } from "@/lib/file-download";
 import {
   AccommodationDocument,
   ExpenseDocument,
@@ -108,14 +109,10 @@ export async function exportAppData(
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `friend-zone-travel-planner-export-${Date.now()}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  await downloadOrShareFile(
+    blob,
+    `friend-zone-travel-planner-export-${Date.now()}.json`,
+  );
 }
 
 /**
@@ -223,14 +220,10 @@ export async function exportRawDatabaseBackup(): Promise<void> {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `friend-zone-travel-planner-recovery-backup-${Date.now()}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  await downloadOrShareFile(
+    blob,
+    `friend-zone-travel-planner-recovery-backup-${Date.now()}.json`,
+  );
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
