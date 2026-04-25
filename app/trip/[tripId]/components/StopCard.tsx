@@ -115,6 +115,7 @@ export function StopCard({
   const stopCurrencyTotals = useMemo(() => {
     const totals: Record<string, number> = {};
     [...accommodations, ...transports, ...expenses].forEach((item) => {
+      if (!item.price || item.price <= 0) return;
       totals[item.currency] = (totals[item.currency] || 0) + item.price;
     });
     return totals;

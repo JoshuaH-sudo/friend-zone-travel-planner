@@ -106,8 +106,8 @@ export function Expenses({
         </Card>
       )}
       {expenses.map((expense) => (
-        <Card key={expense.id}>
-          <CardContent className="flex items-center justify-between p-4">
+        <Card key={expense.id} className="py-2">
+          <CardContent className="flex items-center justify-between px-3 py-2">
             {editingId === expense.id ? (
               <ExpenseForm
                 initialValues={{
@@ -152,7 +152,7 @@ export function Expenses({
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1">
                   <span className="text-sm font-medium">
                     {formatMoney(expense.price, expense.currency)}
                   </span>
@@ -160,15 +160,17 @@ export function Expenses({
                     size="icon"
                     variant="ghost"
                     onClick={() => setEditingId(expense.id)}
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
                     onClick={() => handleDelete(expense.id)}
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
                   >
-                    <Trash2 className="text-destructive h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </>
