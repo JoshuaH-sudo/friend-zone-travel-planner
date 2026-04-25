@@ -25,7 +25,7 @@ import {
   resetAppData,
 } from "@/lib/app-data-transfer";
 import posthog from "posthog-js";
-import { Download, Upload, Trash2 } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 

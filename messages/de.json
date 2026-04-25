@@ -373,9 +373,9 @@
   },
   "dbLoadError": {
     "title": "App-Daten konnten nicht geladen werden",
-    "description": "Beim Laden deiner gespeicherten Daten ist ein Fehler aufgetreten. Du kannst vor dem Löschen der Datenbank ein Roh-Backup exportieren.",
+    "description": "Beim Laden deiner gespeicherten Daten ist ein Fehler aufgetreten. Du kannst vor dem Löschen der Datenbank ein Backup exportieren — die exportierte Datei kann nach der Wiederherstellung über die Einstellungsseite importiert werden.",
     "errorLabel": "Fehlerdetails",
-    "exportButton": "Roh-Backup exportieren",
+    "exportButton": "Backup exportieren",
     "exporting": "Exportiere...",
     "clearButton": "Datenbank löschen",
     "clearing": "Lösche..."

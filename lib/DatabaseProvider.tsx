@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import {
   detectBrowserDateFormat,
   detectBrowserTimezone,
-  exportAppData,
+  exportRawDatabaseBackup,
 } from "@/lib/app-data-transfer";
 import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
 import { getDatabase, deleteDatabaseData, MyDatabase } from "./rxdb-database";
@@ -83,11 +83,9 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const handleExportBackup = async () => {
     try {
       setIsExportingBackup(true);
-      const db = await getDatabase();
-      await exportAppData(db, { theme: null });
-
+      await exportRawDatabaseBackup();
     } catch (error) {
-      console.error("Raw backup export failed:", error);
+      console.error("Backup export failed:", error);
     } finally {
       setIsExportingBackup(false);
     }

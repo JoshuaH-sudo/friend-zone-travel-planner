@@ -190,33 +190,63 @@ export function generateId(): string {
 }
 
 /** Prefix used by the Dexie storage adapter for every per-collection IndexedDB database. */
-const RXDB_DEXIE_DB_PREFIX = `rxdb-dexie-${DB_NAME}--`;
+export const RXDB_DEXIE_DB_PREFIX = `rxdb-dexie-${DB_NAME}--`;
+
+/** Name of the Dexie object store that holds RxDB documents in each collection database. */
+export const RXDB_DEXIE_DOCS_STORE = "docs";
+
+function deleteIndexedDbByName(name: string): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const req = indexedDB.deleteDatabase(name);
+    req.onsuccess = () => resolve();
+    req.onerror = () => {
+      console.error("Failed to delete database:", name, req.error);
+      resolve();
+    };
+    req.onblocked = () => {
+      console.warn("Database deletion blocked for:", name);
+      resolve();
+    };
+  });
+}
 
 /**
  * Deletes all IndexedDB databases created by RxDB's Dexie storage adapter for
  * this app.  Safe to call at any time; resolves even if individual deletions
  * fail so the caller can always proceed with a reload.
+ *
+ * Falls back to known versioned database names when `indexedDB.databases()` is
+ * unavailable (e.g. Safari), so the recovery flow works cross-browser.
  */
 export async function deleteDatabaseData(): Promise<void> {
-  if (typeof indexedDB === "undefined" || !indexedDB.databases) {
+  if (typeof indexedDB === "undefined") {
     return;
   }
-  const allDbs = await indexedDB.databases();
-  const toDelete = allDbs
-    .map((db) => db.name)
-    .filter(
-      (name): name is string =>
-        typeof name === "string" && name.startsWith(RXDB_DEXIE_DB_PREFIX),
-    );
+
+  // Build candidate names from the known current schema versions. This serves
+  // as the cross-browser fallback (e.g. Safari lacks indexedDB.databases()).
+  const candidateDbNames = new Set<string>([
+    DB_NAME,
+    `${RXDB_DEXIE_DB_PREFIX}${tripSchema.version}--trips`,
+    `${RXDB_DEXIE_DB_PREFIX}${stopSchema.version}--stops`,
+    `${RXDB_DEXIE_DB_PREFIX}${accommodationSchema.version}--accommodations`,
+    `${RXDB_DEXIE_DB_PREFIX}${transportSchema.version}--transports`,
+    `${RXDB_DEXIE_DB_PREFIX}${expenseSchema.version}--expenses`,
+    `${RXDB_DEXIE_DB_PREFIX}${userSettingsSchema.version}--settings`,
+  ]);
+
+  // Enumerate all existing databases when the API is available (Chrome/Firefox)
+  // to catch any databases from previous schema versions.
+  if (indexedDB.databases) {
+    const allDbs = await indexedDB.databases();
+    for (const { name } of allDbs) {
+      if (typeof name === "string" && name.startsWith(RXDB_DEXIE_DB_PREFIX)) {
+        candidateDbNames.add(name);
+      }
+    }
+  }
+
   await Promise.all(
-    toDelete.map(
-      (name) =>
-        new Promise<void>((resolve) => {
-          const req = indexedDB.deleteDatabase(name);
-          req.onsuccess = () => resolve();
-          req.onerror = () => resolve();
-          req.onblocked = () => resolve();
-        }),
-    ),
+    [...candidateDbNames].map((name) => deleteIndexedDbByName(name)),
   );
 }

@@ -373,9 +373,9 @@
   },
   "dbLoadError": {
     "title": "Failed to load app data",
-    "description": "An error occurred while loading your stored data. You can export a raw backup before clearing the database.",
+    "description": "An error occurred while loading your stored data. You can export a backup before clearing the database — the exported file can be imported via the Settings page after recovery.",
     "errorLabel": "Error details",
-    "exportButton": "Export Raw Backup",
+    "exportButton": "Export Backup",
     "exporting": "Exporting...",
     "clearButton": "Clear Database",
     "clearing": "Clearing..."
