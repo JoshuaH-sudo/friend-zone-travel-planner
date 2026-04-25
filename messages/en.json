@@ -4,12 +4,15 @@
     "description": "Plan your trips with friends and keep all your travel details in one place."
   },
   "layout": {
-    "footer": "© {year} Friend Zone Travel Planner. All rights reserved."
+    "footer": "© {year} Friend Zone Travel Planner. All rights reserved.",
+    "dataPrivacy": "Your data lives only on this device. No account, no cloud."
   },
   "header": {
     "title": "Friend Zone Travel Planner",
+    "logoAlt": "Friend Zone Travel Planner",
     "toggleTheme": "Toggle theme",
-    "settings": "Settings"
+    "settings": "Settings",
+    "trips": "Trips"
   },
   "home": {
     "newTripName": "New Trip",
@@ -50,6 +53,7 @@
   },
   "settings": {
     "title": "Settings",
+    "subtitle": "Manage defaults for planning, backup, and local device data.",
     "errors": {
       "unknownError": "Unknown error"
     },
@@ -121,7 +125,26 @@
     "newTransportName": "New Transport",
     "loading": "Loading trip...",
     "notFound": "Trip not found",
-    "addStop": "Add Stop"
+    "addStop": "Add Stop",
+    "allTrips": "All trips",
+    "tripEyebrow": "Trip",
+    "stopsCount": "{count, plural, one {# stop} other {# stops}}",
+    "staysCount": "{count, plural, one {# stay} other {# stays}}",
+    "journeysCount": "{count, plural, one {# journey} other {# journeys}}",
+    "daysCount": "{count, plural, one {# day} other {# days}}",
+    "exportJson": "Export JSON",
+    "copyShareLink": "Copy share link",
+    "shareLinkCopied": "Share link copied.",
+    "exportIcal": "Export iCal",
+    "deleteTrip": "Delete trip",
+    "tabOverview": "Overview",
+    "tabItinerary": "Itinerary",
+    "tabMap": "Map",
+    "tabBudget": "Budget",
+    "deleteTripTitle": "Delete this trip?",
+    "deleteTripDescription": "This will remove the trip and all linked stops/items.",
+    "deleteTripCancel": "Cancel",
+    "deleteTripConfirm": "Delete trip"
   },
   "tripNameEditor": {
     "saveAriaLabel": "Save trip name",
@@ -188,6 +211,7 @@
     "cancel": "Cancel",
     "deleteAriaLabel": "Delete stop",
     "editAriaLabel": "Edit stop",
+    "deleteConfirm": "Delete this stop and all its items? This cannot be undone.",
     "errors": {
       "nameRequired": "Name is required",
       "nameTooLong": "Name is too long",
@@ -361,5 +385,37 @@
     "shopping": "Shopping",
     "other": "Other",
     "costByStopTitle": "Cost by stop"
+  },
+  "itineraryTab": {
+    "noStops": "Add stops to build your itinerary."
+  },
+  "mapTab": {
+    "noStops": "Add stops to see them on the map."
+  },
+  "tripStartDateEditor": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "setStartDate": "Set start date",
+    "setStartDateTitle": "Set start date to move the entire trip",
+    "adjustDatesTitle": "Adjust all item dates?",
+    "adjustDatesDescription": "You changed the trip start date. Do you want to shift all accommodation, transport, and expense dates to keep the same relative schedule?",
+    "goBack": "Go back",
+    "onlyUpdateTrip": "Only update trip",
+    "updateAllItems": "Update all items"
+  },
+  "tripStartLocationEditor": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "setStartLocation": "Set start location",
+    "setStartLocationTitle": "Set start location"
+  },
+  "importListener": {
+    "title": "Import shared trip?",
+    "description": "This will create a new local trip copy from the share link.",
+    "cancel": "Cancel",
+    "importing": "Importing...",
+    "import": "Import",
+    "success": "Trip imported.",
+    "error": "Import failed."
   }
 }

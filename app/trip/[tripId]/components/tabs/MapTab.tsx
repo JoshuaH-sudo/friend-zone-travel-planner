@@ -11,6 +11,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import type { StopDocumentType } from "@/lib/rxdb-schema";
+import { useTranslations } from "next-intl";
 
 type Coordinates = { lat: number; lon: number };
 type MapTabProps = {
@@ -34,6 +35,7 @@ function Recenter({ positions }: { positions: [number, number][] }) {
 }
 
 export function MapTab({ stops }: MapTabProps) {
+  const t = useTranslations("mapTab");
   const [coordinatesByStopId, setCoordinatesByStopId] = useState<
     Record<string, Coordinates>
   >({});
@@ -117,7 +119,7 @@ export function MapTab({ stops }: MapTabProps) {
   if (stops.length === 0) {
     return (
       <p className="text-muted-foreground rounded-2xl border border-dashed p-8 text-center">
-        Add stops to see them on the map.
+        {t("noStops")}
       </p>
     );
   }
