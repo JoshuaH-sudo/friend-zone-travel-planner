@@ -128,7 +128,7 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
         <p className="text-muted-foreground">
-          Manage defaults for planning, backup, and local device data.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -322,8 +322,7 @@ export default function SettingsPage() {
                   variant="destructive"
                   disabled={isExporting || isImporting || isResetting}
                 >
-                  <Trash2 data-icon="inline-start" />
-                  Wipe all data
+                  {t("backup.reset")}
                 </Button>
               }
               title={t("backup.resetConfirmTitle")}

@@ -19,6 +19,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { getTransportIcon } from "../utils/transportUtils";
+import { useTranslations } from "next-intl";
 
 type ItineraryTabProps = {
   stops: StopDocumentType[];
@@ -45,13 +46,14 @@ export function ItineraryTab({
   transportsByStop,
   expenses,
 }: ItineraryTabProps) {
+  const t = useTranslations("itineraryTab");
   const today = new Date().toISOString().slice(0, 10);
 
   if (stops.length === 0) {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-muted-foreground rounded-2xl border border-dashed p-8 text-center">
-          Add stops to build your itinerary.
+          {t("noStops")}
         </p>
       </div>
     );

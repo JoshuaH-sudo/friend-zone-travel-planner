@@ -4,12 +4,15 @@
     "description": "Plane deine Reisen mit Freunden und verwalte alle Reisedetails an einem Ort."
   },
   "layout": {
-    "footer": "© {year} Friend Zone Reiseplaner. Alle Rechte vorbehalten."
+    "footer": "© {year} Friend Zone Reiseplaner. Alle Rechte vorbehalten.",
+    "dataPrivacy": "Deine Daten bleiben auf diesem Gerät. Kein Konto, keine Cloud."
   },
   "header": {
     "title": "Friend Zone Reiseplaner",
+    "logoAlt": "Friend Zone Reiseplaner",
     "toggleTheme": "Design umschalten",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "trips": "Reisen"
   },
   "home": {
     "newTripName": "Neue Reise",
@@ -50,6 +53,7 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "subtitle": "Verwalte Standardeinstellungen für Planung, Backup und lokale Gerätedaten.",
     "errors": {
       "unknownError": "Unbekannter Fehler"
     },
@@ -121,7 +125,26 @@
     "newTransportName": "Neuer Transport",
     "loading": "Reise wird geladen...",
     "notFound": "Reise nicht gefunden",
-    "addStop": "Stopp hinzufügen"
+    "addStop": "Stopp hinzufügen",
+    "allTrips": "Alle Reisen",
+    "tripEyebrow": "Reise",
+    "stopsCount": "{count, plural, one {# Stopp} other {# Stopps}}",
+    "staysCount": "{count, plural, one {# Unterkunft} other {# Unterkünfte}}",
+    "journeysCount": "{count, plural, one {# Reiseetappe} other {# Reiseetappen}}",
+    "daysCount": "{count, plural, one {# Tag} other {# Tage}}",
+    "exportJson": "JSON exportieren",
+    "copyShareLink": "Teillink kopieren",
+    "shareLinkCopied": "Teillink kopiert.",
+    "exportIcal": "iCal exportieren",
+    "deleteTrip": "Reise löschen",
+    "tabOverview": "Übersicht",
+    "tabItinerary": "Reiseroute",
+    "tabMap": "Karte",
+    "tabBudget": "Budget",
+    "deleteTripTitle": "Diese Reise löschen?",
+    "deleteTripDescription": "Dadurch werden die Reise und alle verknüpften Stopps/Einträge entfernt.",
+    "deleteTripCancel": "Abbrechen",
+    "deleteTripConfirm": "Reise löschen"
   },
   "tripNameEditor": {
     "saveAriaLabel": "Reisename speichern",
@@ -188,6 +211,7 @@
     "cancel": "Abbrechen",
     "deleteAriaLabel": "Stopp löschen",
     "editAriaLabel": "Stopp bearbeiten",
+    "deleteConfirm": "Diesen Stopp und alle zugehörigen Einträge löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "errors": {
       "nameRequired": "Name ist erforderlich",
       "nameTooLong": "Name ist zu lang",
@@ -370,5 +394,37 @@
     "shopping": "Einkaufen",
     "other": "Sonstiges",
     "costByStopTitle": "Kosten pro Stop"
+  },
+  "itineraryTab": {
+    "noStops": "Füge Stopps hinzu, um deine Reiseroute zu erstellen."
+  },
+  "mapTab": {
+    "noStops": "Füge Stopps hinzu, um sie auf der Karte zu sehen."
+  },
+  "tripStartDateEditor": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "setStartDate": "Startdatum festlegen",
+    "setStartDateTitle": "Startdatum festlegen, um die gesamte Reise zu verschieben",
+    "adjustDatesTitle": "Alle Datumsangaben anpassen?",
+    "adjustDatesDescription": "Du hast das Reisestartdatum geändert. Möchtest du alle Unterkunfts-, Transport- und Ausgabedaten anpassen, um den gleichen relativen Zeitplan beizubehalten?",
+    "goBack": "Zurück",
+    "onlyUpdateTrip": "Nur Reise aktualisieren",
+    "updateAllItems": "Alle Einträge aktualisieren"
+  },
+  "tripStartLocationEditor": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "setStartLocation": "Startort festlegen",
+    "setStartLocationTitle": "Startort festlegen"
+  },
+  "importListener": {
+    "title": "Geteilte Reise importieren?",
+    "description": "Dadurch wird eine neue lokale Reisekopie aus dem Teillink erstellt.",
+    "cancel": "Abbrechen",
+    "importing": "Importiere...",
+    "import": "Importieren",
+    "success": "Reise importiert.",
+    "error": "Import fehlgeschlagen."
   }
 }
