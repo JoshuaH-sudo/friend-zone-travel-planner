@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { formatDateShort } from "@/lib/format";
 import { Calendar, Pencil } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type TripStartDateEditorProps = {
   currentStartDate: string | null;
@@ -33,6 +34,7 @@ export function TripStartDateEditor({
   canAdjustAllDates,
   onSaveStartDate,
 }: TripStartDateEditorProps) {
+  const t = useTranslations("tripStartDateEditor");
   const [isEditingStartDate, setIsEditingStartDate] = useState(false);
   const [startDateDraft, setStartDateDraft] = useState("");
   const [adjustDatesDialogOpen, setAdjustDatesDialogOpen] = useState(false);
@@ -94,7 +96,7 @@ export function TripStartDateEditor({
               variant="ghost"
               className="text-foreground/80 h-6 px-1 text-xs"
             >
-              Save
+              {t("save")}
             </Button>
             <Button
               type="button"
@@ -103,7 +105,7 @@ export function TripStartDateEditor({
               className="text-foreground/60 h-6 px-1 text-xs"
               onClick={() => setIsEditingStartDate(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </form>
         ) : (
@@ -111,11 +113,11 @@ export function TripStartDateEditor({
             type="button"
             className="hover:text-primary-foreground inline-flex items-center gap-1 text-left"
             onClick={beginEditingStartDate}
-            title="Set start date to move the entire trip"
+            title={t("setStartDateTitle")}
           >
             {displayStartDate
               ? `${formatDateShort(displayStartDate)}${rangeEndDate && rangeEndDate !== displayStartDate ? ` – ${formatDateShort(rangeEndDate)}` : ""}`
-              : "Set start date"}
+              : t("setStartDate")}
             <Pencil className="h-3 w-3 opacity-60" />
           </button>
         )}
@@ -132,11 +134,9 @@ export function TripStartDateEditor({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Adjust all item dates?</AlertDialogTitle>
+            <AlertDialogTitle>{t("adjustDatesTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              You changed the trip start date. Do you want to shift all
-              accommodation, transport, and expense dates to keep the same
-              relative schedule?
+              {t("adjustDatesDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -148,7 +148,7 @@ export function TripStartDateEditor({
                 setTimeout(() => startDateInputRef.current?.focus(), 50);
               }}
             >
-              Go back
+              {t("goBack")}
             </AlertDialogCancel>
             <AlertDialogAction
               variant="secondary"
@@ -159,7 +159,7 @@ export function TripStartDateEditor({
                 setAdjustDatesDialogOpen(false);
               }}
             >
-              Only update trip
+              {t("onlyUpdateTrip")}
             </AlertDialogAction>
             <AlertDialogAction
               onClick={async () => {
@@ -169,7 +169,7 @@ export function TripStartDateEditor({
                 setAdjustDatesDialogOpen(false);
               }}
             >
-              Update all items
+              {t("updateAllItems")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

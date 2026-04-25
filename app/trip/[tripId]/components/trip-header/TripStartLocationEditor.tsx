@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FlagTriangleLeft, MapPin, Pencil } from "lucide-react";
 import { TRIP_START_LOCATION_MAX_LENGTH } from "@/lib/rxdb-schema";
+import { useTranslations } from "next-intl";
 
 type TripStartLocationEditorProps = {
   currentStartLocation: string | null;
@@ -14,6 +15,7 @@ export function TripStartLocationEditor({
   currentStartLocation,
   onSaveStartLocation,
 }: TripStartLocationEditorProps) {
+  const t = useTranslations("tripStartLocationEditor");
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -55,7 +57,7 @@ export function TripStartLocationEditor({
             variant="ghost"
             className="text-foreground/80 h-6 px-1 text-xs"
           >
-            Save
+            {t("save")}
           </Button>
           <Button
             type="button"
@@ -64,7 +66,7 @@ export function TripStartLocationEditor({
             className="text-foreground/60 h-6 px-1 text-xs"
             onClick={() => setIsEditing(false)}
           >
-            Cancel
+            {t("cancel")}
           </Button>
         </form>
       ) : (
@@ -72,9 +74,9 @@ export function TripStartLocationEditor({
           type="button"
           className="hover:text-primary-foreground inline-flex items-center gap-1 text-left"
           onClick={beginEditing}
-          title="Set start location"
+          title={t("setStartLocationTitle")}
         >
-          {currentStartLocation ?? "Set start location"}
+          {currentStartLocation ?? t("setStartLocation")}
           <Pencil className="h-3 w-3 opacity-60" />
         </button>
       )}

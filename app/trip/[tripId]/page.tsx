@@ -70,6 +70,7 @@ export default function TripPage() {
   const router = useRouter();
   const db = useDatabase();
   const tStats = useTranslations("tripStats");
+  const t = useTranslations("tripPage");
   const { timezone, defaultCurrency } = useSettings();
   const { rates } = useExchangeRates();
   const tripId = params.tripId as string;
@@ -321,11 +322,11 @@ export default function TripPage() {
   };
 
   if (loading) {
-    return <p className="text-muted-foreground">Loading trip...</p>;
+    return <p className="text-muted-foreground">{t("loading")}</p>;
   }
 
   if (!trip) {
-    return <p className="text-muted-foreground">Trip not found.</p>;
+    return <p className="text-muted-foreground">{t("notFound")}</p>;
   }
 
   const displayStartDate = trip.startDate ?? range.start;
@@ -342,12 +343,12 @@ export default function TripPage() {
             href="/"
             className="text-foreground/80 hover:text-primary-foreground mb-6 inline-flex items-center gap-1.5 text-sm"
           >
-            <ArrowLeft className="h-4 w-4" /> All trips
+            <ArrowLeft className="h-4 w-4" /> {t("allTrips")}
           </Link>
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <p className="text-foreground/60 mb-2 text-xs tracking-widest uppercase">
-                Trip
+                {t("tripEyebrow")}
               </p>
               <EditableText
                 value={trip.name}
@@ -369,13 +370,13 @@ export default function TripPage() {
                   onSaveStartLocation={commitStartLocationChange}
                 />
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {stops.length} stops
+                  <MapPin className="h-4 w-4" /> {t("stopsCount", { count: stops.length })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Bed className="h-4 w-4" /> {totals.totalStays} stays
+                  <Bed className="h-4 w-4" /> {t("staysCount", { count: totals.totalStays })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Plane className="h-4 w-4" /> {totals.totalJourneys} journeys
+                  <Plane className="h-4 w-4" /> {t("journeysCount", { count: totals.totalJourneys })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Wallet className="h-4 w-4" />~
@@ -397,7 +398,7 @@ export default function TripPage() {
                 {totalDays > 0 && (
                   <span className="inline-flex items-center gap-1.5">
                     <CalendarDays className="h-4 w-4" />
-                    {totalDays} days
+                    {t("daysCount", { count: totalDays })}
                   </span>
                 )}
               </div>
@@ -424,7 +425,7 @@ export default function TripPage() {
                       });
                     }}
                   >
-                    Export JSON
+                    {t("exportJson")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={async () => {
@@ -432,23 +433,23 @@ export default function TripPage() {
                       posthog.capture("share_link_copied", {
                         trip_id: trip.id,
                       });
-                      toast.success("Share link copied.");
+                      toast.success(t("shareLinkCopied"));
                     }}
                   >
-                    Copy share link
+                    {t("copyShareLink")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={async () => {
                       await exportTripToIcal(db, trip.id, timezone);
                     }}
                   >
-                    Export iCal
+                    {t("exportIcal")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={() => setDeleteDialogOpen(true)}
                   >
-                    Delete trip
+                    {t("deleteTrip")}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -460,10 +461,10 @@ export default function TripPage() {
       <div className="container py-8">
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-4 sm:inline-grid sm:w-auto">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="itinerary">Itinerary</TabsTrigger>
-            <TabsTrigger value="map">Map</TabsTrigger>
-            <TabsTrigger value="budget">Budget</TabsTrigger>
+            <TabsTrigger value="overview">{t("tabOverview")}</TabsTrigger>
+            <TabsTrigger value="itinerary">{t("tabItinerary")}</TabsTrigger>
+            <TabsTrigger value="map">{t("tabMap")}</TabsTrigger>
+            <TabsTrigger value="budget">{t("tabBudget")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -516,13 +517,13 @@ export default function TripPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this trip?</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteTripTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the trip and all linked stops/items.
+              {t("deleteTripDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("deleteTripCancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={async () => {
@@ -534,7 +535,7 @@ export default function TripPage() {
                 router.push("/");
               }}
             >
-              Delete trip
+              {t("deleteTripConfirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
