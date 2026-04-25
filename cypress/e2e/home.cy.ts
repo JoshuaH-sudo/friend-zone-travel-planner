@@ -4,6 +4,9 @@
 
 describe("Home page", () => {
   beforeEach(() => {
+    // Reset IndexedDB so each test starts with a clean state
+    cy.clearAppStorage();
+
     // Stub exchange-rate API to avoid network dependency
     cy.intercept("GET", "https://api.frankfurter.dev/**", {
       body: { rates: { EUR: 0.93, GBP: 0.79, USD: 1 } },
