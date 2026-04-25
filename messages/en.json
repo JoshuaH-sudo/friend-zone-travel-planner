@@ -97,7 +97,7 @@
       "description": "Export all app data (trips, settings, and preferences) or upload a previously exported backup. Uploading a backup replaces current app data. Maximum upload size is 5 MB.",
       "export": "Export App Data",
       "exporting": "Exporting...",
-      "import": "Upload App Data",
+      "import": "Import App Data",
       "importing": "Importing...",
       "reset": "Delete All Data",
       "resetConfirmTitle": "Delete all app data?",

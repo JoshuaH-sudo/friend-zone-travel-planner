@@ -9,7 +9,6 @@ import {
 } from "react";
 import { useTranslations } from "next-intl";
 import posthog from "posthog-js";
-import { getDatabase, DB_NAME, MyDatabase } from "./rxdb-database";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -19,91 +18,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  detectBrowserDateFormat,
+  detectBrowserTimezone,
+  exportAppData,
+} from "@/lib/app-data-transfer";
+import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
+import { getDatabase, deleteDatabaseData, MyDatabase } from "./rxdb-database";
 
 const DatabaseContext = createContext<MyDatabase | null>(null);
-
-async function exportRawDatabaseBackup(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const openReq = indexedDB.open(DB_NAME);
-
-    openReq.onerror = () =>
-      reject(new Error("Could not open database for export"));
-
-    openReq.onsuccess = () => {
-      const db = openReq.result;
-      const storeNames = Array.from(db.objectStoreNames);
-      const allData: Record<string, unknown[]> = {};
-
-      const finalize = () => {
-        db.close();
-        const blob = new Blob(
-          [
-            JSON.stringify(
-              {
-                dbName: DB_NAME,
-                exportedAt: new Date().toISOString(),
-                data: allData,
-              },
-              null,
-              2,
-            ),
-          ],
-          { type: "application/json" },
-        );
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `friend-zone-raw-backup-${Date.now()}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        resolve();
-      };
-
-      if (storeNames.length === 0) {
-        finalize();
-        return;
-      }
-
-      let remaining = storeNames.length;
-      let finalizeCalled = false;
-      const tx = db.transaction(storeNames, "readonly");
-
-      for (const storeName of storeNames) {
-        const store = tx.objectStore(storeName);
-        const req = store.getAll();
-
-        const finish = (items: unknown[]) => {
-          allData[storeName] = items;
-          remaining--;
-          if (remaining === 0 && !finalizeCalled) {
-            finalizeCalled = true;
-            finalize();
-          }
-        };
-
-        req.onsuccess = () => finish(req.result as unknown[]);
-        req.onerror = () => finish([]);
-      }
-    };
-  });
-}
-
-async function deleteRawDatabase(): Promise<void> {
-  return new Promise<void>((resolve) => {
-    const req = indexedDB.deleteDatabase(DB_NAME);
-    req.onsuccess = () => resolve();
-    req.onerror = () => {
-      console.error("Failed to delete database:", req.error);
-      resolve();
-    };
-    req.onblocked = () => {
-      console.warn("Database deletion blocked. Proceeding with reload...");
-      resolve();
-    };
-  });
-}
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [database, setDatabase] = useState<MyDatabase | null>(null);
@@ -113,10 +36,28 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [isClearingDatabase, setIsClearingDatabase] = useState(false);
   const t = useTranslations("dbLoadError");
 
+  const ensureDefaultSettings = async (db: MyDatabase) => {
+    const existing = await db.settings.findOne(USER_SETTINGS_ID).exec();
+    if (existing) {
+      return;
+    }
+
+    await db.settings.upsert({
+      id: USER_SETTINGS_ID,
+      defaultCurrency: "USD",
+      language: "en",
+      timezone: detectBrowserTimezone(),
+      dateFormat: detectBrowserDateFormat(),
+      analyticsConsent: false,
+      cookiesConsent: false,
+    });
+  };
+
   useEffect(() => {
     const initDatabase = async () => {
       try {
         const db = await getDatabase();
+        await ensureDefaultSettings(db);
         setDatabase(db);
         setIsReady(true);
         console.log("RxDB initialized and ready");
@@ -142,7 +83,9 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const handleExportBackup = async () => {
     try {
       setIsExportingBackup(true);
-      await exportRawDatabaseBackup();
+      const db = await getDatabase();
+      await exportAppData(db, { theme: null });
+
     } catch (error) {
       console.error("Raw backup export failed:", error);
     } finally {
@@ -153,7 +96,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const handleClearDatabase = async () => {
     try {
       setIsClearingDatabase(true);
-      await deleteRawDatabase();
+      await deleteDatabaseData();
       window.location.reload();
     } catch (error) {
       console.error("Database clear failed:", error);

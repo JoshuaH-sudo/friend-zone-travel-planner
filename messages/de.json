@@ -97,7 +97,7 @@
       "description": "Exportiere alle App-Daten (Reisen, Einstellungen und Präferenzen) oder lade ein zuvor exportiertes Backup hoch. Beim Hochladen werden aktuelle Daten ersetzt. Maximale Upload-Größe: 5 MB.",
       "export": "App-Daten exportieren",
       "exporting": "Exportiere...",
-      "import": "App-Daten hochladen",
+      "import": "App-Daten importieren",
       "importing": "Importiere...",
       "reset": "Alle Daten löschen",
       "resetConfirmTitle": "Alle App-Daten löschen?",
