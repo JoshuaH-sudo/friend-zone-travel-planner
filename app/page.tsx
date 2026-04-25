@@ -201,10 +201,11 @@ export default function HomePage() {
                 onChange={(event) => setTripName(event.target.value)}
                 placeholder={t("tripNamePlaceholder")}
               />
+              <div className="flex items-center gap-2">
               <Input
-                value={firstStopName}
-                onChange={(event) => setFirstStopName(event.target.value)}
-                placeholder={t("firstStopPlaceholder")}
+                value={tripStartLocation}
+                onChange={(event) => setTripStartLocation(event.target.value)}
+                placeholder={t("tripStartLocationPlaceholder")}
               />
               <Input
                 value={tripStartDate}
@@ -212,10 +213,11 @@ export default function HomePage() {
                 type="date"
                 placeholder={t("tripStartDatePlaceholder")}
               />
+              </div>
               <Input
-                value={tripStartLocation}
-                onChange={(event) => setTripStartLocation(event.target.value)}
-                placeholder={t("tripStartLocationPlaceholder")}
+                value={firstStopName}
+                onChange={(event) => setFirstStopName(event.target.value)}
+                placeholder={t("firstStopPlaceholder")}
               />
               <Button onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>

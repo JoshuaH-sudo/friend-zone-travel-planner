@@ -22,10 +22,10 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import { Check, Cross, GripVertical, Pencil, Trash2, X } from "lucide-react";
+import { Check, GripVertical, Pencil, Trash2, X } from "lucide-react";
 import { capitalize } from "@/lib/utils";
-import { format as formatDate, parseISO, isEqual, differenceInDays, differenceInYears, differenceInMonths } from "date-fns";
 import { useState, useRef } from "react";
+import { useStopDateRange } from "../hooks/useStopDateRange";
 
 type SortableStopCardProps = {
   index: number;
@@ -53,37 +53,7 @@ export function SortableStopCard({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  //Earliest date from all items in the stop, used for calculating the date range summary
-  const dates = [
-    ...accommodations.map((a) => a.checkIn),
-    ...accommodations.map((a) => a.checkOut),
-    ...transports.map((t) => t.departureDateTime),
-    ...transports.map((t) => t.arrivalDateTime),
-  ];
-  let earliestDate: string | null = null;
-  let latestDate: string | null = null;
-  dates.forEach((date) => {
-    if (!date) return;
-    if (!earliestDate || date < earliestDate) earliestDate = date;
-    if (!latestDate || date > latestDate) latestDate = date;
-  });
-  let dateRangeSummary = "";
-  if (earliestDate && latestDate) {
-    const start = parseISO(earliestDate);
-    const end = parseISO(latestDate);
-    if (isEqual(start, end)) {
-      dateRangeSummary = formatDate(start, "MMM d, yyyy");
-    } else if (differenceInMonths(end, start) < 1) {
-      dateRangeSummary =
-        formatDate(start, "MMM d") + " - " + formatDate(end, "d");
-    } else if (differenceInYears(end, start) >= 1) {
-      dateRangeSummary =
-        formatDate(start, "MMM d, yyyy") + " - " + formatDate(end, "MMM d, yyyy");
-    } else {
-      dateRangeSummary =
-        formatDate(start, "MMM d") + " - " + formatDate(end, "MMM d");
-    }
-  }
+  const { dateRangeSummary } = useStopDateRange(accommodations, transports);
 
   // Edit stop name handlers
   const handleEditClick = () => {

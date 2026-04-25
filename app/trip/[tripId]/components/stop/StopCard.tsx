@@ -6,22 +6,19 @@ import type {
   StopDocumentType,
   TransportDocumentType,
 } from "@/lib/rxdb-schema";
-import { useMemo, useState } from "react";
-import { format } from "date-fns";
-import { Transport } from "./Transport";
+import { useState } from "react";
+import { Transport } from "../transport/Transport";
 import { useTranslations } from "next-intl";
-import { Expenses } from "./Expenses";
+import { Expenses } from "../expense/Expenses";
 import { Input } from "@base-ui/react";
 import { Bed, Plus, Plane, CreditCard, Pencil, Trash2 } from "lucide-react";
-import { Accommodation } from "./Accommodation";
-import { AccommodationForm } from "./AccommodationForm";
-import { TransportForm } from "./TransportForm";
+import { Accommodation } from "../accommodation/Accommodation";
+import { AccommodationForm } from "../accommodation/AccommodationForm";
+import { TransportForm } from "../transport/TransportForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { capitalize } from "@/lib/utils";
-import { convert, formatMoney } from "@/lib/format";
-import { useSettings } from "@/lib/SettingsProvider";
-import { useExchangeRates } from "@/lib/useExchangeRates";
+import { formatMoney } from "@/lib/format";
 import {
   TooltipProvider,
   TooltipRoot,
@@ -29,6 +26,8 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
+import { useStopDateRange } from "../hooks/useStopDateRange";
+import { useStopCostSummary } from "../hooks/useStopCostSummary";
 
 export type StopCardProps = {
   index: number;
@@ -64,26 +63,6 @@ export type StopCardProps = {
   onDeleteStop: () => Promise<void>;
 };
 
-function getTodayDate() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-/**
- * Collects all item date strings for a set of accommodations and transports.
- * Used both for sorting stops and for computing date range summaries.
- */
-export function getAllItemDates(
-  accommodations: AccommodationDocumentType[],
-  transports: TransportDocumentType[],
-): string[] {
-  return [
-    ...accommodations.map((a) => a.checkIn),
-    ...accommodations.map((a) => a.checkOut),
-    ...transports.map((t) => t.departureDateTime),
-    ...transports.map((t) => t.arrivalDateTime),
-  ].filter((d): d is string => Boolean(d));
-}
-
 export function StopCard({
   index,
   stop,
@@ -107,53 +86,17 @@ export function StopCard({
   const [editDraft, setEditDraft] = useState("");
   const t = useTranslations("overviewTab");
   const tStats = useTranslations("tripStats");
-  const { rates } = useExchangeRates();
 
-  const today = getTodayDate();
-
-  // Per-currency totals for this stop
-  const stopCurrencyTotals = useMemo(() => {
-    const totals: Record<string, number> = {};
-    [...accommodations, ...transports, ...expenses].forEach((item) => {
-      if (!item.price || item.price <= 0) return;
-      totals[item.currency] = (totals[item.currency] || 0) + item.price;
-    });
-    return totals;
-  }, [accommodations, transports, expenses]);
-
-  const stopEstimatedTotal = useMemo(() => {
-    return Object.entries(stopCurrencyTotals).reduce(
-      (sum, [currency, amount]) =>
-        sum + convert(amount, currency, defaultCurrency, rates),
-      0,
-    );
-  }, [stopCurrencyTotals, defaultCurrency, rates]);
-
-  // Compute a date range summary from item dates for display in the stop card header.
-  const allItemDates = getAllItemDates(accommodations, transports);
-
-  let dateRangeSummary = "";
-  if (allItemDates.length > 0) {
-    const sorted = [...allItemDates].sort();
-    const earliest = sorted[0].slice(0, 10);
-    const latest = sorted[sorted.length - 1].slice(0, 10);
-    const earliestYear = earliest.slice(0, 4);
-    const latestYear = latest.slice(0, 4);
-    if (earliest === latest) {
-      dateRangeSummary = format(
-        new Date(`${earliest}T00:00:00`),
-        "MMM d, yyyy",
-      );
-    } else if (earliestYear !== latestYear) {
-      dateRangeSummary = `${format(new Date(`${earliest}T00:00:00`), "MMM d, yyyy")} – ${format(new Date(`${latest}T00:00:00`), "MMM d, yyyy")}`;
-    } else {
-      dateRangeSummary = `${format(new Date(`${earliest}T00:00:00`), "MMM d")} – ${format(new Date(`${latest}T00:00:00`), "MMM d")}`;
-    }
-  }
-
-  // Default date/time for new item forms: use earliest item date or today.
-  const defaultDate =
-    allItemDates.length > 0 ? allItemDates.sort()[0].slice(0, 10) : today;
+  const { dateRangeSummary, defaultDate } = useStopDateRange(
+    accommodations,
+    transports,
+  );
+  const { stopCurrencyTotals, stopEstimatedTotal } = useStopCostSummary(
+    accommodations,
+    transports,
+    expenses,
+    defaultCurrency,
+  );
 
   return (
     <Card className="rounded-2xl pb-0 shadow-md">

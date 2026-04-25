@@ -107,8 +107,15 @@ export function useTripData(
       return;
     }
 
+    const stopIds = stops.map((stop) => stop.id);
+
+    if (stopIds.length === 0) {
+      setAccommodationsByStop({});
+      return;
+    }
+
     const subscription = database.accommodations
-      .find()
+      .find({ selector: { stopId: { $in: stopIds } } })
       .sort({ checkIn: "asc", createdAt: "asc" })
       .$.subscribe((allAccommodations) => {
         const nextAccommodationsByStop: Record<
@@ -127,7 +134,7 @@ export function useTripData(
       });
 
     return () => subscription.unsubscribe();
-  }, [database, enabled]);
+  }, [database, enabled, stops]);
 
   useEffect(() => {
     if (!enabled || !database) {
@@ -149,8 +156,15 @@ export function useTripData(
       return;
     }
 
+    const stopIds = stops.map((stop) => stop.id);
+
+    if (stopIds.length === 0) {
+      setTransportsByStop({});
+      return;
+    }
+
     const subscription = database.transports
-      .find()
+      .find({ selector: { stopId: { $in: stopIds } } })
       .sort({ departureDateTime: "asc", createdAt: "asc" })
       .$.subscribe((allTransports) => {
         const nextTransportsByStop: Record<string, TransportDocumentType[]> = {};
@@ -166,7 +180,7 @@ export function useTripData(
       });
 
     return () => subscription.unsubscribe();
-  }, [database, enabled]);
+  }, [database, enabled, stops]);
 
   if (!enabled) {
     return emptyTripData;

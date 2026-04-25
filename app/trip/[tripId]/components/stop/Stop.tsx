@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { TripItemCard } from "@/app/trip/[tripId]/components/TripItemCard";
+import { TripItemCard } from "../shared/TripItemCard";
 import useTime from "@/components/hooks/useTime";
 
 type StopProps = {
