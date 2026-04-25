@@ -3,108 +3,166 @@
 // create-trip dialog flow.
 
 describe("Home page", () => {
-  beforeEach(() => {
-    // Reset IndexedDB so each test starts with a clean state
+  const resetDbAndVisitHome = () => {
+    // Reset IndexedDB so each test group starts from a clean state.
     cy.clearAppStorage();
 
-    // Stub exchange-rate API to avoid network dependency
+    // Stub exchange-rate API to avoid network dependency.
     cy.intercept("GET", "https://api.frankfurter.dev/**", {
       body: { rates: { EUR: 0.93, GBP: 0.79, USD: 1 } },
     }).as("exchangeRates");
 
-    // Visit with localStorage set to prevent tutorial dialog from showing
+    // Prevent tutorial dialog from showing during tests.
     cy.visit("/", {
       onBeforeLoad(win) {
         win.localStorage.setItem("fzt-tutorial-seen", "true");
       },
     });
-  });
+  };
 
-  // ─── Hero section ───────────────────────────────────────────────────────
-
-  it("displays the page hero → hero title is visible", () => {
-    cy.contains("Trips").should("be.visible");
-  });
-
-  it("shows the plan-trip button → button is visible", () => {
-    cy.get("[data-cy=plan-trip-button]").should("be.visible");
-  });
-
-  // ─── Create trip dialog ─────────────────────────────────────────────────
-
-  it("opens create-trip dialog → dialog is shown", () => {
+  const createTripFromDialog = (
+    name: string,
+    options?: { firstStop?: string; startLocation?: string; startDate?: string },
+  ) => {
     cy.get("[data-cy=plan-trip-button]").click();
-    cy.get("[data-cy=create-trip-dialog]").should("be.visible");
-    cy.contains("Create a new trip").should("be.visible");
-  });
-
-  it("creates a trip with a name → navigates to the new trip page", () => {
-    cy.get("[data-cy=plan-trip-button]").click();
-    cy.get("[data-cy=trip-name-input]").type("My Test Trip");
+    if (name) {
+      cy.get("[data-cy=trip-name-input]").clear().type(name);
+    }
+    if (options?.firstStop) {
+      cy.get("[data-cy=first-stop-input]").clear().type(options.firstStop);
+    }
+    if (options?.startLocation) {
+      cy.get("[data-cy=trip-start-location-input]").clear().type(options.startLocation);
+    }
+    if (options?.startDate) {
+      cy.get("[data-cy=trip-start-date-input]").clear().type(options.startDate);
+    }
     cy.get("[data-cy=create-trip-submit]").click();
-    // Should navigate away from home to the trip page
-    cy.url().should("include", "/trip/");
-  });
+  };
 
-  it("creates a trip with name and first stop → navigates to trip page", () => {
-    cy.get("[data-cy=plan-trip-button]").click();
-    cy.get("[data-cy=trip-name-input]").type("Road Trip 66");
-    cy.get("[data-cy=first-stop-input]").type("Chicago");
-    cy.get("[data-cy=create-trip-submit]").click();
-    cy.url().should("include", "/trip/");
-  });
+  describe("hero", () => {
+    beforeEach(() => {
+      resetDbAndVisitHome();
+    });
 
-  // ─── Search & filters ───────────────────────────────────────────────────
+    it("displays the page hero → hero title is visible", () => {
+      cy.contains("Trips").should("be.visible");
+    });
 
-  it("search input is visible → can type in it", () => {
-    cy.get("[data-cy=search-input]").should("be.visible").type("Paris");
-    cy.get("[data-cy=search-input]").should("have.value", "Paris");
-  });
-
-  it("filter tabs are visible → all four tab options rendered", () => {
-    cy.get("[data-cy=filter-tabs]").within(() => {
-      cy.contains("All").should("exist");
-      cy.contains("Upcoming").should("exist");
-      cy.contains("Ongoing").should("exist");
-      cy.contains("Past").should("exist");
+    it("shows the plan-trip button → button is visible", () => {
+      cy.get("[data-cy=plan-trip-button]").should("be.visible");
     });
   });
 
-  // ─── Empty state ─────────────────────────────────────────────────────────
+  describe("create trip dialog", () => {
+    beforeEach(() => {
+      resetDbAndVisitHome();
+    });
 
-  it("shows empty state when no trips exist → empty state message visible", () => {
-    // The app uses IndexedDB which starts empty in a fresh test environment.
-    // If there are existing trips, the empty state won't show, but we
-    // still verify the search input filters correctly.
-    cy.get("body").then(($body) => {
-      if ($body.find("[data-cy=empty-state]").length) {
-        cy.get("[data-cy=empty-state]").should("be.visible");
-        cy.contains("No trips yet.").should("be.visible");
-      } else {
-        // At least one trip card is rendered
-        cy.get("[data-cy=trip-card]").should("have.length.at.least", 1);
-      }
+    it("opens create-trip dialog → dialog is shown", () => {
+      cy.get("[data-cy=plan-trip-button]").click();
+      cy.get("[data-cy=create-trip-dialog]").should("be.visible");
+      cy.contains("Create a new trip").should("be.visible");
+    });
+
+    it("creates a trip with a name → navigates to the new trip page", () => {
+      createTripFromDialog("My Test Trip");
+      cy.url().should("include", "/trip/");
+    });
+
+    it("creates a trip with name and first stop → navigates to trip page", () => {
+      createTripFromDialog("Road Trip 66", { firstStop: "Chicago" });
+      cy.url().should("include", "/trip/");
+    });
+
+    it("closes create-trip dialog → pressing Escape dismisses modal", () => {
+      cy.get("[data-cy=plan-trip-button]").click();
+      cy.get("[data-cy=create-trip-dialog]").should("be.visible");
+      cy.get("body").type("{esc}");
+      cy.get("[data-cy=create-trip-dialog]").should("not.exist");
+    });
+
+    it("creates trip with blank name → uses default New Trip title", () => {
+      createTripFromDialog("");
+      cy.url().should("include", "/trip/");
+      cy.contains("New Trip").should("be.visible");
+    });
+
+    it("creates trip with start details → trip route loads successfully", () => {
+      createTripFromDialog("Date & Place Trip", {
+        startLocation: "Lisbon",
+        startDate: "2026-05-10",
+      });
+      cy.url().should("include", "/trip/");
+      cy.contains("Date & Place Trip").should("be.visible");
     });
   });
 
-  // ─── Trip cards ──────────────────────────────────────────────────────────
+  describe("search and filters", () => {
+    beforeEach(() => {
+      resetDbAndVisitHome();
+    });
 
-  it("trip cards have stable data attributes → data-trip-id present", () => {
-    cy.get("body").then(($body) => {
-      if ($body.find("[data-cy=trip-card]").length) {
-        cy.get("[data-cy=trip-card]")
-          .first()
-          .should("have.attr", "data-trip-id");
-      }
+    it("search input is visible → can type in it", () => {
+      cy.get("[data-cy=search-input]").should("be.visible").type("Paris");
+      cy.get("[data-cy=search-input]").should("have.value", "Paris");
+    });
+
+    it("filter tabs are visible → all four tab options rendered", () => {
+      cy.get("[data-cy=filter-tabs]").within(() => {
+        cy.contains("All").should("exist");
+        cy.contains("Upcoming").should("exist");
+        cy.contains("Ongoing").should("exist");
+        cy.contains("Past").should("exist");
+      });
+    });
+
+    it("search filters by trip name → only matching cards remain", () => {
+      createTripFromDialog("Alpha Adventure", { firstStop: "Paris" });
+      cy.url().should("include", "/trip/");
+      cy.go("back");
+      cy.url().should("eq", `${Cypress.config("baseUrl")}/`);
+
+      createTripFromDialog("Beta Break", { firstStop: "Berlin" });
+      cy.url().should("include", "/trip/");
+      cy.go("back");
+      cy.url().should("eq", `${Cypress.config("baseUrl")}/`);
+
+      cy.get("[data-cy=search-input]").clear().type("Alpha");
+      cy.contains("Alpha Adventure").should("be.visible");
+      cy.contains("Beta Break").should("not.exist");
     });
   });
 
-  it("clicking a trip card → navigates to the trip detail page", () => {
-    cy.get("body").then(($body) => {
-      if ($body.find("[data-cy=trip-card]").length) {
-        cy.get("[data-cy=trip-card]").first().click();
-        cy.url().should("include", "/trip/");
-      }
+  describe("empty state and cards", () => {
+    beforeEach(() => {
+      resetDbAndVisitHome();
+    });
+
+    it("shows empty state when no trips exist → empty state message visible", () => {
+      cy.get("[data-cy=empty-state]").should("be.visible");
+      cy.contains("No trips yet.").should("be.visible");
+    });
+
+    it("trip cards have stable data attributes → data-trip-id present", () => {
+      createTripFromDialog("Card Check Trip", { firstStop: "Madrid" });
+      cy.url().should("include", "/trip/");
+      cy.go("back");
+      cy.url().should("eq", `${Cypress.config("baseUrl")}/`);
+
+      cy.get("[data-cy=trip-card]")
+        .first()
+        .should("have.attr", "data-trip-id");
+    });
+
+    it("clicking a trip card → navigates to the trip detail page", () => {
+      createTripFromDialog("Clickable Trip", { firstStop: "Oslo" });
+      cy.url().should("include", "/trip/");
+      cy.go("back");
+      cy.url().should("eq", `${Cypress.config("baseUrl")}/`);
+
+      cy.get("[data-cy=trip-card]").first().click();
+      cy.url().should("include", "/trip/");
     });
   });
 });

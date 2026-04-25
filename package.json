@@ -10,7 +10,6 @@
     "prepare": "husky",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:component": "cypress run --component",
     "cy:run:e2e": "cypress run --e2e"
   },
   "dependencies": {
