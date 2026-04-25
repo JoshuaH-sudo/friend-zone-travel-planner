@@ -12,7 +12,8 @@ import { useSettings } from "@/lib/SettingsProvider";
 import posthog from "posthog-js";
 import { Input } from "@base-ui/react";
 import { Button } from "@/components/ui/button";
-import { StopCard, getAllItemDates } from "./StopCard";
+import { StopCard } from "../stop/StopCard";
+import { getStopEarliestDate } from "../utils/stopDateUtils";
 
 type OverviewTabProps = {
   stops: StopDocumentType[];
@@ -43,19 +44,6 @@ type OverviewTabProps = {
     },
   ) => Promise<void>;
 };
-
-/** Returns the earliest item date for the given stop, or empty string if none. */
-function getStopEarliestDate(
-  stopId: string,
-  accommodationsByStop: Record<string, AccommodationDocumentType[]>,
-  transportsByStop: Record<string, TransportDocumentType[]>,
-): string {
-  const dates = getAllItemDates(
-    accommodationsByStop[stopId] || [],
-    transportsByStop[stopId] || [],
-  );
-  return dates.length > 0 ? dates.sort()[0] : "";
-}
 
 export const OverviewTab = ({
   stops,

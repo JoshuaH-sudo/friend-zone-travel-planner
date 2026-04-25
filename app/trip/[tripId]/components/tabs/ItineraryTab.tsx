@@ -12,16 +12,13 @@ import { cn } from "@/lib/utils";
 import {
   MapPin,
   Hotel,
-  Plane,
-  Train,
-  Bus,
-  Car,
   Utensils,
   Ticket,
   ShoppingBag,
   MoreHorizontal,
   CreditCard,
 } from "lucide-react";
+import { getTransportIcon } from "../utils/transportUtils";
 
 type ItineraryTabProps = {
   stops: StopDocumentType[];
@@ -145,15 +142,10 @@ export function ItineraryTab({
                     icon = <Hotel className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;
                     label = entry.item.name;
                   } else if (entry.type === "transport") {
-                    const transportType = entry.item.type;
-                    if (transportType === "flight")
-                      icon = <Plane className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;
-                    else if (transportType === "bus")
-                      icon = <Bus className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;
-                    else if (transportType === "car")
-                      icon = <Car className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;
-                    else
-                      icon = <Train className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;
+                    icon = getTransportIcon(
+                      entry.item.type,
+                      "text-muted-foreground h-3.5 w-3.5 shrink-0",
+                    );
                     label = entry.item.name;
                   } else {
                     icon = <CreditCard className="text-muted-foreground h-3.5 w-3.5 shrink-0" />;

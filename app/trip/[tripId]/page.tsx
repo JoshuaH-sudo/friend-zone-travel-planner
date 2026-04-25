@@ -13,20 +13,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditableText } from "./components/EditableText";
-import { TripStartDateEditor } from "./components/TripStartDateEditor";
-import { TripStartLocationEditor } from "./components/TripStartLocationEditor";
-import { OverviewTab } from "./components/OverviewTab";
-import { ItineraryTab } from "./components/ItineraryTab";
-import { MapTab } from "./components/MapTab";
-import { BudgetTab } from "./components/BudgetTab";
-import { TripStats } from "./components/TripStats";
+import { EditableText } from "./components/shared/EditableText";
+import { TripStartDateEditor } from "./components/trip-header/TripStartDateEditor";
+import { TripStartLocationEditor } from "./components/trip-header/TripStartLocationEditor";
+import { OverviewTab } from "./components/tabs/OverviewTab";
+import { ItineraryTab } from "./components/tabs/ItineraryTab";
+import { MapTab } from "./components/tabs/MapTab";
+import { BudgetTab } from "./components/tabs/BudgetTab";
+import { TripStats } from "./components/trip-header/TripStats";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
 import {
   convert,
   daysBetween,
+  formatMoney,
 } from "@/lib/format";
 import { useExchangeRates } from "@/lib/useExchangeRates";
 import {
@@ -60,25 +61,9 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import posthog from "posthog-js";
-import { addDays, format as formatDateFns } from "date-fns";
+import { shiftDateTimeByDays } from "./components/utils/tripDateUtils";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
-
-/**
- * Shift a stored "YYYY-MM-DD" or "YYYY-MM-DDTHH:MM" string by `deltaDays`.
- * Assumes a well-formed date string matching the repo's storage format.
- * Returns the original value unchanged if the format is not recognised.
- */
-function shiftDateTimeByDays(value: string, deltaDays: number): string {
-  const [datePart, timePart] = value.split("T");
-  if (!datePart || !/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
-    return value;
-  }
-  const [y, m, d] = datePart.split("-").map(Number);
-  const shifted = addDays(new Date(y, m - 1, d), deltaDays);
-  const newDate = formatDateFns(shifted, "yyyy-MM-dd");
-  return timePart ? `${newDate}T${timePart}` : newDate;
-}
 
 export default function TripPage() {
   const params = useParams();
