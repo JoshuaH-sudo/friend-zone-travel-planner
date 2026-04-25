@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { useTripData } from "@/components/hooks/useTripData";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import { OverviewTab } from "./components/OverviewTab";
 import { ItineraryTab } from "./components/ItineraryTab";
 import { MapTab } from "./components/MapTab";
 import { BudgetTab } from "./components/BudgetTab";
+import { TripStats } from "./components/TripStats";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
@@ -26,6 +28,13 @@ import {
   daysBetween,
   formatMoney,
 } from "@/lib/format";
+import { useExchangeRates } from "@/lib/useExchangeRates";
+import {
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 import { generateId } from "@/lib/rxdb-database";
 import { toast } from "sonner";
 import {
@@ -43,6 +52,7 @@ import {
   ArrowLeft,
   Bed,
   CalendarDays,
+  Info,
   MapPin,
   MoreHorizontal,
   Plane,
@@ -74,7 +84,9 @@ export default function TripPage() {
   const params = useParams();
   const router = useRouter();
   const db = useDatabase();
+  const tStats = useTranslations("tripStats");
   const { timezone, defaultCurrency } = useSettings();
+  const { rates } = useExchangeRates();
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -97,23 +109,35 @@ export default function TripPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
+  const expensesByStop = useMemo(() => {
+    const result: Record<string, typeof expenses> = {};
+    for (const expense of expenses) {
+      if (!result[expense.stopId]) {
+        result[expense.stopId] = [];
+      }
+      result[expense.stopId].push(expense);
+    }
+    return result;
+  }, [expenses]);
+
   const totals = useMemo(() => {
     const accommodationCost = Object.values(accommodationsByStop)
       .flat()
       .reduce(
         (sum, item) =>
-          sum + convert(item.price, item.currency, defaultCurrency),
+          sum + convert(item.price, item.currency, defaultCurrency, rates),
         0,
       );
     const transportCost = Object.values(transportsByStop)
       .flat()
       .reduce(
         (sum, item) =>
-          sum + convert(item.price, item.currency, defaultCurrency),
+          sum + convert(item.price, item.currency, defaultCurrency, rates),
         0,
       );
     const expenseCost = expenses.reduce(
-      (sum, item) => sum + convert(item.price, item.currency, defaultCurrency),
+      (sum, item) =>
+        sum + convert(item.price, item.currency, defaultCurrency, rates),
       0,
     );
     const totalStays = Object.values(accommodationsByStop).flat().length;
@@ -126,7 +150,7 @@ export default function TripPage() {
       totalStays,
       totalJourneys,
     };
-  }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop]);
+  }, [accommodationsByStop, defaultCurrency, expenses, transportsByStop, rates]);
 
   /** Date range derived from all item dates (accommodations + transports). */
   const range = useMemo(() => {
@@ -350,8 +374,21 @@ export default function TripPage() {
                   <Plane className="h-4 w-4" /> {totals.totalJourneys} journeys
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Wallet className="h-4 w-4" /> ~$
-                  {Math.round(totals.grandCost).toLocaleString()}
+                  <Wallet className="h-4 w-4" />
+                  ~{formatMoney(totals.grandCost, defaultCurrency)}
+                  <TooltipProvider>
+                    <TooltipRoot>
+                      <TooltipTrigger
+                        className="opacity-70 hover:opacity-100 cursor-default"
+                        aria-label={tStats("estimationTooltip")}
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {tStats("estimationTooltip")}
+                      </TooltipContent>
+                    </TooltipRoot>
+                  </TooltipProvider>
                 </span>
                 {totalDays > 0 && (
                   <span className="inline-flex items-center gap-1.5">
@@ -430,6 +467,7 @@ export default function TripPage() {
               stops={stops}
               accommodationsByStop={accommodationsByStop}
               transportsByStop={transportsByStop}
+              expensesByStop={expensesByStop}
               onAddStop={addStop}
               onAddAccommodation={onAddAccommodation}
               onAddTransport={onAddTransport}
@@ -447,12 +485,25 @@ export default function TripPage() {
             <MapTab stops={stops} />
           </TabsContent>
           <TabsContent value="budget">
-            <BudgetTab
-              trip={trip}
-              accommodationsByStop={accommodationsByStop}
-              transportsByStop={transportsByStop}
-              expenses={expenses}
-            />
+            <div className="flex flex-col gap-4">
+              <TripStats
+                tripId={tripId}
+                tripData={{
+                  trip,
+                  stops,
+                  accommodationsByStop,
+                  transportsByStop,
+                  expenses,
+                  loading,
+                }}
+              />
+              <BudgetTab
+                trip={trip}
+                accommodationsByStop={accommodationsByStop}
+                transportsByStop={transportsByStop}
+                expenses={expenses}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
