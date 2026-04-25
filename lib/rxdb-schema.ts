@@ -122,7 +122,7 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
     },
     bannerColor: {
       type: "string",
-      maxLength: 50,
+      maxLength: 30,
     },
     createdAt: {
       type: "number",

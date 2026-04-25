@@ -69,7 +69,7 @@ export default function HomePage() {
   const [tripStartDate, setTripStartDate] = useState("");
   const [tripStartLocation, setTripStartLocation] = useState("");
   const [tripBannerColor, setTripBannerColor] = useState(
-    generateRandomBannerColor,
+    generateRandomBannerColor(),
   );
 
   const cards = useMemo(() => {

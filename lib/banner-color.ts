@@ -23,7 +23,9 @@ export const BANNER_COLOR_PRESETS: string[] = [
 
 /** Returns a randomly selected colour from the preset palette. */
 export function generateRandomBannerColor(): string {
-  return BANNER_COLOR_PRESETS[
-    Math.floor(Math.random() * BANNER_COLOR_PRESETS.length)
-  ];
+  return (
+    BANNER_COLOR_PRESETS[
+      Math.floor(Math.random() * BANNER_COLOR_PRESETS.length)
+    ] ?? BANNER_COLOR_PRESETS[0]
+  );
 }

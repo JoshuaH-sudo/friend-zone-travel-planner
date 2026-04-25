@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import {
-  PopoverRoot,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { BANNER_COLOR_PRESETS } from "@/lib/banner-color";
 import { cn } from "@/lib/utils";
 
@@ -13,19 +15,20 @@ export interface BannerColorPickerProps {
   /** Current CSS colour value (e.g. "#2d6a4f"). */
   value: string;
   onChange: (color: string) => void;
-  className?: string;
+  /** Extra classes for the trigger button. */
+  triggerClassName?: string;
 }
 
 /**
  * A compact colour picker for trip banner backgrounds.
- * Renders a square trigger button showing the current colour swatch.
- * Opens a popover containing preset solid-colour swatches and a native
- * colour input for custom values.
+ * The trigger is a small swatch button showing the current colour.
+ * Clicking it opens a dialog with preset solid-colour swatches and a
+ * native colour input for custom values.
  */
 export function BannerColorPicker({
   value,
   onChange,
-  className,
+  triggerClassName,
 }: BannerColorPickerProps) {
   const [inputValue, setInputValue] = React.useState(value);
 
@@ -34,34 +37,32 @@ export function BannerColorPicker({
   }, [value]);
 
   return (
-    <PopoverRoot>
-      <PopoverTrigger
+    <Dialog>
+      <DialogTrigger
         render={
           <button
             type="button"
             aria-label="Change banner colour"
             className={cn(
-              "size-9 shrink-0 cursor-pointer rounded-lg border border-input bg-input/30 flex items-center justify-center transition-colors hover:bg-input/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
-              className,
+              "size-9 shrink-0 cursor-pointer rounded-lg border-2 border-white/40 ring-1 ring-black/20 transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+              triggerClassName,
             )}
+            style={{ background: value }}
           />
         }
-      >
-        <span
-          className="size-5 rounded"
-          style={{ background: value }}
-          aria-hidden="true"
-        />
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-auto p-3">
-        <div className="grid grid-cols-8 gap-1.5 mb-3">
+      />
+      <DialogContent className="max-w-xs sm:max-w-xs">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Banner colour</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-8 gap-1.5">
           {BANNER_COLOR_PRESETS.map((preset) => (
             <button
               key={preset}
               type="button"
               aria-label={preset}
               className={cn(
-                "size-7 rounded cursor-pointer border-2 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                "size-7 rounded cursor-pointer border-2 transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                 value === preset
                   ? "border-foreground scale-110"
                   : "border-transparent",
@@ -81,10 +82,10 @@ export function BannerColorPicker({
             setInputValue(e.target.value);
             onChange(e.target.value);
           }}
-          className="w-full h-7 cursor-pointer rounded border border-input"
+          className="h-8 w-full cursor-pointer rounded border border-input"
           aria-label="Custom colour"
         />
-      </PopoverContent>
-    </PopoverRoot>
+      </DialogContent>
+    </Dialog>
   );
 }

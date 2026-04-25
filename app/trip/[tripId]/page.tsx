@@ -48,12 +48,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -82,7 +76,6 @@ export default function TripPage() {
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const {
     trip,
     stops,
@@ -415,62 +408,66 @@ export default function TripPage() {
                 )}
               </div>
             </div>
-            <DropdownMenu data-cy="trip-actions">
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                }
-              ></DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={() => setColorPickerOpen(true)}
-                  >
-                    Change banner colour
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await exportTripJson(db, trip.id);
-                      posthog.capture("trip_exported_json", {
-                        trip_id: trip.id,
-                      });
-                    }}
-                  >
-                    Export JSON
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await copyShareLink(db, trip.id);
-                      posthog.capture("share_link_copied", {
-                        trip_id: trip.id,
-                      });
-                      toast.success("Share link copied.");
-                    }}
-                  >
-                    Copy share link
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await exportTripToIcal(db, trip.id, timezone);
-                    }}
-                  >
-                    Export iCal
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteDialogOpen(true)}
-                  >
-                    Delete trip
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex shrink-0 items-center gap-2">
+              <BannerColorPicker
+                value={trip.bannerColor ?? "#2d6a4f"}
+                onChange={async (color) => {
+                  await trip.patch({ bannerColor: color, updatedAt: Date.now() });
+                }}
+                triggerClassName="bg-background/15 hover:bg-background/25 border-white/30"
+              />
+              <DropdownMenu data-cy="trip-actions">
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await exportTripJson(db, trip.id);
+                        posthog.capture("trip_exported_json", {
+                          trip_id: trip.id,
+                        });
+                      }}
+                    >
+                      Export JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await copyShareLink(db, trip.id);
+                        posthog.capture("share_link_copied", {
+                          trip_id: trip.id,
+                        });
+                        toast.success("Share link copied.");
+                      }}
+                    >
+                      Copy share link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await exportTripToIcal(db, trip.id, timezone);
+                      }}
+                    >
+                      Export iCal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      Delete trip
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </section>
@@ -557,22 +554,6 @@ export default function TripPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog open={colorPickerOpen} onOpenChange={setColorPickerOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Banner colour</DialogTitle>
-          </DialogHeader>
-          <div className="flex justify-center py-2">
-            <BannerColorPicker
-              value={trip.bannerColor ?? "#2d6a4f"}
-              onChange={async (color) => {
-                await trip.patch({ bannerColor: color, updatedAt: Date.now() });
-              }}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
