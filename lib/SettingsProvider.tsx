@@ -94,7 +94,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // Sync PostHog opt-in/opt-out with the analyticsConsent setting
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") return;
     if (settings.analyticsConsent) {
       posthog.opt_in_capturing();
     } else {
