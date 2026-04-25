@@ -38,6 +38,8 @@ export type DatabaseCollections = {
 
 export type MyDatabase = RxDatabase<DatabaseCollections>;
 
+export const DB_NAME = "fzt-db";
+
 let dbPromise: Promise<MyDatabase> | null = null;
 
 addRxPlugin(RxDBQueryBuilderPlugin);
@@ -66,7 +68,7 @@ async function createDatabase(): Promise<MyDatabase> {
   console.log("Creating RxDB database...");
 
   const db = await createRxDatabase<DatabaseCollections>({
-    name: "fzt-db",
+    name: DB_NAME,
     storage: wrappedValidateAjvStorage({
       storage: getRxStorageDexie(),
     }),

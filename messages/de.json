@@ -347,6 +347,15 @@
       }
     }
   },
+  "dbLoadError": {
+    "title": "App-Daten konnten nicht geladen werden",
+    "description": "Beim Laden deiner gespeicherten Daten ist ein Fehler aufgetreten. Du kannst vor dem Löschen der Datenbank ein Roh-Backup exportieren.",
+    "errorLabel": "Fehlerdetails",
+    "exportButton": "Roh-Backup exportieren",
+    "exporting": "Exportiere...",
+    "clearButton": "Datenbank löschen",
+    "clearing": "Lösche..."
+  },
   "budgetTab": {
     "tripBudgetLabel": "Reisebudget ({currency})",
     "currencyBreakdownTitle": "Währungsaufschlüsselung",

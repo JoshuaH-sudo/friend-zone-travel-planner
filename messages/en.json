@@ -347,6 +347,15 @@
       }
     }
   },
+  "dbLoadError": {
+    "title": "Failed to load app data",
+    "description": "An error occurred while loading your stored data. You can export a raw backup before clearing the database.",
+    "errorLabel": "Error details",
+    "exportButton": "Export Raw Backup",
+    "exporting": "Exporting...",
+    "clearButton": "Clear Database",
+    "clearing": "Clearing..."
+  },
   "budgetTab": {
     "tripBudgetLabel": "Trip budget ({currency})",
     "currencyBreakdownTitle": "Currency breakdown",
