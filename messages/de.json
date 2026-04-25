@@ -101,7 +101,7 @@
       "description": "Exportiere alle App-Daten (Reisen, Einstellungen und Präferenzen) oder lade ein zuvor exportiertes Backup hoch. Beim Hochladen werden aktuelle Daten ersetzt. Maximale Upload-Größe: 5 MB.",
       "export": "App-Daten exportieren",
       "exporting": "Exportiere...",
-      "import": "App-Daten hochladen",
+      "import": "App-Daten importieren",
       "importing": "Importiere...",
       "reset": "Alle Daten löschen",
       "resetConfirmTitle": "Alle App-Daten löschen?",
@@ -370,6 +370,15 @@
         "cookiesConsentDescription": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
       }
     }
+  },
+  "dbLoadError": {
+    "title": "App-Daten konnten nicht geladen werden",
+    "description": "Beim Laden deiner gespeicherten Daten ist ein Fehler aufgetreten. Du kannst vor dem Löschen der Datenbank ein Backup exportieren — die exportierte Datei kann nach der Wiederherstellung über die Einstellungsseite importiert werden.",
+    "errorLabel": "Fehlerdetails",
+    "exportButton": "Backup exportieren",
+    "exporting": "Exportiere...",
+    "clearButton": "Datenbank löschen",
+    "clearing": "Lösche..."
   },
   "budgetTab": {
     "tripBudgetLabel": "Reisebudget ({currency})",

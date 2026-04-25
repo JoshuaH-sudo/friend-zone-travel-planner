@@ -1,4 +1,4 @@
-import { MyDatabase } from "@/lib/rxdb-database";
+import { MyDatabase, RXDB_DEXIE_DB_PREFIX, RXDB_DEXIE_DOCS_STORE } from "@/lib/rxdb-database";
 import {
   AccommodationDocument,
   ExpenseDocument,
@@ -8,6 +8,12 @@ import {
   USER_SETTINGS_ID,
   UserSettingsDocument,
   DateFormat,
+  tripSchema,
+  stopSchema,
+  accommodationSchema,
+  transportSchema,
+  expenseSchema,
+  userSettingsSchema,
 } from "@/lib/rxdb-schema";
 
 /**
@@ -106,6 +112,121 @@ export async function exportAppData(
   const link = document.createElement("a");
   link.href = url;
   link.download = `friend-zone-travel-planner-export-${Date.now()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Exports app data by reading directly from the underlying IndexedDB/Dexie
+ * databases, bypassing RxDB entirely.  This is safe to call even when RxDB
+ * fails to initialise (e.g. after a failed migration).
+ *
+ * The output format is identical to {@link exportAppData}, so the resulting
+ * file can be imported via the Settings page once the database has been cleared.
+ */
+export async function exportRawDatabaseBackup(): Promise<void> {
+  const collections = [
+    { name: "trips", schema: tripSchema },
+    { name: "stops", schema: stopSchema },
+    { name: "accommodations", schema: accommodationSchema },
+    { name: "transports", schema: transportSchema },
+    { name: "expenses", schema: expenseSchema },
+    { name: "settings", schema: userSettingsSchema },
+  ] as const;
+
+  /**
+   * Opens a per-collection Dexie database directly via the raw IndexedDB API
+   * and returns all non-deleted documents.
+   *
+   * RxDB/Dexie stores boolean fields that are part of indexes as the strings
+   * '1' and '0'.  We restore `_deleted` to a proper boolean so the exported
+   * JSON is accepted by `importAppData`.
+   *
+   * If the database does not exist, or the 'docs' object store is absent, an
+   * empty array is returned without creating any new database files.
+   */
+  const readCollectionDocs = (
+    dbName: string,
+  ): Promise<Record<string, unknown>[]> => {
+    return new Promise((resolve) => {
+      const req = indexedDB.open(dbName);
+
+      // Abort the open request when the database doesn't exist yet to avoid
+      // creating an empty phantom database.
+      req.onupgradeneeded = (event) => {
+        (event.target as IDBOpenDBRequest).transaction?.abort();
+      };
+
+      // Covers both genuine open errors and the AbortError from onupgradeneeded.
+      req.onerror = () => resolve([]);
+
+      req.onsuccess = () => {
+        const db = req.result;
+
+        if (!db.objectStoreNames.contains(RXDB_DEXIE_DOCS_STORE)) {
+          db.close();
+          resolve([]);
+          return;
+        }
+
+        try {
+          const tx = db.transaction([RXDB_DEXIE_DOCS_STORE], "readonly");
+          const getAllReq = tx.objectStore(RXDB_DEXIE_DOCS_STORE).getAll();
+
+          getAllReq.onsuccess = () => {
+            db.close();
+            const docs = (
+              getAllReq.result as Array<Record<string, unknown>>
+            )
+              // RxDB stores _deleted as the string '1' in Dexie
+              .filter(
+                (doc) => doc._deleted !== "1" && doc._deleted !== true,
+              )
+              .map((doc) => ({ ...doc, _deleted: false }));
+            resolve(docs);
+          };
+
+          getAllReq.onerror = () => {
+            db.close();
+            resolve([]);
+          };
+        } catch {
+          db.close();
+          resolve([]);
+        }
+      };
+    });
+  };
+
+  const results = await Promise.all(
+    collections.map(async ({ name, schema }) => {
+      const dbName = `${RXDB_DEXIE_DB_PREFIX}${schema.version}--${name}`;
+      const docs = await readCollectionDocs(dbName);
+      return { name, docs };
+    }),
+  );
+
+  const data: Record<string, Record<string, unknown>[]> = {};
+  for (const { name, docs } of results) {
+    data[name] = docs;
+  }
+
+  const payload: AppDataExport = {
+    version: APP_DATA_EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    preferences: { theme: null },
+    data: data as AppDataExport["data"],
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `friend-zone-travel-planner-recovery-backup-${Date.now()}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

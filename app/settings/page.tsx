@@ -25,6 +25,7 @@ import {
   resetAppData,
 } from "@/lib/app-data-transfer";
 import posthog from "posthog-js";
+import { Download, Upload } from "lucide-react";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -302,6 +303,7 @@ export default function SettingsPage() {
               onClick={handleExport}
               disabled={isExporting || isImporting || isResetting}
             >
+              <Download data-icon="inline-start" />
               {isExporting ? t("backup.exporting") : t("backup.export")}
             </Button>
             <Button
@@ -310,6 +312,7 @@ export default function SettingsPage() {
               onClick={handleImportClick}
               disabled={isExporting || isImporting || isResetting}
             >
+              <Upload data-icon="inline-start" />
               {isImporting ? t("backup.importing") : t("backup.import")}
             </Button>
             <ConfirmationDialog

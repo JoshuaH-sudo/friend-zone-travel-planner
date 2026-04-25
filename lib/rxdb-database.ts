@@ -38,6 +38,8 @@ export type DatabaseCollections = {
 
 export type MyDatabase = RxDatabase<DatabaseCollections>;
 
+export const DB_NAME = "fzt-db";
+
 let dbPromise: Promise<MyDatabase> | null = null;
 
 addRxPlugin(RxDBQueryBuilderPlugin);
@@ -53,8 +55,28 @@ if (isDevMode) {
   console.log("Production mode - RxDB Dev Mode plugin not enabled");
 }
 
+/** Dev-only: set `localStorage.setItem('fzt_simulate_db_error', '1')` in the
+ *  browser console to make the next database initialisation throw, simulating a
+ *  real-world load failure.  Remove the flag with
+ *  `localStorage.removeItem('fzt_simulate_db_error')` and reload to recover. */
 export async function getDatabase(): Promise<MyDatabase> {
   if (dbPromise) {
+    return dbPromise;
+  }
+
+  if (
+    isDevMode &&
+    typeof localStorage !== "undefined" &&
+    localStorage.getItem("fzt_simulate_db_error") === "1"
+  ) {
+    const err = new Error(
+      "[DEV] Simulated database initialisation failure (fzt_simulate_db_error flag is set)",
+    );
+    dbPromise = Promise.reject(err);
+    // Prevent the rejected promise from being cached for the next real load
+    dbPromise.catch(() => {
+      dbPromise = null;
+    });
     return dbPromise;
   }
 
@@ -66,7 +88,7 @@ async function createDatabase(): Promise<MyDatabase> {
   console.log("Creating RxDB database...");
 
   const db = await createRxDatabase<DatabaseCollections>({
-    name: "fzt-db",
+    name: DB_NAME,
     storage: wrappedValidateAjvStorage({
       storage: getRxStorageDexie(),
     }),
@@ -166,4 +188,66 @@ export function generateId(): string {
     return customHashFunction(Date.now().toString() + Math.random().toString());
   }
   return crypto.randomUUID();
+}
+
+/** Prefix used by the Dexie storage adapter for every per-collection IndexedDB database. */
+export const RXDB_DEXIE_DB_PREFIX = `rxdb-dexie-${DB_NAME}--`;
+
+/** Name of the Dexie object store that holds RxDB documents in each collection database. */
+export const RXDB_DEXIE_DOCS_STORE = "docs";
+
+function deleteIndexedDbByName(name: string): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const req = indexedDB.deleteDatabase(name);
+    req.onsuccess = () => resolve();
+    req.onerror = () => {
+      console.error("Failed to delete database:", name, req.error);
+      resolve();
+    };
+    req.onblocked = () => {
+      console.warn("Database deletion blocked for:", name);
+      resolve();
+    };
+  });
+}
+
+/**
+ * Deletes all IndexedDB databases created by RxDB's Dexie storage adapter for
+ * this app.  Safe to call at any time; resolves even if individual deletions
+ * fail so the caller can always proceed with a reload.
+ *
+ * Falls back to known versioned database names when `indexedDB.databases()` is
+ * unavailable (e.g. Safari), so the recovery flow works cross-browser.
+ */
+export async function deleteDatabaseData(): Promise<void> {
+  if (typeof indexedDB === "undefined") {
+    return;
+  }
+
+  // Build candidate names from the known current schema versions. This serves
+  // as the cross-browser fallback (e.g. Safari lacks indexedDB.databases()).
+  const candidateDbNames = new Set<string>([
+    DB_NAME,
+    `${RXDB_DEXIE_DB_PREFIX}${tripSchema.version}--trips`,
+    `${RXDB_DEXIE_DB_PREFIX}${stopSchema.version}--stops`,
+    `${RXDB_DEXIE_DB_PREFIX}${accommodationSchema.version}--accommodations`,
+    `${RXDB_DEXIE_DB_PREFIX}${transportSchema.version}--transports`,
+    `${RXDB_DEXIE_DB_PREFIX}${expenseSchema.version}--expenses`,
+    `${RXDB_DEXIE_DB_PREFIX}${userSettingsSchema.version}--settings`,
+  ]);
+
+  // Enumerate all existing databases when the API is available (Chrome/Firefox)
+  // to catch any databases from previous schema versions.
+  if (indexedDB.databases) {
+    const allDbs = await indexedDB.databases();
+    for (const { name } of allDbs) {
+      if (typeof name === "string" && name.startsWith(RXDB_DEXIE_DB_PREFIX)) {
+        candidateDbNames.add(name);
+      }
+    }
+  }
+
+  await Promise.all(
+    [...candidateDbNames].map((name) => deleteIndexedDbByName(name)),
+  );
 }
