@@ -101,7 +101,7 @@
       "description": "Export all app data (trips, settings, and preferences) or upload a previously exported backup. Uploading a backup replaces current app data. Maximum upload size is 5 MB.",
       "export": "Export App Data",
       "exporting": "Exporting...",
-      "import": "Upload App Data",
+      "import": "Import App Data",
       "importing": "Importing...",
       "reset": "Delete All Data",
       "resetConfirmTitle": "Delete all app data?",
@@ -370,6 +370,15 @@
         "cookiesConsentDescription": "Allow cookies to be stored on your device for a better experience."
       }
     }
+  },
+  "dbLoadError": {
+    "title": "Failed to load app data",
+    "description": "An error occurred while loading your stored data. You can export a backup before clearing the database — the exported file can be imported via the Settings page after recovery.",
+    "errorLabel": "Error details",
+    "exportButton": "Export Backup",
+    "exporting": "Exporting...",
+    "clearButton": "Clear Database",
+    "clearing": "Clearing..."
   },
   "budgetTab": {
     "tripBudgetLabel": "Trip budget ({currency})",

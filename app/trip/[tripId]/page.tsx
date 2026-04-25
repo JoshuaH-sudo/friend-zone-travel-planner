@@ -62,6 +62,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import posthog from "posthog-js";
 import { shiftDateTimeByDays } from "./components/utils/tripDateUtils";
+import { BannerColorPicker } from "@/components/BannerColorPicker";
 
 type TabId = "overview" | "itinerary" | "map" | "budget";
 
@@ -337,7 +338,12 @@ export default function TripPage() {
 
   return (
     <div>
-      <section className="gradient-hero text-primary-foreground">
+      <section
+        className="text-primary-foreground"
+        style={{
+          background: trip.bannerColor ?? "var(--gradient-hero)",
+        }}
+      >
         <div className="container py-8 sm:py-12">
           <Link
             href="/"
@@ -403,57 +409,66 @@ export default function TripPage() {
                 )}
               </div>
             </div>
-            <DropdownMenu data-cy="trip-actions">
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0"
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                }
-              ></DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await exportTripJson(db, trip.id);
-                      posthog.capture("trip_exported_json", {
-                        trip_id: trip.id,
-                      });
-                    }}
-                  >
-                    {t("exportJson")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await copyShareLink(db, trip.id);
-                      posthog.capture("share_link_copied", {
-                        trip_id: trip.id,
-                      });
-                      toast.success(t("shareLinkCopied"));
-                    }}
-                  >
-                    {t("copyShareLink")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await exportTripToIcal(db, trip.id, timezone);
-                    }}
-                  >
-                    {t("exportIcal")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    variant="destructive"
-                    onClick={() => setDeleteDialogOpen(true)}
-                  >
-                    {t("deleteTrip")}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex shrink-0 items-center gap-2">
+              <BannerColorPicker
+                value={trip.bannerColor ?? "#2d6a4f"}
+                onChange={async (color) => {
+                  await trip.patch({ bannerColor: color, updatedAt: Date.now() });
+                }}
+                triggerClassName="bg-background/15 hover:bg-background/25 border-white/30"
+              />
+              <DropdownMenu data-cy="trip-actions">
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="bg-background/15 hover:bg-background/25 text-primary-foreground border-0"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await exportTripJson(db, trip.id);
+                        posthog.capture("trip_exported_json", {
+                          trip_id: trip.id,
+                        });
+                      }}
+                    >
+                      {t("exportJson")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await copyShareLink(db, trip.id);
+                        posthog.capture("share_link_copied", {
+                          trip_id: trip.id,
+                        });
+                        toast.success(t("shareLinkCopied"));
+                      }}
+                    >
+                      {t("copyShareLink")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        await exportTripToIcal(db, trip.id, timezone);
+                      }}
+                    >
+                      {t("exportIcal")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      {t("deleteTrip")}
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </section>

@@ -15,6 +15,8 @@ export type TripDocument = {
   startDate?: string;
   /** Optional trip start location. */
   startLocation?: string;
+  /** Optional CSS colour value used as the trip banner background (e.g. "#2d6a4f"). */
+  bannerColor?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -92,7 +94,7 @@ export type UserSettingsDocument = {
 
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
-  version: 3,
+  version: 4,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -117,6 +119,10 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
     startLocation: {
       type: "string",
       maxLength: TRIP_START_LOCATION_MAX_LENGTH,
+    },
+    bannerColor: {
+      type: "string",
+      maxLength: 30,
     },
     createdAt: {
       type: "number",
