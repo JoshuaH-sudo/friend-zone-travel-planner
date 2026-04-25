@@ -95,7 +95,7 @@ export function Expenses({
         </Card>
       )}
       {expenses.map((expense) => (
-        <Card key={expense.id} className="py-2">
+        <Card key={expense.id} className="py-2 border-border/50 rounded-md ring-foreground/5">
           <CardContent className="flex items-center justify-between px-3 py-2">
             {editingId === expense.id ? (
               <ExpenseForm

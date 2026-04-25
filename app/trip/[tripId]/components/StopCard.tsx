@@ -342,7 +342,7 @@ export function StopCard({
           </section>
           <hr/>
           <section>
-            <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
+            <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase mb-2">
               <CreditCard className="text-muted-foreground h-4 w-4" />
               <p>{t("sections.expenses")}</p>
             </div>
