@@ -67,6 +67,7 @@ async function exportRawDatabaseBackup(): Promise<void> {
       }
 
       let remaining = storeNames.length;
+      let finalizeCalled = false;
       const tx = db.transaction(storeNames, "readonly");
 
       for (const storeName of storeNames) {
@@ -76,7 +77,10 @@ async function exportRawDatabaseBackup(): Promise<void> {
         const finish = (items: unknown[]) => {
           allData[storeName] = items;
           remaining--;
-          if (remaining === 0) finalize();
+          if (remaining === 0 && !finalizeCalled) {
+            finalizeCalled = true;
+            finalize();
+          }
         };
 
         req.onsuccess = () => finish(req.result as unknown[]);
@@ -90,8 +94,14 @@ async function deleteRawDatabase(): Promise<void> {
   return new Promise<void>((resolve) => {
     const req = indexedDB.deleteDatabase(DB_NAME);
     req.onsuccess = () => resolve();
-    req.onerror = () => resolve();
-    req.onblocked = () => resolve();
+    req.onerror = () => {
+      console.error("Failed to delete database:", req.error);
+      resolve();
+    };
+    req.onblocked = () => {
+      console.warn("Database deletion blocked. Proceeding with reload...");
+      resolve();
+    };
   });
 }
 
@@ -112,7 +122,14 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
         console.log("RxDB initialized and ready");
       } catch (error) {
         console.error("Database initialization error:", error);
-        const err = error instanceof Error ? error : new Error(String(error));
+        const err =
+          error instanceof Error
+            ? error
+            : new Error(
+                typeof error === "object"
+                  ? JSON.stringify(error)
+                  : String(error),
+              );
         posthog.captureException(err);
         setLoadError(err);
         setIsReady(true);
