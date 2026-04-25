@@ -7,6 +7,7 @@ import {
   useState,
   useEffect,
 } from "react";
+import posthog from "posthog-js";
 import { useDatabase } from "@/lib/DatabaseProvider";
 import { USER_SETTINGS_ID, DateFormat } from "@/lib/rxdb-schema";
 import {
@@ -90,6 +91,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, [db]);
+
+  // Sync PostHog opt-in/opt-out with the analyticsConsent setting
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") return;
+    if (settings.analyticsConsent) {
+      posthog.opt_in_capturing();
+    } else {
+      posthog.opt_out_capturing();
+    }
+  }, [settings.analyticsConsent]);
 
   const updateSettings = async (partial: Partial<Settings>) => {
     const currentDoc = await db.settings.findOne(USER_SETTINGS_ID).exec();
