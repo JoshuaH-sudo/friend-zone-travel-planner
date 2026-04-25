@@ -27,7 +27,7 @@ import { dateFormats, DateFormat } from "@/lib/rxdb-schema";
 
 const TUTORIAL_SEEN_KEY = "fzt-tutorial-seen";
 
-type InfoStep = {
+type TutorialInfoStep = {
   kind: "info";
   icon: LucideIcon;
   titleKey:
@@ -49,7 +49,7 @@ type SetupStep = {
   icon: LucideIcon;
 };
 
-type Step = InfoStep | SetupStep;
+type Step = TutorialInfoStep | SetupStep;
 
 const STEPS: Step[] = [
   {
@@ -154,7 +154,7 @@ export function TutorialDialog() {
 
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-medium">{t("steps.setup.theme")}</span>
-              <Select value={theme} onValueChange={(v) => v && setTheme(v)}>
+              <Select value={theme ?? "system"} onValueChange={(v) => v && setTheme(v)}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
