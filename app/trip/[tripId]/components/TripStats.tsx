@@ -122,12 +122,14 @@ export function TripStats({
 
       (accommodationsByStop[stop.id] || []).forEach((acc) => {
         accommodationCount++;
+        if (!acc.price || !acc.currency || acc.price <= 0) return;
         currencyTotals[acc.currency] =
           (currencyTotals[acc.currency] || 0) + acc.price;
       });
 
       (transportsByStop[stop.id] || []).forEach((trans) => {
         transportCount++;
+        if (!trans.price || !trans.currency || trans.price <= 0) return;
         currencyTotals[trans.currency] =
           (currencyTotals[trans.currency] || 0) + trans.price;
       });
@@ -135,6 +137,7 @@ export function TripStats({
 
     // Include expenses in per-currency totals
     (expenses || []).forEach((expense) => {
+      if (!expense.price || !expense.currency || expense.price <= 0) return;
       currencyTotals[expense.currency] =
         (currencyTotals[expense.currency] || 0) + expense.price;
     });

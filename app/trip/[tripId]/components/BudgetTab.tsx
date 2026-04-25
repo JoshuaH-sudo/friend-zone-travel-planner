@@ -51,6 +51,7 @@ export function BudgetTab({
     // Per-currency breakdown
     const byCurrency: Record<string, number> = {};
     [...allAccommodations, ...allTransports, ...expenses].forEach((item) => {
+      if (!item.price || !item.currency || item.price <= 0) return;
       byCurrency[item.currency] =
         (byCurrency[item.currency] || 0) + item.price;
     });
