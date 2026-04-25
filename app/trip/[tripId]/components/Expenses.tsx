@@ -74,17 +74,6 @@ export function Expenses({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsAdding(true)}
-          className="text-muted-foreground w-fit px-0"
-        >
-          <Plus className="h-4 w-4" />
-          {t("actions.addExpense")}
-        </Button>
-      </div>
       {isAdding && (
         <Card>
           <CardContent className="p-4">
@@ -160,7 +149,7 @@ export function Expenses({
                     size="icon"
                     variant="ghost"
                     onClick={() => setEditingId(expense.id)}
-                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground h-7 w-7"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
@@ -168,7 +157,7 @@ export function Expenses({
                     size="icon"
                     variant="ghost"
                     onClick={() => handleDelete(expense.id)}
-                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    className="text-muted-foreground hover:text-destructive h-7 w-7"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -178,6 +167,17 @@ export function Expenses({
           </CardContent>
         </Card>
       ))}
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsAdding(true)}
+          className="text-muted-foreground w-fit px-0"
+        >
+          <Plus className="h-4 w-4" />
+          {t("actions.addExpense")}
+        </Button>
+      </div>
     </div>
   );
 }

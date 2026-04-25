@@ -284,6 +284,7 @@ export function StopCard({
               )}
             </div>
           </section>
+          <hr/>
           <section>
             <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
               <Plane className="text-muted-foreground h-4 w-4" />
@@ -339,6 +340,7 @@ export function StopCard({
               )}
             </div>
           </section>
+          <hr/>
           <section>
             <div className="text-muted-foreground flex items-center gap-1 text-xs font-light uppercase">
               <CreditCard className="text-muted-foreground h-4 w-4" />
