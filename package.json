@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:component": "cypress run --component",
+    "cy:run:e2e": "cypress run --e2e"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -51,6 +55,7 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cypress": "^15.14.1",
     "eslint": "^10",
     "eslint-config-next": "16.2.2",
     "husky": "^9.1.7",

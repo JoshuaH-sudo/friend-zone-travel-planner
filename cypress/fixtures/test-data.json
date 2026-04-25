@@ -1,0 +1,82 @@
+{
+  "trips": [
+    {
+      "id": "test-trip-001",
+      "name": "Paris Adventure",
+      "startDate": "2025-06-01",
+      "startLocation": "London",
+      "createdAt": 1700000000000,
+      "updatedAt": 1700000000000
+    },
+    {
+      "id": "test-trip-002",
+      "name": "Tokyo Trip",
+      "startDate": "2025-09-15",
+      "createdAt": 1700000001000,
+      "updatedAt": 1700000001000
+    }
+  ],
+  "stops": [
+    {
+      "id": "test-stop-001",
+      "name": "Paris",
+      "tripId": "test-trip-001",
+      "createdAt": 1700000000000,
+      "updatedAt": 1700000000000
+    },
+    {
+      "id": "test-stop-002",
+      "name": "Lyon",
+      "tripId": "test-trip-001",
+      "createdAt": 1700000000500,
+      "updatedAt": 1700000000500
+    }
+  ],
+  "accommodations": [
+    {
+      "id": "test-accommodation-001",
+      "name": "Hotel du Louvre",
+      "price": 150,
+      "currency": "EUR",
+      "checkIn": "2025-06-01T14:00",
+      "checkOut": "2025-06-05T11:00",
+      "stopId": "test-stop-001",
+      "createdAt": 1700000000000,
+      "updatedAt": 1700000000000
+    }
+  ],
+  "transports": [
+    {
+      "id": "test-transport-001",
+      "name": "Eurostar to Paris",
+      "type": "train",
+      "price": 80,
+      "currency": "GBP",
+      "departureDateTime": "2025-06-01T09:00",
+      "arrivalDateTime": "2025-06-01T12:15",
+      "stopId": "test-stop-001",
+      "createdAt": 1700000000000,
+      "updatedAt": 1700000000000
+    }
+  ],
+  "expenses": [
+    {
+      "id": "test-expense-001",
+      "tripId": "test-trip-001",
+      "stopId": "test-stop-001",
+      "name": "Dinner at Le Jules Verne",
+      "category": "food",
+      "price": 120,
+      "currency": "EUR",
+      "createdAt": 1700000000000,
+      "updatedAt": 1700000000000
+    }
+  ],
+  "settings": {
+    "id": "user-settings",
+    "defaultCurrency": "USD",
+    "language": "en",
+    "timezone": "Europe/London",
+    "dateFormat": "dd/MM/yyyy"
+  }
+}

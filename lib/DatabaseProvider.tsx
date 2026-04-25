@@ -9,7 +9,7 @@ import {
 } from "react";
 import { getDatabase, MyDatabase } from "./rxdb-database";
 
-const DatabaseContext = createContext<MyDatabase | null>(null);
+export const DatabaseContext = createContext<MyDatabase | null>(null);
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [database, setDatabase] = useState<MyDatabase | null>(null);

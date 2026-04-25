@@ -25,6 +25,17 @@ Use this skill when work touches the local database layer for the trip planner.
 5. Reuse the existing provider/database abstraction instead of creating duplicate database initialization logic.
 6. Keep the current plugin setup and development-only hash fallback unless the task specifically changes environment support.
 
+## Testing
+
+When changing schemas or document shapes, **also update the following test files**:
+- `cypress/fixtures/test-data.json` — update affected test data objects to match new fields
+- `cypress/support/test-db.ts` — update the corresponding `TEST_*` constants and seed data
+- `cypress/component/*.cy.tsx` — update any mock document objects that include changed fields
+
+Use `cypress/support/TestWrapper.tsx` (`createMockDatabase()`) to mock the database in component tests.
+Use `DatabaseContext` (exported from `lib/DatabaseProvider.tsx`) for custom mock providers.
+Use `SettingsContext` (exported from `lib/SettingsProvider.tsx`) for settings mocking.
+
 ## Debugging
 
 - Inspect RxDB errors for `cause`, `fix`, and `docs` before guessing.

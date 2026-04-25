@@ -99,7 +99,7 @@ export function StopCard({
   );
 
   return (
-    <Card className="rounded-2xl pb-0 shadow-md">
+    <Card className="rounded-2xl pb-0 shadow-md" data-cy="stop-card">
       <CardHeader className="flex flex-row items-center gap-1 pb-4">
         <div className="flex w-full flex-row items-start gap-2">
           <div className="bg-primary-muted text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-serif font-semibold">
@@ -117,16 +117,18 @@ export function StopCard({
                 }}
               >
                 <Input
+                  data-cy="stop-name-input"
                   value={editDraft}
                   onChange={(e) => setEditDraft(e.target.value)}
                   className="h-8 px-2 py-1 font-serif text-2xl"
                   maxLength={100}
                   autoFocus
                 />
-                <Button size="icon-sm" variant="ghost" type="submit">
+                <Button data-cy="stop-name-save" size="icon-sm" variant="ghost" type="submit">
                   ✓
                 </Button>
                 <Button
+                  data-cy="stop-name-cancel"
                   type="button"
                   size="icon-sm"
                   variant="ghost"
@@ -137,7 +139,7 @@ export function StopCard({
               </form>
             ) : (
               <>
-                <CardTitle className="truncate font-serif text-2xl">
+                <CardTitle data-cy="stop-name" className="truncate font-serif text-2xl">
                   {capitalize(stop.name)}
                 </CardTitle>
                 {dateRangeSummary && (
@@ -151,6 +153,7 @@ export function StopCard({
           {!isEditing && (
             <div className="ml-2 flex gap-1">
               <Button
+                data-cy="edit-stop-button"
                 type="button"
                 size="icon-sm"
                 variant="ghost"
@@ -162,6 +165,7 @@ export function StopCard({
                 <Pencil className="h-4 w-4" />
               </Button>
               <Button
+                data-cy="delete-stop-button"
                 type="button"
                 size="icon-sm"
                 variant="ghost"
@@ -216,6 +220,7 @@ export function StopCard({
                 </div>
               ) : (
                 <Button
+                  data-cy="add-accommodation-button"
                   variant="ghost"
                   size="sm"
                   onClick={onStartAddAccommodation}
@@ -272,6 +277,7 @@ export function StopCard({
                 </div>
               ) : (
                 <Button
+                  data-cy="add-transport-button"
                   variant="ghost"
                   size="sm"
                   onClick={onStartAddTransport}
