@@ -303,6 +303,12 @@
     "accommodations": "Unterkünfte",
     "transports": "Reisen",
     "expenses": "Ausgaben",
-    "estimationTooltip": "Die Gesamtbeträge werden anhand aktueller Wechselkurse geschätzt und entsprechen möglicherweise nicht den tatsächlichen Kosten."
+    "estimationTooltip": "Die Gesamtbeträge werden anhand aktueller Wechselkurse geschätzt und entsprechen möglicherweise nicht den tatsächlichen Kosten.",
+    "expenseBreakdownTitle": "Ausgabenaufschlüsselung",
+    "food": "Essen",
+    "activity": "Aktivität",
+    "shopping": "Einkaufen",
+    "other": "Sonstiges",
+    "costByStopTitle": "Kosten pro Stop"
   }
 }

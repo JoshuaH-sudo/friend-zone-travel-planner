@@ -499,6 +499,7 @@ export default function TripPage() {
               />
               <BudgetTab
                 trip={trip}
+                stops={stops}
                 accommodationsByStop={accommodationsByStop}
                 transportsByStop={transportsByStop}
                 expenses={expenses}

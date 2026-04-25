@@ -303,6 +303,12 @@
     "accommodations": "Accommodations",
     "transports": "Transports",
     "expenses": "Expenses",
-    "estimationTooltip": "Totals are estimated using current exchange rates and may not reflect actual costs."
+    "estimationTooltip": "Totals are estimated using current exchange rates and may not reflect actual costs.",
+    "expenseBreakdownTitle": "Expense breakdown",
+    "food": "Food",
+    "activity": "Activity",
+    "shopping": "Shopping",
+    "other": "Other",
+    "costByStopTitle": "Cost by stop"
   }
 }
