@@ -16,11 +16,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Search, MapPin, CalendarIcon } from "lucide-react";
+import {
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import { Plus, Search, MapPin, CalendarIcon, Info } from "lucide-react";
 import { formatMoney, convert, formatDateShortWithFormat } from "@/lib/format";
+import { useExchangeRates } from "@/lib/useExchangeRates";
 import type {
+  AccommodationDocument,
   ExpenseDocument,
   StopDocument,
+  TransportDocument,
   TripDocument,
 } from "@/lib/rxdb-schema";
 import { useSettings } from "@/lib/SettingsProvider";
@@ -33,14 +42,20 @@ type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
 export default function HomePage() {
   const t = useTranslations("home");
+  const tStats = useTranslations("tripStats");
   const db = useDatabase();
   const router = useRouter();
   const { defaultCurrency, dateFormat } = useSettings();
+  const { rates } = useExchangeRates();
   const trips = useRxQuery<TripDocument>(
     db.trips.find().sort({ updatedAt: "desc" }),
   );
   const stops = useRxQuery<StopDocument>(db.stops.find());
   const expenses = useRxQuery<ExpenseDocument>(db.expenses.find());
+  const accommodations = useRxQuery<AccommodationDocument>(
+    db.accommodations.find(),
+  );
+  const transports = useRxQuery<TransportDocument>(db.transports.find());
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<TripStatusFilter>("all");
   const [isCreating, setIsCreating] = useState(false);
@@ -50,6 +65,11 @@ export default function HomePage() {
 
   const cards = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
+
+    // Build stop->tripId lookup for accommodations and transports
+    const stopTripMap = new Map<string, string>();
+    stops.forEach((stop) => stopTripMap.set(stop.id, stop.tripId));
+
     return trips
       .map((trip) => {
         const tripStops = stops.filter((stop) => stop.tripId === trip.id);
@@ -58,13 +78,33 @@ export default function HomePage() {
           !startDate || startDate > today
             ? "upcoming"
             : "ongoing";
-        const total = expenses
+
+        const expenseTotal = expenses
           .filter((expense) => expense.tripId === trip.id)
           .reduce(
             (sum, expense) =>
-              sum + convert(expense.price, expense.currency, defaultCurrency),
+              sum + convert(expense.price, expense.currency, defaultCurrency, rates),
             0,
           );
+
+        const accommodationTotal = accommodations
+          .filter((acc) => stopTripMap.get(acc.stopId) === trip.id)
+          .reduce(
+            (sum, acc) =>
+              sum + convert(acc.price, acc.currency, defaultCurrency, rates),
+            0,
+          );
+
+        const transportTotal = transports
+          .filter((trans) => stopTripMap.get(trans.stopId) === trip.id)
+          .reduce(
+            (sum, trans) =>
+              sum + convert(trans.price, trans.currency, defaultCurrency, rates),
+            0,
+          );
+
+        const total = expenseTotal + accommodationTotal + transportTotal;
+
         return {
           trip,
           status,
@@ -79,7 +119,7 @@ export default function HomePage() {
         card.trip.name.toLowerCase().includes(search.trim().toLowerCase()),
       )
       .filter((card) => filter === "all" || card.status === filter);
-  }, [defaultCurrency, expenses, filter, search, stops, trips]);
+  }, [accommodations, defaultCurrency, expenses, filter, rates, search, stops, transports, trips]);
 
   const createTrip = async () => {
     const now = Date.now();
@@ -247,9 +287,24 @@ export default function HomePage() {
                     {card.stopNames}
                   </p>
                 )}
-                <p className="text-foreground mt-4 text-lg font-semibold">
-                  {formatMoney(card.total, defaultCurrency)}
-                </p>
+                <div className="mt-4 flex items-center gap-1.5">
+                  <p className="text-foreground text-lg font-semibold">
+                    ~{formatMoney(card.total, defaultCurrency)}
+                  </p>
+                  <TooltipProvider>
+                    <TooltipRoot>
+                      <TooltipTrigger
+                        className="text-muted-foreground hover:text-foreground cursor-default"
+                        aria-label={tStats("estimationTooltip")}
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {tStats("estimationTooltip")}
+                      </TooltipContent>
+                    </TooltipRoot>
+                  </TooltipProvider>
+                </div>
               </CardContent>
             </Card>
           ))}
