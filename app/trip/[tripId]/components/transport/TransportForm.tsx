@@ -147,7 +147,7 @@ export function TransportForm({
           {warningSummary}
         </p>
       )}
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="space-y-2">
           <Label htmlFor="transport-type">{t("typeLabel")}</Label>
           <Select
@@ -192,7 +192,7 @@ export function TransportForm({
           )}
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="space-y-2">
           <Label>{t("departureLabel")}</Label>
           <Controller

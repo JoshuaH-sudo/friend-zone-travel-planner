@@ -162,7 +162,7 @@ export function AccommodationForm({
         )}
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="space-y-2">
           <Label>{t("checkInLabel")}</Label>
           <Controller
