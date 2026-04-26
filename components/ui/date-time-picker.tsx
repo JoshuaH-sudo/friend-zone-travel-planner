@@ -15,6 +15,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import { useIsMobile } from "@/components/hooks/useIsMobile";
 
 /** Parse an ISO date or datetime string into a Date.
  * Parses in local time to avoid UTC midnight shifts.
@@ -55,6 +56,8 @@ export interface DateTimePickerProps {
   presets?: Array<{ label: string; date: Date }>;
   /** User's preferred date format */
   dateFormat?: DateFormatOption;
+  /** Optional id forwarded to the native input on mobile */
+  id?: string;
 }
 
 const hours = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
@@ -68,6 +71,7 @@ export function DateTimePicker({
   pairedHighlightDate,
   presets,
   dateFormat = "MM/dd/yyyy",
+  id,
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -163,6 +167,28 @@ export function DateTimePicker({
   const display12Hour = date ? date.getHours() % 12 || 12 : 12;
   const displayMinute = date ? date.getMinutes() : 0;
   const displayAmPm = date ? (date.getHours() >= 12 ? "PM" : "AM") : "AM";
+
+  const isMobile = useIsMobile();
+
+  // On mobile, use a native datetime-local input for a better UX.
+  if (isMobile) {
+    return (
+      <div className={cn("relative", className)}>
+        <input
+          id={id}
+          type="datetime-local"
+          value={value ?? ""}
+          aria-label={placeholder}
+          onChange={(e) => {
+            onChange(e.target.value);
+          }}
+          className={cn(
+            "border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          )}
+        />
+      </div>
+    );
+  }
 
   return (
     <PopoverRoot open={open} onOpenChange={setOpen}>

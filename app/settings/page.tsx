@@ -297,10 +297,12 @@ export default function SettingsPage() {
           <p className="text-muted-foreground text-sm">
             {t("backup.description")}
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+            <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
             <Button
               type="button"
               onClick={handleExport}
+              className="flex-1"
               disabled={isExporting || isImporting || isResetting}
             >
               <Download data-icon="inline-start" />
@@ -310,16 +312,19 @@ export default function SettingsPage() {
               type="button"
               variant="outline"
               onClick={handleImportClick}
+              className="flex-1"
               disabled={isExporting || isImporting || isResetting}
             >
               <Upload data-icon="inline-start" />
               {isImporting ? t("backup.importing") : t("backup.import")}
             </Button>
+            </div>
             <ConfirmationDialog
               trigger={
                 <Button
                   type="button"
                   variant="destructive"
+                  className="w-full sm:w-auto"
                   disabled={isExporting || isImporting || isResetting}
                 >
                   {t("backup.reset")}
