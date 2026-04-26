@@ -119,7 +119,6 @@ export function TransportForm({
   const watchedType = watch("type");
   const watchedCurrency = watch("currency");
   const watchedArrivalDateTime = watch("arrivalDateTime");
-  const nameRegistration = register("name");
   const datePresets = [
     { label: t("datePresetToday"), date: new Date() },
     { label: t("datePresetTomorrow"), date: new Date(Date.now() + MS_PER_DAY) },
@@ -173,19 +172,27 @@ export function TransportForm({
             <p className="text-destructive text-sm">{errors.type.message}</p>
           )}
         </div>
-        <div className="space-y-2 w-xl">
-          <Label htmlFor="transport-name">{t("nameLabel")}</Label>
-          <Input
-            id="transport-name"
-            {...nameRegistration}
-            ref={(element) => {
-              nameRegistration.ref(element);
-              nameInputRef.current = element;
-            }}
-            type="text"
-            autoFocus={autoFocusName}
-            placeholder={t("namePlaceholder")}
-            className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
+        <div className="w-full space-y-2">
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <>
+                <Label htmlFor="transport-name">{t("nameLabel")}</Label>
+                <Input
+                  id="transport-name"
+                  {...field}
+                  ref={(element) => {
+                    field.ref(element);
+                    nameInputRef.current = element;
+                  }}
+                  type="text"
+                  autoFocus={autoFocusName}
+                  placeholder={t("namePlaceholder")}
+                  className={highlightNameInput ? "ring-primary/40 ring-2" : ""}
+                />
+              </>
+            )}
           />
           {errors.name && (
             <p className="text-destructive text-sm">{errors.name.message}</p>
@@ -203,7 +210,7 @@ export function TransportForm({
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={t("departurePlaceholder")}
-                className="w-full"
+                className="w-fit"
                 highlightedDates={highlightedDates}
                 pairedHighlightDate={watchedArrivalDateTime || undefined}
                 presets={datePresets}
@@ -232,7 +239,7 @@ export function TransportForm({
                 value={field.value || undefined}
                 onChange={field.onChange}
                 placeholder={t("arrivalPlaceholder")}
-                className="w-full"
+                className="w-fit"
                 highlightedDates={highlightedDates}
                 presets={datePresets}
                 dateFormat={dateFormat}
