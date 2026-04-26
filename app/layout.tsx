@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { SettingsProvider } from "@/lib/SettingsProvider";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ImportListener } from "@/components/ImportListener";
+import { NativeThemeSync } from "@/components/NativeThemeSync";
 import { Toaster } from "sonner";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -55,6 +56,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <NativeThemeSync />
             <DatabaseProvider>
               <SettingsProvider>
                 <ImportListener />
