@@ -173,7 +173,7 @@ export function AccommodationForm({
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={t("checkInPlaceholder")}
-                className="w-full"
+                className="w-fit"
                 highlightedDates={highlightedDates}
                 presets={datePresets}
                 dateFormat={dateFormat}
@@ -194,7 +194,7 @@ export function AccommodationForm({
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={t("checkOutPlaceholder")}
-                className="w-full"
+                className="w-fit"
                 highlightedDates={highlightedDates}
                 pairedHighlightDate={watchedCheckIn}
                 presets={datePresets}
