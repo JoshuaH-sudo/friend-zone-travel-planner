@@ -17,7 +17,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div className="container flex w-full items-center justify-between gap-4 px-4 py-4">
           <Link href="/" className="flex items-center gap-3">
               <img
-                src="/favicon.svg"
+                src="/favicon.png"
                 alt={tHeader("logoAlt")}
                 className="h-10 w-10 antialiased"
               /> 
