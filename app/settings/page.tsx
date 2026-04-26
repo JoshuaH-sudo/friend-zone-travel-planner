@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -352,6 +353,14 @@ export default function SettingsPage() {
             <p className="text-muted-foreground text-sm">{statusMessage}</p>
           ) : null}
         </div>
+      </section>
+      <section className="border-border bg-muted/40 rounded-2xl border p-6 text-sm">
+        <p className="text-muted-foreground">
+          Need help?{" "}
+          <Link href="/support" className="text-primary font-medium underline-offset-2 hover:underline">
+            Visit the Support page
+          </Link>.
+        </p>
       </section>
     </div>
   );
