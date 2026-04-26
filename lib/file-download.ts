@@ -16,21 +16,46 @@ function getPlatformParam(): "ios" | "android" | null {
 }
 
 /**
- * Returns true when running on an iOS device (iPhone, iPad, iPod).
+ * Returns true when the web app is running inside a React Native WebView.
  *
- * iOS Safari does not honour the `download` attribute on anchor elements, so
- * we need a different strategy there.  Android Chrome supports the attribute
- * natively, so we intentionally exclude Android from this check.
+ * The native app injects `window.ReactNativeWebView` into the WebView context,
+ * which is the same object used by the native theme bridge.  When present it
+ * means we are inside a managed WebView on either iOS or Android.
+ */
+function isInReactNativeWebView(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.ReactNativeWebView !== "undefined"
+  );
+}
+
+/**
+ * Determines whether to use the Web Share API instead of anchor-click download.
  *
- * The `?platform=ios|android` URL param takes precedence over user-agent
- * detection — useful when the WebView host can declare the platform explicitly.
+ * The Web Share API is preferred in two cases:
+ *
+ * 1. **iOS** — Safari silently ignores the `download` attribute on anchor
+ *    elements, so the share sheet is the only reliable save path.
+ *
+ * 2. **React Native WebView (any platform)** — The WebView does not have a
+ *    native download manager, so blob-URL anchor clicks silently do nothing on
+ *    Android.  Routing through the Web Share API lets the host app (or Android
+ *    system) handle file saving correctly.
+ *
+ * The `?platform=ios|android` URL param takes precedence over auto-detection —
+ * useful when the WebView host wants to force a specific path regardless of
+ * what the code would otherwise infer from the environment.
  */
 function shouldUseWebShare(): boolean {
+  // Explicit URL param overrides take highest priority.
   const param = getPlatformParam();
   if (param === "ios") return true;
   if (param === "android") return false;
 
-  // Auto-detect iOS via user-agent / touch capability.
+  // Inside a React Native WebView anchor downloads don't work on either platform.
+  if (isInReactNativeWebView()) return true;
+
+  // Auto-detect iOS via user-agent / touch capability for plain Safari.
   if (typeof navigator === "undefined") return false;
   return (
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -42,12 +67,13 @@ function shouldUseWebShare(): boolean {
 /**
  * Downloads or shares a file depending on the platform capabilities.
  *
- * On iOS, Safari silently ignores the `download` attribute on anchor elements.
- * The Web Share API is used instead so the user gets a native share sheet that
- * lets them save the file to Files, send it via AirDrop, etc.
- *
- * On Android and desktop browsers the classic anchor‑click approach is used,
- * which triggers the browser's built-in download behaviour.
+ * - **iOS Safari** — the `download` attribute is ignored, so the Web Share
+ *   API is used to open the native share sheet.
+ * - **React Native WebView (iOS or Android)** — the WebView has no download
+ *   manager, so the Web Share API is used here too.  Android WebView surfaces
+ *   the share sheet which allows the user to save the file.
+ * - **Android Chrome & desktop browsers** — the classic anchor-click download
+ *   path is used, which triggers the browser's built-in download behaviour.
  *
  * The React Native WebView host can pass `?platform=ios` or
  * `?platform=android` in the URL to override automatic platform detection.
