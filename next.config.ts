@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
     ];
   },
   skipTrailingSlashRedirect: true,
+  allowedDevOrigins: ['10.0.2.2'],
 };
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
