@@ -138,18 +138,14 @@ export default function WebViewScreen() {
     const message = parseThemeMessage(event.nativeEvent.data);
     if (!message) return;
 
-    const { theme: newTheme, backgroundColor, statusBarStyle } = message.payload;
+    const { theme: newTheme } = message.payload;
 
-    // Only update when something actually changed.
+    // Only update when something actually changed; colors are derived from
+    // theme state via getThemeConfig so no separate caching is needed.
     setTheme((prev) => {
       if (prev === newTheme) return prev;
       return newTheme as AppTheme;
     });
-
-    // backgroundColor / statusBarStyle are derived from the theme state above
-    // but you can also cache them directly if you want to avoid recomputing.
-    void backgroundColor; // used via getThemeConfig(theme)
-    void statusBarStyle;  // used via getThemeConfig(theme)
   }, []);
 
   return (
@@ -197,7 +193,7 @@ Set the splash background to match your default theme:
 ```
 
 For dark-default users you can check `Appearance.getColorScheme()` and use the
-appropriate colour in `app.config.js` via a dynamic config.
+appropriate color in `app.config.js` via a dynamic config.
 
 ### SplashScreen (optional – for finer control)
 
@@ -223,7 +219,7 @@ export default function RootLayout() {
   }, []);
 
   if (!ready) {
-    // Keep the native background colour visible while loading.
+    // Keep the native background color visible while loading.
     return <View style={{ flex: 1, backgroundColor: config.backgroundColor }} />;
   }
 
@@ -246,7 +242,7 @@ npx expo install expo-status-bar react-native-webview
 | Step | Who | What |
 |------|-----|-------|
 | 1 | Native app | Reads system / stored theme preference |
-| 2 | Native app | Sets container + splash background to matching colour |
+| 2 | Native app | Sets container + splash background to matching color |
 | 3 | Native app | Loads WebView with `?native=true&theme=<value>` |
 | 4 | Web app | Reads URL param → applies via `setTheme` |
 | 5 | Web app | Resolves theme → `sendThemeToNative` posts `THEME_UPDATE` |

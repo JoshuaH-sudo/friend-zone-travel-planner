@@ -31,7 +31,7 @@ interface ThemeConfig {
 }
 
 /**
- * Per-theme colour config.
+ * Per-theme color config.
  *
  * backgroundColor values are hex equivalents of the CSS custom properties
  * defined in globals.css:
