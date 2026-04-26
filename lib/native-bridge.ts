@@ -25,6 +25,23 @@ export interface NativeThemePayload {
   };
 }
 
+/**
+ * Payload sent to the React Native WebView host when the web app wants to
+ * download or share a file.  The native app is responsible for writing the
+ * file to disk and/or invoking the system share sheet.
+ */
+export interface NativeDownloadPayload {
+  type: "DOWNLOAD_FILE";
+  payload: {
+    /** Suggested file name including extension (e.g. "backup.json"). */
+    filename: string;
+    /** MIME type of the file (e.g. "application/json"). */
+    mimeType: string;
+    /** Base-64 encoded file content (no data-URI prefix). */
+    base64: string;
+  };
+}
+
 interface ThemeConfig {
   backgroundColor: string;
   statusBarStyle: "light-content" | "dark-content";
@@ -82,5 +99,43 @@ declare global {
 export function sendThemeToNative(resolvedTheme: string): void {
   if (typeof window === "undefined" || !window.ReactNativeWebView) return;
   const payload = getNativeThemePayload(resolvedTheme);
+  window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+}
+
+/**
+ * Asks the React Native WebView host to save/share a file.
+ *
+ * The blob is converted to a base-64 string and posted as a
+ * `DOWNLOAD_FILE` message.  The native app is expected to write the file
+ * to the device and/or open the system share sheet.
+ *
+ * This is the only reliable way to trigger a file download from a React
+ * Native WebView — neither the anchor `download` attribute nor
+ * `navigator.share({ files })` works inside an Android WebView.
+ *
+ * Safe to call at any time – silently does nothing when the app is not
+ * running inside a React Native WebView.
+ */
+export async function sendFileToNative(
+  blob: Blob,
+  filename: string,
+): Promise<void> {
+  if (typeof window === "undefined" || !window.ReactNativeWebView) return;
+
+  // Convert blob → ArrayBuffer → base-64 string.
+  const buffer = await blob.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const base64 = btoa(
+    Array.from(bytes, (b) => String.fromCharCode(b)).join(""),
+  );
+
+  const payload: NativeDownloadPayload = {
+    type: "DOWNLOAD_FILE",
+    payload: {
+      filename,
+      mimeType: blob.type || "application/octet-stream",
+      base64,
+    },
+  };
   window.ReactNativeWebView.postMessage(JSON.stringify(payload));
 }

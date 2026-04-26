@@ -8,6 +8,7 @@ import {
   TransportDocument,
   TripDocument,
 } from "@/lib/rxdb-schema";
+import { downloadOrShareFile } from "@/lib/file-download";
 
 type ShareBundle = {
   v: 1;
@@ -54,12 +55,7 @@ export async function exportTripJson(db: MyDatabase, tripId: string) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: "application/json",
   });
-  const href = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = href;
-  anchor.download = `trip-${tripId}.json`;
-  anchor.click();
-  URL.revokeObjectURL(href);
+  await downloadOrShareFile(blob, `trip-${tripId}.json`);
 }
 
 export async function copyShareLink(db: MyDatabase, tripId: string) {
