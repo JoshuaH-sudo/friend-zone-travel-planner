@@ -27,9 +27,10 @@ function readUrlTheme(): string | null {
  * Two complementary mechanisms are used:
  *
  * 1. **Initial theme from URL param** – On first mount the hook reads
- *    `?native=true&theme=<value>` and applies it via `setTheme`. This keeps
- *    the web app in sync with whatever theme the native app chose for the
- *    splash/loading screen.
+ *    `?native=true&theme=<value>` and applies it via `setTheme`, but **only
+ *    when the stored preference is `"system"`** (the default for new users).
+ *    If the user has explicitly chosen `"light"` or `"dark"` in app settings
+ *    that choice is preserved and the URL hint is ignored.
  *
  * 2. **Live updates via postMessage** – Whenever the resolved theme changes,
  *    `sendThemeToNative` posts a THEME_UPDATE message to the WebView host so
@@ -39,20 +40,27 @@ function readUrlTheme(): string | null {
  * WebView (i.e. `window.ReactNativeWebView` is absent / URL param is missing).
  */
 export function useNativeThemeSync(): void {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const lastSentTheme = useRef<string | null>(null);
   const urlThemeApplied = useRef(false);
 
-  // Apply the initial theme from URL param once on mount.
+  // Apply the initial theme from URL param once on mount, but ONLY when the
+  // user's stored preference is "system" (the default for new users). If the
+  // user has already manually picked "light" or "dark" in settings we must
+  // respect that choice and ignore the native hint.
   useEffect(() => {
     if (urlThemeApplied.current) return;
     urlThemeApplied.current = true;
+
+    // `theme` is the value persisted by next-themes ("system" | "light" | "dark").
+    // Only override when it is still "system" so manual selections are preserved.
+    if (theme !== "system") return;
 
     const urlTheme = readUrlTheme();
     if (urlTheme) {
       setTheme(urlTheme);
     }
-  }, [setTheme]);
+  }, [theme, setTheme]);
 
   // Send a THEME_UPDATE message whenever the resolved theme changes.
   useEffect(() => {
