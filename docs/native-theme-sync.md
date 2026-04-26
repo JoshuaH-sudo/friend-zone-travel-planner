@@ -84,19 +84,33 @@ export interface NativeThemePayload {
   };
 }
 
+export interface NativeDownloadPayload {
+  type: "DOWNLOAD_FILE";
+  payload: {
+    /** Suggested file name including extension (e.g. "backup.json"). */
+    filename: string;
+    /** MIME type (e.g. "application/json"). */
+    mimeType: string;
+    /** Base-64 encoded file content (no data-URI prefix). */
+    base64: string;
+  };
+}
+
+export type NativeMessage = NativeThemePayload | NativeDownloadPayload;
+
 /**
  * Safely parses a raw postMessage string from the web app.
- * Returns null if the message is not a valid THEME_UPDATE payload.
+ * Returns null if the message cannot be parsed.
  */
-export function parseThemeMessage(raw: string): NativeThemePayload | null {
+export function parseNativeMessage(raw: string): NativeMessage | null {
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (
       typeof parsed === "object" &&
       parsed !== null &&
-      (parsed as Record<string, unknown>).type === "THEME_UPDATE"
+      typeof (parsed as Record<string, unknown>).type === "string"
     ) {
-      return parsed as NativeThemePayload;
+      return parsed as NativeMessage;
     }
     return null;
   } catch {
@@ -114,6 +128,8 @@ export function parseThemeMessage(raw: string): NativeThemePayload | null {
 import React, { useCallback, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 
 import {
@@ -122,7 +138,7 @@ import {
   buildWebViewUrl,
   getThemeConfig,
 } from "../utils/theme";
-import { parseThemeMessage } from "../utils/nativeBridge";
+import { parseNativeMessage } from "../utils/nativeBridge";
 
 const BASE_URL = "https://yourapp.com"; // ← replace with your production URL
 
@@ -134,18 +150,40 @@ export default function WebViewScreen() {
   const webViewRef = useRef<WebView>(null);
   const webViewUrl = buildWebViewUrl(BASE_URL, theme);
 
-  const handleMessage = useCallback((event: WebViewMessageEvent) => {
-    const message = parseThemeMessage(event.nativeEvent.data);
+  const handleMessage = useCallback(async (event: WebViewMessageEvent) => {
+    const message = parseNativeMessage(event.nativeEvent.data);
     if (!message) return;
 
-    const { theme: newTheme } = message.payload;
+    if (message.type === "THEME_UPDATE") {
+      const { theme: newTheme } = message.payload;
+      setTheme((prev) => {
+        if (prev === newTheme) return prev;
+        return newTheme as AppTheme;
+      });
+      return;
+    }
 
-    // Only update when something actually changed; colors are derived from
-    // theme state via getThemeConfig so no separate caching is needed.
-    setTheme((prev) => {
-      if (prev === newTheme) return prev;
-      return newTheme as AppTheme;
-    });
+    if (message.type === "DOWNLOAD_FILE") {
+      const { filename, mimeType, base64 } = message.payload;
+      try {
+        // Write the base-64 data to a temporary file.
+        const fileUri = `${FileSystem.cacheDirectory}${filename}`;
+        await FileSystem.writeAsStringAsync(fileUri, base64, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        // Open the system share sheet so the user can save or send the file.
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(fileUri, {
+            mimeType,
+            dialogTitle: `Save ${filename}`,
+          });
+        }
+      } catch (err) {
+        console.error("DOWNLOAD_FILE failed", err);
+      }
+      return;
+    }
   }, []);
 
   return (
@@ -232,12 +270,14 @@ export default function RootLayout() {
 ## 5 · Required packages
 
 ```bash
-npx expo install expo-status-bar react-native-webview
+npx expo install expo-status-bar expo-file-system expo-sharing react-native-webview
 ```
 
 ---
 
 ## 6 · End-to-end flow summary
+
+### Theme sync
 
 | Step | Who | What |
 |------|-----|-------|
@@ -248,3 +288,14 @@ npx expo install expo-status-bar react-native-webview
 | 5 | Web app | Resolves theme → `sendThemeToNative` posts `THEME_UPDATE` |
 | 6 | Native app | `onMessage` fires → updates `StatusBar` & background |
 | 7+ | Web app | User changes theme → repeat step 5–6 for every change |
+
+### File download / export
+
+| Step | Who | What |
+|------|-----|-------|
+| 1 | Web app | User triggers an export action |
+| 2 | Web app | `downloadOrShareFile` detects `window.ReactNativeWebView` |
+| 3 | Web app | Converts Blob → base-64, posts `DOWNLOAD_FILE` message |
+| 4 | Native app | `onMessage` fires, reads `filename`, `mimeType`, `base64` |
+| 5 | Native app | `expo-file-system` writes base-64 to `cacheDirectory` |
+| 6 | Native app | `expo-sharing` opens the system share sheet |

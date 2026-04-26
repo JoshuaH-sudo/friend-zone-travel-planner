@@ -1,3 +1,5 @@
+import { sendFileToNative } from "./native-bridge";
+
 /**
  * Reads an explicit platform override from the URL query string.
  *
@@ -30,32 +32,20 @@ function isInReactNativeWebView(): boolean {
 }
 
 /**
- * Determines whether to use the Web Share API instead of anchor-click download.
+ * Returns true when running on an iOS device (iPhone, iPad, iPod) outside of
+ * a React Native WebView (i.e. plain Safari).
  *
- * The Web Share API is preferred in two cases:
+ * iOS Safari does not honour the `download` attribute on anchor elements, so
+ * we need a different strategy there.
  *
- * 1. **iOS** — Safari silently ignores the `download` attribute on anchor
- *    elements, so the share sheet is the only reliable save path.
- *
- * 2. **React Native WebView (any platform)** — The WebView does not have a
- *    native download manager, so blob-URL anchor clicks silently do nothing on
- *    Android.  Routing through the Web Share API lets the host app (or Android
- *    system) handle file saving correctly.
- *
- * The `?platform=ios|android` URL param takes precedence over auto-detection —
- * useful when the WebView host wants to force a specific path regardless of
- * what the code would otherwise infer from the environment.
+ * The `?platform=ios|android` URL param takes precedence over user-agent
+ * detection — useful when the WebView host can declare the platform explicitly.
  */
-function shouldUseWebShare(): boolean {
-  // Explicit URL param overrides take highest priority.
+function isIosSafari(): boolean {
   const param = getPlatformParam();
   if (param === "ios") return true;
   if (param === "android") return false;
 
-  // Inside a React Native WebView anchor downloads don't work on either platform.
-  if (isInReactNativeWebView()) return true;
-
-  // Auto-detect iOS via user-agent / touch capability for plain Safari.
   if (typeof navigator === "undefined") return false;
   return (
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -67,11 +57,13 @@ function shouldUseWebShare(): boolean {
 /**
  * Downloads or shares a file depending on the platform capabilities.
  *
- * - **iOS Safari** — the `download` attribute is ignored, so the Web Share
- *   API is used to open the native share sheet.
- * - **React Native WebView (iOS or Android)** — the WebView has no download
- *   manager, so the Web Share API is used here too.  Android WebView surfaces
- *   the share sheet which allows the user to save the file.
+ * - **React Native WebView (iOS or Android)** — neither anchor downloads nor
+ *   `navigator.share({ files })` work reliably inside a WebView.  The file is
+ *   posted to the native app via `window.ReactNativeWebView.postMessage()` as a
+ *   base-64 encoded `DOWNLOAD_FILE` message.  The native app is responsible for
+ *   writing the file and/or opening the system share sheet.
+ * - **iOS Safari** — the `download` attribute is ignored; the Web Share API is
+ *   used to open the native share sheet.
  * - **Android Chrome & desktop browsers** — the classic anchor-click download
  *   path is used, which triggers the browser's built-in download behaviour.
  *
@@ -85,8 +77,17 @@ export async function downloadOrShareFile(
   blob: Blob,
   filename: string,
 ): Promise<void> {
+  // Inside a React Native WebView neither anchor downloads nor navigator.share
+  // with files works on Android.  Use the postMessage native bridge instead.
+  if (isInReactNativeWebView()) {
+    await sendFileToNative(blob, filename);
+    return;
+  }
+
+  // Plain iOS Safari ignores the anchor `download` attribute — use the Web
+  // Share API to surface the native share sheet.
   if (
-    shouldUseWebShare() &&
+    isIosSafari() &&
     typeof navigator !== "undefined" &&
     typeof navigator.share === "function" &&
     typeof navigator.canShare === "function"
@@ -105,8 +106,8 @@ export async function downloadOrShareFile(
     }
   }
 
-  // Standard anchor download — works on Android, desktop, and any browser
-  // that supports the `download` attribute.
+  // Standard anchor download — works on Android Chrome, desktop, and any
+  // browser that supports the `download` attribute.
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
