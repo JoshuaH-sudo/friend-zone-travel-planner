@@ -7,6 +7,7 @@ import { useRxQuery } from "@/lib/useRxQuery";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -207,40 +208,57 @@ export default function HomePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
+              <div className="space-y-2 flex flex-row items-center gap-4">
                 <BannerColorPicker
                   value={tripBannerColor}
                   onChange={setTripBannerColor}
                 />
+              <div className="space-y-2">
+                <Label htmlFor="trip-name-input">{t("tripNamePlaceholder")}</Label>
                 <Input
-                 data-cy="trip-name-input"
+                  id="trip-name-input"
+                  data-cy="trip-name-input"
                   value={tripName}
                   onChange={(event) => setTripName(event.target.value)}
-                  placeholder={t("tripNamePlaceholder")}
-                  className="flex-1"
+                  placeholder={t("tripNameExample")}
+                  className="w-full"
                 />
               </div>
-              <div className="flex items-center gap-2">
-              <Input
-                data-cy="trip-start-location-input"
-                value={tripStartLocation}
-                onChange={(event) => setTripStartLocation(event.target.value)}
-                placeholder={t("tripStartLocationPlaceholder")}
-              />
-              <Input
-                data-cy="trip-start-date-input"
-                value={tripStartDate}
-                onChange={(event) => setTripStartDate(event.target.value)}
-                type="date"
-                placeholder={t("tripStartDatePlaceholder")}
-              />
               </div>
-              <Input
-                data-cy="first-stop-input"
-                value={firstStopName}
-                onChange={(event) => setFirstStopName(event.target.value)}
-                placeholder={t("firstStopPlaceholder")}
-              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="trip-start-location-input">{t("tripStartLocationPlaceholder")}</Label>
+                  <Input
+                    id="trip-start-location-input"
+                    data-cy="trip-start-location-input"
+                    value={tripStartLocation}
+                    onChange={(event) => setTripStartLocation(event.target.value)}
+                    placeholder={t("tripStartLocationExample")}
+                  />
+                </div>
+                <div className="min-w-0 space-y-2">
+                  <Label htmlFor="trip-start-date-input">{t("tripStartDatePlaceholder")}</Label>
+                  <Input
+                    id="trip-start-date-input"
+                    data-cy="trip-start-date-input"
+                    value={tripStartDate}
+                    onChange={(event) => setTripStartDate(event.target.value)}
+                    type="date"
+                    placeholder={t("tripStartDateExample")}
+                    className="w-full min-w-0"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="first-stop-input">{t("firstStopPlaceholder")}</Label>
+                <Input
+                  id="first-stop-input"
+                  data-cy="first-stop-input"
+                  value={firstStopName}
+                  onChange={(event) => setFirstStopName(event.target.value)}
+                  placeholder={t("firstStopExample")}
+                />
+              </div>
               <Button data-cy="create-trip-submit" onClick={createTrip}>{t("createAndOpen")}</Button>
             </div>
           </DialogContent>

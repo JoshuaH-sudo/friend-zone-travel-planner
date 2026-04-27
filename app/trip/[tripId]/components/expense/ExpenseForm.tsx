@@ -193,11 +193,19 @@ export function ExpenseForm({
             control={control}
             name="date"
             render={({ field }) => (
-              <Input
-                {...field}
-                type="date"
-                placeholder={t("datePlaceholder")}
-              />
+              <div className="relative">
+                <Input
+                  {...field}
+                  type="date"
+                  placeholder={t("datePlaceholder")}
+                  className="peer"
+                />
+                {!field.value && (
+                  <span className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm peer-focus:hidden">
+                    {t("datePlaceholder")}
+                  </span>
+                )}
+              </div>
             )}
           />
           {errors.date && (
