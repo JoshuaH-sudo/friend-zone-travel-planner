@@ -1,7 +1,21 @@
 {
   "metadata": {
     "title": "Friend Zone Travel Planner",
-    "description": "Plan your trips with friends and keep all your travel details in one place."
+    "titleTemplate": "%s | Friend Zone Travel Planner",
+    "description": "Plan your trips with friends and keep all your travel details in one place.",
+    "keywords": "travel planner, trip planner, itinerary, travel with friends, trip organizer",
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your default currency, theme, language, and back up your trip data."
+    },
+    "support": {
+      "title": "Support",
+      "description": "Get help with Friend Zone Travel Planner, including troubleshooting, data export, and privacy details."
+    },
+    "trip": {
+      "title": "Trip Details",
+      "description": "View and manage your trip itinerary, budget, map, and expenses."
+    }
   },
   "layout": {
     "footer": "© {year} Friend Zone Travel Planner. All rights reserved.",

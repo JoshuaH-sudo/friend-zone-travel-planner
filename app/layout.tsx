@@ -13,8 +13,15 @@ import { Toaster } from "sonner";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
   return {
-    title: t("title"),
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    title: {
+      default: t("title"),
+      template: t("titleTemplate"),
+    },
     description: t("description"),
+    keywords: t("keywords"),
     openGraph: {
       title: t("title"),
       description: t("description"),
@@ -36,6 +43,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: "/favicon.png",
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
