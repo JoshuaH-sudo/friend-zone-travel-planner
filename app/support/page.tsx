@@ -1,14 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Smartphone, Wrench } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Support | Friend Zone Travel Planner",
-  description:
-    "Get help with Friend Zone Travel Planner, including troubleshooting, data export, and privacy details.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  const title = t("support.title");
+  const description = t("support.description");
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/og.png"],
+    },
+  };
+}
 
 const faq = [
   {

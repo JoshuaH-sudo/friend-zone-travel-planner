@@ -1,7 +1,21 @@
 {
   "metadata": {
     "title": "Friend Zone Reiseplaner",
-    "description": "Plane deine Reisen mit Freunden und verwalte alle Reisedetails an einem Ort."
+    "titleTemplate": "%s | Friend Zone Reiseplaner",
+    "description": "Plane deine Reisen mit Freunden und verwalte alle Reisedetails an einem Ort.",
+    "keywords": "Reiseplaner, Reiseorganisation, Reiseroute, Reisen mit Freunden, Reiseroute planen",
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Verwalte deine Standardwährung, das Design, die Sprache und sichere deine Reisedaten."
+    },
+    "support": {
+      "title": "Support",
+      "description": "Erhalte Hilfe bei Friend Zone Reiseplaner, einschließlich Fehlerbehebung, Datenexport und Datenschutz."
+    },
+    "trip": {
+      "title": "Reisedetails",
+      "description": "Verwalte deine Reiseroute, Budget, Karte und Ausgaben."
+    }
   },
   "layout": {
     "footer": "© {year} Friend Zone Reiseplaner. Alle Rechte vorbehalten.",
