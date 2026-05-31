@@ -25,6 +25,7 @@ import {
 } from "@/lib/app-data-transfer";
 import { USER_SETTINGS_ID } from "@/lib/rxdb-schema";
 import { getDatabase, deleteDatabaseData, MyDatabase } from "./rxdb-database";
+import { DEFAULT_ROUTE_COMPARE_WEIGHTS } from "@/lib/routes/constants";
 
 export const DatabaseContext = createContext<MyDatabase | null>(null);
 
@@ -48,6 +49,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
       language: "en",
       timezone: detectBrowserTimezone(),
       dateFormat: detectBrowserDateFormat(),
+      compareWeights: DEFAULT_ROUTE_COMPARE_WEIGHTS,
       analyticsConsent: false,
       cookiesConsent: false,
     });
@@ -126,7 +128,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
             <p className="text-muted-foreground mb-1 text-xs">
               {t("errorLabel")}
             </p>
-            <p className="break-all font-mono text-sm">{loadError.message}</p>
+            <p className="font-mono text-sm break-all">{loadError.message}</p>
           </div>
           <AlertDialogFooter>
             <Button

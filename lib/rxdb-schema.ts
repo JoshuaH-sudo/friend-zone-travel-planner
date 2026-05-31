@@ -11,6 +11,8 @@ export type TripDocument = {
   id: string;
   name: string;
   budget?: number;
+  status?: "planning" | "booked" | "completed";
+  activeRouteId?: string;
   /** Optional trip start date ("YYYY-MM-DD"). Used to shift all item dates as a unit. */
   startDate?: string;
   /** Optional trip start location. */
@@ -25,6 +27,7 @@ export type StopDocument = {
   id: string;
   name: string;
   tripId: string;
+  routeId?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -38,6 +41,7 @@ export type AccommodationDocument = {
   checkOut: string;
   timezone?: string;
   stopId: string;
+  routeId?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -54,6 +58,7 @@ export type TransportDocument = {
   arrivalDateTime?: string;
   timezone?: string;
   stopId: string;
+  routeId?: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -68,8 +73,59 @@ export type ExpenseDocument = {
   createdAt: number;
   updatedAt: number;
   stopId: string;
+  routeId?: string;
   name: string;
   date?: string;
+};
+
+export type RouteCompareWeights = {
+  cost: number;
+  duration: number;
+  travel: number;
+  events: number;
+};
+
+export type RouteDocument = {
+  id: string;
+  tripId: string;
+  name: string;
+  color: string;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type RouteStopIntelItem = {
+  name: string;
+  date: string;
+};
+
+export type RouteStopDocument = {
+  id: string;
+  tripId: string;
+  routeId: string;
+  name: string;
+  order: number;
+  startDate?: string;
+  endDate?: string;
+  latitude?: number;
+  longitude?: number;
+  countryCode?: string;
+  timezone?: string;
+  intel?: {
+    fetchedAt: number;
+    items: RouteStopIntelItem[];
+  };
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type RoutePreferenceDocument = {
+  id: string;
+  tripId: string;
+  routeId: string;
+  weights: RouteCompareWeights;
+  createdAt: number;
+  updatedAt: number;
 };
 
 export type DateFormat = "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy-MM-dd";
@@ -88,13 +144,14 @@ export type UserSettingsDocument = {
   language: string;
   timezone: string;
   dateFormat: DateFormat;
+  compareWeights?: RouteCompareWeights;
   analyticsConsent?: boolean;
   cookiesConsent?: boolean;
 };
 
 // RxDB Schemas
 export const tripSchema: RxJsonSchema<TripDocument> = {
-  version: 4,
+  version: 5,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -110,6 +167,14 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
       multipleOf: 0.01,
       minimum: 0,
       maximum: 100000000,
+    },
+    status: {
+      type: "string",
+      enum: ["planning", "booked", "completed"],
+    },
+    activeRouteId: {
+      type: "string",
+      maxLength: 100,
     },
     startDate: {
       type: "string",
@@ -142,7 +207,7 @@ export const tripSchema: RxJsonSchema<TripDocument> = {
 };
 
 export const stopSchema: RxJsonSchema<StopDocument> = {
-  version: 1,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -157,6 +222,11 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
       type: "string",
       maxLength: 100,
       ref: "trips",
+    },
+    routeId: {
+      type: "string",
+      maxLength: 100,
+      ref: "routes",
     },
     createdAt: {
       type: "number",
@@ -176,7 +246,7 @@ export const stopSchema: RxJsonSchema<StopDocument> = {
 };
 
 export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
-  version: 1,
+  version: 2,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -214,6 +284,11 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
       maxLength: 100,
       ref: "stops",
     },
+    routeId: {
+      type: "string",
+      maxLength: 100,
+      ref: "routes",
+    },
     createdAt: {
       type: "number",
       multipleOf: 1,
@@ -242,7 +317,7 @@ export const accommodationSchema: RxJsonSchema<AccommodationDocument> = {
 };
 
 export const transportSchema: RxJsonSchema<TransportDocument> = {
-  version: 2,
+  version: 3,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -284,6 +359,11 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
       maxLength: 100,
       ref: "stops",
     },
+    routeId: {
+      type: "string",
+      maxLength: 100,
+      ref: "routes",
+    },
     createdAt: {
       type: "number",
       multipleOf: 1,
@@ -312,7 +392,7 @@ export const transportSchema: RxJsonSchema<TransportDocument> = {
 };
 
 export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
-  version: 0,
+  version: 1,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -368,6 +448,11 @@ export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
       maxLength: 100,
       ref: "stops",
     },
+    routeId: {
+      type: "string",
+      maxLength: 100,
+      ref: "routes",
+    },
   },
   required: [
     "id",
@@ -380,6 +465,131 @@ export const expenseSchema: RxJsonSchema<ExpenseDocument> = {
     "updatedAt",
   ],
   indexes: ["tripId"],
+};
+
+export const routeSchema: RxJsonSchema<RouteDocument> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: { type: "string", maxLength: 100 },
+    tripId: { type: "string", maxLength: 100, ref: "trips" },
+    name: { type: "string", maxLength: 120 },
+    color: { type: "string", maxLength: 30 },
+    createdAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+    updatedAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+  },
+  required: ["id", "tripId", "name", "color", "createdAt", "updatedAt"],
+  indexes: ["tripId", "createdAt"],
+};
+
+export const routeStopSchema: RxJsonSchema<RouteStopDocument> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: { type: "string", maxLength: 100 },
+    tripId: { type: "string", maxLength: 100, ref: "trips" },
+    routeId: { type: "string", maxLength: 100, ref: "routes" },
+    name: { type: "string", maxLength: 150 },
+    order: { type: "number", multipleOf: 1, minimum: 0, maximum: 10000 },
+    startDate: { type: "string", maxLength: 10 },
+    endDate: { type: "string", maxLength: 10 },
+    latitude: { type: "number", minimum: -90, maximum: 90 },
+    longitude: { type: "number", minimum: -180, maximum: 180 },
+    countryCode: { type: "string", maxLength: 2 },
+    timezone: { type: "string", maxLength: 100 },
+    intel: {
+      type: "object",
+      properties: {
+        fetchedAt: {
+          type: "number",
+          multipleOf: 1,
+          minimum: 0,
+          maximum: 8640000000000000,
+        },
+        items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string", maxLength: 200 },
+              date: { type: "string", maxLength: 30 },
+            },
+            required: ["name", "date"],
+          },
+        },
+      },
+      required: ["fetchedAt", "items"],
+    },
+    createdAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+    updatedAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+  },
+  required: [
+    "id",
+    "tripId",
+    "routeId",
+    "name",
+    "order",
+    "createdAt",
+    "updatedAt",
+  ],
+  indexes: ["tripId", "routeId", "order"],
+};
+
+export const routePreferenceSchema: RxJsonSchema<RoutePreferenceDocument> = {
+  version: 0,
+  primaryKey: "id",
+  type: "object",
+  properties: {
+    id: { type: "string", maxLength: 100 },
+    tripId: { type: "string", maxLength: 100, ref: "trips" },
+    routeId: { type: "string", maxLength: 100, ref: "routes" },
+    weights: {
+      type: "object",
+      properties: {
+        cost: { type: "number", minimum: 0, maximum: 1 },
+        duration: { type: "number", minimum: 0, maximum: 1 },
+        travel: { type: "number", minimum: 0, maximum: 1 },
+        events: { type: "number", minimum: 0, maximum: 1 },
+      },
+      required: ["cost", "duration", "travel", "events"],
+    },
+    createdAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+    updatedAt: {
+      type: "number",
+      multipleOf: 1,
+      minimum: 0,
+      maximum: 8640000000000000,
+    },
+  },
+  required: ["id", "tripId", "routeId", "weights", "createdAt", "updatedAt"],
+  indexes: ["tripId", "routeId"],
 };
 
 // RxDocument types
@@ -402,7 +612,25 @@ export type TransportDocumentType = RxDocument<
 >;
 
 export type ExpenseDocMethods = Record<string, never>;
-export type ExpenseDocumentType = RxDocument<ExpenseDocument, ExpenseDocMethods>;
+export type ExpenseDocumentType = RxDocument<
+  ExpenseDocument,
+  ExpenseDocMethods
+>;
+
+export type RouteDocMethods = Record<string, never>;
+export type RouteDocumentType = RxDocument<RouteDocument, RouteDocMethods>;
+
+export type RouteStopDocMethods = Record<string, never>;
+export type RouteStopDocumentType = RxDocument<
+  RouteStopDocument,
+  RouteStopDocMethods
+>;
+
+export type RoutePreferenceDocMethods = Record<string, never>;
+export type RoutePreferenceDocumentType = RxDocument<
+  RoutePreferenceDocument,
+  RoutePreferenceDocMethods
+>;
 
 // RxCollection types
 export type TripCollectionMethods = Record<string, never>;
@@ -440,10 +668,31 @@ export type ExpenseCollection = RxCollection<
   ExpenseCollectionMethods
 >;
 
+export type RouteCollectionMethods = Record<string, never>;
+export type RouteCollection = RxCollection<
+  RouteDocument,
+  RouteDocMethods,
+  RouteCollectionMethods
+>;
+
+export type RouteStopCollectionMethods = Record<string, never>;
+export type RouteStopCollection = RxCollection<
+  RouteStopDocument,
+  RouteStopDocMethods,
+  RouteStopCollectionMethods
+>;
+
+export type RoutePreferenceCollectionMethods = Record<string, never>;
+export type RoutePreferenceCollection = RxCollection<
+  RoutePreferenceDocument,
+  RoutePreferenceDocMethods,
+  RoutePreferenceCollectionMethods
+>;
+
 export const USER_SETTINGS_ID = "user-settings";
 
 export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
-  version: 3,
+  version: 4,
   primaryKey: "id",
   type: "object",
   properties: {
@@ -466,6 +715,16 @@ export const userSettingsSchema: RxJsonSchema<UserSettingsDocument> = {
     dateFormat: {
       type: "string",
       enum: dateFormats,
+    },
+    compareWeights: {
+      type: "object",
+      properties: {
+        cost: { type: "number", minimum: 0, maximum: 1 },
+        duration: { type: "number", minimum: 0, maximum: 1 },
+        travel: { type: "number", minimum: 0, maximum: 1 },
+        events: { type: "number", minimum: 0, maximum: 1 },
+      },
+      required: ["cost", "duration", "travel", "events"],
     },
     analyticsConsent: {
       type: "boolean",

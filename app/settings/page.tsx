@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { CurrencySelect } from "@/components/ui/currency-select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import posthog from "posthog-js";
 import { Download, Upload } from "lucide-react";
 
 const MAX_IMPORT_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const clampWeight = (value: number) => Math.min(1, Math.max(0, value || 0));
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -48,6 +50,8 @@ export default function SettingsPage() {
     setAnalyticsConsent,
     cookiesConsent,
     setCookiesConsent,
+    compareWeights,
+    setCompareWeights,
   } = useSettings();
   const importInputRef = useRef<HTMLInputElement>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -128,9 +132,7 @@ export default function SettingsPage() {
     <div className="container flex flex-col gap-8 py-8 sm:py-12">
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-4xl font-semibold">{t("title")}</h2>
-        <p className="text-muted-foreground">
-          {t("subtitle")}
-        </p>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <section className="bg-card shadow-soft flex flex-col gap-4 rounded-2xl border p-6">
@@ -272,9 +274,7 @@ export default function SettingsPage() {
 
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="font-medium">
-                {t("general.cookiesConsent.label")}
-              </p>
+              <p className="font-medium">{t("general.cookiesConsent.label")}</p>
               <p className="text-muted-foreground text-sm">
                 {t("general.cookiesConsent.description")}
               </p>
@@ -286,6 +286,41 @@ export default function SettingsPage() {
               onChange={(e) => setCookiesConsent(e.target.checked)}
               aria-label={t("general.cookiesConsent.label")}
             />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="font-medium">{t("general.compareWeights.label")}</p>
+              <p className="text-muted-foreground text-sm">
+                {t("general.compareWeights.description")}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(["cost", "duration", "travel", "events"] as const).map(
+                (key) => (
+                  <label
+                    key={key}
+                    className="flex items-center justify-between gap-2 text-sm"
+                  >
+                    <span>{t(`general.compareWeights.fields.${key}`)}</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={compareWeights[key]}
+                      onChange={(event) =>
+                        setCompareWeights({
+                          ...compareWeights,
+                          [key]: clampWeight(Number(event.target.value)),
+                        })
+                      }
+                      className="w-24"
+                    />
+                  </label>
+                ),
+              )}
+            </div>
           </div>
         </div>
       </section>
@@ -299,26 +334,26 @@ export default function SettingsPage() {
             {t("backup.description")}
           </p>
           <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-            <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto">
-            <Button
-              type="button"
-              onClick={handleExport}
-              className="flex-1"
-              disabled={isExporting || isImporting || isResetting}
-            >
-              <Download data-icon="inline-start" />
-              {isExporting ? t("backup.exporting") : t("backup.export")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleImportClick}
-              className="flex-1"
-              disabled={isExporting || isImporting || isResetting}
-            >
-              <Upload data-icon="inline-start" />
-              {isImporting ? t("backup.importing") : t("backup.import")}
-            </Button>
+            <div className="flex w-full flex-row flex-wrap gap-2 sm:w-auto">
+              <Button
+                type="button"
+                onClick={handleExport}
+                className="flex-1"
+                disabled={isExporting || isImporting || isResetting}
+              >
+                <Download data-icon="inline-start" />
+                {isExporting ? t("backup.exporting") : t("backup.export")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleImportClick}
+                className="flex-1"
+                disabled={isExporting || isImporting || isResetting}
+              >
+                <Upload data-icon="inline-start" />
+                {isImporting ? t("backup.importing") : t("backup.import")}
+              </Button>
             </div>
             <ConfirmationDialog
               trigger={
@@ -357,9 +392,13 @@ export default function SettingsPage() {
       <section className="border-border bg-muted/40 rounded-2xl border p-6 text-sm">
         <p className="text-muted-foreground">
           Need help?{" "}
-          <Link href="/support" className="text-primary font-medium underline-offset-2 hover:underline">
+          <Link
+            href="/support"
+            className="text-primary font-medium underline-offset-2 hover:underline"
+          >
             Visit the Support page
-          </Link>.
+          </Link>
+          .
         </p>
       </section>
     </div>

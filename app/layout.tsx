@@ -9,6 +9,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ImportListener } from "@/components/ImportListener";
 import { NativeThemeSync } from "@/components/NativeThemeSync";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/lib/QueryProvider";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("metadata");
@@ -76,11 +77,7 @@ export default async function RootLayout({
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         />
-        <link
-          rel="icon"
-          href="/favicon.png"
-          type="image/png"
-        />
+        <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
@@ -90,14 +87,16 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NativeThemeSync />
-            <DatabaseProvider>
-              <SettingsProvider>
-                <ImportListener />
-                <AppLayout>{children}</AppLayout>
-                <Toaster richColors />
-              </SettingsProvider>
-            </DatabaseProvider>
+            <QueryProvider>
+              <NativeThemeSync />
+              <DatabaseProvider>
+                <SettingsProvider>
+                  <ImportListener />
+                  <AppLayout>{children}</AppLayout>
+                  <Toaster richColors />
+                </SettingsProvider>
+              </DatabaseProvider>
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

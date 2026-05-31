@@ -1,4 +1,8 @@
-import { MyDatabase, RXDB_DEXIE_DB_PREFIX, RXDB_DEXIE_DOCS_STORE } from "@/lib/rxdb-database";
+import {
+  MyDatabase,
+  RXDB_DEXIE_DB_PREFIX,
+  RXDB_DEXIE_DOCS_STORE,
+} from "@/lib/rxdb-database";
 import { downloadOrShareFile } from "@/lib/file-download";
 import {
   AccommodationDocument,
@@ -6,6 +10,9 @@ import {
   StopDocument,
   TransportDocument,
   TripDocument,
+  RouteDocument,
+  RouteStopDocument,
+  RoutePreferenceDocument,
   USER_SETTINGS_ID,
   UserSettingsDocument,
   DateFormat,
@@ -14,8 +21,12 @@ import {
   accommodationSchema,
   transportSchema,
   expenseSchema,
+  routeSchema,
+  routeStopSchema,
+  routePreferenceSchema,
   userSettingsSchema,
 } from "@/lib/rxdb-schema";
+import { DEFAULT_ROUTE_COMPARE_WEIGHTS } from "@/lib/routes/constants";
 
 /**
  * Detects the user's timezone from the browser.
@@ -74,23 +85,52 @@ export type AppDataExport = {
     accommodations: AccommodationDocument[];
     transports: TransportDocument[];
     expenses: ExpenseDocument[];
+    routes: RouteDocument[];
+    route_stops: RouteStopDocument[];
+    route_preferences: RoutePreferenceDocument[];
     settings: UserSettingsDocument[];
   };
 };
+
+function normalizeRouteStopDoc(
+  routeStop: RouteStopDocument,
+): RouteStopDocument {
+  return {
+    ...routeStop,
+    intel: routeStop.intel
+      ? {
+          ...routeStop.intel,
+          items: [...routeStop.intel.items],
+        }
+      : undefined,
+  };
+}
 
 export async function exportAppData(
   db: MyDatabase,
   preferences: AppDataExport["preferences"],
 ) {
-  const [trips, stops, accommodations, transports, expenses, settings] =
-    await Promise.all([
-      db.trips.find().exec(),
-      db.stops.find().exec(),
-      db.accommodations.find().exec(),
-      db.transports.find().exec(),
-      db.expenses.find().exec(),
-      db.settings.find().exec(),
-    ]);
+  const [
+    trips,
+    stops,
+    accommodations,
+    transports,
+    expenses,
+    routes,
+    routeStops,
+    routePreferences,
+    settings,
+  ] = await Promise.all([
+    db.trips.find().exec(),
+    db.stops.find().exec(),
+    db.accommodations.find().exec(),
+    db.transports.find().exec(),
+    db.expenses.find().exec(),
+    db.routes.find().exec(),
+    db.route_stops.find().exec(),
+    db.route_preferences.find().exec(),
+    db.settings.find().exec(),
+  ]);
 
   const payload: AppDataExport = {
     version: APP_DATA_EXPORT_VERSION,
@@ -102,6 +142,11 @@ export async function exportAppData(
       accommodations: accommodations.map((doc) => doc.toJSON()),
       transports: transports.map((doc) => doc.toJSON()),
       expenses: expenses.map((doc) => doc.toJSON()),
+      routes: routes.map((doc) => doc.toJSON()),
+      route_stops: routeStops.map((doc) =>
+        normalizeRouteStopDoc(doc.toJSON() as RouteStopDocument),
+      ),
+      route_preferences: routePreferences.map((doc) => doc.toJSON()),
       settings: settings.map((doc) => doc.toJSON()),
     },
   };
@@ -130,6 +175,9 @@ export async function exportRawDatabaseBackup(): Promise<void> {
     { name: "accommodations", schema: accommodationSchema },
     { name: "transports", schema: transportSchema },
     { name: "expenses", schema: expenseSchema },
+    { name: "routes", schema: routeSchema },
+    { name: "route_stops", schema: routeStopSchema },
+    { name: "route_preferences", schema: routePreferenceSchema },
     { name: "settings", schema: userSettingsSchema },
   ] as const;
 
@@ -174,13 +222,9 @@ export async function exportRawDatabaseBackup(): Promise<void> {
 
           getAllReq.onsuccess = () => {
             db.close();
-            const docs = (
-              getAllReq.result as Array<Record<string, unknown>>
-            )
+            const docs = (getAllReq.result as Array<Record<string, unknown>>)
               // RxDB stores _deleted as the string '1' in Dexie
-              .filter(
-                (doc) => doc._deleted !== "1" && doc._deleted !== true,
-              )
+              .filter((doc) => doc._deleted !== "1" && doc._deleted !== true)
               .map((doc) => ({ ...doc, _deleted: false }));
             resolve(docs);
           };
@@ -278,7 +322,28 @@ export async function importAppData(db: MyDatabase, content: string) {
       dataValue.expenses === undefined
         ? []
         : readArray<ExpenseDocument>(dataValue.expenses, "data.expenses"),
-    settings: readArray<UserSettingsDocument>(dataValue.settings, "data.settings"),
+    routes:
+      dataValue.routes === undefined
+        ? []
+        : readArray<RouteDocument>(dataValue.routes, "data.routes"),
+    route_stops:
+      dataValue.route_stops === undefined
+        ? []
+        : readArray<RouteStopDocument>(
+            dataValue.route_stops,
+            "data.route_stops",
+          ),
+    route_preferences:
+      dataValue.route_preferences === undefined
+        ? []
+        : readArray<RoutePreferenceDocument>(
+            dataValue.route_preferences,
+            "data.route_preferences",
+          ),
+    settings: readArray<UserSettingsDocument>(
+      dataValue.settings,
+      "data.settings",
+    ),
   };
 
   if (data.settings.length !== 1 || data.settings[0]?.id !== USER_SETTINGS_ID) {
@@ -291,6 +356,9 @@ export async function importAppData(db: MyDatabase, content: string) {
     previousAccommodations,
     previousTransports,
     previousExpenses,
+    previousRoutes,
+    previousRouteStops,
+    previousRoutePreferences,
     previousSettings,
   ] = await Promise.all([
     db.trips.find().exec(),
@@ -298,6 +366,9 @@ export async function importAppData(db: MyDatabase, content: string) {
     db.accommodations.find().exec(),
     db.transports.find().exec(),
     db.expenses.find().exec(),
+    db.routes.find().exec(),
+    db.route_stops.find().exec(),
+    db.route_preferences.find().exec(),
     db.settings.find().exec(),
   ]);
 
@@ -307,6 +378,11 @@ export async function importAppData(db: MyDatabase, content: string) {
     accommodations: previousAccommodations.map((doc) => doc.toJSON()),
     transports: previousTransports.map((doc) => doc.toJSON()),
     expenses: previousExpenses.map((doc) => doc.toJSON()),
+    routes: previousRoutes.map((doc) => doc.toJSON()),
+    route_stops: previousRouteStops.map((doc) =>
+      normalizeRouteStopDoc(doc.toJSON() as RouteStopDocument),
+    ),
+    route_preferences: previousRoutePreferences.map((doc) => doc.toJSON()),
     settings: previousSettings.map((doc) => doc.toJSON()),
   };
 
@@ -337,10 +413,14 @@ export async function resetAppData(db: MyDatabase) {
     language: "en",
     timezone: detectBrowserTimezone(),
     dateFormat: detectBrowserDateFormat(),
+    compareWeights: DEFAULT_ROUTE_COMPARE_WEIGHTS,
   });
 }
 
 async function clearAllCollections(db: MyDatabase) {
+  await db.route_preferences.find().remove();
+  await db.route_stops.find().remove();
+  await db.routes.find().remove();
   await db.transports.find().remove();
   await db.expenses.find().remove();
   await db.accommodations.find().remove();
@@ -367,6 +447,15 @@ async function upsertAllCollections(
   }
   if (data.expenses.length > 0) {
     await db.expenses.bulkUpsert(data.expenses);
+  }
+  if (data.routes.length > 0) {
+    await db.routes.bulkUpsert(data.routes);
+  }
+  if (data.route_stops.length > 0) {
+    await db.route_stops.bulkUpsert(data.route_stops);
+  }
+  if (data.route_preferences.length > 0) {
+    await db.route_preferences.bulkUpsert(data.route_preferences);
   }
   if (data.settings.length > 0) {
     await db.settings.bulkUpsert(data.settings);

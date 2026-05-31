@@ -115,6 +115,16 @@
       "cookiesConsent": {
         "label": "Accept cookies",
         "description": "Allow cookies to be stored on your device for a better experience."
+      },
+      "compareWeights": {
+        "label": "Compare scoring weights",
+        "description": "Adjust default scoring priorities for route comparison.",
+        "fields": {
+          "cost": "Cost",
+          "duration": "Duration",
+          "travel": "Travel",
+          "events": "Events"
+        }
       }
     },
     "backup": {
@@ -165,7 +175,11 @@
     "deleteTripTitle": "Delete this trip?",
     "deleteTripDescription": "This will remove the trip and all linked stops/items.",
     "deleteTripCancel": "Cancel",
-    "deleteTripConfirm": "Delete trip"
+    "deleteTripConfirm": "Delete trip",
+    "tabCompare": "Compare",
+    "activeRoute": "Active",
+    "routeSyncFailed": "Some route data could not be synced.",
+    "routeBootstrapFailed": "Could not initialize routes for this trip."
   },
   "tripNameEditor": {
     "saveAriaLabel": "Save trip name",
@@ -447,5 +461,39 @@
     "import": "Import",
     "success": "Trip imported.",
     "error": "Import failed."
+  },
+  "routeEditor": {
+    "active": "Active",
+    "createRouteTitle": "Create route",
+    "createRouteDescription": "Name the route and create it from the current route setup.",
+    "confirmCreateRoute": "Create route",
+    "newRoutePlaceholder": "New route name",
+    "addRoute": "Add route",
+    "duplicate": "Duplicate",
+    "setActive": "Set active",
+    "delete": "Delete",
+    "routeNamePlaceholder": "Route name",
+    "saveRouteName": "Save route name",
+    "newStopPlaceholder": "Add route stop",
+    "addStop": "Add stop",
+    "sortStops": "Sort stops A-Z",
+    "locationPlaceholder": "Location",
+    "saveLocation": "Save",
+    "intel": "Intel",
+    "intelMissingLocation": "Add a recognized location to load events.",
+    "loading": "Loading…",
+    "intelEmpty": "No upcoming festivals/holidays found.",
+    "actionFailed": "Route action failed.",
+    "locationResolveFailed": "Could not resolve location."
+  },
+  "compareTab": {
+    "empty": "Create a route to start comparing.",
+    "activeRoute": "Active route",
+    "activate": "Activate",
+    "score": "Score: {value}",
+    "stops": "Stops: {count}",
+    "travelSegments": "Travel segments: {count}",
+    "totalCost": "Total cost: {value}",
+    "events": "Events: {count}"
   }
 }

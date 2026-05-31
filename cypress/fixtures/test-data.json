@@ -77,6 +77,12 @@
     "defaultCurrency": "USD",
     "language": "en",
     "timezone": "Europe/London",
-    "dateFormat": "dd/MM/yyyy"
+    "dateFormat": "dd/MM/yyyy",
+    "compareWeights": {
+      "cost": 0.35,
+      "duration": 0.25,
+      "travel": 0.2,
+      "events": 0.2
+    }
   }
 }
