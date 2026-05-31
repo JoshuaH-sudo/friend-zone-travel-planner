@@ -9,6 +9,9 @@ import {
   accommodationSchema,
   transportSchema,
   expenseSchema,
+  routeSchema,
+  routeStopSchema,
+  routePreferenceSchema,
   userSettingsSchema,
   TripCollection,
   StopCollection,
@@ -16,10 +19,14 @@ import {
   AccommodationCollection,
   TransportCollection,
   ExpenseCollection,
+  RouteCollection,
+  RouteStopCollection,
+  RoutePreferenceCollection,
   UserSettingsCollection,
 } from "./rxdb-schema";
 import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode";
 import CryptoJS from "crypto-js";
+import { DEFAULT_ROUTE_COMPARE_WEIGHTS } from "@/lib/routes/constants";
 
 // Custom hash function that works in non-secure contexts
 function customHashFunction(input: string) {
@@ -33,6 +40,9 @@ export type DatabaseCollections = {
   accommodations: AccommodationCollection;
   transports: TransportCollection;
   expenses: ExpenseCollection;
+  routes: RouteCollection;
+  route_stops: RouteStopCollection;
+  route_preferences: RoutePreferenceCollection;
   settings: UserSettingsCollection;
 };
 
@@ -110,6 +120,11 @@ async function createDatabase(): Promise<MyDatabase> {
         2: (oldDoc) => ({ ...oldDoc, startDate: undefined }),
         3: (oldDoc) => ({ ...oldDoc, startLocation: undefined }),
         4: (oldDoc) => ({ ...oldDoc, bannerColor: undefined }),
+        5: (oldDoc) => ({
+          ...oldDoc,
+          status: "planning",
+          activeRouteId: undefined,
+        }),
       },
     },
     stops: {
@@ -120,12 +135,14 @@ async function createDatabase(): Promise<MyDatabase> {
           const { date: _date, ...rest } = oldDoc as OldStopDocument;
           return rest;
         },
+        2: (oldDoc) => ({ ...oldDoc, routeId: undefined }),
       },
     },
     accommodations: {
       schema: accommodationSchema,
       migrationStrategies: {
         1: (oldDoc) => ({ ...oldDoc, timezone: undefined }),
+        2: (oldDoc) => ({ ...oldDoc, routeId: undefined }),
       },
     },
     transports: {
@@ -158,10 +175,23 @@ async function createDatabase(): Promise<MyDatabase> {
             arrivalDateTime: arrivalTime ? `${date}T${arrivalTime}` : undefined,
           };
         },
+        3: (oldDoc) => ({ ...oldDoc, routeId: undefined }),
       },
     },
     expenses: {
       schema: expenseSchema,
+      migrationStrategies: {
+        1: (oldDoc) => ({ ...oldDoc, routeId: undefined }),
+      },
+    },
+    routes: {
+      schema: routeSchema,
+    },
+    route_stops: {
+      schema: routeStopSchema,
+    },
+    route_preferences: {
+      schema: routePreferenceSchema,
     },
     settings: {
       schema: userSettingsSchema,
@@ -172,6 +202,10 @@ async function createDatabase(): Promise<MyDatabase> {
           ...oldDoc,
           analyticsConsent: false,
           cookiesConsent: false,
+        }),
+        4: (oldDoc) => ({
+          ...oldDoc,
+          compareWeights: DEFAULT_ROUTE_COMPARE_WEIGHTS,
         }),
       },
     },
@@ -233,6 +267,9 @@ export async function deleteDatabaseData(): Promise<void> {
     `${RXDB_DEXIE_DB_PREFIX}${accommodationSchema.version}--accommodations`,
     `${RXDB_DEXIE_DB_PREFIX}${transportSchema.version}--transports`,
     `${RXDB_DEXIE_DB_PREFIX}${expenseSchema.version}--expenses`,
+    `${RXDB_DEXIE_DB_PREFIX}${routeSchema.version}--routes`,
+    `${RXDB_DEXIE_DB_PREFIX}${routeStopSchema.version}--route_stops`,
+    `${RXDB_DEXIE_DB_PREFIX}${routePreferenceSchema.version}--route_preferences`,
     `${RXDB_DEXIE_DB_PREFIX}${userSettingsSchema.version}--settings`,
   ]);
 

@@ -35,12 +35,31 @@ Cypress.Commands.add("getTestData", () => {
 
 Cypress.Commands.add("clearAppStorage", () => {
   return cy.window().then((win) => {
-    // Clear IndexedDB (used by RxDB/Dexie)
-    return new Promise<void>((resolve) => {
-      const req = win.indexedDB.deleteDatabase("fzt-db");
-      req.onsuccess = () => resolve();
-      req.onerror = () => resolve(); // resolve even on error so tests continue
-      req.onblocked = () => resolve();
+    const deleteDb = (name: string) =>
+      new Promise<void>((resolve) => {
+        const req = win.indexedDB.deleteDatabase(name);
+        req.onsuccess = () => resolve();
+        req.onerror = () => resolve();
+        req.onblocked = () => resolve();
+      });
+
+    const databasesPromise = win.indexedDB.databases
+      ? win.indexedDB.databases()
+      : Promise.resolve([]);
+
+    return databasesPromise.then((dbs) => {
+      const names = new Set<string>(["fzt-db"]);
+      dbs.forEach((db) => {
+        if (
+          typeof db.name === "string" &&
+          db.name.startsWith("rxdb-dexie-fzt-db--")
+        ) {
+          names.add(db.name);
+        }
+      });
+      return Promise.all([...names].map((name) => deleteDb(name))).then(
+        () => undefined,
+      );
     });
   });
 });

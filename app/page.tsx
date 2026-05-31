@@ -40,9 +40,7 @@ import { useTranslations } from "next-intl";
 import posthog from "posthog-js";
 import { TutorialDialog } from "@/components/TutorialDialog";
 import { BannerColorPicker } from "@/components/BannerColorPicker";
-import {
-  generateRandomBannerColor,
-} from "@/lib/banner-color";
+import { generateRandomBannerColor } from "@/lib/banner-color";
 
 type TripStatusFilter = "all" | "upcoming" | "ongoing" | "past";
 
@@ -85,15 +83,14 @@ export default function HomePage() {
         const tripStops = stops.filter((stop) => stop.tripId === trip.id);
         const startDate = trip.startDate;
         const status: Exclude<TripStatusFilter, "all"> =
-          !startDate || startDate > today
-            ? "upcoming"
-            : "ongoing";
+          !startDate || startDate > today ? "upcoming" : "ongoing";
 
         const expenseTotal = expenses
           .filter((expense) => expense.tripId === trip.id)
           .reduce(
             (sum, expense) =>
-              sum + convert(expense.price, expense.currency, defaultCurrency, rates),
+              sum +
+              convert(expense.price, expense.currency, defaultCurrency, rates),
             0,
           );
 
@@ -109,7 +106,8 @@ export default function HomePage() {
           .filter((trans) => stopTripMap.get(trans.stopId) === trip.id)
           .reduce(
             (sum, trans) =>
-              sum + convert(trans.price, trans.currency, defaultCurrency, rates),
+              sum +
+              convert(trans.price, trans.currency, defaultCurrency, rates),
             0,
           );
 
@@ -129,7 +127,17 @@ export default function HomePage() {
         card.trip.name.toLowerCase().includes(search.trim().toLowerCase()),
       )
       .filter((card) => filter === "all" || card.status === filter);
-  }, [accommodations, defaultCurrency, expenses, filter, rates, search, stops, transports, trips]);
+  }, [
+    accommodations,
+    defaultCurrency,
+    expenses,
+    filter,
+    rates,
+    search,
+    stops,
+    transports,
+    trips,
+  ]);
 
   const createTrip = async () => {
     const now = Date.now();
@@ -139,6 +147,7 @@ export default function HomePage() {
       createdTrip = await db.trips.insert({
         id: nextTripId,
         name: tripName.trim() || t("newTripName"),
+        status: "planning",
         startDate: tripStartDate || undefined,
         startLocation: tripStartLocation.trim() || undefined,
         bannerColor: tripBannerColor,
@@ -208,36 +217,44 @@ export default function HomePage() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-3">
-              <div className="space-y-2 flex flex-row items-center gap-4">
+              <div className="flex flex-row items-center gap-4 space-y-2">
                 <BannerColorPicker
                   value={tripBannerColor}
                   onChange={setTripBannerColor}
                 />
-              <div className="space-y-2">
-                <Label htmlFor="trip-name-input">{t("tripNamePlaceholder")}</Label>
-                <Input
-                  id="trip-name-input"
-                  data-cy="trip-name-input"
-                  value={tripName}
-                  onChange={(event) => setTripName(event.target.value)}
-                  placeholder={t("tripNameExample")}
-                  className="w-full"
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="trip-name-input">
+                    {t("tripNamePlaceholder")}
+                  </Label>
+                  <Input
+                    id="trip-name-input"
+                    data-cy="trip-name-input"
+                    value={tripName}
+                    onChange={(event) => setTripName(event.target.value)}
+                    placeholder={t("tripNameExample")}
+                    className="w-full"
+                  />
+                </div>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="trip-start-location-input">{t("tripStartLocationPlaceholder")}</Label>
+                  <Label htmlFor="trip-start-location-input">
+                    {t("tripStartLocationPlaceholder")}
+                  </Label>
                   <Input
                     id="trip-start-location-input"
                     data-cy="trip-start-location-input"
                     value={tripStartLocation}
-                    onChange={(event) => setTripStartLocation(event.target.value)}
+                    onChange={(event) =>
+                      setTripStartLocation(event.target.value)
+                    }
                     placeholder={t("tripStartLocationExample")}
                   />
                 </div>
                 <div className="min-w-0 space-y-2">
-                  <Label htmlFor="trip-start-date-input">{t("tripStartDatePlaceholder")}</Label>
+                  <Label htmlFor="trip-start-date-input">
+                    {t("tripStartDatePlaceholder")}
+                  </Label>
                   <Input
                     id="trip-start-date-input"
                     data-cy="trip-start-date-input"
@@ -250,7 +267,9 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="first-stop-input">{t("firstStopPlaceholder")}</Label>
+                <Label htmlFor="first-stop-input">
+                  {t("firstStopPlaceholder")}
+                </Label>
                 <Input
                   id="first-stop-input"
                   data-cy="first-stop-input"
@@ -259,7 +278,9 @@ export default function HomePage() {
                   placeholder={t("firstStopExample")}
                 />
               </div>
-              <Button data-cy="create-trip-submit" onClick={createTrip}>{t("createAndOpen")}</Button>
+              <Button data-cy="create-trip-submit" onClick={createTrip}>
+                {t("createAndOpen")}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -302,11 +323,19 @@ export default function HomePage() {
         <Card className="shadow-soft" data-cy="empty-state">
           <CardContent className="text-muted-foreground flex flex-col items-center gap-3 py-12 text-center">
             <p>{t("empty.noTrips")}</p>
-            <Button data-cy="empty-plan-trip-button" onClick={() => setIsCreating(true)}>{t("planTrip")}</Button>
+            <Button
+              data-cy="empty-plan-trip-button"
+              onClick={() => setIsCreating(true)}
+            >
+              {t("planTrip")}
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" data-cy="trips-grid">
+        <section
+          className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+          data-cy="trips-grid"
+        >
           {cards.map((card) => (
             <Card
               key={card.trip.id}
@@ -317,7 +346,9 @@ export default function HomePage() {
             >
               <CardHeader
                 className="relative h-32 p-0"
-                style={{ background: card.trip.bannerColor ?? "var(--gradient-hero)" }}
+                style={{
+                  background: card.trip.bannerColor ?? "var(--gradient-hero)",
+                }}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--accent)/0.4),transparent_60%)]" />
                 <span className="bg-background/90 text-foreground absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase">

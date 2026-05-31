@@ -115,6 +115,16 @@
       "cookiesConsent": {
         "label": "Cookies akzeptieren",
         "description": "Erlaube das Speichern von Cookies auf deinem Gerät für eine bessere Nutzungserfahrung."
+      },
+      "compareWeights": {
+        "label": "Vergleichsgewichtung",
+        "description": "Passe die Standard-Prioritäten für den Routenvergleich an.",
+        "fields": {
+          "cost": "Kosten",
+          "duration": "Dauer",
+          "travel": "Reiseaufwand",
+          "events": "Events"
+        }
       }
     },
     "backup": {
@@ -165,7 +175,11 @@
     "deleteTripTitle": "Diese Reise löschen?",
     "deleteTripDescription": "Dadurch werden die Reise und alle verknüpften Stopps/Einträge entfernt.",
     "deleteTripCancel": "Abbrechen",
-    "deleteTripConfirm": "Reise löschen"
+    "deleteTripConfirm": "Reise löschen",
+    "tabCompare": "Vergleich",
+    "activeRoute": "Aktiv",
+    "routeSyncFailed": "Einige Routendaten konnten nicht synchronisiert werden.",
+    "routeBootstrapFailed": "Routen konnten für diese Reise nicht initialisiert werden."
   },
   "tripNameEditor": {
     "saveAriaLabel": "Reisename speichern",
@@ -447,5 +461,34 @@
     "import": "Importieren",
     "success": "Reise importiert.",
     "error": "Import fehlgeschlagen."
+  },
+  "routeEditor": {
+    "active": "Aktiv",
+    "newRoutePlaceholder": "Neuer Routenname",
+    "addRoute": "Route hinzufügen",
+    "duplicate": "Duplizieren",
+    "setActive": "Aktiv setzen",
+    "delete": "Löschen",
+    "newStopPlaceholder": "Routenstopp hinzufügen",
+    "addStop": "Stopp hinzufügen",
+    "sortStops": "Stopps A-Z sortieren",
+    "locationPlaceholder": "Ort",
+    "saveLocation": "Speichern",
+    "intel": "Events",
+    "intelMissingLocation": "Füge einen erkannten Ort hinzu, um Events zu laden.",
+    "loading": "Lädt…",
+    "intelEmpty": "Keine bevorstehenden Festivals/Feiertage gefunden.",
+    "actionFailed": "Routenaktion fehlgeschlagen.",
+    "locationResolveFailed": "Ort konnte nicht aufgelöst werden."
+  },
+  "compareTab": {
+    "empty": "Erstelle eine Route, um zu vergleichen.",
+    "activeRoute": "Aktive Route",
+    "activate": "Aktivieren",
+    "score": "Punktzahl: {value}",
+    "stops": "Stopps: {count}",
+    "travelSegments": "Reiseabschnitte: {count}",
+    "totalCost": "Gesamtkosten: {value}",
+    "events": "Events: {count}"
   }
 }

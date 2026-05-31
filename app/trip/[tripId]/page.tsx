@@ -20,15 +20,12 @@ import { OverviewTab } from "./components/tabs/OverviewTab";
 import { ItineraryTab } from "./components/tabs/ItineraryTab";
 import { MapTab } from "./components/tabs/MapTab";
 import { BudgetTab } from "./components/tabs/BudgetTab";
+import { CompareTab } from "./components/tabs/CompareTab";
 import { TripStats } from "./components/trip-header/TripStats";
 import { copyShareLink, exportTripJson } from "@/lib/share";
 import { exportTripToIcal } from "@/lib/ical-export";
 import { useSettings } from "@/lib/SettingsProvider";
-import {
-  convert,
-  daysBetween,
-  formatMoney,
-} from "@/lib/format";
+import { convert, daysBetween, formatMoney } from "@/lib/format";
 import { useExchangeRates } from "@/lib/useExchangeRates";
 import {
   TooltipProvider,
@@ -63,8 +60,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import posthog from "posthog-js";
 import { shiftDateTimeByDays } from "./components/utils/tripDateUtils";
 import { BannerColorPicker } from "@/components/BannerColorPicker";
+import { RouteEditor } from "./components/routes/RouteEditor";
+import {
+  activateRoute,
+  ensureTripBootstrapped,
+  syncRouteToStops,
+} from "@/lib/routes/service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-type TabId = "overview" | "itinerary" | "map" | "budget";
+type TabId = "overview" | "compare" | "itinerary" | "map" | "budget";
 
 export default function TripPage() {
   const params = useParams();
@@ -72,19 +82,65 @@ export default function TripPage() {
   const db = useDatabase();
   const tStats = useTranslations("tripStats");
   const t = useTranslations("tripPage");
-  const { timezone, defaultCurrency } = useSettings();
+  const { timezone, defaultCurrency, compareWeights } = useSettings();
   const { rates } = useExchangeRates();
   const tripId = params.tripId as string;
   const [tab, setTab] = useState<TabId>("overview");
+  const [tabRouteSelections, setTabRouteSelections] = useState<
+    Partial<Record<TabId, string>>
+  >({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const selectedRouteIdForTab = tabRouteSelections[tab] ?? null;
   const {
-    trip,
     stops,
     accommodationsByStop,
     transportsByStop,
     expenses,
     loading,
+    routeStops,
+  } = useTripData(tripId, {
+    database: db,
+    selectedRouteId: selectedRouteIdForTab,
+  });
+  const {
+    trip,
+    stops: allStops,
+    accommodationsByStop: allAccommodationsByStop,
+    transportsByStop: allTransportsByStop,
+    expenses: allExpenses,
+    routes,
+    routeStops: allRouteStops,
   } = useTripData(tripId, { database: db });
+
+  useEffect(() => {
+    if (!trip) return;
+    ensureTripBootstrapped(db, trip.id).catch((error) => {
+      console.error("Route bootstrap failed", error);
+      toast.error(t("routeBootstrapFailed"));
+    });
+  }, [db, t, trip]);
+
+  useEffect(() => {
+    if (!trip?.activeRouteId) return;
+    setTabRouteSelections((current) => ({
+      overview: current.overview ?? trip.activeRouteId!,
+      compare: current.compare ?? trip.activeRouteId!,
+      itinerary: current.itinerary ?? trip.activeRouteId!,
+      map: current.map ?? trip.activeRouteId!,
+      budget: current.budget ?? trip.activeRouteId!,
+    }));
+  }, [trip?.activeRouteId]);
+
+  useEffect(() => {
+    if (!routes.length) return;
+    Promise.allSettled(
+      routes.map((route) => syncRouteToStops(db, tripId, route.id)),
+    ).then((results) => {
+      if (results.some((result) => result.status === "rejected")) {
+        toast.error(t("routeSyncFailed"));
+      }
+    });
+  }, [db, routes, t, tripId]);
 
   useEffect(() => {
     if (!loading && trip) {
@@ -97,15 +153,32 @@ export default function TripPage() {
   }, [loading]);
 
   const expensesByStop = useMemo(() => {
+    const visibleStopIds = new Set(stops.map((stop) => stop.id));
+    const visibleExpenses = expenses.filter(
+      (expense) =>
+        visibleStopIds.has(expense.stopId) ||
+        (selectedRouteIdForTab && expense.routeId === selectedRouteIdForTab),
+    );
     const result: Record<string, typeof expenses> = {};
-    for (const expense of expenses) {
+    for (const expense of visibleExpenses) {
       if (!result[expense.stopId]) {
         result[expense.stopId] = [];
       }
       result[expense.stopId].push(expense);
     }
     return result;
-  }, [expenses]);
+  }, [expenses, selectedRouteIdForTab, stops]);
+
+  const allExpensesByStop = useMemo(() => {
+    const result: Record<string, typeof allExpenses> = {};
+    for (const expense of allExpenses) {
+      if (!result[expense.stopId]) {
+        result[expense.stopId] = [];
+      }
+      result[expense.stopId].push(expense);
+    }
+    return result;
+  }, [allExpenses]);
 
   const totals = useMemo(() => {
     const accommodationCost = Object.values(accommodationsByStop)
@@ -122,18 +195,25 @@ export default function TripPage() {
           sum + convert(item.price, item.currency, defaultCurrency, rates),
         0,
       );
-    const expenseCost = expenses.reduce(
-      (sum, item) =>
-        sum + convert(item.price, item.currency, defaultCurrency, rates),
-      0,
-    );
+    const visibleStopIds = new Set(stops.map((stop) => stop.id));
+    const filteredExpenseCost = expenses
+      .filter(
+        (expense) =>
+          visibleStopIds.has(expense.stopId) ||
+          (selectedRouteIdForTab && expense.routeId === selectedRouteIdForTab),
+      )
+      .reduce(
+        (sum, item) =>
+          sum + convert(item.price, item.currency, defaultCurrency, rates),
+        0,
+      );
     const totalStays = Object.values(accommodationsByStop).flat().length;
     const totalJourneys = Object.values(transportsByStop).flat().length;
     return {
       accommodationCost,
       transportCost,
-      expenseCost,
-      grandCost: accommodationCost + transportCost + expenseCost,
+      expenseCost: filteredExpenseCost,
+      grandCost: accommodationCost + transportCost + filteredExpenseCost,
       totalStays,
       totalJourneys,
     };
@@ -141,6 +221,8 @@ export default function TripPage() {
     accommodationsByStop,
     defaultCurrency,
     expenses,
+    stops,
+    selectedRouteIdForTab,
     transportsByStop,
     rates,
   ]);
@@ -253,12 +335,25 @@ export default function TripPage() {
   };
 
   const addStop = async (name: string) => {
+    const routeId = selectedRouteIdForTab ?? trip?.activeRouteId;
+    if (!routeId) return;
+    const now = Date.now();
     await db.stops.insert({
       id: generateId(),
       name,
       tripId,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      routeId,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await db.route_stops.insert({
+      id: generateId(),
+      tripId,
+      routeId,
+      name,
+      order: routeStops.length,
+      createdAt: now,
+      updatedAt: now,
     });
     posthog.capture("stop_added", { trip_id: tripId });
   };
@@ -277,6 +372,7 @@ export default function TripPage() {
     await db.accommodations.insert({
       id: generateId(),
       stopId,
+      routeId: selectedRouteIdForTab ?? trip?.activeRouteId,
       name: payload.name,
       checkIn: payload.checkIn,
       checkOut: payload.checkOut,
@@ -306,6 +402,7 @@ export default function TripPage() {
     await db.transports.insert({
       id: generateId(),
       stopId,
+      routeId: selectedRouteIdForTab ?? trip?.activeRouteId,
       name: payload.name,
       type: "flight",
       departureDateTime: payload.departureDateTime,
@@ -376,13 +473,16 @@ export default function TripPage() {
                   onSaveStartLocation={commitStartLocationChange}
                 />
                 <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {t("stopsCount", { count: stops.length })}
+                  <MapPin className="h-4 w-4" />{" "}
+                  {t("stopsCount", { count: stops.length })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Bed className="h-4 w-4" /> {t("staysCount", { count: totals.totalStays })}
+                  <Bed className="h-4 w-4" />{" "}
+                  {t("staysCount", { count: totals.totalStays })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Plane className="h-4 w-4" /> {t("journeysCount", { count: totals.totalJourneys })}
+                  <Plane className="h-4 w-4" />{" "}
+                  {t("journeysCount", { count: totals.totalJourneys })}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Wallet className="h-4 w-4" />~
@@ -413,7 +513,10 @@ export default function TripPage() {
               <BannerColorPicker
                 value={trip.bannerColor ?? "#2d6a4f"}
                 onChange={async (color) => {
-                  await trip.patch({ bannerColor: color, updatedAt: Date.now() });
+                  await trip.patch({
+                    bannerColor: color,
+                    updatedAt: Date.now(),
+                  });
                 }}
                 triggerClassName="bg-background/15 hover:bg-background/25 border-white/30"
               />
@@ -475,22 +578,87 @@ export default function TripPage() {
 
       <div className="container py-8">
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="mb-6 grid w-full grid-cols-4 sm:inline-grid sm:w-auto">
+          <TabsList className="mb-6 grid w-full grid-cols-5 sm:inline-grid sm:w-auto">
             <TabsTrigger value="overview">{t("tabOverview")}</TabsTrigger>
+            <TabsTrigger value="compare">{t("tabCompare")}</TabsTrigger>
             <TabsTrigger value="itinerary">{t("tabItinerary")}</TabsTrigger>
             <TabsTrigger value="map">{t("tabMap")}</TabsTrigger>
             <TabsTrigger value="budget">{t("tabBudget")}</TabsTrigger>
           </TabsList>
 
+          {routes.length > 0 ? (
+            <div className="mb-4 max-w-xs">
+              <Select
+                value={
+                  selectedRouteIdForTab ?? trip.activeRouteId ?? routes[0].id
+                }
+                onValueChange={(routeId) =>
+                  setTabRouteSelections((current) => ({
+                    ...current,
+                    [tab]: routeId,
+                  }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {routes.map((route) => (
+                    <SelectItem key={route.id} value={route.id}>
+                      {route.name}
+                      {trip.activeRouteId === route.id
+                        ? ` (${t("activeRoute")})`
+                        : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+
           <TabsContent value="overview">
-            <OverviewTab
-              stops={stops}
-              accommodationsByStop={accommodationsByStop}
-              transportsByStop={transportsByStop}
-              expensesByStop={expensesByStop}
-              onAddStop={addStop}
-              onAddAccommodation={onAddAccommodation}
-              onAddTransport={onAddTransport}
+            <div className="space-y-4">
+              <RouteEditor
+                db={db}
+                tripId={tripId}
+                routes={routes}
+                routeStops={routeStops}
+                activeRouteId={trip.activeRouteId ?? routes[0]?.id ?? ""}
+                selectedRouteId={
+                  selectedRouteIdForTab ??
+                  trip.activeRouteId ??
+                  routes[0]?.id ??
+                  ""
+                }
+                onSelectRoute={(routeId) =>
+                  setTabRouteSelections((current) => ({
+                    ...current,
+                    [tab]: routeId,
+                  }))
+                }
+              />
+              <OverviewTab
+                stops={stops}
+                accommodationsByStop={accommodationsByStop}
+                transportsByStop={transportsByStop}
+                expensesByStop={expensesByStop}
+                onAddStop={addStop}
+                onAddAccommodation={onAddAccommodation}
+                onAddTransport={onAddTransport}
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="compare">
+            <CompareTab
+              routes={routes}
+              routeStops={allRouteStops}
+              stops={allStops}
+              accommodationsByStop={allAccommodationsByStop}
+              transportsByStop={allTransportsByStop}
+              expensesByStop={allExpensesByStop}
+              weights={compareWeights}
+              activeRouteId={trip.activeRouteId ?? routes[0]?.id ?? ""}
+              onActivateRoute={(routeId) => activateRoute(db, tripId, routeId)}
             />
           </TabsContent>
           <TabsContent value="itinerary">
@@ -498,7 +666,9 @@ export default function TripPage() {
               stops={stops}
               accommodationsByStop={accommodationsByStop}
               transportsByStop={transportsByStop}
-              expenses={expenses}
+              expenses={expenses.filter((expense) =>
+                stops.some((stop) => stop.id === expense.stopId),
+              )}
             />
           </TabsContent>
           <TabsContent value="map">
@@ -513,7 +683,11 @@ export default function TripPage() {
                   stops,
                   accommodationsByStop,
                   transportsByStop,
-                  expenses,
+                  expenses: expenses.filter((expense) =>
+                    stops.some((stop) => stop.id === expense.stopId),
+                  ),
+                  routes,
+                  routeStops,
                   loading,
                 }}
               />
@@ -522,7 +696,9 @@ export default function TripPage() {
                 stops={stops}
                 accommodationsByStop={accommodationsByStop}
                 transportsByStop={transportsByStop}
-                expenses={expenses}
+                expenses={expenses.filter((expense) =>
+                  stops.some((stop) => stop.id === expense.stopId),
+                )}
               />
             </div>
           </TabsContent>

@@ -9,7 +9,15 @@ import {
 } from "react";
 import posthog from "posthog-js";
 import { useDatabase } from "@/lib/DatabaseProvider";
-import { USER_SETTINGS_ID, DateFormat } from "@/lib/rxdb-schema";
+import {
+  USER_SETTINGS_ID,
+  DateFormat,
+  RouteCompareWeights,
+} from "@/lib/rxdb-schema";
+import {
+  DEFAULT_ROUTE_COMPARE_WEIGHTS,
+  normalizeRouteCompareWeights,
+} from "@/lib/routes/constants";
 import {
   detectBrowserTimezone,
   detectBrowserDateFormat,
@@ -22,6 +30,7 @@ interface Settings {
   dateFormat: DateFormat;
   analyticsConsent: boolean;
   cookiesConsent: boolean;
+  compareWeights: RouteCompareWeights;
 }
 
 interface SettingsContextValue extends Settings {
@@ -31,6 +40,7 @@ interface SettingsContextValue extends Settings {
   setDateFormat: (dateFormat: DateFormat) => void;
   setAnalyticsConsent: (value: boolean) => void;
   setCookiesConsent: (value: boolean) => void;
+  setCompareWeights: (value: RouteCompareWeights) => void;
 }
 
 function getDefaultSettings(): Settings {
@@ -42,6 +52,7 @@ function getDefaultSettings(): Settings {
       typeof window !== "undefined" ? detectBrowserDateFormat() : "MM/dd/yyyy",
     analyticsConsent: false,
     cookiesConsent: false,
+    compareWeights: DEFAULT_ROUTE_COMPARE_WEIGHTS,
   };
 }
 
@@ -55,6 +66,7 @@ const ssrFallbackSettings: Settings = {
   dateFormat: "MM/dd/yyyy",
   analyticsConsent: false,
   cookiesConsent: false,
+  compareWeights: DEFAULT_ROUTE_COMPARE_WEIGHTS,
 };
 
 export const SettingsContext = createContext<SettingsContextValue>({
@@ -65,6 +77,7 @@ export const SettingsContext = createContext<SettingsContextValue>({
   setDateFormat: () => {},
   setAnalyticsConsent: () => {},
   setCookiesConsent: () => {},
+  setCompareWeights: () => {},
 });
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
@@ -85,6 +98,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             dateFormat: doc.dateFormat ?? defaults.dateFormat,
             analyticsConsent: doc.analyticsConsent ?? false,
             cookiesConsent: doc.cookiesConsent ?? false,
+            compareWeights: doc.compareWeights ?? DEFAULT_ROUTE_COMPARE_WEIGHTS,
           });
         }
       });
@@ -112,12 +126,18 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           dateFormat: currentDoc.dateFormat ?? defaults.dateFormat,
           analyticsConsent: currentDoc.analyticsConsent ?? false,
           cookiesConsent: currentDoc.cookiesConsent ?? false,
+          compareWeights:
+            currentDoc.compareWeights ?? DEFAULT_ROUTE_COMPARE_WEIGHTS,
         }
       : defaults;
+    const normalizedCompareWeights = partial.compareWeights
+      ? normalizeRouteCompareWeights(partial.compareWeights)
+      : current.compareWeights;
     await db.settings.upsert({
       id: USER_SETTINGS_ID,
       ...current,
       ...partial,
+      compareWeights: normalizedCompareWeights,
     });
   };
 
@@ -137,6 +157,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setDateFormat: (dateFormat) => updateSettings({ dateFormat }),
     setAnalyticsConsent: (value) => updateSettings({ analyticsConsent: value }),
     setCookiesConsent: (value) => updateSettings({ cookiesConsent: value }),
+    setCompareWeights: (value) =>
+      updateSettings({
+        compareWeights: normalizeRouteCompareWeights(value),
+      }),
   };
 
   return (

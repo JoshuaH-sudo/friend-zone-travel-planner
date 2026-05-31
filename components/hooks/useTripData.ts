@@ -3,6 +3,8 @@ import { getDatabase, MyDatabase } from "@/lib/rxdb-database";
 import {
   AccommodationDocumentType,
   ExpenseDocumentType,
+  RouteDocumentType,
+  RouteStopDocumentType,
   StopDocumentType,
   TransportDocumentType,
   TripDocumentType,
@@ -14,12 +16,15 @@ export type UseTripDataResult = {
   accommodationsByStop: Record<string, AccommodationDocumentType[]>;
   transportsByStop: Record<string, TransportDocumentType[]>;
   expenses: ExpenseDocumentType[];
+  routes: RouteDocumentType[];
+  routeStops: RouteStopDocumentType[];
   loading: boolean;
 };
 
 type UseTripDataOptions = {
   database?: MyDatabase | null;
   enabled?: boolean;
+  selectedRouteId?: string | null;
 };
 
 const emptyTripData: UseTripDataResult = {
@@ -28,6 +33,8 @@ const emptyTripData: UseTripDataResult = {
   accommodationsByStop: {},
   transportsByStop: {},
   expenses: [],
+  routes: [],
+  routeStops: [],
   loading: false,
 };
 
@@ -35,7 +42,11 @@ export function useTripData(
   tripId: string,
   options?: UseTripDataOptions,
 ): UseTripDataResult {
-  const { database: initialDatabase = null, enabled = true } = options ?? {};
+  const {
+    database: initialDatabase = null,
+    enabled = true,
+    selectedRouteId = null,
+  } = options ?? {};
   const [loadedDatabase, setLoadedDatabase] = useState<MyDatabase | null>(null);
   const [trip, setTrip] = useState<TripDocumentType | null>(null);
   const [stops, setStops] = useState<StopDocumentType[]>([]);
@@ -46,6 +57,8 @@ export function useTripData(
     Record<string, TransportDocumentType[]>
   >({});
   const [expenses, setExpenses] = useState<ExpenseDocumentType[]>([]);
+  const [routes, setRoutes] = useState<RouteDocumentType[]>([]);
+  const [routeStops, setRouteStops] = useState<RouteStopDocumentType[]>([]);
   const [resolvedTripId, setResolvedTripId] = useState<string | null>(null);
   const database = initialDatabase ?? loadedDatabase;
 
@@ -79,10 +92,12 @@ export function useTripData(
       return;
     }
 
-    const subscription = database.trips.findOne(tripId).$.subscribe((tripRecord) => {
-      setTrip(tripRecord);
-      setResolvedTripId(tripId);
-    });
+    const subscription = database.trips
+      .findOne(tripId)
+      .$.subscribe((tripRecord) => {
+        setTrip(tripRecord);
+        setResolvedTripId(tripId);
+      });
 
     return () => subscription.unsubscribe();
   }, [database, enabled, tripId]);
@@ -92,15 +107,19 @@ export function useTripData(
       return;
     }
 
+    const selector = selectedRouteId
+      ? { tripId, routeId: selectedRouteId }
+      : { tripId };
+
     const subscription = database.stops
-      .find({ selector: { tripId } })
+      .find({ selector })
       .sort({ createdAt: "asc", id: "asc" })
       .$.subscribe((stopsRecords) => {
         setStops(stopsRecords);
       });
 
     return () => subscription.unsubscribe();
-  }, [database, enabled, tripId]);
+  }, [database, enabled, selectedRouteId, tripId]);
 
   useEffect(() => {
     if (!enabled || !database) {
@@ -141,6 +160,40 @@ export function useTripData(
       return;
     }
 
+    const subscription = database.routes
+      .find({ selector: { tripId } })
+      .sort({ createdAt: "asc", id: "asc" })
+      .$.subscribe((routeRecords) => {
+        setRoutes(routeRecords);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database, enabled, tripId]);
+
+  useEffect(() => {
+    if (!enabled || !database) {
+      return;
+    }
+
+    const selector = selectedRouteId
+      ? { tripId, routeId: selectedRouteId }
+      : { tripId };
+
+    const subscription = database.route_stops
+      .find({ selector })
+      .sort({ order: "asc", createdAt: "asc", id: "asc" })
+      .$.subscribe((records) => {
+        setRouteStops(records);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [database, enabled, selectedRouteId, tripId]);
+
+  useEffect(() => {
+    if (!enabled || !database) {
+      return;
+    }
+
     const subscription = database.expenses
       .find({ selector: { tripId } })
       .sort({ date: "asc", createdAt: "asc" })
@@ -167,7 +220,8 @@ export function useTripData(
       .find({ selector: { stopId: { $in: stopIds } } })
       .sort({ departureDateTime: "asc", createdAt: "asc" })
       .$.subscribe((allTransports) => {
-        const nextTransportsByStop: Record<string, TransportDocumentType[]> = {};
+        const nextTransportsByStop: Record<string, TransportDocumentType[]> =
+          {};
 
         allTransports.forEach((transport) => {
           if (!nextTransportsByStop[transport.stopId]) {
@@ -194,6 +248,8 @@ export function useTripData(
     accommodationsByStop,
     transportsByStop,
     expenses,
+    routes,
+    routeStops,
     loading,
   };
 }
