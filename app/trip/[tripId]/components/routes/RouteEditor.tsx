@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RouteDocumentType, RouteStopDocumentType } from "@/lib/rxdb-schema";
@@ -15,6 +15,14 @@ import {
 import { RouteStopRow } from "./RouteStopRow";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type RouteEditorProps = {
   db: MyDatabase;
@@ -36,13 +44,19 @@ export function RouteEditor({
   onSelectRoute,
 }: RouteEditorProps) {
   const t = useTranslations("routeEditor");
+  const [isCreateRouteOpen, setIsCreateRouteOpen] = useState(false);
   const [newRouteName, setNewRouteName] = useState("");
+  const [routeNameDraft, setRouteNameDraft] = useState("");
   const [newStopName, setNewStopName] = useState("");
 
   const selectedRoute = useMemo(
     () => routes.find((route) => route.id === selectedRouteId),
     [routes, selectedRouteId],
   );
+
+  useEffect(() => {
+    setRouteNameDraft(selectedRoute?.name ?? "");
+  }, [selectedRoute?.id, selectedRoute?.name]);
 
   return (
     <section className="space-y-4 rounded-2xl border p-4">
@@ -71,25 +85,42 @@ export function RouteEditor({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Input
-          value={newRouteName}
-          onChange={(event) => setNewRouteName(event.target.value)}
-          placeholder={t("newRoutePlaceholder")}
-          className="max-w-xs"
-        />
-        <Button
-          type="button"
-          onClick={async () => {
-            const route = await createRoute(db, tripId, {
-              name: newRouteName.trim() || `Route ${routes.length + 1}`,
-              sourceRouteId: selectedRouteId,
-            });
-            setNewRouteName("");
-            onSelectRoute(route.id);
-          }}
-        >
-          {t("addRoute")}
-        </Button>
+        <Dialog open={isCreateRouteOpen} onOpenChange={setIsCreateRouteOpen}>
+          <DialogTrigger
+            render={
+              <Button type="button" variant="secondary">
+                {t("addRoute")}
+              </Button>
+            }
+          />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("createRouteTitle")}</DialogTitle>
+              <DialogDescription>{t("createRouteDescription")}</DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col gap-3">
+              <Input
+                value={newRouteName}
+                onChange={(event) => setNewRouteName(event.target.value)}
+                placeholder={t("newRoutePlaceholder")}
+              />
+              <Button
+                type="button"
+                onClick={async () => {
+                  const route = await createRoute(db, tripId, {
+                    name: newRouteName.trim() || `Route ${routes.length + 1}`,
+                    sourceRouteId: selectedRouteId,
+                  });
+                  setNewRouteName("");
+                  onSelectRoute(route.id);
+                  setIsCreateRouteOpen(false);
+                }}
+              >
+                {t("confirmCreateRoute")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         {selectedRoute ? (
           <>
             <Button
@@ -142,8 +173,31 @@ export function RouteEditor({
       </div>
 
       {selectedRoute ? (
-        <>
-          <div className="flex gap-2">
+        <div className="space-y-4 rounded-2xl border p-4">
+          <div className="flex flex-wrap gap-2">
+            <Input
+              value={routeNameDraft}
+              onChange={(event) => setRouteNameDraft(event.target.value)}
+              placeholder={t("routeNamePlaceholder")}
+              className="max-w-xs"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                const nextName = routeNameDraft.trim();
+                if (!nextName || nextName === selectedRoute.name) return;
+                await selectedRoute.patch({
+                  name: nextName,
+                  updatedAt: Date.now(),
+                });
+              }}
+            >
+              {t("saveRouteName")}
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
             <Input
               value={newStopName}
               onChange={(event) => setNewStopName(event.target.value)}
@@ -190,7 +244,7 @@ export function RouteEditor({
               {t("sortStops")}
             </Button>
           ) : null}
-        </>
+        </div>
       ) : null}
     </section>
   );

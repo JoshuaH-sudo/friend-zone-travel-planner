@@ -111,6 +111,13 @@ export default function TripPage() {
     routes,
     routeStops: allRouteStops,
   } = useTripData(tripId, { database: db });
+  const selectedRouteValue =
+    selectedRouteIdForTab ?? trip?.activeRouteId ?? routes[0]?.id ?? "";
+  const selectedRouteLabel = useMemo(() => {
+    const selectedRoute = routes.find((route) => route.id === selectedRouteValue);
+    if (!selectedRoute) return "";
+    return `${selectedRoute.name}${trip?.activeRouteId === selectedRoute.id ? ` (${t("activeRoute")})` : ""}`;
+  }, [routes, selectedRouteValue, t, trip?.activeRouteId]);
 
   useEffect(() => {
     if (!trip) return;
@@ -589,9 +596,7 @@ export default function TripPage() {
           {routes.length > 0 ? (
             <div className="mb-4 max-w-xs">
               <Select
-                value={
-                  selectedRouteIdForTab ?? trip.activeRouteId ?? routes[0].id
-                }
+                value={selectedRouteValue}
                 onValueChange={(routeId) =>
                   setTabRouteSelections((current) => ({
                     ...current,
@@ -600,7 +605,7 @@ export default function TripPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>{selectedRouteLabel}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {routes.map((route) => (
