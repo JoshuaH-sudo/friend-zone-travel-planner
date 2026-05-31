@@ -113,11 +113,6 @@ export default function TripPage() {
   } = useTripData(tripId, { database: db });
   const selectedRouteValue =
     selectedRouteIdForTab ?? trip?.activeRouteId ?? routes[0]?.id ?? "";
-  const selectedRouteLabel = useMemo(() => {
-    const selectedRoute = routes.find((route) => route.id === selectedRouteValue);
-    if (!selectedRoute) return "";
-    return `${selectedRoute.name}${trip?.activeRouteId === selectedRoute.id ? ` (${t("activeRoute")})` : ""}`;
-  }, [routes, selectedRouteValue, t, trip?.activeRouteId]);
 
   useEffect(() => {
     if (!trip) return;
@@ -605,7 +600,15 @@ export default function TripPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue>{selectedRouteLabel}</SelectValue>
+                  <SelectValue>
+                    {(value) => {
+                      const selectedRoute = routes.find(
+                        (route) => route.id === value,
+                      );
+                      if (!selectedRoute) return "";
+                      return `${selectedRoute.name}${trip.activeRouteId === selectedRoute.id ? ` (${t("activeRoute")})` : ""}`;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {routes.map((route) => (
